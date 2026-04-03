@@ -1,13 +1,30 @@
 import { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, Apple } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Apple, Loader2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import type { AxiosError } from 'axios';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await signIn(email, password);
+    } catch (err) {
+      const axiosErr = err as AxiosError<{ message: string }>;
+      setError(
+        axiosErr.response?.data?.message || 'Login failed. Please try again.',
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,6 +65,12 @@ export default function LoginPage() {
             <p className="text-[#8d99ae] text-sm text-center" style={{ marginBottom: '2.5rem' }}>
               Login with Email
             </p>
+
+            {error && (
+              <p style={{ color: '#d90429', fontSize: '0.8125rem', textAlign: 'center', marginBottom: '1rem' }}>
+                {error}
+              </p>
+            )}
 
             <form onSubmit={handleSubmit}>
               {/* Email */}
@@ -98,11 +121,13 @@ export default function LoginPage() {
               {/* Sign In Button */}
               <button
                 type="submit"
-                style={{ width: '100%', padding: '0.875rem', borderRadius: '9999px', backgroundColor: '#ef233c', color: 'white', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.05em', border: 'none', cursor: 'pointer' }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#d90429')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef233c')}
+                disabled={loading}
+                style={{ width: '100%', padding: '0.875rem', borderRadius: '9999px', backgroundColor: '#ef233c', color: 'white', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.05em', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#d90429'; }}
+                onMouseLeave={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#ef233c'; }}
               >
-                LOGIN
+                {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
+                {loading ? 'LOGGING IN...' : 'LOGIN'}
               </button>
             </form>
 
