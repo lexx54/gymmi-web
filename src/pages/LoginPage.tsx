@@ -1,31 +1,23 @@
 import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Apple, Loader2 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useLogin } from '../hooks/useAuthApi';
 import type { AxiosError } from 'axios';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { mutate: login, isPending: loading, error: mutationError } = useLogin();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const error = mutationError
+    ? (mutationError as AxiosError<{ message: string }>).response?.data?.message ||
+      mutationError.message ||
+      'Login failed. Please try again.'
+    : '';
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await signIn(email, password);
-    } catch (err) {
-      const axiosErr = err as AxiosError<{ message: string }>;
-      console.log(axiosErr);
-      setError(
-        axiosErr.response?.data?.message|| axiosErr.message || 'Login failed. Please try again.',
-      );
-    } finally {
-      setLoading(false);
-    }
+    login({ identifier: email, password });
   };
 
   return (
