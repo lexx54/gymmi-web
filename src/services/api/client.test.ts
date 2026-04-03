@@ -48,7 +48,7 @@ describe('API Client - creation', () => {
   it('should create axios instance with correct config', () => {
     expect(axios.create).toHaveBeenCalledWith({
       baseURL: 'http://localhost:3000',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'web' },
     });
   });
 
