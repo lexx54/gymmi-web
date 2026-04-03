@@ -19,8 +19,9 @@ export default function LoginPage() {
       await signIn(email, password);
     } catch (err) {
       const axiosErr = err as AxiosError<{ message: string }>;
+      console.log(axiosErr);
       setError(
-        axiosErr.response?.data?.message || 'Login failed. Please try again.',
+        axiosErr.response?.data?.message|| axiosErr.message || 'Login failed. Please try again.',
       );
     } finally {
       setLoading(false);
