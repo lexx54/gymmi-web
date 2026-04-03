@@ -1,23 +1,61 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Lock, Eye, EyeOff, Apple, Loader2 } from 'lucide-react';
 import { useLogin } from '../hooks/useAuthApi';
 import type { AxiosError } from 'axios';
+
+const LOCKOUT_DURATION = 180_000;
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
   const { mutate: login, isPending: loading, error: mutationError } = useLogin();
 
-  const error = mutationError
-    ? (mutationError as AxiosError<{ message: string }>).response?.data?.message ||
-      mutationError.message ||
-      'Login failed. Please try again.'
-    : '';
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const tick = () => {
+      const diff = Math.ceil((lockedUntil - Date.now()) / 1000);
+      if (diff <= 0) {
+        setLockedUntil(null);
+        setRemainingSeconds(0);
+      } else {
+        setRemainingSeconds(diff);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [lockedUntil]);
+
+  const isLocked = remainingSeconds > 0;
+  const disabled = loading || isLocked;
+
+  const formatCountdown = (s: number) =>
+    `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+  const error = isLocked
+    ? `Too many attempts. Try again in ${formatCountdown(remainingSeconds)}`
+    : mutationError
+      ? (mutationError as AxiosError<{ message: string }>).response?.data?.message ||
+        mutationError.message ||
+        'Login failed. Please try again.'
+      : '';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login({ identifier: email, password });
+    if (disabled) return;
+    login(
+      { identifier: email, password },
+      {
+        onError: (err) => {
+          if ((err as AxiosError).response?.status === 429) {
+            setLockedUntil(Date.now() + LOCKOUT_DURATION);
+          }
+        },
+      },
+    );
   };
 
   return (
@@ -114,13 +152,13 @@ export default function LoginPage() {
               {/* Sign In Button */}
               <button
                 type="submit"
-                disabled={loading}
-                style={{ width: '100%', padding: '0.875rem', borderRadius: '9999px', backgroundColor: '#ef233c', color: 'white', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.05em', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#d90429'; }}
-                onMouseLeave={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#ef233c'; }}
+                disabled={disabled}
+                style={{ width: '100%', padding: '0.875rem', borderRadius: '9999px', backgroundColor: disabled ? '#8d99ae' : '#ef233c', color: 'white', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.05em', border: 'none', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.backgroundColor = '#d90429'; }}
+                onMouseLeave={(e) => { if (!disabled) e.currentTarget.style.backgroundColor = disabled ? '#8d99ae' : '#ef233c'; }}
               >
                 {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
-                {loading ? 'LOGGING IN...' : 'LOGIN'}
+                {isLocked ? `WAIT ${formatCountdown(remainingSeconds)}` : loading ? 'LOGGING IN...' : 'LOGIN'}
               </button>
             </form>
 
