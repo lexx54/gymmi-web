@@ -1,17 +1,32 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail, Lock, Eye, EyeOff, Apple, Loader2 } from 'lucide-react';
-import { useLogin } from '../hooks/useAuthApi';
 import type { AxiosError } from 'axios';
+import { toast } from 'sonner';
+import { useLogin } from '../hooks/useAuthApi';
+import { loginSchema, type LoginFormValues } from '../schemas/auth';
 
 const LOCKOUT_DURATION = 180_000;
 
+const errorTextStyle = { color: '#d90429', fontSize: '0.75rem', marginTop: '0.375rem' } as const;
+
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
-  const { mutate: login, isPending: loading, error: mutationError } = useLogin();
+  const { mutate: login, isPending: loading } = useLogin();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { identifier: '', password: '' },
+  });
 
   useEffect(() => {
     if (!lockedUntil) return;
@@ -35,24 +50,29 @@ export default function LoginPage() {
   const formatCountdown = (s: number) =>
     `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
-  const error = isLocked
+  const lockoutMessage = isLocked
     ? `Too many attempts. Try again in ${formatCountdown(remainingSeconds)}`
-    : mutationError
-      ? (mutationError as AxiosError<{ message: string }>).response?.data?.message ||
-        mutationError.message ||
-        'Login failed. Please try again.'
-      : '';
+    : '';
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (data: LoginFormValues) => {
     if (disabled) return;
     login(
-      { identifier: email, password },
+      { identifier: data.identifier, password: data.password },
       {
+        onSuccess: () => {
+          navigate('/dashboard');
+        },
         onError: (err) => {
-          if ((err as AxiosError).response?.status === 429) {
+          const ax = err as AxiosError<{ message: string }>;
+          if (ax.response?.status === 429) {
             setLockedUntil(Date.now() + LOCKOUT_DURATION);
+            return;
           }
+          toast.error(
+            ax.response?.data?.message ||
+              (err instanceof Error ? err.message : '') ||
+              'Login failed. Please try again.',
+          );
         },
       },
     );
@@ -97,46 +117,52 @@ export default function LoginPage() {
               Login with Email
             </p>
 
-            {error && (
+            {lockoutMessage && (
               <p style={{ color: '#d90429', fontSize: '0.8125rem', textAlign: 'center', marginBottom: '1rem' }}>
-                {error}
+                {lockoutMessage}
               </p>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form noValidate onSubmit={handleSubmit(onSubmit)}>
               {/* Email */}
-              <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
-                <span style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#8d99ae', display: 'flex', alignItems: 'center' }}>
-                  <Mail size={18} />
-                </span>
-                <input
-                  type="email"
-                  placeholder="email@mail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{ width: '100%', paddingLeft: '3.25rem', paddingRight: '1.25rem', paddingTop: '0.875rem', paddingBottom: '0.875rem', borderRadius: '9999px', border: '1px solid #d2d6df', backgroundColor: 'white', color: '#2b2d42', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
-                />
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#8d99ae', display: 'flex', alignItems: 'center' }}>
+                    <Mail size={18} />
+                  </span>
+                  <input
+                    type="email"
+                    placeholder="email@mail.com"
+                    autoComplete="email"
+                    {...register('identifier')}
+                    style={{ width: '100%', paddingLeft: '3.25rem', paddingRight: '1.25rem', paddingTop: '0.875rem', paddingBottom: '0.875rem', borderRadius: '9999px', border: errors.identifier ? '1px solid #d90429' : '1px solid #d2d6df', backgroundColor: 'white', color: '#2b2d42', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                {errors.identifier && <p style={errorTextStyle}>{errors.identifier.message}</p>}
               </div>
 
               {/* Password */}
-              <div style={{ position: 'relative', marginBottom: '0.75rem' }}>
-                <span style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#8d99ae', display: 'flex', alignItems: 'center' }}>
-                  <Lock size={18} />
-                </span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ width: '100%', paddingLeft: '3.25rem', paddingRight: '3.25rem', paddingTop: '0.875rem', paddingBottom: '0.875rem', borderRadius: '9999px', border: '1px solid #d2d6df', backgroundColor: 'white', color: '#2b2d42', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#8d99ae', background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+              <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#8d99ae', display: 'flex', alignItems: 'center' }}>
+                    <Lock size={18} />
+                  </span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••••••"
+                    autoComplete="current-password"
+                    {...register('password')}
+                    style={{ width: '100%', paddingLeft: '3.25rem', paddingRight: '3.25rem', paddingTop: '0.875rem', paddingBottom: '0.875rem', borderRadius: '9999px', border: errors.password ? '1px solid #d90429' : '1px solid #d2d6df', backgroundColor: 'white', color: '#2b2d42', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#8d99ae', background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.password && <p style={errorTextStyle}>{errors.password.message}</p>}
               </div>
 
               {/* Forgot Password */}
@@ -201,12 +227,12 @@ export default function LoginPage() {
             {/* Sign Up */}
             <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#8d99ae', marginTop: '2rem' }}>
               Don't have an account?{' '}
-              <button
-                type="button"
-                style={{ color: '#ef233c', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: '0.875rem' }}
+              <Link
+                to="/signup"
+                style={{ color: '#ef233c', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
               >
                 Register Now
-              </button>
+              </Link>
             </p>
           </div>
         </div>

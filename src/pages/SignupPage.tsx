@@ -1,0 +1,445 @@
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Mail, Lock, Eye, EyeOff, User, Apple, Loader2 } from 'lucide-react';
+import type { AxiosError } from 'axios';
+import { toast } from 'sonner';
+import { useSignup } from '../hooks/useAuthApi';
+import { signupSchema, type SignupFormValues } from '../schemas/auth';
+
+const LOCKOUT_DURATION = 180_000;
+
+const errorTextStyle = { color: '#d90429', fontSize: '0.75rem', marginTop: '0.375rem' } as const;
+
+function getMutationErrorMessage(err: unknown, fallback: string) {
+  const ax = err as AxiosError<{ message: string }>;
+  return ax.response?.data?.message || (err instanceof Error ? err.message : null) || fallback;
+}
+
+export default function SignupPage() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+  const { mutate: signup, isPending: loading } = useSignup();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const tick = () => {
+      const diff = Math.ceil((lockedUntil - Date.now()) / 1000);
+      if (diff <= 0) {
+        setLockedUntil(null);
+        setRemainingSeconds(0);
+      } else {
+        setRemainingSeconds(diff);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [lockedUntil]);
+
+  const isLocked = remainingSeconds > 0;
+  const disabled = loading || isLocked;
+
+  const formatCountdown = (s: number) =>
+    `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+  const onSubmit = (data: SignupFormValues) => {
+    if (disabled) return;
+    signup(
+      { email: data.email, username: data.username, password: data.password },
+      {
+        onSuccess: () => {
+          toast.success('Account created successfully!');
+          navigate('/login');
+        },
+        onError: (err) => {
+          if ((err as AxiosError).response?.status === 429) {
+            setLockedUntil(Date.now() + LOCKOUT_DURATION);
+            toast.error(
+              `Too many attempts. Try again in ${formatCountdown(Math.ceil(LOCKOUT_DURATION / 1000))}`,
+            );
+            return;
+          }
+          toast.error(getMutationErrorMessage(err, 'Sign up failed. Please try again.'));
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex min-h-screen">
+      <div className="hidden lg:flex lg:w-[40%] relative bg-[#2b2d42] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80"
+          alt="Gym"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+          <div>
+            <h1 className="text-4xl font-bold text-white tracking-tight">Gymmi</h1>
+          </div>
+          <div className="mb-16">
+            <p className="text-lg text-[#edf2f4]/80 italic max-w-sm leading-relaxed">
+              "The only bad workout is the one that didn't happen."
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center bg-[#edf2f4] px-12 py-12">
+        <div className="w-full max-w-lg">
+          <div className="lg:hidden text-center mb-8">
+            <h1 className="text-3xl font-bold text-[#2b2d42]">Gymmi</h1>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-xl" style={{ padding: '3rem' }}>
+            <h2 className="text-3xl font-bold text-[#2b2d42] text-center" style={{ marginBottom: '0.25rem' }}>
+              Create account
+            </h2>
+            <p className="text-[#8d99ae] text-sm text-center" style={{ marginBottom: '2.5rem' }}>
+              Sign up with Email
+            </p>
+
+            <form noValidate onSubmit={handleSubmit(onSubmit)}>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '1.25rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#8d99ae',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Mail size={18} />
+                  </span>
+                  <input
+                    type="email"
+                    placeholder="email@mail.com"
+                    autoComplete="email"
+                    {...register('email')}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '3.25rem',
+                      paddingRight: '1.25rem',
+                      paddingTop: '0.875rem',
+                      paddingBottom: '0.875rem',
+                      borderRadius: '9999px',
+                      border: errors.email ? '1px solid #d90429' : '1px solid #d2d6df',
+                      backgroundColor: 'white',
+                      color: '#2b2d42',
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+                {errors.email && <p style={errorTextStyle}>{errors.email.message}</p>}
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '1.25rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#8d99ae',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <User size={18} />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="username"
+                    autoComplete="username"
+                    {...register('username')}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '3.25rem',
+                      paddingRight: '1.25rem',
+                      paddingTop: '0.875rem',
+                      paddingBottom: '0.875rem',
+                      borderRadius: '9999px',
+                      border: errors.username ? '1px solid #d90429' : '1px solid #d2d6df',
+                      backgroundColor: 'white',
+                      color: '#2b2d42',
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+                {errors.username && <p style={errorTextStyle}>{errors.username.message}</p>}
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '1.25rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#8d99ae',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Lock size={18} />
+                  </span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••••••"
+                    autoComplete="new-password"
+                    {...register('password')}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '3.25rem',
+                      paddingRight: '3.25rem',
+                      paddingTop: '0.875rem',
+                      paddingBottom: '0.875rem',
+                      borderRadius: '9999px',
+                      border: errors.password ? '1px solid #d90429' : '1px solid #d2d6df',
+                      backgroundColor: 'white',
+                      color: '#2b2d42',
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '1.25rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#8d99ae',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.password && <p style={errorTextStyle}>{errors.password.message}</p>}
+              </div>
+
+              <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '1.25rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#8d99ae',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Lock size={18} />
+                  </span>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="confirm password"
+                    autoComplete="new-password"
+                    {...register('confirmPassword')}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '3.25rem',
+                      paddingRight: '3.25rem',
+                      paddingTop: '0.875rem',
+                      paddingBottom: '0.875rem',
+                      borderRadius: '9999px',
+                      border: errors.confirmPassword ? '1px solid #d90429' : '1px solid #d2d6df',
+                      backgroundColor: 'white',
+                      color: '#2b2d42',
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '1.25rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#8d99ae',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p style={errorTextStyle}>{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={disabled}
+                style={{
+                  width: '100%',
+                  padding: '0.875rem',
+                  borderRadius: '9999px',
+                  backgroundColor: disabled ? '#8d99ae' : '#ef233c',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  letterSpacing: '0.05em',
+                  border: 'none',
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  opacity: disabled ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  marginTop: '1rem',
+                }}
+                onMouseEnter={(e) => {
+                  if (!disabled) e.currentTarget.style.backgroundColor = '#d90429';
+                }}
+                onMouseLeave={(e) => {
+                  if (!disabled) e.currentTarget.style.backgroundColor = disabled ? '#8d99ae' : '#ef233c';
+                }}
+              >
+                {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
+                {isLocked
+                  ? `WAIT ${formatCountdown(remainingSeconds)}`
+                  : loading
+                    ? 'CREATING ACCOUNT...'
+                    : 'SIGN UP'}
+              </button>
+            </form>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.75rem 0' }}>
+              <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
+              <span style={{ fontSize: '0.75rem', color: '#8d99ae', textTransform: 'uppercase' }}>Or</span>
+              <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem' }}>
+              <button
+                type="button"
+                style={{
+                  width: '2.75rem',
+                  height: '2.75rem',
+                  borderRadius: '9999px',
+                  backgroundColor: 'white',
+                  border: '1px solid #d2d6df',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <svg viewBox="0 0 24 24" style={{ width: '1.25rem', height: '1.25rem' }}>
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                style={{
+                  width: '2.75rem',
+                  height: '2.75rem',
+                  borderRadius: '9999px',
+                  backgroundColor: '#1877F2',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <svg viewBox="0 0 24 24" style={{ width: '1.25rem', height: '1.25rem' }} fill="white">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                style={{
+                  width: '2.75rem',
+                  height: '2.75rem',
+                  borderRadius: '9999px',
+                  backgroundColor: 'black',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <Apple size={20} color="white" />
+              </button>
+            </div>
+
+            <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#8d99ae', marginTop: '2rem' }}>
+              Already have an account?{' '}
+              <Link
+                to="/login"
+                style={{ color: '#ef233c', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
+              >
+                Login
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

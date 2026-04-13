@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
@@ -30,4 +31,8 @@ body {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.editorial-shadow {
+  box-shadow: 0 40px 60px -10px rgba(10, 12, 32, 0.4);
 }

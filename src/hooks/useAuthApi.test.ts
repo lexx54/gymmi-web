@@ -6,18 +6,19 @@ import type { ReactNode } from 'react';
 import { useLogin, useSignup, useForgotPassword, useResetPassword } from './useAuthApi';
 
 const mockSignIn = vi.fn();
-const mockSignUp = vi.fn();
 
 vi.mock('../context/AuthContext', () => ({
-  useAuth: () => ({ signIn: mockSignIn, signUp: mockSignUp }),
+  useAuth: () => ({ signIn: mockSignIn }),
 }));
 
+const mockSignupApi = vi.fn();
 const mockForgotPasswordApi = vi.fn();
 const mockResetPasswordApi = vi.fn();
 
 vi.mock('../services/api/auth', () => ({
-  forgotPasswordApi: (...args: any[]) => mockForgotPasswordApi(...args),
-  resetPasswordApi: (...args: any[]) => mockResetPasswordApi(...args),
+  signupApi: (...args: unknown[]) => mockSignupApi(...args),
+  forgotPasswordApi: (...args: unknown[]) => mockForgotPasswordApi(...args),
+  resetPasswordApi: (...args: unknown[]) => mockResetPasswordApi(...args),
 }));
 
 function createWrapper() {
@@ -30,7 +31,7 @@ function createWrapper() {
 
 beforeEach(() => {
   mockSignIn.mockReset();
-  mockSignUp.mockReset();
+  mockSignupApi.mockReset();
   mockForgotPasswordApi.mockReset();
   mockResetPasswordApi.mockReset();
 });
@@ -64,8 +65,12 @@ describe('useLogin', () => {
 });
 
 describe('useSignup', () => {
-  it('should call signUp and report success', async () => {
-    mockSignUp.mockResolvedValue(undefined);
+  it('should call signupApi and report success', async () => {
+    mockSignupApi.mockResolvedValue({
+      accessToken: 'a',
+      refreshToken: 'b',
+      user: { id: '1', email: 'a@b.com', username: 'user' },
+    });
 
     const { result } = renderHook(() => useSignup(), {
       wrapper: createWrapper(),
@@ -78,11 +83,15 @@ describe('useSignup', () => {
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockSignUp).toHaveBeenCalledWith('a@b.com', 'user', 'pass123');
+    expect(mockSignupApi).toHaveBeenCalledWith({
+      email: 'a@b.com',
+      username: 'user',
+      password: 'pass123',
+    });
   });
 
-  it('should report error when signUp fails', async () => {
-    mockSignUp.mockRejectedValue(new Error('Email taken'));
+  it('should report error when signupApi fails', async () => {
+    mockSignupApi.mockRejectedValue(new Error('Email taken'));
 
     const { result } = renderHook(() => useSignup(), {
       wrapper: createWrapper(),
