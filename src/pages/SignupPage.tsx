@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail, Lock, Eye, EyeOff, User, Apple, Loader2 } from 'lucide-react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
+import styled from 'styled-components';
 import { useSignup } from '../hooks/useAuthApi';
 import { signupSchema, type SignupFormValues } from '../schemas/auth';
 
@@ -85,38 +86,31 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <div className="hidden lg:flex lg:w-[40%] relative bg-[#2b2d42] overflow-hidden">
-        <img
+    <PageContainer>
+      <HeroPanel>
+        <HeroImage
           src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80"
           alt="Gym"
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <HeroContent>
           <div>
-            <h1 className="text-4xl font-bold text-white tracking-tight">Gymmi</h1>
+            <HeroTitle>Gymmi</HeroTitle>
           </div>
-          <div className="mb-16">
-            <p className="text-lg text-[#edf2f4]/80 italic max-w-sm leading-relaxed">
-              "The only bad workout is the one that didn't happen."
-            </p>
-          </div>
-        </div>
-      </div>
+          <HeroFooter>
+            <HeroQuote>"The only bad workout is the one that didn't happen."</HeroQuote>
+          </HeroFooter>
+        </HeroContent>
+      </HeroPanel>
 
-      <div className="flex-1 flex items-center justify-center bg-[#edf2f4] px-12 py-12">
-        <div className="w-full max-w-lg">
-          <div className="lg:hidden text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#2b2d42]">Gymmi</h1>
-          </div>
+      <FormPanel>
+        <FormInner>
+          <MobileBrand>
+            <MobileBrandTitle>Gymmi</MobileBrandTitle>
+          </MobileBrand>
 
-          <div className="bg-white rounded-3xl shadow-xl" style={{ padding: '3rem' }}>
-            <h2 className="text-3xl font-bold text-[#2b2d42] text-center" style={{ marginBottom: '0.25rem' }}>
-              Create account
-            </h2>
-            <p className="text-[#8d99ae] text-sm text-center" style={{ marginBottom: '2.5rem' }}>
-              Sign up with Email
-            </p>
+          <FormCard style={{ padding: '3rem' }}>
+            <FormTitle style={{ marginBottom: '0.25rem' }}>Create account</FormTitle>
+            <FormSubtitle style={{ marginBottom: '2.5rem' }}>Sign up with Email</FormSubtitle>
 
             <form noValidate onSubmit={handleSubmit(onSubmit)}>
               <div style={{ marginBottom: '1.25rem' }}>
@@ -437,9 +431,115 @@ export default function SignupPage() {
                 Login
               </Link>
             </p>
-          </div>
-        </div>
-      </div>
-    </div>
+          </FormCard>
+        </FormInner>
+      </FormPanel>
+    </PageContainer>
   );
 }
+
+const PageContainer = styled.div`
+  display: flex;
+  min-height: 100vh;
+`;
+
+const HeroPanel = styled.div`
+  display: none;
+  position: relative;
+  overflow: hidden;
+  background-color: #2b2d42;
+
+  @media (min-width: 1024px) {
+    display: flex;
+    width: 40%;
+  }
+`;
+
+const HeroImage = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.4;
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem;
+  width: 100%;
+`;
+
+const HeroTitle = styled.h1`
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+`;
+
+const HeroFooter = styled.div`
+  margin-bottom: 4rem;
+`;
+
+const HeroQuote = styled.p`
+  font-size: 1.125rem;
+  line-height: 1.625;
+  color: rgba(237, 242, 244, 0.8);
+  font-style: italic;
+  max-width: 24rem;
+`;
+
+const FormPanel = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #edf2f4;
+  padding: 3rem;
+`;
+
+const FormInner = styled.div`
+  width: 100%;
+  max-width: 32rem;
+`;
+
+const MobileBrand = styled.div`
+  text-align: center;
+  margin-bottom: 2rem;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
+`;
+
+const MobileBrandTitle = styled.h1`
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #2b2d42;
+`;
+
+const FormCard = styled.div`
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+`;
+
+const FormTitle = styled.h2`
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #2b2d42;
+  text-align: center;
+`;
+
+const FormSubtitle = styled.p`
+  color: #8d99ae;
+  font-size: 0.875rem;
+  text-align: center;
+`;

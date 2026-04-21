@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext';
 
 export function PublicRoute() {
@@ -7,13 +8,9 @@ export function PublicRoute() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-anti-flash_white">
-        <Loader2
-          className="size-10 text-[#ef233c]"
-          style={{ animation: 'spin 1s linear infinite' }}
-          aria-label="Loading"
-        />
-      </div>
+      <Centered>
+        <Spinner aria-label="Loading" />
+      </Centered>
     );
   }
 
@@ -23,3 +20,18 @@ export function PublicRoute() {
 
   return <Outlet />;
 }
+
+const Centered = styled.div`
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: #edf2f4;
+`;
+
+const Spinner = styled(Loader2)`
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #ef233c;
+  animation: spin 1s linear infinite;
+`;
