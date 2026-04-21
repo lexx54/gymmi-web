@@ -59,6 +59,7 @@ export default {
         'inverse-surface': '#e0e0fc',
         'on-tertiary-container': '#5c000b',
         'on-tertiary-fixed-variant': '#930018',
+        'kinetic-red': '#ef233c',
       },
       fontFamily: {
         headline: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],

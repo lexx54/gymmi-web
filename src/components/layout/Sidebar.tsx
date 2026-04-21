@@ -31,9 +31,9 @@ export function Sidebar() {
     isActive ? 'size-6 shrink-0 text-background' : 'size-6 shrink-0';
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-full py-10 w-72 bg-surface-container-low border-r border-outline-variant/15 z-50">
+    <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-full py-10 w-72 bg-surface-container-low z-50">
       <div className="px-8">
-        <h1 className="text-3xl font-black text-[#ef233c] mb-12 font-headline italic tracking-tighter">
+        <h1 className="text-3xl font-black text-kinetic-red mb-12 font-headline italic tracking-tighter">
           KINETIC
         </h1>
         <div className="mb-12 flex items-center gap-4">

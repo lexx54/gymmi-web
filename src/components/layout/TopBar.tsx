@@ -9,8 +9,8 @@ type TopBarProps = {
 
 export function TopBar({ title = 'DASHBOARD' }: TopBarProps) {
   return (
-    <header className="fixed top-0 w-full z-40 bg-transparent backdrop-blur-3xl flex justify-between items-center px-6 py-4 lg:pl-80">
-      <div className="lg:hidden text-2xl font-black italic tracking-tighter text-[#ef233c] font-headline">
+    <header className="fixed top-0 w-full z-40 bg-transparent backdrop-blur-3xl flex justify-between items-center pl-6 pr-6 py-4 lg:pl-80">
+      <div className="lg:hidden text-2xl font-black italic tracking-tighter text-kinetic-red font-headline">
         KINETIC
       </div>
       <div className="hidden lg:block text-primary font-headline tracking-tighter font-bold text-xl uppercase">
