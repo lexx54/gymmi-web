@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import { PrivateRoute } from './components/PrivateRoute'
 import { PublicRoute } from './components/PublicRoute'
 import { DashboardLayout } from './components/layout/DashboardLayout'
+import AnalyticsPage from './pages/AnalyticsPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 
@@ -18,6 +19,7 @@ function App() {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

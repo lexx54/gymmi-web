@@ -15,7 +15,7 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Workouts', to: '/dashboard', icon: Dumbbell },
-  { label: 'Analytics', to: '/dashboard', icon: BarChart3 },
+  { label: 'Analytics', to: '/analytics', icon: BarChart3 },
   { label: 'Settings', to: '/dashboard', icon: Settings },
 ];
 
