@@ -1,48 +1,53 @@
 import type { LucideIcon } from 'lucide-react';
 
 /**
- * Describes a single bar in the weekly training volume chart.
+ * Accent tone used by stat tiles to drive icon and value coloring.
+ * Maps to Tailwind tokens defined in `tailwind.config.js`.
+ */
+export type AccentTone = 'primary' | 'secondary' | 'tertiary';
+
+/**
+ * A single column in the weekly volume bar chart.
  */
 export interface ChartBar {
-  /** Short day label shown under the bar (e.g. "MON"). */
+  /** Day label rendered beneath the bar, e.g. "MON". */
   day: string;
-  /** Bar height expressed as a percentage of the chart area (0-100). */
+  /** Resting bar height as a percentage of the chart's vertical space (0-100). */
   heightPct: number;
-  /** Hover-state bar height (0-100). Defaults to `heightPct` when omitted. */
+  /** Optional alternate height used while the bar is hovered (0-100). */
   hoverHeightPct?: number;
-  /** When true, the bar renders with the primary gradient accent. */
+  /** When true, the bar is rendered with the primary gradient highlight. */
   active?: boolean;
 }
 
 /**
- * A recent activity entry shown in the "Recent Activity" grid.
+ * Props for an individual stat tile in the dashboard right column.
  */
-export interface Activity {
-  id: string;
-  /** Relative-time label (e.g. "YESTERDAY", "2 DAYS AGO"). */
-  when: string;
-  title: string;
-  /** Subtitle metadata (e.g. "5.2 km • 28:14"). */
-  meta: string;
-  /** URL of the thumbnail image. */
-  image: string;
-  /** Optional destination; when provided, the card renders as a link. */
-  href?: string;
+export interface StatTileProps {
+  /** Lucide icon component shown in the icon chip. */
+  icon: LucideIcon;
+  /** Uppercase label, e.g. "CALORIES". */
+  label: string;
+  /** Big display value, e.g. "1,842". */
+  value: string;
+  /** Small unit suffix paired with the value, e.g. "KCAL". */
+  unit: string;
+  /** Color scheme for the icon and value. */
+  accent: AccentTone;
 }
 
 /**
- * Accent color tokens available for a stat tile.
- * Maps to Material theme tokens defined in tailwind.config.js.
+ * Recent workout/activity entry rendered in the bottom strip.
  */
-export type StatAccent = 'primary' | 'tertiary' | 'secondary';
-
-/**
- * Props for a single stat tile in the dashboard side column.
- */
-export interface StatTileProps {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  unit: string;
-  accent: StatAccent;
+export interface Activity {
+  /** Stable identifier used as React key. */
+  id: string;
+  /** Relative time label, e.g. "YESTERDAY", "2 DAYS AGO". */
+  when: string;
+  /** Title of the activity, e.g. "Urban Trail Run". */
+  title: string;
+  /** Compact metadata line, e.g. "5.2 km • 28:14". */
+  meta: string;
+  /** Thumbnail image URL. */
+  image: string;
 }

@@ -1,45 +1,35 @@
 import { ChevronRight } from 'lucide-react';
 import type { Activity } from '../../types/dashboard';
 
-export type ActivityCardProps = Omit<Activity, 'id'>;
+type ActivityCardProps = Omit<Activity, 'id'>;
 
 /**
- * A single "Recent Activity" row rendered as a nested double-rounded card to
- * imply depth via tonal layering (DESIGN.md section 4). When `href` is
- * provided the card becomes an anchor; otherwise it renders as a plain div.
+ * Compact card representing a single recent workout/activity.
+ * Left thumbnail + stacked label/title/meta + trailing chevron.
  */
-export default function ActivityCard({ when, title, meta, image, href }: ActivityCardProps) {
-  const inner = (
-    <div className="bg-surface-container-high rounded-[2.2rem] p-6 flex items-center gap-5">
-      <div className="w-16 h-16 rounded-3xl overflow-hidden shrink-0">
-        <img
-          alt=""
-          className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
-          src={image}
-        />
+export function ActivityCard({ when, title, meta, image }: ActivityCardProps) {
+  return (
+    <button
+      type="button"
+      className="group flex items-center gap-4 rounded-2xl bg-surface-container p-4 text-left w-full ring-1 ring-outline-variant/15 hover:bg-surface-container-high transition-colors"
+    >
+      <div className="size-14 shrink-0 rounded-full overflow-hidden bg-surface-container-highest">
+        <img alt="" src={image} className="w-full h-full object-cover" />
       </div>
-      <div className="flex-grow min-w-0">
-        <p className="text-xs font-bold text-primary mb-0.5">{when}</p>
-        <h5 className="font-bold font-headline text-lg text-on-surface">{title}</h5>
-        <p className="text-xs text-on-surface-variant">{meta}</p>
+      <div className="flex-1 min-w-0">
+        <p className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/70">
+          {when}
+        </p>
+        <p className="font-headline font-bold text-on-surface tracking-tight truncate">
+          {title}
+        </p>
+        <p className="font-body text-xs text-on-surface-variant/70 truncate">{meta}</p>
       </div>
       <ChevronRight
-        className="size-6 shrink-0 text-on-surface-variant/30"
+        className="size-5 text-on-surface-variant/60 group-hover:text-primary transition-colors shrink-0"
         strokeWidth={2}
         aria-hidden
       />
-    </div>
+    </button>
   );
-
-  const wrapperClass = 'bg-surface-container-low p-1 rounded-[2.5rem] block';
-
-  if (href) {
-    return (
-      <a className={wrapperClass} href={href}>
-        {inner}
-      </a>
-    );
-  }
-
-  return <div className={wrapperClass}>{inner}</div>;
 }

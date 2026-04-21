@@ -1,45 +1,42 @@
 import type { Activity } from '../../types/dashboard';
-import ActivityCard from './ActivityCard';
+import { ActivityCard } from './ActivityCard';
 
-export interface RecentActivitySectionProps {
+interface RecentActivitySectionProps {
+  /** Recent activities to render. Typically capped at 3. */
   activities: Activity[];
-  viewHistoryHref?: string;
 }
 
 /**
- * "Recent Activity" section: editorial header row plus a responsive grid of
- * activity cards. Uses significant whitespace between the heading and the
- * "View History" link per DESIGN.md section 6 (intentional asymmetry).
+ * Bottom strip of the dashboard. Demonstrates the "intentional asymmetry"
+ * rule from DESIGN.md by anchoring the section title left and pushing
+ * the secondary "VIEW HISTORY" link to the far right with breathing room.
  */
-export default function RecentActivitySection({
-  activities,
-  viewHistoryHref = '#',
-}: RecentActivitySectionProps) {
+export function RecentActivitySection({ activities }: RecentActivitySectionProps) {
   return (
-    <div className="lg:col-span-12 mt-4">
-      <div className="flex justify-between items-end mb-8">
-        <h4 className="text-2xl font-bold font-headline tracking-tight uppercase text-on-surface">
+    <section className="col-span-12 mt-4">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-headline font-extrabold text-xl sm:text-2xl text-on-surface tracking-tight uppercase">
           Recent Activity
-        </h4>
-        <a
-          className="text-primary text-xs font-bold tracking-widest hover:underline uppercase"
-          href={viewHistoryHref}
+        </h3>
+        <button
+          type="button"
+          className="font-label text-[11px] uppercase tracking-[0.2em] text-on-surface-variant/70 hover:text-primary transition-colors"
         >
           View History
-        </a>
+        </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {activities.map((a) => (
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {activities.map((activity) => (
           <ActivityCard
-            key={a.id}
-            when={a.when}
-            title={a.title}
-            meta={a.meta}
-            image={a.image}
-            href={a.href}
+            key={activity.id}
+            when={activity.when}
+            title={activity.title}
+            meta={activity.meta}
+            image={activity.image}
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,27 +1,26 @@
-import type { CSSProperties } from 'react';
 import type { ChartBar } from '../../types/dashboard';
+import { WeeklyBarChart } from './WeeklyBarChart';
 
-export interface WeeklyProgressCardProps {
-  /** Overline label rendered above the title (e.g. "Weekly Progress"). */
+interface WeeklyProgressCardProps {
+  /** Small overline shown above the title, e.g. "Weekly Progress". */
   subtitle: string;
-  /** Main card title (e.g. "VOLUME TRAINING"). */
+  /** Bold uppercase title, e.g. "VOLUME TRAINING". */
   title: string;
-  /** Completion percentage shown as the large italic accent number. */
+  /** Goal completion percentage (0-100). */
   percent: number;
-  /** Exactly 7 bars describing the weekly training volume. */
+  /** Seven-day bar chart data. */
   bars: ChartBar[];
-  /** Optional decorative background image rendered at low opacity. */
+  /** Optional ghost background image overlaid at low opacity. */
   bgImageUrl?: string;
 }
 
-type CSSWithVars = CSSProperties & Record<'--h' | '--hover-h', string>;
-
 /**
- * Large bento card showing the weekly training volume chart with a subtle
- * background image overlay. Applies the "Editorial Kinetic" shadow defined
- * in index.css (`.editorial-shadow`).
+ * Hero card on the dashboard. Combines an editorial title block with
+ * a large goal callout and the weekly bar chart. Background image
+ * sits behind the content at ~10% opacity to provide texture without
+ * hurting legibility.
  */
-export default function WeeklyProgressCard({
+export function WeeklyProgressCard({
   subtitle,
   title,
   percent,
@@ -29,61 +28,37 @@ export default function WeeklyProgressCard({
   bgImageUrl,
 }: WeeklyProgressCardProps) {
   return (
-    <div className="lg:col-span-8 bg-surface-container-low rounded-[2rem] p-8 relative overflow-hidden editorial-shadow group">
-      <div className="relative z-10">
-        <div className="flex justify-between items-start mb-12">
-          <div>
-            <p className="text-primary font-label font-bold tracking-widest text-xs mb-1 uppercase">
-              {subtitle}
-            </p>
-            <h3 className="text-3xl font-bold font-headline text-on-surface">{title}</h3>
-          </div>
-          <div className="text-right">
-            <span className="text-4xl font-black italic font-headline text-primary">
-              {percent}%
-            </span>
-            <p className="text-[10px] font-label text-on-surface-variant font-bold tracking-widest">
-              GOAL REACHED
-            </p>
-          </div>
+    <section className="relative lg:col-span-8 overflow-hidden rounded-3xl bg-surface-container-low p-6 sm:p-8 lg:p-10">
+      {bgImageUrl !== undefined ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-10 bg-center bg-no-repeat bg-cover pointer-events-none"
+          style={{ backgroundImage: `url(${bgImageUrl})` }}
+        />
+      ) : null}
+
+      <div className="relative flex items-start justify-between gap-6 mb-8">
+        <div>
+          <p className="font-label text-[11px] uppercase tracking-[0.25em] text-on-surface-variant/70 mb-2">
+            {subtitle}
+          </p>
+          <h3 className="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-on-surface tracking-tight">
+            {title}
+          </h3>
         </div>
-        <div className="h-64 flex items-end justify-between gap-2">
-          {bars.map((bar, index) => {
-            const style: CSSWithVars = {
-              '--h': `${bar.heightPct}%`,
-              '--hover-h': `${bar.hoverHeightPct ?? bar.heightPct}%`,
-            };
-            const base =
-              'w-full rounded-t-xl transition-all duration-700 h-[var(--h)] group-hover:h-[var(--hover-h)]';
-            const variant = bar.active
-              ? 'bg-gradient-to-t from-primary-container to-primary shadow-[0_0_20px_rgba(255,83,90,0.3)]'
-              : 'bg-surface-container-highest';
-            return (
-              <div
-                key={`${bar.day}-${index}`}
-                className={`${base} ${variant}`}
-                style={style}
-                aria-hidden
-              />
-            );
-          })}
-        </div>
-        <div className="flex justify-between mt-4 text-[10px] font-bold text-on-surface-variant font-label tracking-widest px-1">
-          {bars.map((bar, index) => (
-            <span
-              key={`label-${bar.day}-${index}`}
-              className={bar.active ? 'text-primary' : undefined}
-            >
-              {bar.day}
-            </span>
-          ))}
+        <div className="text-right">
+          <p className="font-headline font-extrabold italic text-primary text-4xl sm:text-5xl lg:text-6xl tracking-tighter leading-none">
+            {percent}%
+          </p>
+          <p className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/70 mt-2">
+            Goal Reached
+          </p>
         </div>
       </div>
-      {bgImageUrl ? (
-        <div className="absolute right-0 top-0 w-1/2 h-full opacity-10 grayscale pointer-events-none">
-          <img alt="" className="w-full h-full object-cover" src={bgImageUrl} />
-        </div>
-      ) : null}
-    </div>
+
+      <div className="relative">
+        <WeeklyBarChart bars={bars} />
+      </div>
+    </section>
   );
 }

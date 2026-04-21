@@ -4,6 +4,11 @@ import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
 import { FloatingActionButton } from './FloatingActionButton';
 
+/**
+ * Top-level shell for every authenticated dashboard route.
+ * Provides the persistent left rail, transparent top bar, mobile bottom nav,
+ * and the floating "Start Workout" CTA. The active route renders inside `<Outlet />`.
+ */
 export function DashboardLayout() {
   return (
     <div className="dark min-h-screen bg-background font-body text-on-surface">
