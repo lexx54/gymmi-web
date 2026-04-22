@@ -7,6 +7,7 @@ import { DashboardLayout } from './components/layout/DashboardLayout'
 import AnalyticsPage from './pages/AnalyticsPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import WorkoutsPage from './pages/WorkoutsPage'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/workouts" element={<WorkoutsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
