@@ -5,6 +5,8 @@ import { PrivateRoute } from './components/PrivateRoute'
 import { PublicRoute } from './components/PublicRoute'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 import AnalyticsPage from './pages/AnalyticsPage'
+import ExerciseBuilderPage from './pages/ExerciseBuilderPage'
+import ExercisesPage from './pages/ExercisesPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import WorkoutsPage from './pages/WorkoutsPage'
@@ -22,6 +24,8 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/workouts" element={<WorkoutsPage />} />
+          <Route path="/exercises" element={<ExercisesPage />} />
+          <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

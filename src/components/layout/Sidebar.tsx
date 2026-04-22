@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -15,6 +15,7 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Workouts', to: '/workouts', icon: Dumbbell },
+  { label: 'Exercises', to: '/exercises', icon: NotebookPen },
   { label: 'Analytics', to: '/analytics', icon: BarChart3 },
   { label: 'Settings', to: '/dashboard', icon: Settings },
 ];
