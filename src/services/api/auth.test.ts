@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { loginApi, signupApi, forgotPasswordApi, resetPasswordApi } from './auth';
+import { loginApi, signupApi, forgotPasswordApi, resetPasswordApi, logoutApi } from './auth';
 import apiClient from './client';
 
 vi.mock('./client', () => ({
@@ -94,5 +94,21 @@ describe('resetPasswordApi', () => {
       newPassword: 'newpass',
     });
     expect(result).toEqual(response);
+  });
+});
+
+describe('logoutApi', () => {
+  it('should POST to /auth/logout', async () => {
+    mockPost.mockResolvedValue({ data: undefined });
+
+    await logoutApi();
+
+    expect(mockPost).toHaveBeenCalledWith('/auth/logout');
+  });
+
+  it('should propagate errors', async () => {
+    mockPost.mockRejectedValue(new Error('Network Error'));
+
+    await expect(logoutApi()).rejects.toThrow('Network Error');
   });
 });
