@@ -36,3 +36,7 @@ export async function resetPasswordApi(
   );
   return data;
 }
+
+export async function logoutApi(): Promise<void> {
+  await apiClient.post('/auth/logout');
+}

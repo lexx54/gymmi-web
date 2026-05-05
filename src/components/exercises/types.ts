@@ -9,12 +9,7 @@ export type TargetMuscle =
   | 'Back'
   | 'Shoulders';
 
-export type Equipment =
-  | 'Dumbbells'
-  | 'Barbell'
-  | 'Cable Machine'
-  | 'Kettlebell'
-  | 'Bodyweight';
+export type Equipment = string;
 
 export type ExerciseTag = string;
 

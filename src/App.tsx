@@ -8,6 +8,7 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import ExerciseBuilderPage from './pages/ExerciseBuilderPage'
 import ExercisesPage from './pages/ExercisesPage'
 import LoginPage from './pages/LoginPage'
+import SettingsPage from './pages/SettingsPage'
 import SignupPage from './pages/SignupPage'
 import WorkoutsPage from './pages/WorkoutsPage'
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/workouts" element={<WorkoutsPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

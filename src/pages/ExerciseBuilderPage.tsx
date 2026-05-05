@@ -26,6 +26,7 @@ import type {
 } from '../components/exercises/types';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { useListData } from '../hooks/useListData';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -45,6 +46,8 @@ export default function ExerciseBuilderPage() {
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
   const [draft, setDraft] = useState<ExerciseDraft>(INITIAL_DRAFT);
+  const { data: equipments } = useListData<{ id: string; name: string; type: string }>('equipments');
+  const equipmentOptions = equipments?.map((e) => e.name);
 
   const handleNameChange = useCallback((name: string) => {
     setDraft((prev) => ({ ...prev, name }));
@@ -102,6 +105,7 @@ export default function ExerciseBuilderPage() {
                 name={draft.name}
                 targetMuscle={draft.targetMuscle}
                 equipment={draft.equipment}
+                equipmentOptions={equipmentOptions}
                 onNameChange={handleNameChange}
                 onTargetMuscleChange={handleTargetMuscleChange}
                 onEquipmentChange={handleEquipmentChange}

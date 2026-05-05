@@ -2,12 +2,13 @@ import styled from 'styled-components';
 import type { Equipment, TargetMuscle } from './types';
 
 const TARGET_MUSCLES: TargetMuscle[] = ['Quads', 'Hamstrings', 'Chest', 'Back', 'Shoulders'];
-const EQUIPMENT: Equipment[] = ['Dumbbells', 'Barbell', 'Cable Machine', 'Kettlebell', 'Bodyweight'];
+const DEFAULT_EQUIPMENT: Equipment[] = ['Dumbbells', 'Barbell', 'Cable Machine', 'Kettlebell', 'Bodyweight'];
 
 type BasicInfoCardProps = {
   name: string;
   targetMuscle: TargetMuscle;
   equipment: Equipment;
+  equipmentOptions?: Equipment[];
   onNameChange: (value: string) => void;
   onTargetMuscleChange: (value: TargetMuscle) => void;
   onEquipmentChange: (value: Equipment) => void;
@@ -20,6 +21,7 @@ export function BasicInfoCard({
   name,
   targetMuscle,
   equipment,
+  equipmentOptions = DEFAULT_EQUIPMENT,
   onNameChange,
   onTargetMuscleChange,
   onEquipmentChange,
@@ -59,7 +61,7 @@ export function BasicInfoCard({
             value={equipment}
             onChange={(event) => onEquipmentChange(event.target.value as Equipment)}
           >
-            {EQUIPMENT.map((item) => (
+            {equipmentOptions.map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>

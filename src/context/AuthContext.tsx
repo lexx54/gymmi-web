@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { loginApi, signupApi } from '../services/api/auth';
+import { loginApi, logoutApi, signupApi } from '../services/api/auth';
 import {
   saveTokens,
   getTokens,
@@ -14,7 +14,7 @@ type AuthContextType = {
   isLoading: boolean;
   signIn: (identifier: string, password: string) => Promise<void>;
   signUp: (email: string, username: string, password: string) => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   signIn: async () => {},
   signUp: async () => {},
-  signOut: () => {},
+  signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -60,7 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(response.user);
   };
 
-  const signOut = () => {
+  const signOut = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // best-effort: still clear locally
+    }
     clearTokens();
     setUser(null);
   };

@@ -1,6 +1,7 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useAuth } from '../../context/AuthContext';
 
 type SidebarProps = {
   username: string;
@@ -17,13 +18,21 @@ const sidebarItems: SidebarItem[] = [
   { label: 'Workouts', to: '/workouts', icon: Dumbbell },
   { label: 'Exercises', to: '/exercises', icon: NotebookPen },
   { label: 'Analytics', to: '/analytics', icon: BarChart3 },
-  { label: 'Settings', to: '/dashboard', icon: Settings },
+  { label: 'Settings', to: '/settings', icon: Settings },
 ];
 
 /**
  * Displays the main dashboard navigation sidebar.
  */
 export function Sidebar({ username }: SidebarProps) {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
   return (
     <SidebarAside>
       <SidebarBrand>KINETIC</SidebarBrand>
@@ -51,6 +60,10 @@ export function Sidebar({ username }: SidebarProps) {
           })}
         </NavList>
       </SidebarNav>
+      <SignOutButton type="button" onClick={handleSignOut}>
+        <LogOut size={16} aria-hidden />
+        <span>Sign Out</span>
+      </SignOutButton>
     </SidebarAside>
   );
 }
@@ -158,5 +171,27 @@ const NavItemLink = styled(NavLink)`
     background: linear-gradient(180deg, #ff9da8 0%, #ef233c 100%);
     color: #2a0911;
     font-weight: 700;
+  }
+`;
+
+const SignOutButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: auto;
+  border: none;
+  border-radius: 0.8rem;
+  padding: 0.92rem 0.9rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  background: transparent;
+  color: #cfd4ef;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    background-color: rgba(239, 35, 60, 0.12);
+    color: #ff535a;
   }
 `;
