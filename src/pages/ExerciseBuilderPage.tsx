@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { ActivationMapCard } from '../components/exercises/ActivationMapCard';
+import { ActivationMapCard, suggestSecondaryStabilizers } from '../components/exercises/ActivationMapCard';
 import { BasicInfoCard } from '../components/exercises/BasicInfoCard';
 import { BuilderPageHeader } from '../components/exercises/BuilderPageHeader';
 import { DifficultyMovementCard } from '../components/exercises/DifficultyMovementCard';
@@ -31,6 +31,8 @@ import { useListEquipments, useListMuscles } from '../hooks/useListData';
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
   targetMuscle: 'Quads',
+  activationSecondary: 'Glutes',
+  activationStabilizers: 'Core',
   equipment: 'Dumbbells',
   instructions: '',
   difficulty: 'Intermediate',
@@ -50,12 +52,43 @@ export default function ExerciseBuilderPage() {
   const { data: muscles } = useListMuscles();
   const equipmentOptions = equipments?.map((e) => e.name);
   const muscleOptions = muscles?.map((m) => m.name);
+  const muscleKey = useMemo(
+    () => (muscles?.length ? muscles.map((m) => m.name).join('|') : ''),
+    [muscles],
+  );
+  const prevMuscleKeyRef = useRef('');
 
   useEffect(() => {
     if (!muscles?.length) return;
     const names = muscles.map((m) => m.name);
-    setDraft((prev) => (names.includes(prev.targetMuscle) ? prev : { ...prev, targetMuscle: names[0] }));
-  }, [muscles]);
+    const muscleListJustLoaded = prevMuscleKeyRef.current === '' && muscleKey !== '';
+    prevMuscleKeyRef.current = muscleKey;
+
+    setDraft((prev) => {
+      const target = names.includes(prev.targetMuscle) ? prev.targetMuscle : names[0];
+      const suggested = suggestSecondaryStabilizers(muscles, target);
+      const targetChanged = target !== prev.targetMuscle;
+      const resetSecondary =
+        targetChanged || muscleListJustLoaded || !names.includes(prev.activationSecondary);
+      const resetStabilizers =
+        targetChanged || muscleListJustLoaded || !names.includes(prev.activationStabilizers);
+      return {
+        ...prev,
+        targetMuscle: target,
+        activationSecondary: resetSecondary ? suggested.secondary : prev.activationSecondary,
+        activationStabilizers: resetStabilizers ? suggested.stabilizers : prev.activationStabilizers,
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `muscleKey` fingerprints `muscles`; including `muscles` retriggers on query ref churn.
+  }, [muscleKey, draft.targetMuscle]);
+
+  const handleActivationSecondaryChange = useCallback((activationSecondary: string) => {
+    setDraft((prev) => ({ ...prev, activationSecondary }));
+  }, []);
+
+  const handleActivationStabilizersChange = useCallback((activationStabilizers: string) => {
+    setDraft((prev) => ({ ...prev, activationStabilizers }));
+  }, []);
 
   const handleNameChange = useCallback((name: string) => {
     setDraft((prev) => ({ ...prev, name }));
@@ -120,7 +153,15 @@ export default function ExerciseBuilderPage() {
                 onEquipmentChange={handleEquipmentChange}
               />
               <InstructionsCard value={draft.instructions} onChange={handleInstructionsChange} />
-              <ActivationMapCard muscles={muscles} targetMuscle={draft.targetMuscle} />
+              <ActivationMapCard
+                muscleNames={muscleOptions ?? []}
+                primary={draft.targetMuscle}
+                secondary={draft.activationSecondary}
+                stabilizers={draft.activationStabilizers}
+                onPrimaryChange={handleTargetMuscleChange}
+                onSecondaryChange={handleActivationSecondaryChange}
+                onStabilizersChange={handleActivationStabilizersChange}
+              />
             </LeftColumn>
             <RightColumn>
               <MediaUploadCard />

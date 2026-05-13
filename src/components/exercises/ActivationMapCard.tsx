@@ -1,3 +1,4 @@
+import type { ChangeEvent } from 'react';
 import styled from 'styled-components';
 import type { ListCatalogItem } from '../../hooks/useListData';
 
@@ -9,7 +10,9 @@ type ActivationEntry = {
   value: string;
 };
 
-function buildActivations(muscles: ListCatalogItem[], targetMuscle: string): ActivationEntry[] {
+const FALLBACK_MUSCLE_NAMES = ['Quads', 'Hamstrings', 'Chest', 'Back', 'Shoulders'];
+
+export function buildActivations(muscles: ListCatalogItem[], targetMuscle: string): ActivationEntry[] {
   if (muscles.length === 0) {
     return [
       { id: 'primary', label: 'Primary', value: targetMuscle },
@@ -43,25 +46,88 @@ function buildActivations(muscles: ListCatalogItem[], targetMuscle: string): Act
   ];
 }
 
+export function suggestSecondaryStabilizers(
+  muscles: ListCatalogItem[],
+  targetMuscle: string,
+): { secondary: string; stabilizers: string } {
+  const entries = buildActivations(muscles, targetMuscle);
+  return {
+    secondary: entries.find((e) => e.id === 'secondary')!.value,
+    stabilizers: entries.find((e) => e.id === 'stabilizers')!.value,
+  };
+}
+
+function muscleSelectOptions(apiNames: string[], primary: string, secondary: string, stabilizers: string): string[] {
+  const base = apiNames.length > 0 ? apiNames : FALLBACK_MUSCLE_NAMES;
+  const out = [...base];
+  for (const v of [primary, secondary, stabilizers]) {
+    if (v && !out.includes(v)) out.push(v);
+  }
+  return out;
+}
+
 type ActivationMapCardProps = {
-  muscles?: ListCatalogItem[];
-  targetMuscle: string;
+  muscleNames: string[];
+  primary: string;
+  secondary: string;
+  stabilizers: string;
+  onPrimaryChange: (name: string) => void;
+  onSecondaryChange: (name: string) => void;
+  onStabilizersChange: (name: string) => void;
 };
+
+const TIERS: { id: ActivationTier; label: string }[] = [
+  { id: 'primary', label: 'Primary' },
+  { id: 'secondary', label: 'Secondary' },
+  { id: 'stabilizers', label: 'Stabilizers' },
+];
 
 /**
  * Shows the muscle activation map for the exercise with tonal accent bars.
  */
-export function ActivationMapCard({ muscles = [], targetMuscle }: ActivationMapCardProps) {
-  const entries = buildActivations(muscles, targetMuscle);
+export function ActivationMapCard({
+  muscleNames,
+  primary,
+  secondary,
+  stabilizers,
+  onPrimaryChange,
+  onSecondaryChange,
+  onStabilizersChange,
+}: ActivationMapCardProps) {
+  const options = muscleSelectOptions(muscleNames, primary, secondary, stabilizers);
+
+  const valueFor = (id: ActivationTier) => {
+    if (id === 'primary') return primary;
+    if (id === 'secondary') return secondary;
+    return stabilizers;
+  };
+
+  const onChangeFor = (id: ActivationTier) => (event: ChangeEvent<HTMLSelectElement>) => {
+    const v = event.target.value;
+    if (id === 'primary') onPrimaryChange(v);
+    else if (id === 'secondary') onSecondaryChange(v);
+    else onStabilizersChange(v);
+  };
 
   return (
     <Card>
       <Title>Activation Map</Title>
       <Grid>
-        {entries.map((entry) => (
-          <Tile key={entry.id} $tier={entry.id}>
-            <TileLabel>{entry.label}</TileLabel>
-            <TileValue>{entry.value}</TileValue>
+        {TIERS.map((tier) => (
+          <Tile key={tier.id} $tier={tier.id}>
+            <TileLabel htmlFor={`activation-${tier.id}`}>{tier.label}</TileLabel>
+            <MuscleSelect
+              id={`activation-${tier.id}`}
+              value={valueFor(tier.id)}
+              onChange={onChangeFor(tier.id)}
+              aria-label={`${tier.label} muscle`}
+            >
+              {options.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </MuscleSelect>
           </Tile>
         ))}
       </Grid>
@@ -112,8 +178,9 @@ const Tile = styled.div<{ $tier: ActivationTier }>`
   }
 `;
 
-const TileLabel = styled.p`
-  margin: 0 0 0.3rem;
+const TileLabel = styled.label`
+  display: block;
+  margin: 0 0 0.45rem;
   color: #e7bdbb;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -121,9 +188,21 @@ const TileLabel = styled.p`
   font-weight: 700;
 `;
 
-const TileValue = styled.p`
+const MuscleSelect = styled.select`
+  width: 100%;
   margin: 0;
+  background-color: #181a2e;
+  border: none;
+  border-radius: 0.45rem;
   color: #e0e0fc;
-  font-size: 1.2rem;
+  padding: 0.55rem 0.4rem;
+  font-size: 1.05rem;
   font-weight: 700;
+  outline: none;
+  cursor: pointer;
+  transition: box-shadow 150ms ease;
+
+  &:focus {
+    box-shadow: 0 0 0 2px #ffb3b1;
+  }
 `;

@@ -12,6 +12,10 @@ export type ExerciseTag = string;
 export type ExerciseDraft = {
   name: string;
   targetMuscle: TargetMuscle;
+  /** Secondary muscle in activation map (from `/list/muscles` names). */
+  activationSecondary: string;
+  /** Stabilizer muscles in activation map (from `/list/muscles` names). */
+  activationStabilizers: string;
   equipment: Equipment;
   instructions: string;
   difficulty: Difficulty;
