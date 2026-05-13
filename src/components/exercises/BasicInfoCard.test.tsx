@@ -77,4 +77,17 @@ describe('BasicInfoCard', () => {
     expect(screen.getByText('Medicine Ball')).toBeInTheDocument();
     expect(screen.queryByText('Barbell')).not.toBeInTheDocument();
   });
+
+  it('uses custom targetMuscleOptions when provided', () => {
+    render(
+      <BasicInfoCard
+        {...defaultProps}
+        targetMuscleOptions={['Biceps', 'Triceps', 'Forearms']}
+      />,
+    );
+
+    expect(screen.getByText('Biceps')).toBeInTheDocument();
+    expect(screen.getByText('Triceps')).toBeInTheDocument();
+    expect(screen.queryByText('Hamstrings')).not.toBeInTheDocument();
+  });
 });

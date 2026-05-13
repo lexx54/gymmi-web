@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import type { ListCatalogItem } from '../../hooks/useListData';
 
 type ActivationTier = 'primary' | 'secondary' | 'stabilizers';
 
@@ -8,21 +9,56 @@ type ActivationEntry = {
   value: string;
 };
 
-const DEFAULT_ACTIVATIONS: ActivationEntry[] = [
-  { id: 'primary', label: 'Primary', value: 'Quadriceps' },
-  { id: 'secondary', label: 'Secondary', value: 'Glutes' },
-  { id: 'stabilizers', label: 'Stabilizers', value: 'Core' },
-];
+function buildActivations(muscles: ListCatalogItem[], targetMuscle: string): ActivationEntry[] {
+  if (muscles.length === 0) {
+    return [
+      { id: 'primary', label: 'Primary', value: targetMuscle },
+      { id: 'secondary', label: 'Secondary', value: 'Glutes' },
+      { id: 'stabilizers', label: 'Stabilizers', value: 'Core' },
+    ];
+  }
+
+  const primaryMeta = muscles.find((m) => m.name === targetMuscle);
+  const primaryType = primaryMeta?.type;
+
+  const sameTypeOthers = muscles.filter((m) => m.type === primaryType && m.name !== targetMuscle);
+  const secondaryName =
+    sameTypeOthers[0]?.name ?? muscles.find((m) => m.name !== targetMuscle)?.name ?? targetMuscle;
+
+  const stabilizerCandidate = muscles.find(
+    (m) =>
+      m.name !== targetMuscle &&
+      m.name !== secondaryName &&
+      (primaryType === undefined || m.type !== primaryType),
+  );
+  const stabilizersName =
+    stabilizerCandidate?.name ??
+    muscles.find((m) => m.name !== targetMuscle && m.name !== secondaryName)?.name ??
+    'Core';
+
+  return [
+    { id: 'primary', label: 'Primary', value: targetMuscle },
+    { id: 'secondary', label: 'Secondary', value: secondaryName },
+    { id: 'stabilizers', label: 'Stabilizers', value: stabilizersName },
+  ];
+}
+
+type ActivationMapCardProps = {
+  muscles?: ListCatalogItem[];
+  targetMuscle: string;
+};
 
 /**
  * Shows the muscle activation map for the exercise with tonal accent bars.
  */
-export function ActivationMapCard() {
+export function ActivationMapCard({ muscles = [], targetMuscle }: ActivationMapCardProps) {
+  const entries = buildActivations(muscles, targetMuscle);
+
   return (
     <Card>
       <Title>Activation Map</Title>
       <Grid>
-        {DEFAULT_ACTIVATIONS.map((entry) => (
+        {entries.map((entry) => (
           <Tile key={entry.id} $tier={entry.id}>
             <TileLabel>{entry.label}</TileLabel>
             <TileValue>{entry.value}</TileValue>

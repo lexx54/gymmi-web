@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
-import { useListData } from './useListData';
+import { useListData, useListMuscles } from './useListData';
 
 const mockGet = vi.fn();
 
@@ -65,5 +65,16 @@ describe('useListData', () => {
 
     const cached = queryClient.getQueryData(['list', 'muscles']);
     expect(cached).toEqual([]);
+  });
+
+  it('useListMuscles should call apiClient.get with /list/muscles', async () => {
+    mockGet.mockResolvedValue({ data: [] });
+
+    const { result } = renderHook(() => useListMuscles(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockGet).toHaveBeenCalledWith('/list/muscles');
   });
 });

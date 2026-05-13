@@ -1,13 +1,14 @@
 import styled from 'styled-components';
 import type { Equipment, TargetMuscle } from './types';
 
-const TARGET_MUSCLES: TargetMuscle[] = ['Quads', 'Hamstrings', 'Chest', 'Back', 'Shoulders'];
+const FALLBACK_TARGET_MUSCLES: TargetMuscle[] = ['Quads', 'Hamstrings', 'Chest', 'Back', 'Shoulders'];
 const DEFAULT_EQUIPMENT: Equipment[] = ['Dumbbells', 'Barbell', 'Cable Machine', 'Kettlebell', 'Bodyweight'];
 
 type BasicInfoCardProps = {
   name: string;
   targetMuscle: TargetMuscle;
   equipment: Equipment;
+  targetMuscleOptions?: TargetMuscle[];
   equipmentOptions?: Equipment[];
   onNameChange: (value: string) => void;
   onTargetMuscleChange: (value: TargetMuscle) => void;
@@ -21,11 +22,15 @@ export function BasicInfoCard({
   name,
   targetMuscle,
   equipment,
+  targetMuscleOptions,
   equipmentOptions = DEFAULT_EQUIPMENT,
   onNameChange,
   onTargetMuscleChange,
   onEquipmentChange,
 }: BasicInfoCardProps) {
+  const muscleOptions =
+    targetMuscleOptions && targetMuscleOptions.length > 0 ? targetMuscleOptions : FALLBACK_TARGET_MUSCLES;
+
   return (
     <Card>
       <AccentBar />
@@ -47,7 +52,7 @@ export function BasicInfoCard({
             value={targetMuscle}
             onChange={(event) => onTargetMuscleChange(event.target.value as TargetMuscle)}
           >
-            {TARGET_MUSCLES.map((muscle) => (
+            {muscleOptions.map((muscle) => (
               <option key={muscle} value={muscle}>
                 {muscle}
               </option>

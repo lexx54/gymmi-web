@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ActivationMapCard } from '../components/exercises/ActivationMapCard';
@@ -26,7 +26,7 @@ import type {
 } from '../components/exercises/types';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
-import { useListData } from '../hooks/useListData';
+import { useListEquipments, useListMuscles } from '../hooks/useListData';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -46,8 +46,16 @@ export default function ExerciseBuilderPage() {
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
   const [draft, setDraft] = useState<ExerciseDraft>(INITIAL_DRAFT);
-  const { data: equipments } = useListData<{ id: string; name: string; type: string }>('equipments');
+  const { data: equipments } = useListEquipments();
+  const { data: muscles } = useListMuscles();
   const equipmentOptions = equipments?.map((e) => e.name);
+  const muscleOptions = muscles?.map((m) => m.name);
+
+  useEffect(() => {
+    if (!muscles?.length) return;
+    const names = muscles.map((m) => m.name);
+    setDraft((prev) => (names.includes(prev.targetMuscle) ? prev : { ...prev, targetMuscle: names[0] }));
+  }, [muscles]);
 
   const handleNameChange = useCallback((name: string) => {
     setDraft((prev) => ({ ...prev, name }));
@@ -105,13 +113,14 @@ export default function ExerciseBuilderPage() {
                 name={draft.name}
                 targetMuscle={draft.targetMuscle}
                 equipment={draft.equipment}
+                targetMuscleOptions={muscleOptions}
                 equipmentOptions={equipmentOptions}
                 onNameChange={handleNameChange}
                 onTargetMuscleChange={handleTargetMuscleChange}
                 onEquipmentChange={handleEquipmentChange}
               />
               <InstructionsCard value={draft.instructions} onChange={handleInstructionsChange} />
-              <ActivationMapCard />
+              <ActivationMapCard muscles={muscles} targetMuscle={draft.targetMuscle} />
             </LeftColumn>
             <RightColumn>
               <MediaUploadCard />

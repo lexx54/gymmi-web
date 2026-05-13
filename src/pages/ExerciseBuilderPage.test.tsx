@@ -17,8 +17,16 @@ vi.mock('../context/AuthContext', () => ({
 }));
 
 vi.mock('../hooks/useListData', () => ({
-  useListData: () => ({
-    data: [{ id: '1', name: 'Dumbbells', type: 'free_weight' }],
+  useListEquipments: () => ({
+    data: [{ id: '1', name: 'Dumbbells', type: 'free_weight', description: '' }],
+    isLoading: false,
+    isError: false,
+  }),
+  useListMuscles: () => ({
+    data: [
+      { id: '1', name: 'Quads', type: 'Lower Body', description: '' },
+      { id: '2', name: 'Chest', type: 'Upper Body', description: '' },
+    ],
     isLoading: false,
     isError: false,
   }),

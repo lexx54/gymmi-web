@@ -2,12 +2,8 @@ export type Difficulty = 'Novice' | 'Intermediate' | 'Elite';
 
 export type MovementType = 'Compound' | 'Isolation';
 
-export type TargetMuscle =
-  | 'Quads'
-  | 'Hamstrings'
-  | 'Chest'
-  | 'Back'
-  | 'Shoulders';
+/** Muscle name from API (`GET /list/muscles`) or legacy string values. */
+export type TargetMuscle = string;
 
 export type Equipment = string;
 
