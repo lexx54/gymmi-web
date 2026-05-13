@@ -2,6 +2,7 @@ export type AuthUser = {
   id: string;
   email: string;
   username: string;
+  role: { id: string; name: string };
 };
 
 export type AuthResponse = {
@@ -19,6 +20,7 @@ export type SignupParams = {
   email: string;
   username: string;
   password: string;
+  role: string;
 };
 
 export type ForgotPasswordParams = {

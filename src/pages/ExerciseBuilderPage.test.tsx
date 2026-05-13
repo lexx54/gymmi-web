@@ -7,13 +7,18 @@ import ExerciseBuilderPage from './ExerciseBuilderPage';
 
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
-    user: { id: '1', email: 'test@test.com', username: 'testuser' },
+    user: { id: '1', email: 'test@test.com', username: 'testuser', role: { id: 'r1', name: 'Admin' } },
     isAuthenticated: true,
     isLoading: false,
     signIn: vi.fn(),
     signUp: vi.fn(),
     signOut: vi.fn(),
   }),
+}));
+
+vi.mock('../hooks/usePermissions', () => ({
+  useMyPermissions: () => ({ data: [], isLoading: false }),
+  useHasPermission: () => true,
 }));
 
 vi.mock('../hooks/useListData', () => ({

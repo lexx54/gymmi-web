@@ -7,7 +7,7 @@ import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { useSignup } from '../hooks/useAuthApi';
-import { signupSchema, type SignupFormValues } from '../schemas/auth';
+import { signupSchema, SIGNUP_ROLES, type SignupFormValues } from '../schemas/auth';
 
 const LOCKOUT_DURATION = 180_000;
 
@@ -65,7 +65,7 @@ export default function SignupPage() {
   const onSubmit = (data: SignupFormValues) => {
     if (disabled) return;
     signup(
-      { email: data.email, username: data.username, password: data.password },
+      { email: data.email, username: data.username, password: data.password, role: data.role },
       {
         onSuccess: () => {
           toast.success('Account created successfully!');
@@ -307,6 +307,37 @@ export default function SignupPage() {
                 {errors.confirmPassword && (
                   <p style={errorTextStyle}>{errors.confirmPassword.message}</p>
                 )}
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <p style={{ color: '#2b2d42', fontSize: '0.75rem', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  I am a
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  {SIGNUP_ROLES.map((r) => (
+                    <label
+                      key={r}
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.4rem',
+                        padding: '0.75rem 0.5rem',
+                        borderRadius: '9999px',
+                        border: '1px solid #d2d6df',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: '#2b2d42',
+                      }}
+                    >
+                      <input type="radio" value={r} {...register('role')} style={{ accentColor: '#ef233c' }} />
+                      {r}
+                    </label>
+                  ))}
+                </div>
+                {errors.role && <p style={errorTextStyle}>{errors.role.message}</p>}
               </div>
 
               <button

@@ -14,7 +14,7 @@ export function useLogin() {
 
 export function useSignup() {
   return useMutation({
-    mutationFn: (params: { email: string; username: string; password: string }) =>
+    mutationFn: (params: { email: string; username: string; password: string; role: string }) =>
       signupApi(params),
   });
 }

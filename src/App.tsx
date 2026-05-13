@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { PrivateRoute } from './components/PrivateRoute'
 import { PublicRoute } from './components/PublicRoute'
+import { RoleRoute } from './components/RoleRoute'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 import AnalyticsPage from './pages/AnalyticsPage'
 import ExerciseBuilderPage from './pages/ExerciseBuilderPage'
@@ -11,6 +12,8 @@ import LoginPage from './pages/LoginPage'
 import SettingsPage from './pages/SettingsPage'
 import SignupPage from './pages/SignupPage'
 import WorkoutsPage from './pages/WorkoutsPage'
+import AdminPermissionsPage from './pages/admin/AdminPermissionsPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
   return (
@@ -28,6 +31,8 @@ function App() {
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />
+          <Route path="/admin/users" element={<RoleRoute role="Admin"><AdminUsersPage /></RoleRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Can } from '../Can';
 
 type BuilderPageHeaderProps = {
   onDiscard: () => void;
@@ -22,9 +23,11 @@ export function BuilderPageHeader({ onDiscard, onPublish }: BuilderPageHeaderPro
         <SecondaryButton type="button" onClick={onDiscard}>
           Discard Draft
         </SecondaryButton>
-        <PrimaryButton type="button" onClick={onPublish}>
-          Publish Exercise
-        </PrimaryButton>
+        <Can resource="exercises" action="CREATE">
+          <PrimaryButton type="button" onClick={onPublish}>
+            Publish Exercise
+          </PrimaryButton>
+        </Can>
       </Actions>
     </HeaderRoot>
   );

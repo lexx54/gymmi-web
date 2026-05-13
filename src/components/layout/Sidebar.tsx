@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
@@ -24,9 +24,15 @@ const sidebarItems: SidebarItem[] = [
 /**
  * Displays the main dashboard navigation sidebar.
  */
+const adminItems: SidebarItem[] = [
+  { label: 'Permissions', to: '/admin/permissions', icon: Shield },
+  { label: 'Users', to: '/admin/users', icon: Users },
+];
+
 export function Sidebar({ username }: SidebarProps) {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const isAdmin = user?.role?.name === 'Admin';
 
   const handleSignOut = async () => {
     await signOut();
@@ -40,7 +46,7 @@ export function Sidebar({ username }: SidebarProps) {
         <Avatar />
         <ProfileText>
           <Username>{username.toUpperCase().slice(0, 6)}</Username>
-          <EliteStatus>ELITE STATUS</EliteStatus>
+          <EliteStatus>{user?.role?.name?.toUpperCase() ?? 'MEMBER'}</EliteStatus>
           <Streak>7 DAY STREAK</Streak>
         </ProfileText>
       </ProfileCard>
@@ -59,6 +65,25 @@ export function Sidebar({ username }: SidebarProps) {
             );
           })}
         </NavList>
+        {isAdmin && (
+          <>
+            <AdminDivider />
+            <AdminLabel>Admin</AdminLabel>
+            <NavList>
+              {adminItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.label}>
+                    <NavItemLink to={item.to} end>
+                      <Icon size={16} aria-hidden />
+                      <span>{item.label}</span>
+                    </NavItemLink>
+                  </li>
+                );
+              })}
+            </NavList>
+          </>
+        )}
       </SidebarNav>
       <SignOutButton type="button" onClick={handleSignOut}>
         <LogOut size={16} aria-hidden />
@@ -172,6 +197,22 @@ const NavItemLink = styled(NavLink)`
     color: #2a0911;
     font-weight: 700;
   }
+`;
+
+const AdminDivider = styled.hr`
+  border: none;
+  border-top: 1px solid #262840;
+  margin: 1.25rem 0 0.5rem;
+`;
+
+const AdminLabel = styled.p`
+  margin: 0 0 0.5rem;
+  padding-left: 0.9rem;
+  color: #e7bdbb;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.58rem;
+  font-weight: 700;
 `;
 
 const SignOutButton = styled.button`

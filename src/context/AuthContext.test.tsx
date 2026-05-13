@@ -67,7 +67,7 @@ describe('AuthContext', () => {
   });
 
   it('when valid JWT token exists, decodes and sets user', async () => {
-    const token = makeJwt({ sub: '42', email: 'a@b.com', username: 'volt' });
+    const token = makeJwt({ sub: '42', email: 'a@b.com', username: 'volt', roleId: 'r1', roleName: 'Client' });
     mockGetTokens.mockReturnValue({ accessToken: token, refreshToken: 'rt' });
 
     const { result } = renderHook(() => useAuth(), {
@@ -79,6 +79,7 @@ describe('AuthContext', () => {
       id: '42',
       email: 'a@b.com',
       username: 'volt',
+      role: { id: 'r1', name: 'Client' },
     });
     expect(result.current.isAuthenticated).toBe(true);
   });

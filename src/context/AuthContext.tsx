@@ -13,7 +13,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (identifier: string, password: string) => Promise<void>;
-  signUp: (email: string, username: string, password: string) => Promise<void>;
+  signUp: (email: string, username: string, password: string, role: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: payload.sub,
         email: payload.email,
         username: payload.username ?? payload.email,
+        role: { id: payload.roleId ?? '', name: payload.roleName ?? '' },
       });
     } catch {
       clearTokens();
@@ -54,8 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(response.user);
   };
 
-  const signUp = async (email: string, username: string, password: string) => {
-    const response = await signupApi({ email, username, password });
+  const signUp = async (email: string, username: string, password: string, role: string) => {
+    const response = await signupApi({ email, username, password, role });
     saveTokens(response.accessToken, response.refreshToken);
     setUser(response.user);
   };

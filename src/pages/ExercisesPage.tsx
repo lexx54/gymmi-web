@@ -10,6 +10,7 @@ import {
   ExercisesPageShell,
 } from '../components/exercises/ExercisesShell';
 import type { ExerciseSummary } from '../components/exercises/types';
+import { Can } from '../components/Can';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 
@@ -98,10 +99,12 @@ export default function ExercisesPage() {
                 Build, curate, and refine every exercise your athletes will meet in the field.
               </Subtitle>
             </Copy>
-            <CreateButton type="button" onClick={() => navigate('/exercises/new')}>
-              <Plus size={16} />
-              Create Exercise
-            </CreateButton>
+            <Can resource="exercises" action="CREATE">
+              <CreateButton type="button" onClick={() => navigate('/exercises/new')}>
+                <Plus size={16} />
+                Create Exercise
+              </CreateButton>
+            </Can>
           </HeaderRow>
 
           <SearchField
