@@ -1,6 +1,8 @@
-import { BarChart3, Dumbbell, LifeBuoy, MoreVertical, Play, Plus, Search, Settings, Sparkles, Timer, Utensils, Waves, Users } from 'lucide-react';
+import { Dumbbell, MoreVertical, Play, Plus, Search, Sparkles, Timer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { Sidebar } from '../components/layout/Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 type Routine = {
   id: string;
@@ -82,55 +84,12 @@ const protocols: Protocol[] = [
  * Routine library landing page for browsing and starting workout protocols.
  */
 export default function WorkoutLibraryPage() {
+  const { user } = useAuth();
+  const username = user?.username ?? 'Alex';
+
   return (
     <PageShell>
-      <LibrarySidebar aria-label="Workout navigation">
-        <Brand>KINETIC</Brand>
-
-        <ProfilePanel>
-          <AvatarGlow />
-          <ProfileCopy>
-            <ProfileName>Training Log</ProfileName>
-            <ProfileStatus>Elite Status</ProfileStatus>
-          </ProfileCopy>
-        </ProfilePanel>
-
-        <NavList>
-          <NavItem>
-            <BarChart3 size={16} aria-hidden />
-            <span>Performance</span>
-          </NavItem>
-          <NavItemActive>
-            <Dumbbell size={16} aria-hidden />
-            <span>Training Log</span>
-          </NavItemActive>
-          <NavItem>
-            <Waves size={16} aria-hidden />
-            <span>Recovery</span>
-          </NavItem>
-          <NavItem>
-            <Utensils size={16} aria-hidden />
-            <span>Nutrition</span>
-          </NavItem>
-          <NavItem>
-            <Users size={16} aria-hidden />
-            <span>Community</span>
-          </NavItem>
-        </NavList>
-
-        <StartWorkoutLink to="/workout/new">Start Workout</StartWorkoutLink>
-
-        <UtilityList>
-          <NavItem>
-            <Settings size={15} aria-hidden />
-            <span>Settings</span>
-          </NavItem>
-          <NavItem>
-            <LifeBuoy size={15} aria-hidden />
-            <span>Support</span>
-          </NavItem>
-        </UtilityList>
-      </LibrarySidebar>
+      <Sidebar username={username} />
 
       <MainPanel>
         <HeroRow>
@@ -235,133 +194,6 @@ const PageShell = styled.div`
     linear-gradient(135deg, #101225 0%, #111326 48%, #0d1021 100%);
   color: #f7f7ff;
   font-family: Inter, "Plus Jakarta Sans", system-ui, sans-serif;
-`;
-
-const LibrarySidebar = styled.aside`
-  display: none;
-  width: 17rem;
-  flex-shrink: 0;
-  padding: 2rem 1.25rem;
-  background: rgba(16, 18, 37, 0.78);
-  backdrop-filter: blur(26px);
-  box-shadow: 30px 0 60px -42px rgba(0, 0, 0, 0.9);
-
-  @media (min-width: 1024px) {
-    display: flex;
-    flex-direction: column;
-  }
-`;
-
-const Brand = styled.p`
-  margin: 0;
-  color: #ff535a;
-  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  font-size: 1.1rem;
-  font-style: italic;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-`;
-
-const ProfilePanel = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-top: 1.7rem;
-  padding: 0.6rem 0;
-`;
-
-const AvatarGlow = styled.div`
-  width: 2.35rem;
-  height: 2.35rem;
-  border-radius: 0.8rem;
-  background:
-    linear-gradient(135deg, rgba(255, 179, 177, 0.8), rgba(255, 83, 90, 0.82)),
-    radial-gradient(circle at 50% 24%, #313349 0 32%, #181a2e 33% 100%);
-  box-shadow: 0 0 34px -10px rgba(255, 83, 90, 0.95);
-`;
-
-const ProfileCopy = styled.div`
-  display: grid;
-  gap: 0.12rem;
-`;
-
-const ProfileName = styled.span`
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-`;
-
-const ProfileStatus = styled.span`
-  color: #e7bdbb;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-`;
-
-const NavList = styled.ul`
-  display: grid;
-  gap: 0.55rem;
-  margin: 3rem 0 0;
-  padding: 0;
-  list-style: none;
-`;
-
-const NavItem = styled.li`
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.9rem 0.2rem;
-  color: rgba(231, 189, 187, 0.62);
-  font-size: 0.66rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-`;
-
-const NavItemActive = styled(NavItem)`
-  position: relative;
-  margin-inline: -1.25rem;
-  padding-inline: 1.45rem;
-  background: linear-gradient(90deg, rgba(255, 83, 90, 0.18), rgba(255, 83, 90, 0.02));
-  color: #ffe5e2;
-
-  &::after {
-    position: absolute;
-    right: 0;
-    top: 0.35rem;
-    bottom: 0.35rem;
-    width: 0.22rem;
-    border-radius: 999px;
-    background: linear-gradient(180deg, #ffb3b1, #ff535a);
-    content: '';
-  }
-`;
-
-const StartWorkoutLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: auto;
-  border-radius: 0.7rem;
-  padding: 1rem 1.4rem;
-  background: linear-gradient(135deg, #ffb3b1, #ff535a);
-  color: #2a0911;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-decoration: none;
-  text-transform: uppercase;
-  box-shadow: 0 34px 58px -34px rgba(255, 83, 90, 0.95);
-`;
-
-const UtilityList = styled.ul`
-  display: grid;
-  gap: 0.25rem;
-  margin: 1.9rem 0 0;
-  padding: 0;
-  list-style: none;
 `;
 
 const MainPanel = styled.main`
