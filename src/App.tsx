@@ -11,6 +11,7 @@ import ExercisesPage from './pages/ExercisesPage'
 import LoginPage from './pages/LoginPage'
 import SettingsPage from './pages/SettingsPage'
 import SignupPage from './pages/SignupPage'
+import WorkoutLibraryPage from './pages/WorkoutLibraryPage'
 import WorkoutsPage from './pages/WorkoutsPage'
 import AdminPermissionsPage from './pages/admin/AdminPermissionsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
@@ -27,7 +28,9 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/workouts" element={<WorkoutsPage />} />
+          <Route path="/workouts" element={<Navigate to="/workout/new" replace />} />
+          <Route path="/workout" element={<WorkoutLibraryPage />} />
+          <Route path="/workout/new" element={<WorkoutsPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/settings" element={<SettingsPage />} />

@@ -83,7 +83,7 @@ const nextSetId = () => {
 };
 
 /**
- * Routine builder page (`/workouts`).
+ * Routine builder page (`/workout/new`).
  * Pairs the exercise library with an active routine canvas.
  */
 export default function WorkoutsPage() {
