@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { Plus, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import styled from 'styled-components';
 import { ExerciseCatalogCard } from '../components/exercises/ExerciseCatalogCard';
+import { ExerciseBulkCsvModal } from '../components/exercises/ExerciseBulkCsvModal';
 import { ExercisesHeader } from '../components/exercises/ExercisesHeader';
 import {
   ExercisesContent,
@@ -13,6 +16,7 @@ import type { ExerciseSummary } from '../components/exercises/types';
 import { Can } from '../components/Can';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { uploadExerciseBulkCsv } from '../services/api/exercises';
 
 const CATALOG: ExerciseSummary[] = [
   {
@@ -73,6 +77,16 @@ export default function ExercisesPage() {
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
   const [search, setSearch] = useState('');
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const bulkCsvMutation = useMutation({
+    mutationFn: uploadExerciseBulkCsv,
+    onSuccess: (result) => {
+      toast.success(`Created ${result.created} exercises from CSV`);
+    },
+    onError: () => {
+      toast.error('Could not upload exercise CSV');
+    },
+  });
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -100,10 +114,16 @@ export default function ExercisesPage() {
               </Subtitle>
             </Copy>
             <Can resource="exercises" action="CREATE">
-              <CreateButton type="button" onClick={() => navigate('/exercises/new')}>
-                <Plus size={16} />
-                Create Exercise
-              </CreateButton>
+              <ActionGroup>
+                <SecondaryButton type="button" onClick={() => setIsBulkModalOpen(true)}>
+                  <Upload size={16} />
+                  Bulk csv
+                </SecondaryButton>
+                <CreateButton type="button" onClick={() => navigate('/exercises/new')}>
+                  <Plus size={16} />
+                  Create Exercise
+                </CreateButton>
+              </ActionGroup>
             </Can>
           </HeaderRow>
 
@@ -123,6 +143,16 @@ export default function ExercisesPage() {
 
           {visible.length === 0 ? <EmptyState>No exercises match that filter.</EmptyState> : null}
         </ExercisesContent>
+        <ExerciseBulkCsvModal
+          isOpen={isBulkModalOpen}
+          isUploading={bulkCsvMutation.isPending}
+          result={bulkCsvMutation.data}
+          onClose={() => {
+            setIsBulkModalOpen(false);
+            bulkCsvMutation.reset();
+          }}
+          onUpload={(file) => bulkCsvMutation.mutate(file)}
+        />
       </ExercisesMain>
     </ExercisesPageShell>
   );
@@ -173,6 +203,12 @@ const Subtitle = styled.p`
   line-height: 1.5;
 `;
 
+const ActionGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+`;
+
 const CreateButton = styled.button`
   display: inline-flex;
   align-items: center;
@@ -197,6 +233,12 @@ const CreateButton = styled.button`
   &:active {
     transform: scale(0.97);
   }
+`;
+
+const SecondaryButton = styled(CreateButton)`
+  background: #1c1e32;
+  color: #ffdad6;
+  box-shadow: none;
 `;
 
 const SearchField = styled.input`
