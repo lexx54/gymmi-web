@@ -37,6 +37,20 @@ vi.mock('../hooks/useListData', () => ({
   }),
 }));
 
+vi.mock('../hooks/useExercises', () => ({
+  useCreateExercise: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
+}));
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {

@@ -4,13 +4,18 @@ import { Can } from '../Can';
 type BuilderPageHeaderProps = {
   onDiscard: () => void;
   onPublish: () => void;
+  isPublishing?: boolean;
 };
 
 /**
  * Asymmetric page header for the exercise builder:
  * editorial headline on the left, primary actions on the right.
  */
-export function BuilderPageHeader({ onDiscard, onPublish }: BuilderPageHeaderProps) {
+export function BuilderPageHeader({
+  onDiscard,
+  onPublish,
+  isPublishing = false,
+}: BuilderPageHeaderProps) {
   return (
     <HeaderRoot>
       <Copy>
@@ -24,8 +29,8 @@ export function BuilderPageHeader({ onDiscard, onPublish }: BuilderPageHeaderPro
           Discard Draft
         </SecondaryButton>
         <Can resource="exercises" action="CREATE">
-          <PrimaryButton type="button" onClick={onPublish}>
-            Publish Exercise
+          <PrimaryButton type="button" onClick={onPublish} disabled={isPublishing}>
+            {isPublishing ? 'Publishing...' : 'Publish Exercise'}
           </PrimaryButton>
         </Can>
       </Actions>
@@ -119,5 +124,11 @@ const PrimaryButton = styled.button`
 
   &:active {
     transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
   }
 `;

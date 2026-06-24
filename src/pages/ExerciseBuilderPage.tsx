@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import styled from 'styled-components';
 import { ActivationMapCard, suggestSecondaryStabilizers } from '../components/exercises/ActivationMapCard';
 import { BasicInfoCard } from '../components/exercises/BasicInfoCard';
@@ -26,7 +27,9 @@ import type {
 } from '../components/exercises/types';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { useCreateExercise } from '../hooks/useExercises';
 import { useListEquipments, useListMuscles } from '../hooks/useListData';
+import type { CreateExerciseParams } from '../services/api/exercises';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -40,12 +43,25 @@ const INITIAL_DRAFT: ExerciseDraft = {
   tags: ['Strength', 'Hypertrophy', 'Leg Day'],
 };
 
+function draftToCreateParams(draft: ExerciseDraft): CreateExerciseParams {
+  return {
+    name: draft.name.trim(),
+    targetMuscle: draft.targetMuscle,
+    equipment: draft.equipment,
+    instructions: draft.instructions.trim(),
+    difficulty: draft.difficulty,
+    movementType: draft.movementType,
+    tags: draft.tags,
+  };
+}
+
 /**
  * Exercise builder page for creating a new movement entry.
  */
 export default function ExerciseBuilderPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const createExercise = useCreateExercise();
   const username = user?.username ?? 'Alex';
   const [draft, setDraft] = useState<ExerciseDraft>(INITIAL_DRAFT);
   const { data: equipments } = useListEquipments();
@@ -130,7 +146,24 @@ export default function ExerciseBuilderPage() {
   };
 
   const handlePublish = () => {
-    navigate('/exercises');
+    if (!draft.name.trim()) {
+      toast.error('Exercise name is required');
+      return;
+    }
+    if (!draft.instructions.trim()) {
+      toast.error('Instructions are required');
+      return;
+    }
+
+    createExercise.mutate(draftToCreateParams(draft), {
+      onSuccess: () => {
+        toast.success('Exercise published');
+        navigate('/exercises');
+      },
+      onError: () => {
+        toast.error('Could not publish exercise');
+      },
+    });
   };
 
   return (
@@ -139,7 +172,11 @@ export default function ExerciseBuilderPage() {
       <ExercisesMain>
         <ExercisesHeader title="Workout Builder" />
         <ExercisesContent>
-          <BuilderPageHeader onDiscard={handleDiscard} onPublish={handlePublish} />
+          <BuilderPageHeader
+            onDiscard={handleDiscard}
+            onPublish={handlePublish}
+            isPublishing={createExercise.isPending}
+          />
           <BentoGrid>
             <LeftColumn>
               <BasicInfoCard

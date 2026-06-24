@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { Plus, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,58 +15,19 @@ import type { ExerciseSummary } from '../components/exercises/types';
 import { Can } from '../components/Can';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
-import { uploadExerciseBulkCsv } from '../services/api/exercises';
+import { useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
+import type { Exercise } from '../services/api/exercises';
 
-const CATALOG: ExerciseSummary[] = [
-  {
-    id: 'bulgarian-split-squat',
-    name: 'Bulgarian Split Squat',
-    targetMuscle: 'Quads',
-    equipment: 'Dumbbells',
-    difficulty: 'Intermediate',
-    tags: ['Strength', 'Unilateral'],
-  },
-  {
-    id: 'barbell-bench-press',
-    name: 'Barbell Bench Press',
-    targetMuscle: 'Chest',
-    equipment: 'Barbell',
-    difficulty: 'Intermediate',
-    tags: ['Compound', 'Upper Body'],
-  },
-  {
-    id: 'romanian-deadlift',
-    name: 'Romanian Deadlift',
-    targetMuscle: 'Hamstrings',
-    equipment: 'Barbell',
-    difficulty: 'Elite',
-    tags: ['Hinge', 'Posterior'],
-  },
-  {
-    id: 'lat-pulldown',
-    name: 'Lat Pulldown',
-    targetMuscle: 'Back',
-    equipment: 'Cable Machine',
-    difficulty: 'Novice',
-    tags: ['Pull', 'Back Day'],
-  },
-  {
-    id: 'overhead-press',
-    name: 'Overhead Press',
-    targetMuscle: 'Shoulders',
-    equipment: 'Barbell',
-    difficulty: 'Intermediate',
-    tags: ['Press', 'Power'],
-  },
-  {
-    id: 'kettlebell-swing',
-    name: 'Kettlebell Swing',
-    targetMuscle: 'Hamstrings',
-    equipment: 'Kettlebell',
-    difficulty: 'Intermediate',
-    tags: ['Explosive', 'Conditioning'],
-  },
-];
+function toExerciseSummary(exercise: Exercise): ExerciseSummary {
+  return {
+    id: exercise.id,
+    name: exercise.name,
+    targetMuscle: exercise.targetMuscle,
+    equipment: exercise.equipment,
+    difficulty: exercise.difficulty as ExerciseSummary['difficulty'],
+    tags: exercise.tags,
+  };
+}
 
 /**
  * Exercises catalog list page. Entry point to the builder.
@@ -78,26 +38,32 @@ export default function ExercisesPage() {
   const username = user?.username ?? 'Alex';
   const [search, setSearch] = useState('');
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-  const bulkCsvMutation = useMutation({
-    mutationFn: uploadExerciseBulkCsv,
-    onSuccess: (result) => {
-      toast.success(`Created ${result.created} exercises from CSV`);
-    },
-    onError: () => {
-      toast.error('Could not upload exercise CSV');
-    },
-  });
+  const { data: exercises, isLoading, isError } = useExercises();
+  const bulkCsvMutation = useUploadExerciseBulkCsv();
+
+  const catalog = useMemo(
+    () => (exercises ?? []).map(toExerciseSummary),
+    [exercises],
+  );
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return CATALOG;
-    return CATALOG.filter((exercise) =>
+    if (!query) return catalog;
+    return catalog.filter((exercise) =>
       [exercise.name, exercise.targetMuscle, exercise.equipment, ...exercise.tags]
         .join(' ')
         .toLowerCase()
         .includes(query),
     );
-  }, [search]);
+  }, [catalog, search]);
+
+  const emptyMessage = useMemo(() => {
+    if (isLoading) return 'Loading exercises...';
+    if (isError) return 'Could not load exercises.';
+    if (catalog.length === 0) return 'No exercises yet. Create your first movement.';
+    if (search.trim()) return 'No exercises match that filter.';
+    return null;
+  }, [isLoading, isError, catalog.length, search]);
 
   return (
     <ExercisesPageShell>
@@ -135,13 +101,15 @@ export default function ExercisesPage() {
             aria-label="Filter exercises"
           />
 
-          <Grid>
-            {visible.map((exercise) => (
-              <ExerciseCatalogCard key={exercise.id} exercise={exercise} />
-            ))}
-          </Grid>
-
-          {visible.length === 0 ? <EmptyState>No exercises match that filter.</EmptyState> : null}
+          {emptyMessage ? (
+            <EmptyState>{emptyMessage}</EmptyState>
+          ) : (
+            <Grid>
+              {visible.map((exercise) => (
+                <ExerciseCatalogCard key={exercise.id} exercise={exercise} />
+              ))}
+            </Grid>
+          )}
         </ExercisesContent>
         <ExerciseBulkCsvModal
           isOpen={isBulkModalOpen}
@@ -151,7 +119,16 @@ export default function ExercisesPage() {
             setIsBulkModalOpen(false);
             bulkCsvMutation.reset();
           }}
-          onUpload={(file) => bulkCsvMutation.mutate(file)}
+          onUpload={(file) =>
+            bulkCsvMutation.mutate(file, {
+              onSuccess: (result) => {
+                toast.success(`Created ${result.created} exercises from CSV`);
+              },
+              onError: () => {
+                toast.error('Could not upload exercise CSV');
+              },
+            })
+          }
         />
       </ExercisesMain>
     </ExercisesPageShell>
