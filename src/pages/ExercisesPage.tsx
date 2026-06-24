@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import styled from 'styled-components';
 import { ExerciseCatalogCard } from '../components/exercises/ExerciseCatalogCard';
 import { ExerciseBulkCsvModal } from '../components/exercises/ExerciseBulkCsvModal';
+import { NoExercises } from '../components/exercises/NoExercises';
 import { ExercisesHeader } from '../components/exercises/ExercisesHeader';
 import {
   ExercisesContent,
@@ -57,13 +58,7 @@ export default function ExercisesPage() {
     );
   }, [catalog, search]);
 
-  const emptyMessage = useMemo(() => {
-    if (isLoading) return 'Loading exercises...';
-    if (isError) return 'Could not load exercises.';
-    if (catalog.length === 0) return 'No exercises yet. Create your first movement.';
-    if (search.trim()) return 'No exercises match that filter.';
-    return null;
-  }, [isLoading, isError, catalog.length, search]);
+  const showGrid = !isLoading && !isError && visible.length > 0;
 
   return (
     <ExercisesPageShell>
@@ -101,14 +96,27 @@ export default function ExercisesPage() {
             aria-label="Filter exercises"
           />
 
-          {emptyMessage ? (
-            <EmptyState>{emptyMessage}</EmptyState>
-          ) : (
+          {showGrid ? (
             <Grid>
               {visible.map((exercise) => (
                 <ExerciseCatalogCard key={exercise.id} exercise={exercise} />
               ))}
             </Grid>
+          ) : (
+            <NoExercises
+              variant={
+                isLoading
+                  ? 'loading'
+                  : isError
+                    ? 'error'
+                    : catalog.length === 0
+                      ? 'empty'
+                      : 'no-results'
+              }
+              onCreateExercise={() => navigate('/exercises/new')}
+              onBulkUpload={() => setIsBulkModalOpen(true)}
+              onClearSearch={() => setSearch('')}
+            />
           )}
         </ExercisesContent>
         <ExerciseBulkCsvModal
@@ -243,11 +251,4 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
   gap: 1.25rem;
-`;
-
-const EmptyState = styled.p`
-  margin: 2rem 0 0;
-  color: #e7bdbb;
-  font-size: 0.9rem;
-  text-align: center;
 `;
