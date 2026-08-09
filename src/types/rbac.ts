@@ -29,6 +29,7 @@ export type AdminUserDto = {
   email: string;
   username: string;
   isActive: boolean;
+  hasPaid: boolean;
   roleId: string;
   role: { id: string; name: string };
   createdAt: string;

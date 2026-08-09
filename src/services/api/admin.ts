@@ -37,7 +37,7 @@ export async function fetchAdminUsers(
 
 export async function patchAdminUser(
   userId: string,
-  body: { roleId?: string; isActive?: boolean },
+  body: { roleId?: string; isActive?: boolean; hasPaid?: boolean },
 ): Promise<unknown> {
   const { data } = await apiClient.patch(`/admin/users/${userId}`, body);
   return data;

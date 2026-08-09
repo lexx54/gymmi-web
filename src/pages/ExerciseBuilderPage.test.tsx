@@ -7,7 +7,13 @@ import ExerciseBuilderPage from './ExerciseBuilderPage';
 
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
-    user: { id: '1', email: 'test@test.com', username: 'testuser', role: { id: 'r1', name: 'Admin' } },
+    user: {
+      id: '1',
+      email: 'test@test.com',
+      username: 'testuser',
+      hasPaid: false,
+      role: { id: 'r1', name: 'Admin' },
+    },
     isAuthenticated: true,
     isLoading: false,
     signIn: vi.fn(),

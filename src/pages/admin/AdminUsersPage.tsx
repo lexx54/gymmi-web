@@ -30,7 +30,10 @@ export default function AdminUsersPage() {
   });
 
   const patchMutation = useMutation({
-    mutationFn: (vars: { userId: string; body: { roleId?: string; isActive?: boolean } }) =>
+    mutationFn: (vars: {
+      userId: string;
+      body: { roleId?: string; isActive?: boolean; hasPaid?: boolean };
+    }) =>
       patchAdminUser(vars.userId, vars.body),
     onSuccess: () => {
       toast.success('User updated');
@@ -62,6 +65,7 @@ export default function AdminUsersPage() {
                       <Th>Email</Th>
                       <Th>Role</Th>
                       <Th>Active</Th>
+                      <Th>Paid</Th>
                     </tr>
                   </thead>
                   <tbody>
@@ -91,6 +95,19 @@ export default function AdminUsersPage() {
                               patchMutation.mutate({
                                 userId: u.id,
                                 body: { isActive: e.target.checked },
+                              })
+                            }
+                            style={{ accentColor: '#ff535a', width: 18, height: 18 }}
+                          />
+                        </Td>
+                        <Td>
+                          <input
+                            type="checkbox"
+                            checked={u.hasPaid}
+                            onChange={(e) =>
+                              patchMutation.mutate({
+                                userId: u.id,
+                                body: { hasPaid: e.target.checked },
                               })
                             }
                             style={{ accentColor: '#ff535a', width: 18, height: 18 }}

@@ -7,7 +7,13 @@ import SettingsPage from './SettingsPage';
 
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
-    user: { id: '1', email: 'test@test.com', username: 'testuser' },
+    user: {
+      id: '1',
+      email: 'test@test.com',
+      username: 'testuser',
+      hasPaid: false,
+      role: { id: 'r1', name: 'Client' },
+    },
     isAuthenticated: true,
     isLoading: false,
     signIn: vi.fn(),

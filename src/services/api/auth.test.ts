@@ -17,7 +17,13 @@ describe('loginApi', () => {
     const response = {
       accessToken: 'at',
       refreshToken: 'rt',
-      user: { id: '1', email: 'a@b.com', username: 'user' },
+      user: {
+        id: '1',
+        email: 'a@b.com',
+        username: 'user',
+        hasPaid: false,
+        role: { id: 'r1', name: 'Client' },
+      },
     };
     mockPost.mockResolvedValue({ data: response });
 
@@ -44,7 +50,13 @@ describe('signupApi', () => {
     const response = {
       accessToken: 'at',
       refreshToken: 'rt',
-      user: { id: '1', email: 'a@b.com', username: 'newuser' },
+      user: {
+        id: '1',
+        email: 'a@b.com',
+        username: 'newuser',
+        hasPaid: false,
+        role: { id: 'r1', name: 'Client' },
+      },
     };
     mockPost.mockResolvedValue({ data: response });
 

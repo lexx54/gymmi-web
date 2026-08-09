@@ -67,7 +67,14 @@ describe('AuthContext', () => {
   });
 
   it('when valid JWT token exists, decodes and sets user', async () => {
-    const token = makeJwt({ sub: '42', email: 'a@b.com', username: 'volt', roleId: 'r1', roleName: 'Client' });
+    const token = makeJwt({
+      sub: '42',
+      email: 'a@b.com',
+      username: 'volt',
+      hasPaid: true,
+      roleId: 'r1',
+      roleName: 'Client',
+    });
     mockGetTokens.mockReturnValue({ accessToken: token, refreshToken: 'rt' });
 
     const { result } = renderHook(() => useAuth(), {
@@ -79,6 +86,7 @@ describe('AuthContext', () => {
       id: '42',
       email: 'a@b.com',
       username: 'volt',
+      hasPaid: true,
       role: { id: 'r1', name: 'Client' },
     });
     expect(result.current.isAuthenticated).toBe(true);
@@ -89,7 +97,13 @@ describe('AuthContext', () => {
     mockLoginApi.mockResolvedValue({
       accessToken: 'at',
       refreshToken: 'rt',
-      user: { id: '1', email: 'a@b.com', username: 'user1' },
+      user: {
+        id: '1',
+        email: 'a@b.com',
+        username: 'user1',
+        hasPaid: false,
+        role: { id: 'r1', name: 'Client' },
+      },
     });
 
     const { result } = renderHook(() => useAuth(), {
@@ -111,6 +125,8 @@ describe('AuthContext', () => {
       id: '1',
       email: 'a@b.com',
       username: 'user1',
+      hasPaid: false,
+      role: { id: 'r1', name: 'Client' },
     });
     expect(result.current.isAuthenticated).toBe(true);
   });

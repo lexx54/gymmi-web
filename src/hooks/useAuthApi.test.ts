@@ -69,7 +69,13 @@ describe('useSignup', () => {
     mockSignupApi.mockResolvedValue({
       accessToken: 'a',
       refreshToken: 'b',
-      user: { id: '1', email: 'a@b.com', username: 'user' },
+      user: {
+        id: '1',
+        email: 'a@b.com',
+        username: 'user',
+        hasPaid: false,
+        role: { id: 'r1', name: 'Client' },
+      },
     });
 
     const { result } = renderHook(() => useSignup(), {
