@@ -5,10 +5,12 @@ const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: './e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Auth endpoints are throttled per X-Client-Id; keep local runs modestly parallel.
+  workers: process.env.CI ? 1 : 4,
   reporter: 'html',
   use: {
     baseURL,

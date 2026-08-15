@@ -2,13 +2,30 @@ import axios from 'axios';
 import { getTokens, saveTokens, clearTokens } from '../storage/tokenStorage';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const CLIENT_ID_STORAGE_KEY = 'gymmi-client-id';
+
+/**
+ * Stable per-browser client id so auth throttling is not shared across
+ * Playwright workers / browser contexts that all used to send "web".
+ */
+function getClientId(): string {
+  if (typeof localStorage === 'undefined') {
+    return 'web';
+  }
+  const existing = localStorage.getItem(CLIENT_ID_STORAGE_KEY);
+  if (existing) return existing;
+  const next = `web-${crypto.randomUUID()}`;
+  localStorage.setItem(CLIENT_ID_STORAGE_KEY, next);
+  return next;
+}
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'web' },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 apiClient.interceptors.request.use((config) => {
+  config.headers['X-Client-Id'] = getClientId();
   const { accessToken } = getTokens();
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;

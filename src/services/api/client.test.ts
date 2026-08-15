@@ -48,7 +48,7 @@ describe('API Client - creation', () => {
   it('should create axios instance with correct config', () => {
     expect(axios.create).toHaveBeenCalledWith({
       baseURL: 'http://localhost:3000',
-      headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'web' },
+      headers: { 'Content-Type': 'application/json' },
     });
   });
 
@@ -69,6 +69,7 @@ describe('API Client - request interceptor', () => {
     const result = requestInterceptor(config);
 
     expect(result.headers.Authorization).toBe('Bearer my-token');
+    expect(result.headers['X-Client-Id']).toEqual(expect.any(String));
   });
 
   it('should not add Authorization header when no access token', () => {
