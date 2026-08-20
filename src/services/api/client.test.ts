@@ -129,7 +129,7 @@ describe('API Client - response interceptor', () => {
     mockInstance.mockResolvedValue({ data: { retried: true } });
 
     const error = {
-      config: { url: '/users', headers: {} },
+      config: { url: '/users', headers: {} as Record<string, string> },
       response: { status: 401 },
     };
 

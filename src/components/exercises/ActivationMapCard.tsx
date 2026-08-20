@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { ListCatalogItem } from '../../hooks/useListData';
 
@@ -82,6 +83,12 @@ const TIERS: { id: ActivationTier; label: string }[] = [
   { id: 'stabilizers', label: 'Stabilizers' },
 ];
 
+const TIER_LABEL_KEYS: Record<ActivationTier, string> = {
+  primary: 'exercises.primary',
+  secondary: 'exercises.secondary',
+  stabilizers: 'exercises.stabilizers',
+};
+
 /**
  * Shows the muscle activation map for the exercise with tonal accent bars.
  */
@@ -94,6 +101,7 @@ export function ActivationMapCard({
   onSecondaryChange,
   onStabilizersChange,
 }: ActivationMapCardProps) {
+  const { t } = useTranslation();
   const options = muscleSelectOptions(muscleNames, primary, secondary, stabilizers);
 
   const valueFor = (id: ActivationTier) => {
@@ -111,16 +119,16 @@ export function ActivationMapCard({
 
   return (
     <Card>
-      <Title>Activation Map</Title>
+      <Title>{t('exercises.activationMap')}</Title>
       <Grid>
         {TIERS.map((tier) => (
           <Tile key={tier.id} $tier={tier.id}>
-            <TileLabel htmlFor={`activation-${tier.id}`}>{tier.label}</TileLabel>
+            <TileLabel htmlFor={`activation-${tier.id}`}>{t(TIER_LABEL_KEYS[tier.id])}</TileLabel>
             <MuscleSelect
               id={`activation-${tier.id}`}
               value={valueFor(tier.id)}
               onChange={onChangeFor(tier.id)}
-              aria-label={`${tier.label} muscle`}
+              aria-label={t('exercises.muscleLabel', { tier: t(TIER_LABEL_KEYS[tier.id]) })}
             >
               {options.map((name) => (
                 <option key={name} value={name}>

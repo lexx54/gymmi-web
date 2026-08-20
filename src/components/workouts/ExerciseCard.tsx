@@ -1,4 +1,5 @@
 import { GripVertical, PlusSquare, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { SetRow } from './SetRow';
 import type { RoutineExercise, SetField } from './types';
@@ -23,6 +24,7 @@ export function ExerciseCard({
   onRemoveExercise,
   onUpdateSet,
 }: ExerciseCardProps) {
+  const { t } = useTranslation();
   const positionLabel = position.toString().padStart(2, '0');
 
   return (
@@ -32,14 +34,14 @@ export function ExerciseCard({
           <PositionChip>{positionLabel}</PositionChip>
           <HeaderText>
             <Title>{exercise.name}</Title>
-            <Target>Target: {exercise.target}</Target>
+            <Target>{t('workouts.target', { target: exercise.target })}</Target>
           </HeaderText>
         </HeaderLeft>
         <HeaderActions>
-          <IconButton type="button" aria-label="Reorder exercise">
+          <IconButton type="button" aria-label={t('workouts.reorderExercise')}>
             <GripVertical size={16} />
           </IconButton>
-          <IconButton type="button" aria-label="Remove exercise" onClick={onRemoveExercise} $danger>
+          <IconButton type="button" aria-label={t('workouts.removeExercise')} onClick={onRemoveExercise} $danger>
             <Trash2 size={16} />
           </IconButton>
         </HeaderActions>
@@ -49,11 +51,11 @@ export function ExerciseCard({
         <SetsTable>
           <thead>
             <tr>
-              <Th>Set</Th>
-              <Th>Weight (kg)</Th>
-              <Th>Reps</Th>
-              <Th>Rest</Th>
-              <Th>RPE</Th>
+              <Th>{t('workouts.set')}</Th>
+              <Th>{t('workouts.weight')}</Th>
+              <Th>{t('workouts.reps')}</Th>
+              <Th>{t('workouts.rest')}</Th>
+              <Th>{t('workouts.rpe')}</Th>
               <Th aria-hidden />
             </tr>
           </thead>
@@ -72,7 +74,7 @@ export function ExerciseCard({
 
         <AddSetButton type="button" onClick={onAddSet}>
           <PlusSquare size={14} />
-          Add Set
+          {t('workouts.addSet')}
         </AddSetButton>
       </CardBody>
     </Card>

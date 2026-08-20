@@ -1,5 +1,6 @@
 import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 
@@ -8,30 +9,31 @@ type SidebarProps = {
 };
 
 interface SidebarItem {
-  label: string;
+  labelKey: string;
   to: string;
   icon: typeof LayoutDashboard;
 }
 
 const sidebarItems: SidebarItem[] = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Workouts', to: '/workout', icon: Dumbbell },
-  { label: 'Exercises', to: '/exercises', icon: NotebookPen },
-  { label: 'Analytics', to: '/analytics', icon: BarChart3 },
-  { label: 'Settings', to: '/settings', icon: Settings },
+  { labelKey: 'nav.dashboard', to: '/dashboard', icon: LayoutDashboard },
+  { labelKey: 'nav.workouts', to: '/workout', icon: Dumbbell },
+  { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
+  { labelKey: 'nav.analytics', to: '/analytics', icon: BarChart3 },
+  { labelKey: 'nav.settings', to: '/settings', icon: Settings },
 ];
 
 /**
  * Displays the main dashboard navigation sidebar.
  */
 const adminItems: SidebarItem[] = [
-  { label: 'Permissions', to: '/admin/permissions', icon: Shield },
-  { label: 'Users', to: '/admin/users', icon: Users },
+  { labelKey: 'nav.permissions', to: '/admin/permissions', icon: Shield },
+  { labelKey: 'nav.users', to: '/admin/users', icon: Users },
 ];
 
 export function Sidebar({ username }: SidebarProps) {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isAdmin = user?.role?.name === 'Admin';
 
   const handleSignOut = async () => {
@@ -46,20 +48,20 @@ export function Sidebar({ username }: SidebarProps) {
         <Avatar />
         <ProfileText>
           <Username>{username.toUpperCase().slice(0, 6)}</Username>
-          <EliteStatus>{user?.role?.name?.toUpperCase() ?? 'MEMBER'}</EliteStatus>
-          <Streak>7 DAY STREAK</Streak>
+          <EliteStatus>{user?.role?.name?.toUpperCase() ?? t('common.member')}</EliteStatus>
+          <Streak>{t('nav.streak')}</Streak>
         </ProfileText>
       </ProfileCard>
-      <SidebarNav aria-label="Dashboard navigation">
+      <SidebarNav aria-label={t('nav.dashboardNavigation')}>
         <NavList>
           {sidebarItems.map((item) => {
             const Icon = item.icon;
 
             return (
-              <li key={item.label}>
+              <li key={item.labelKey}>
                 <NavItemLink to={item.to} end>
                   <Icon size={16} aria-hidden />
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                 </NavItemLink>
               </li>
             );
@@ -68,15 +70,15 @@ export function Sidebar({ username }: SidebarProps) {
         {isAdmin && (
           <>
             <AdminDivider />
-            <AdminLabel>Admin</AdminLabel>
+            <AdminLabel>{t('common.admin')}</AdminLabel>
             <NavList>
               {adminItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <li key={item.label}>
+                  <li key={item.labelKey}>
                     <NavItemLink to={item.to} end>
                       <Icon size={16} aria-hidden />
-                      <span>{item.label}</span>
+                      <span>{t(item.labelKey)}</span>
                     </NavItemLink>
                   </li>
                 );
@@ -87,7 +89,7 @@ export function Sidebar({ username }: SidebarProps) {
       </SidebarNav>
       <SignOutButton type="button" onClick={handleSignOut}>
         <LogOut size={16} aria-hidden />
-        <span>Sign Out</span>
+        <span>{t('nav.signOut')}</span>
       </SignOutButton>
     </SidebarAside>
   );

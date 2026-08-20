@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Can } from '../Can';
 
@@ -16,21 +17,23 @@ export function BuilderPageHeader({
   onPublish,
   isPublishing = false,
 }: BuilderPageHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <HeaderRoot>
       <Copy>
-        <Eyebrow>New Entry</Eyebrow>
+        <Eyebrow>{t('exercises.newEntry')}</Eyebrow>
         <Headline>
-          Define Your <Accent>Kinetic</Accent> Edge
+          {t('exercises.builderTitle')}
         </Headline>
       </Copy>
       <Actions>
         <SecondaryButton type="button" onClick={onDiscard}>
-          Discard Draft
+          {t('exercises.discardDraft')}
         </SecondaryButton>
         <Can resource="exercises" action="CREATE">
           <PrimaryButton type="button" onClick={onPublish} disabled={isPublishing}>
-            {isPublishing ? 'Publishing...' : 'Publish Exercise'}
+            {isPublishing ? t('exercises.publishing') : t('exercises.publishExercise')}
           </PrimaryButton>
         </Can>
       </Actions>
@@ -74,11 +77,6 @@ const Headline = styled.h2`
   font-size: 3rem;
   line-height: 1.05;
   color: #e0e0fc;
-`;
-
-const Accent = styled.em`
-  color: #ff535a;
-  font-style: italic;
 `;
 
 const Actions = styled.div`

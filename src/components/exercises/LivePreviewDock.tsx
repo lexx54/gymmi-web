@@ -1,26 +1,29 @@
 import { Eye, Monitor, Smartphone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Floating glass dock that summarizes the live preview state.
  */
 export function LivePreviewDock() {
+  const { t } = useTranslation();
+
   return (
-    <Dock aria-label="Live preview controls">
+    <Dock aria-label={t('exercises.previewControls')}>
       <StatusCluster>
         <EyeBadge>
           <Eye size={18} />
         </EyeBadge>
         <StatusText>
-          <Title>Live Preview</Title>
-          <Subtitle>Last saved: Just now</Subtitle>
+          <Title>{t('exercises.livePreview')}</Title>
+          <Subtitle>{t('exercises.lastSaved')}</Subtitle>
         </StatusText>
       </StatusCluster>
       <Divider aria-hidden />
-      <ViewportButton type="button" aria-label="Preview on mobile">
+      <ViewportButton type="button" aria-label={t('exercises.previewMobile')}>
         <Smartphone size={18} />
       </ViewportButton>
-      <ViewportButton type="button" aria-label="Preview on desktop">
+      <ViewportButton type="button" aria-label={t('exercises.previewDesktop')}>
         <Monitor size={18} />
       </ViewportButton>
     </Dock>

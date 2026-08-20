@@ -6,8 +6,9 @@ import { Mail, Lock, Eye, EyeOff, Apple, Loader2 } from 'lucide-react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { useLogin } from '../hooks/useAuthApi';
-import { loginSchema, type LoginFormValues } from '../schemas/auth';
+import { createLoginSchema, type LoginFormValues } from '../schemas/auth';
 
 const LOCKOUT_DURATION = 180_000;
 
@@ -15,6 +16,7 @@ const errorTextStyle = { color: '#d90429', fontSize: '0.75rem', marginTop: '0.37
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
@@ -25,7 +27,7 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(t)),
     defaultValues: { identifier: '', password: '' },
   });
 
@@ -52,7 +54,7 @@ export default function LoginPage() {
     `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   const lockoutMessage = isLocked
-    ? `Too many attempts. Try again in ${formatCountdown(remainingSeconds)}`
+    ? t('auth.lockout', { time: formatCountdown(remainingSeconds) })
     : '';
 
   const onSubmit = (data: LoginFormValues) => {
@@ -72,7 +74,7 @@ export default function LoginPage() {
           toast.error(
             ax.response?.data?.message ||
               (err instanceof Error ? err.message : '') ||
-              'Login failed. Please try again.',
+              t('auth.loginFailed'),
           );
         },
       },
@@ -92,7 +94,7 @@ export default function LoginPage() {
             <HeroTitle>Gymmi</HeroTitle>
           </div>
           <HeroFooter>
-            <HeroQuote>"The only bad workout is the one that didn't happen."</HeroQuote>
+            <HeroQuote>{t('auth.quote')}</HeroQuote>
           </HeroFooter>
         </HeroContent>
       </HeroPanel>
@@ -106,8 +108,8 @@ export default function LoginPage() {
           </MobileBrand>
 
           <FormCard style={{ padding: '3rem' }}>
-            <FormTitle style={{ marginBottom: '0.25rem' }}>Welcome</FormTitle>
-            <FormSubtitle style={{ marginBottom: '2.5rem' }}>Login with Email</FormSubtitle>
+            <FormTitle style={{ marginBottom: '0.25rem' }}>{t('auth.welcome')}</FormTitle>
+            <FormSubtitle style={{ marginBottom: '2.5rem' }}>{t('auth.loginWithEmail')}</FormSubtitle>
 
             {lockoutMessage && (
               <p style={{ color: '#d90429', fontSize: '0.8125rem', textAlign: 'center', marginBottom: '1rem' }}>
@@ -124,7 +126,7 @@ export default function LoginPage() {
                   </span>
                   <input
                     type="email"
-                    placeholder="email@mail.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     autoComplete="email"
                     {...register('identifier')}
                     style={{ width: '100%', paddingLeft: '3.25rem', paddingRight: '1.25rem', paddingTop: '0.875rem', paddingBottom: '0.875rem', borderRadius: '9999px', border: errors.identifier ? '1px solid #d90429' : '1px solid #d2d6df', backgroundColor: 'white', color: '#2b2d42', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
@@ -141,7 +143,7 @@ export default function LoginPage() {
                   </span>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     autoComplete="current-password"
                     {...register('password')}
                     style={{ width: '100%', paddingLeft: '3.25rem', paddingRight: '3.25rem', paddingTop: '0.875rem', paddingBottom: '0.875rem', borderRadius: '9999px', border: errors.password ? '1px solid #d90429' : '1px solid #d2d6df', backgroundColor: 'white', color: '#2b2d42', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
@@ -163,7 +165,7 @@ export default function LoginPage() {
                   type="button"
                   style={{ fontSize: '0.75rem', color: '#8d99ae', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
                 >
-                  Forgot your password?
+                  {t('auth.forgotPassword')}
                 </button>
               </div>
 
@@ -176,14 +178,18 @@ export default function LoginPage() {
                 onMouseLeave={(e) => { if (!disabled) e.currentTarget.style.backgroundColor = disabled ? '#8d99ae' : '#ef233c'; }}
               >
                 {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
-                {isLocked ? `WAIT ${formatCountdown(remainingSeconds)}` : loading ? 'LOGGING IN...' : 'LOGIN'}
+                {isLocked
+                  ? t('auth.wait', { time: formatCountdown(remainingSeconds) })
+                  : loading
+                    ? t('auth.loggingIn')
+                    : t('auth.login')}
               </button>
             </form>
 
             {/* Divider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.75rem 0' }}>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
-              <span style={{ fontSize: '0.75rem', color: '#8d99ae', textTransform: 'uppercase' }}>Or</span>
+              <span style={{ fontSize: '0.75rem', color: '#8d99ae', textTransform: 'uppercase' }}>{t('common.or')}</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
             </div>
 
@@ -218,12 +224,12 @@ export default function LoginPage() {
 
             {/* Sign Up */}
             <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#8d99ae', marginTop: '2rem' }}>
-              Don't have an account?{' '}
+              {t('auth.dontHaveAccount')}{' '}
               <Link
                 to="/signup"
                 style={{ color: '#ef233c', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
               >
-                Register Now
+                {t('auth.registerNow')}
               </Link>
             </p>
           </FormCard>

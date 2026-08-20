@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type ModalProps = {
@@ -14,6 +15,8 @@ type ModalProps = {
  * Generic modal shell for focused overlay workflows.
  */
 export function Modal({ isOpen, title, description, children, onClose }: ModalProps) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -30,7 +33,7 @@ export function Modal({ isOpen, title, description, children, onClose }: ModalPr
             <Title id="modal-title">{title}</Title>
             {description ? <Description id="modal-description">{description}</Description> : null}
           </div>
-          <CloseButton type="button" aria-label="Close modal" onClick={onClose}>
+          <CloseButton type="button" aria-label={t('common.closeModal')} onClick={onClose}>
             <X size={18} aria-hidden />
           </CloseButton>
         </Header>

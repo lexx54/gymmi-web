@@ -1,5 +1,6 @@
 import { ArrowUp, Minus, TrendingUp } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
 
@@ -7,7 +8,7 @@ type Status = 'ELITE' | 'ADVANCED';
 
 type RecordRow = {
   id: string;
-  exercise: string;
+  exerciseKey: string;
   date: string;
   weight: string;
   status: Status;
@@ -15,25 +16,27 @@ type RecordRow = {
 };
 
 const RECORDS: RecordRow[] = [
-  { id: 'squat', exercise: 'Back Squat', date: 'Oct 12, 2024', weight: '185.0', status: 'ELITE', icon: TrendingUp },
-  { id: 'bench', exercise: 'Bench Press', date: 'Sep 28, 2024', weight: '120.0', status: 'ADVANCED', icon: Minus },
-  { id: 'deadlift', exercise: 'Deadlift', date: 'Nov 02, 2024', weight: '220.0', status: 'ELITE', icon: ArrowUp },
+  { id: 'squat', exerciseKey: 'analytics.backSquat', date: 'Oct 12, 2024', weight: '185.0', status: 'ELITE', icon: TrendingUp },
+  { id: 'bench', exerciseKey: 'analytics.benchPress', date: 'Sep 28, 2024', weight: '120.0', status: 'ADVANCED', icon: Minus },
+  { id: 'deadlift', exerciseKey: 'analytics.deadlift', date: 'Nov 02, 2024', weight: '220.0', status: 'ELITE', icon: ArrowUp },
 ];
 
 /**
  * Lists the athlete's personal records in a compact table-like layout.
  */
 export function PersonalRecordsCard() {
+  const { t } = useTranslation();
+
   return (
     <AnalyticsCard>
-      <Eyebrow>Hall of Fame</Eyebrow>
-      <CardTitle>Personal Records</CardTitle>
+      <Eyebrow>{t('analytics.hallOfFame')}</Eyebrow>
+      <CardTitle>{t('analytics.personalRecords')}</CardTitle>
 
       <HeaderRow>
-        <HeaderCell>Exercise</HeaderCell>
-        <HeaderCell>Last PR Date</HeaderCell>
-        <HeaderCell>Weight</HeaderCell>
-        <HeaderCell>Status</HeaderCell>
+        <HeaderCell>{t('analytics.exercise')}</HeaderCell>
+        <HeaderCell>{t('analytics.lastPrDate')}</HeaderCell>
+        <HeaderCell>{t('analytics.weight')}</HeaderCell>
+        <HeaderCell>{t('analytics.status')}</HeaderCell>
       </HeaderRow>
 
       <List>
@@ -45,16 +48,16 @@ export function PersonalRecordsCard() {
                 <IconWrap>
                   <Icon size={16} />
                 </IconWrap>
-                <ExerciseName>{record.exercise}</ExerciseName>
+                <ExerciseName>{t(record.exerciseKey)}</ExerciseName>
               </ExerciseCell>
               <DateCell>{record.date}</DateCell>
               <WeightCell>
-                {record.weight} <WeightUnit>KG</WeightUnit>
+                {record.weight} <WeightUnit>{t('analytics.kg')}</WeightUnit>
               </WeightCell>
               <StatusCell>
                 <StatusBadge $status={record.status}>
                   <StatusDot />
-                  {record.status}
+                  {record.status === 'ELITE' ? t('analytics.elite') : t('analytics.advanced')}
                 </StatusBadge>
               </StatusCell>
             </Row>

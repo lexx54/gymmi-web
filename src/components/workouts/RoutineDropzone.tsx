@@ -1,16 +1,19 @@
 import { LibraryBig } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Empty-state dropzone shown beneath the routine list.
  */
 export function RoutineDropzone() {
+  const { t } = useTranslation();
+
   return (
     <Zone>
       <Icon>
         <LibraryBig size={32} />
       </Icon>
-      <Hint>Drag exercises from library to add</Hint>
+      <Hint>{t('workouts.dropHint')}</Hint>
     </Zone>
   );
 }

@@ -64,12 +64,14 @@ describe('signupApi', () => {
       email: 'a@b.com',
       username: 'newuser',
       password: 'pass123',
+      role: 'Client',
     });
 
     expect(mockPost).toHaveBeenCalledWith('/auth/signup', {
       email: 'a@b.com',
       username: 'newuser',
       password: 'pass123',
+      role: 'Client',
     });
     expect(result).toEqual(response);
   });

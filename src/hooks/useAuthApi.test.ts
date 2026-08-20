@@ -86,6 +86,7 @@ describe('useSignup', () => {
       email: 'a@b.com',
       username: 'user',
       password: 'pass123',
+      role: 'Client',
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -93,6 +94,7 @@ describe('useSignup', () => {
       email: 'a@b.com',
       username: 'user',
       password: 'pass123',
+      role: 'Client',
     });
   });
 
@@ -107,6 +109,7 @@ describe('useSignup', () => {
       email: 'a@b.com',
       username: 'user',
       password: 'pass',
+      role: 'Client',
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));

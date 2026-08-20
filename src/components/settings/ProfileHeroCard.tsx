@@ -1,4 +1,5 @@
 import { Heart, Pencil, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CardSurface } from './SettingsShell';
 
@@ -7,59 +8,57 @@ import { CardSurface } from './SettingsShell';
  * workout frequency, and goal progress.
  */
 export function ProfileHeroCard() {
+  const { t } = useTranslation();
+
   return (
     <HeroWrapper>
       <HeroLeft>
         <AvatarSection>
           <AvatarBox>
             <AvatarPlaceholder />
-            <EditBadge aria-label="Edit avatar">
+            <EditBadge aria-label={t('settings.editAvatar')}>
               <Pencil size={12} />
             </EditBadge>
           </AvatarBox>
         </AvatarSection>
         <ProfileInfo>
-          <DisplayName>Alex &quot;Volt&quot; Sterling</DisplayName>
-          <StatusLine>ELITE STATUS &bull; MEMBER SINCE OCT 2022</StatusLine>
-          <Bio>
-            Performance-driven endurance athlete focused on high-intensity
-            metabolic conditioning. Currently training for the Kinetic Global
-            Sprint series.
-          </Bio>
+          <DisplayName>{t('settings.displayName')}</DisplayName>
+          <StatusLine>{t('settings.statusLine')}</StatusLine>
+          <Bio>{t('settings.bio')}</Bio>
           <TagRow>
             <Tag>
-              <TagIcon>&#9878;</TagIcon> Endurance Pro
+              <TagIcon>&#9878;</TagIcon> {t('settings.endurancePro')}
             </Tag>
             <Tag>
-              <TagIcon>&#9201;</TagIcon> PB: 2:45 Marathon
+              <TagIcon>&#9201;</TagIcon> {t('settings.marathonPb')}
             </Tag>
           </TagRow>
           <HeartStat>
             <Heart size={14} fill="#ffb3b1" color="#ffb3b1" />
-            <span>48 BPM RHR</span>
+            <span>{t('settings.rhr')}</span>
           </HeartStat>
         </ProfileInfo>
       </HeroLeft>
       <HeroRight>
         <StatBlock>
           <StatHeader>
-            <StatLabel>WORKOUT FREQUENCY</StatLabel>
+            <StatLabel>{t('settings.workoutFrequency')}</StatLabel>
             <TrendingUp size={16} color="#ffb3b1" />
           </StatHeader>
           <StatValue>
-            6.4<StatUnit>/week</StatUnit>
+            6.4<StatUnit>{t('settings.perWeek')}</StatUnit>
           </StatValue>
         </StatBlock>
         <ProgressBlock>
           <ProgressHeader>
-            <StatLabel>GOAL PROGRESS</StatLabel>
+            <StatLabel>{t('settings.goalProgress')}</StatLabel>
             <ProgressPercent>84%</ProgressPercent>
           </ProgressHeader>
           <ProgressTrack>
             <ProgressFill style={{ width: '84%' }} />
           </ProgressTrack>
         </ProgressBlock>
-        <ViewProfileButton type="button">VIEW PUBLIC PROFILE</ViewProfileButton>
+        <ViewProfileButton type="button">{t('settings.viewPublicProfile')}</ViewProfileButton>
       </HeroRight>
     </HeroWrapper>
   );

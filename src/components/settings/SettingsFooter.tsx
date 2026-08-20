@@ -1,15 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Footer bar with system state message and save/discard action buttons.
  */
 export function SettingsFooter() {
+  const { t } = useTranslation();
+
   return (
     <FooterBar>
-      <SystemState>System state: All local changes encrypted.</SystemState>
+      <SystemState>{t('settings.systemState')}</SystemState>
       <Actions>
-        <DiscardButton type="button">DISCARD CHANGES</DiscardButton>
-        <SaveButton type="button">SAVE CONFIGURATION</SaveButton>
+        <DiscardButton type="button">{t('settings.discardChanges')}</DiscardButton>
+        <SaveButton type="button">{t('settings.saveConfiguration')}</SaveButton>
       </Actions>
     </FooterBar>
   );

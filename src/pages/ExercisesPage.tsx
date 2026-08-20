@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Plus, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ExerciseCatalogCard } from '../components/exercises/ExerciseCatalogCard';
 import { ExerciseBulkCsvModal } from '../components/exercises/ExerciseBulkCsvModal';
@@ -35,6 +36,7 @@ function toExerciseSummary(exercise: Exercise): ExerciseSummary {
  */
 export default function ExercisesPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
   const [search, setSearch] = useState('');
@@ -64,25 +66,23 @@ export default function ExercisesPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title="Exercises" />
+        <ExercisesHeader title={t('nav.exercises')} />
         <ExercisesContent>
           <HeaderRow>
             <Copy>
-              <Eyebrow>Catalog</Eyebrow>
-              <Title>Design your movement catalog</Title>
-              <Subtitle>
-                Build, curate, and refine every exercise your athletes will meet in the field.
-              </Subtitle>
+              <Eyebrow>{t('exercises.catalog')}</Eyebrow>
+              <Title>{t('exercises.catalogTitle')}</Title>
+              <Subtitle>{t('exercises.catalogSubtitle')}</Subtitle>
             </Copy>
             <Can resource="exercises" action="CREATE">
               <ActionGroup>
                 <SecondaryButton type="button" onClick={() => setIsBulkModalOpen(true)}>
                   <Upload size={16} />
-                  Bulk csv
+                  {t('exercises.bulkCsv')}
                 </SecondaryButton>
                 <CreateButton type="button" onClick={() => navigate('/exercises/new')}>
                   <Plus size={16} />
-                  Create Exercise
+                  {t('exercises.createExercise')}
                 </CreateButton>
               </ActionGroup>
             </Can>
@@ -92,8 +92,8 @@ export default function ExercisesPage() {
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Filter exercises by name, muscle, or tag..."
-            aria-label="Filter exercises"
+            placeholder={t('exercises.filterPlaceholder')}
+            aria-label={t('exercises.filterLabel')}
           />
 
           {showGrid ? (
@@ -130,10 +130,10 @@ export default function ExercisesPage() {
           onUpload={(file) =>
             bulkCsvMutation.mutate(file, {
               onSuccess: (result) => {
-                toast.success(`Created ${result.created} exercises from CSV`);
+                toast.success(t('exercises.createdCsv', { count: result.created }));
               },
               onError: () => {
-                toast.error('Could not upload exercise CSV');
+                toast.error(t('exercises.csvFailed'));
               },
             })
           }

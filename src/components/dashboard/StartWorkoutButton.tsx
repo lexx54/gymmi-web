@@ -1,14 +1,17 @@
 import { Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Floating primary action for starting a workout.
  */
 export function StartWorkoutButton() {
+  const { t } = useTranslation();
+
   return (
     <Button type="button">
       <Play size={14} fill="currentColor" />
-      Start Workout
+      {t('dashboard.startWorkout')}
     </Button>
   );
 }

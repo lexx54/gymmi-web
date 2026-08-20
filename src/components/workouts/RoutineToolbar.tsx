@@ -1,4 +1,5 @@
 import { Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type RoutineToolbarProps = {
@@ -17,24 +18,24 @@ export function RoutineToolbar({
   durationLabel,
   intensityLabel,
 }: RoutineToolbarProps) {
+  const { t } = useTranslation();
+
   return (
     <Container>
       <TitleBlock>
         <TitleInput
           value={title}
           onChange={(event) => onTitleChange(event.target.value)}
-          aria-label="Routine title"
+          aria-label={t('workouts.routineTitle')}
         />
-        <Meta>
-          Duration Est: {durationLabel} • Intensity: {intensityLabel}
-        </Meta>
+        <Meta>{t('workouts.durationEst', { duration: durationLabel, intensity: intensityLabel })}</Meta>
       </TitleBlock>
       <Actions>
         <SecondaryButton type="button">
           <Save size={16} />
-          Save Draft
+          {t('workouts.saveDraft')}
         </SecondaryButton>
-        <PrimaryButton type="button">Finish Routine</PrimaryButton>
+        <PrimaryButton type="button">{t('workouts.finishRoutine')}</PrimaryButton>
       </Actions>
     </Container>
   );

@@ -1,4 +1,5 @@
 import { BarChart3 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CardSurface, SectionTitle } from './SettingsShell';
 
@@ -9,42 +10,44 @@ interface ZoneData {
 }
 
 const zones: ZoneData[] = [
-  { label: 'ZONE 5', value: '178+', percent: 100 },
-  { label: 'ZONE 4', value: '162', percent: 78 },
-  { label: 'ZONE 3', value: '145', percent: 58 },
+  { label: '5', value: '178+', percent: 100 },
+  { label: '4', value: '162', percent: 78 },
+  { label: '3', value: '145', percent: 58 },
 ];
 
 /**
  * Training metrics section with unit system toggle and heart rate zones.
  */
 export function TrainingMetricsCard() {
+  const { t } = useTranslation();
+
   return (
     <Wrapper>
       <SectionTitle>
-        <BarChart3 size={18} color="#ffb3b1" /> Training Metrics
+        <BarChart3 size={18} color="#ffb3b1" /> {t('settings.trainingMetrics')}
       </SectionTitle>
 
       <MetricSection>
         <MetricRow>
           <MetricLabel>
-            <MetricName>Unit System</MetricName>
-            <MetricSub>Metric (km, kg, celsius)</MetricSub>
+            <MetricName>{t('settings.unitSystem')}</MetricName>
+            <MetricSub>{t('settings.metricDetail')}</MetricSub>
           </MetricLabel>
           <ToggleGroup>
-            <ToggleButton $active>METRIC</ToggleButton>
-            <ToggleButton $active={false}>IMPERIAL</ToggleButton>
+            <ToggleButton $active>{t('settings.metric')}</ToggleButton>
+            <ToggleButton $active={false}>{t('settings.imperial')}</ToggleButton>
           </ToggleGroup>
         </MetricRow>
       </MetricSection>
 
       <ZonesSection>
         <ZonesHeader>
-          <ZonesTitle>Heart Rate Zones</ZonesTitle>
-          <CalcAuto>CALCULATE AUTO</CalcAuto>
+          <ZonesTitle>{t('settings.heartRateZones')}</ZonesTitle>
+          <CalcAuto>{t('settings.calculateAuto')}</CalcAuto>
         </ZonesHeader>
         {zones.map((zone) => (
           <ZoneRow key={zone.label}>
-            <ZoneLabel>{zone.label}</ZoneLabel>
+            <ZoneLabel>{t('settings.zone', { number: zone.label })}</ZoneLabel>
             <ZoneBarTrack>
               <ZoneBarFill style={{ width: `${zone.percent}%` }} />
             </ZoneBarTrack>

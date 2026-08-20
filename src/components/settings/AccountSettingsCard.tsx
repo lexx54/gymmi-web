@@ -1,4 +1,5 @@
 import { Eye, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CardSurface, SectionTitle } from './SettingsShell';
 
@@ -6,24 +7,26 @@ import { CardSurface, SectionTitle } from './SettingsShell';
  * Account settings section with email, password, 2FA, and location sync controls.
  */
 export function AccountSettingsCard() {
+  const { t } = useTranslation();
+
   return (
     <Wrapper>
       <SectionTitle>
-        <Users size={18} color="#ffb3b1" /> Account Settings
+        <Users size={18} color="#ffb3b1" /> {t('settings.accountSettings')}
       </SectionTitle>
 
       <FieldGroup>
-        <FieldLabel>EMAIL ADDRESS</FieldLabel>
+        <FieldLabel>{t('settings.emailAddress')}</FieldLabel>
         <FieldInput>
           <span>alex.volt@kinetic.performance</span>
         </FieldInput>
       </FieldGroup>
 
       <FieldGroup>
-        <FieldLabel>PASSWORD</FieldLabel>
+        <FieldLabel>{t('settings.password')}</FieldLabel>
         <FieldInput>
           <PasswordDots>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</PasswordDots>
-          <EyeButton type="button" aria-label="Toggle password visibility">
+          <EyeButton type="button" aria-label={t('settings.togglePassword')}>
             <Eye size={16} />
           </EyeButton>
         </FieldInput>
@@ -31,18 +34,18 @@ export function AccountSettingsCard() {
 
       <ToggleRow>
         <ToggleGroup>
-          <FieldLabel>TWO-FACTOR AUTH</FieldLabel>
+          <FieldLabel>{t('settings.twoFactor')}</FieldLabel>
           <ToggleTrack $active>
             <ToggleThumb $active />
           </ToggleTrack>
-          <ToggleLabel $active>ENABLED</ToggleLabel>
+          <ToggleLabel $active>{t('common.enabled')}</ToggleLabel>
         </ToggleGroup>
         <ToggleGroup>
-          <FieldLabel>LOCATION SYNC</FieldLabel>
+          <FieldLabel>{t('settings.locationSync')}</FieldLabel>
           <ToggleTrack $active={false}>
             <ToggleThumb $active={false} />
           </ToggleTrack>
-          <ToggleLabel $active={false}>DISABLED</ToggleLabel>
+          <ToggleLabel $active={false}>{t('common.disabled')}</ToggleLabel>
         </ToggleGroup>
       </ToggleRow>
     </Wrapper>

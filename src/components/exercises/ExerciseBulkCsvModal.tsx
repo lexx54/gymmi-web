@@ -1,5 +1,6 @@
 import { Upload } from 'lucide-react';
 import { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Modal } from '../common/Modal';
 import type { BulkExerciseCsvResult } from '../../services/api/exercises';
@@ -24,6 +25,7 @@ export function ExerciseBulkCsvModal({
   onClose,
   onUpload,
 }: ExerciseBulkCsvModalProps) {
+  const { t } = useTranslation();
   const inputId = useId();
   const [file, setFile] = useState<File | null>(null);
 
@@ -35,13 +37,13 @@ export function ExerciseBulkCsvModal({
   return (
     <Modal
       isOpen={isOpen}
-      title="Bulk CSV"
-      description="Upload a CSV file to create exercises in bulk."
+      title={t('exercises.bulkCsv')}
+      description={t('exercises.bulkCsvDescription')}
       onClose={onClose}
     >
       <Content>
         <Columns>
-          <ColumnsTitle>Required columns</ColumnsTitle>
+          <ColumnsTitle>{t('exercises.requiredColumns')}</ColumnsTitle>
           <ColumnList>
             {requiredColumns.map((column) => (
               <ColumnPill key={column}>{column}</ColumnPill>
@@ -52,8 +54,8 @@ export function ExerciseBulkCsvModal({
         <UploadLabel htmlFor={inputId}>
           <Upload size={22} aria-hidden />
           <UploadCopy>
-            <strong>{file?.name ?? 'Choose CSV file'}</strong>
-            <span>Only `.csv` files using the required columns are supported.</span>
+            <strong>{file?.name ?? t('exercises.chooseCsv')}</strong>
+            <span>{t('exercises.csvOnly')}</span>
           </UploadCopy>
         </UploadLabel>
         <FileInput
@@ -65,8 +67,8 @@ export function ExerciseBulkCsvModal({
 
         {result ? (
           <ResultText>
-            Created {result.created} exercises
-            {result.errors.length > 0 ? `, skipped ${result.errors.length} rows` : ''}.
+            {t('exercises.createdResult', { count: result.created })}
+            {result.errors.length > 0 ? t('exercises.skippedRows', { count: result.errors.length }) : ''}.
           </ResultText>
         ) : null}
 
@@ -74,7 +76,7 @@ export function ExerciseBulkCsvModal({
           <ErrorList>
             {result.errors.map((error) => (
               <li key={`${error.row}-${error.message}`}>
-                Row {error.row}: {error.message}
+                {t('exercises.rowError', { row: error.row, message: error.message })}
               </li>
             ))}
           </ErrorList>
@@ -82,10 +84,10 @@ export function ExerciseBulkCsvModal({
 
         <Actions>
           <SecondaryButton type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </SecondaryButton>
           <PrimaryButton type="button" disabled={!file || isUploading} onClick={handleSubmit}>
-            {isUploading ? 'Uploading...' : 'Upload CSV'}
+            {isUploading ? t('exercises.uploading') : t('exercises.uploadCsv')}
           </PrimaryButton>
         </Actions>
       </Content>

@@ -3,6 +3,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
 import { AccountSettingsCard } from '../components/settings/AccountSettingsCard';
 import { DataManagementCard } from '../components/settings/DataManagementCard';
+import { LanguageSettingsCard } from '../components/settings/LanguageSettingsCard';
 import { ProfileHeroCard } from '../components/settings/ProfileHeroCard';
 import { SettingsFooter } from '../components/settings/SettingsFooter';
 import {
@@ -13,6 +14,7 @@ import {
 } from '../components/settings/SettingsShell';
 import { TrainingMetricsCard } from '../components/settings/TrainingMetricsCard';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Settings & Profile page combining user profile, account settings,
@@ -20,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
  */
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const username = user?.username ?? 'Alex';
 
   return (
@@ -27,7 +30,7 @@ export default function SettingsPage() {
       <Sidebar username={username} />
       <SettingsMain>
         <HeaderRow>
-          <SettingsPageTitle>Settings &amp; Profile</SettingsPageTitle>
+          <SettingsPageTitle>{t('settings.title')}</SettingsPageTitle>
           <TopBar />
         </HeaderRow>
         <SettingsContent>
@@ -36,6 +39,7 @@ export default function SettingsPage() {
             <AccountSettingsCard />
             <TrainingMetricsCard />
           </MiddleGrid>
+          <LanguageSettingsCard />
           <DataManagementCard />
           <SettingsFooter />
         </SettingsContent>

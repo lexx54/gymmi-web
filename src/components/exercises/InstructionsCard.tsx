@@ -1,4 +1,5 @@
 import { Bold, Italic, List } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type InstructionsCardProps = {
@@ -10,18 +11,20 @@ type InstructionsCardProps = {
  * Step-by-step movement instructions with basic formatting toolbar.
  */
 export function InstructionsCard({ value, onChange }: InstructionsCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card>
       <HeaderRow>
-        <FieldLabel>Detailed Instructions</FieldLabel>
+        <FieldLabel>{t('exercises.detailedInstructions')}</FieldLabel>
         <ToolbarGroup>
-          <ToolbarButton type="button" aria-label="Bold">
+          <ToolbarButton type="button" aria-label={t('exercises.bold')}>
             <Bold size={14} />
           </ToolbarButton>
-          <ToolbarButton type="button" aria-label="Italic">
+          <ToolbarButton type="button" aria-label={t('exercises.italic')}>
             <Italic size={14} />
           </ToolbarButton>
-          <ToolbarButton type="button" aria-label="Bulleted list">
+          <ToolbarButton type="button" aria-label={t('exercises.bulletedList')}>
             <List size={14} />
           </ToolbarButton>
         </ToolbarGroup>
@@ -29,7 +32,7 @@ export function InstructionsCard({ value, onChange }: InstructionsCardProps) {
       <Textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Break down the movement step-by-step..."
+        placeholder={t('exercises.instructionsPlaceholder')}
         rows={8}
       />
     </Card>

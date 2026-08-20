@@ -1,36 +1,39 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const BARS = [
-  { day: 'Mon', height: 35 },
-  { day: 'Tue', height: 52 },
-  { day: 'Wed', height: 30 },
-  { day: 'Thu', height: 64 },
-  { day: 'Fri', height: 74, active: true },
-  { day: 'Sat', height: 46 },
-  { day: 'Sun', height: 22 },
+  { dayKey: 'dates.mon', height: 35 },
+  { dayKey: 'dates.tue', height: 52 },
+  { dayKey: 'dates.wed', height: 30 },
+  { dayKey: 'dates.thu', height: 64 },
+  { dayKey: 'dates.fri', height: 74, active: true },
+  { dayKey: 'dates.sat', height: 46 },
+  { dayKey: 'dates.sun', height: 22 },
 ];
 
 /**
  * Displays weekly progress with static bar metrics.
  */
 export function WeeklyProgressCard() {
+  const { t } = useTranslation();
+
   return (
     <Card>
       <HeaderRow>
         <div>
-          <Eyebrow>Weekly Progress</Eyebrow>
-          <Title>Volume Training</Title>
+          <Eyebrow>{t('dashboard.weeklyProgress')}</Eyebrow>
+          <Title>{t('dashboard.volumeTraining')}</Title>
         </div>
         <PercentWrap>
           <Percent>84%</Percent>
-          <PercentCaption>Goal Reached</PercentCaption>
+          <PercentCaption>{t('dashboard.goalReached')}</PercentCaption>
         </PercentWrap>
       </HeaderRow>
       <BarsWrap>
         {BARS.map((bar) => (
-          <BarItem key={bar.day}>
+          <BarItem key={bar.dayKey}>
             <Bar $height={bar.height} $active={Boolean(bar.active)} />
-            <DayLabel>{bar.day}</DayLabel>
+            <DayLabel>{t(bar.dayKey)}</DayLabel>
           </BarItem>
         ))}
       </BarsWrap>

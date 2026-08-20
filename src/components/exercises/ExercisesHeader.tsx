@@ -1,4 +1,5 @@
 import { Bell, HelpCircle, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type ExercisesHeaderProps = {
@@ -12,8 +13,11 @@ type ExercisesHeaderProps = {
  */
 export function ExercisesHeader({
   title,
-  searchPlaceholder = 'Search exercises...',
+  searchPlaceholder,
 }: ExercisesHeaderProps) {
+  const { t } = useTranslation();
+  const placeholder = searchPlaceholder ?? t('exercises.searchExercises');
+
   return (
     <HeaderRoot>
       <Title>{title}</Title>
@@ -24,17 +28,17 @@ export function ExercisesHeader({
           </SearchIcon>
           <SearchInput
             type="text"
-            placeholder={searchPlaceholder}
-            aria-label="Search exercises"
+            placeholder={placeholder}
+            aria-label={t('exercises.searchExercises')}
           />
         </SearchWrap>
-        <IconButton type="button" aria-label="Notifications">
+        <IconButton type="button" aria-label={t('common.notifications')}>
           <BellWithDot>
             <Bell size={16} />
             <NotificationDot aria-hidden />
           </BellWithDot>
         </IconButton>
-        <IconButton type="button" aria-label="Help">
+        <IconButton type="button" aria-label={t('common.help')}>
           <HelpCircle size={16} />
         </IconButton>
         <Avatar aria-hidden />

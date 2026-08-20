@@ -1,8 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ExerciseLibraryItem } from './ExerciseLibraryItem';
 import type { Category, LibraryExercise } from './types';
 
 const CATEGORIES: Category[] = ['All', 'Chest', 'Back', 'Legs', 'Core'];
+const CATEGORY_LABEL_KEYS: Record<Category, string> = {
+  All: 'workouts.categories.all',
+  Chest: 'workouts.categories.chest',
+  Back: 'workouts.categories.back',
+  Legs: 'workouts.categories.legs',
+  Core: 'workouts.categories.core',
+};
 
 type ExerciseLibraryProps = {
   exercises: LibraryExercise[];
@@ -20,6 +28,7 @@ export function ExerciseLibrary({
   onCategoryChange,
   totalCount,
 }: ExerciseLibraryProps) {
+  const { t } = useTranslation();
   const visible =
     activeCategory === 'All'
       ? exercises
@@ -28,11 +37,11 @@ export function ExerciseLibrary({
   return (
     <Container>
       <Header>
-        <Title>Exercise Library</Title>
-        <CountPill>{totalCount} Exercises</CountPill>
+        <Title>{t('workouts.exerciseLibrary')}</Title>
+        <CountPill>{t('workouts.count', { count: totalCount })}</CountPill>
       </Header>
 
-      <Tabs role="tablist" aria-label="Exercise categories">
+      <Tabs role="tablist" aria-label={t('workouts.exerciseCategories')}>
         {CATEGORIES.map((category) => (
           <Tab
             key={category}
@@ -42,7 +51,7 @@ export function ExerciseLibrary({
             $active={activeCategory === category}
             onClick={() => onCategoryChange(category)}
           >
-            {category}
+            {t(CATEGORY_LABEL_KEYS[category])}
           </Tab>
         ))}
       </Tabs>

@@ -1,18 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
 
 type Segment = {
   id: string;
-  label: string;
+  labelKey: string;
   percent: number;
   color: string;
 };
 
 const SEGMENTS: Segment[] = [
-  { id: 'legs', label: 'Legs (Lower Body)', percent: 45, color: '#ef233c' },
-  { id: 'push', label: 'Push (Chest/Shoulders)', percent: 30, color: '#f5a7ad' },
-  { id: 'core', label: 'Core & Stability', percent: 15, color: '#5e6787' },
-  { id: 'other', label: 'Other', percent: 10, color: '#3d4463' },
+  { id: 'legs', labelKey: 'analytics.legsLower', percent: 45, color: '#ef233c' },
+  { id: 'push', labelKey: 'analytics.pushChest', percent: 30, color: '#f5a7ad' },
+  { id: 'core', labelKey: 'analytics.coreStability', percent: 15, color: '#5e6787' },
+  { id: 'other', labelKey: 'analytics.other', percent: 10, color: '#3d4463' },
 ];
 
 const RADIUS = 72;
@@ -34,15 +35,16 @@ function computeSlices(segments: Segment[]): SegmentSlice[] {
  * Shows training load distribution across muscle groups.
  */
 export function MuscleLoadCard() {
+  const { t } = useTranslation();
   const slices = computeSlices(SEGMENTS);
 
   return (
     <AnalyticsCard>
-      <Eyebrow>Body Composition</Eyebrow>
-      <CardTitle>Muscle Load</CardTitle>
+      <Eyebrow>{t('analytics.bodyComposition')}</Eyebrow>
+      <CardTitle>{t('analytics.muscleLoad')}</CardTitle>
 
       <DonutWrap>
-        <DonutSvg viewBox="0 0 200 200" role="img" aria-label="Muscle load distribution">
+        <DonutSvg viewBox="0 0 200 200" role="img" aria-label={t('analytics.muscleLoadDistribution')}>
           <circle cx="100" cy="100" r={RADIUS} stroke="#23284a" strokeWidth="20" fill="none" />
           {slices.map((slice) => (
             <circle
@@ -62,7 +64,7 @@ export function MuscleLoadCard() {
         </DonutSvg>
         <DonutCenter>
           <CenterValue>84</CenterValue>
-          <CenterLabel>Sets</CenterLabel>
+          <CenterLabel>{t('analytics.sets')}</CenterLabel>
         </DonutCenter>
       </DonutWrap>
 
@@ -70,7 +72,7 @@ export function MuscleLoadCard() {
         {SEGMENTS.map((segment) => (
           <LegendItem key={segment.id}>
             <LegendDot style={{ background: segment.color }} />
-            <LegendLabel>{segment.label}</LegendLabel>
+            <LegendLabel>{t(segment.labelKey)}</LegendLabel>
             <LegendValue>{segment.percent}%</LegendValue>
           </LegendItem>
         ))}

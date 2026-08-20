@@ -1,13 +1,16 @@
 import { Bell } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Displays the dashboard utility actions on the top-right.
  */
 export function TopBar() {
+  const { t } = useTranslation();
+
   return (
     <Container>
-      <IconButton type="button" aria-label="Notifications">
+      <IconButton type="button" aria-label={t('common.notifications')}>
         <Bell size={16} />
       </IconButton>
       <AvatarFrame aria-hidden>

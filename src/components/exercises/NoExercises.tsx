@@ -1,4 +1,5 @@
 import { Dumbbell, Plus, Upload } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Can } from '../Can';
 
@@ -11,22 +12,22 @@ type NoExercisesProps = {
   onClearSearch?: () => void;
 };
 
-const COPY: Record<NoExercisesVariant, { title: string; description: string }> = {
+const COPY: Record<NoExercisesVariant, { titleKey: string; descriptionKey: string }> = {
   loading: {
-    title: 'Loading exercises',
-    description: 'Fetching your movement catalog...',
+    titleKey: 'exercises.loadingTitle',
+    descriptionKey: 'exercises.loadingDescription',
   },
   error: {
-    title: 'Could not load exercises',
-    description: 'Something went wrong while loading your catalog. Try again in a moment.',
+    titleKey: 'exercises.loadErrorTitle',
+    descriptionKey: 'exercises.errorDescription',
   },
   empty: {
-    title: 'No exercises yet',
-    description: 'Start building your movement library by creating an exercise or importing a CSV.',
+    titleKey: 'exercises.emptyTitle',
+    descriptionKey: 'exercises.emptyDescription',
   },
   'no-results': {
-    title: 'No exercises found',
-    description: 'Nothing matches your search. Try a different name, muscle group, or tag.',
+    titleKey: 'exercises.emptySearchTitle',
+    descriptionKey: 'exercises.noResultsDescription',
   },
 };
 
@@ -39,7 +40,8 @@ export function NoExercises({
   onBulkUpload,
   onClearSearch,
 }: NoExercisesProps) {
-  const { title, description } = COPY[variant];
+  const { t } = useTranslation();
+  const { titleKey, descriptionKey } = COPY[variant];
 
   return (
     <Root role="status" aria-live="polite">
@@ -48,26 +50,26 @@ export function NoExercises({
           <Dumbbell size={32} strokeWidth={1.75} />
         </IconWrap>
       ) : null}
-      <Eyebrow>{variant === 'loading' ? 'Catalog' : 'Exercises'}</Eyebrow>
-      <Title>{title}</Title>
-      <Description>{description}</Description>
+      <Eyebrow>{variant === 'loading' ? t('exercises.catalog') : t('nav.exercises')}</Eyebrow>
+      <Title>{t(titleKey)}</Title>
+      <Description>{t(descriptionKey)}</Description>
       {variant === 'empty' ? (
         <Can resource="exercises" action="CREATE">
           <Actions>
             <PrimaryButton type="button" onClick={onCreateExercise}>
               <Plus size={16} />
-              Create Exercise
+              {t('exercises.createExercise')}
             </PrimaryButton>
             <SecondaryButton type="button" onClick={onBulkUpload}>
               <Upload size={16} />
-              Bulk csv
+              {t('exercises.bulkCsv')}
             </SecondaryButton>
           </Actions>
         </Can>
       ) : null}
       {variant === 'no-results' ? (
         <SecondaryButton type="button" onClick={onClearSearch}>
-          Clear search
+          {t('exercises.clearSearch')}
         </SecondaryButton>
       ) : null}
     </Root>

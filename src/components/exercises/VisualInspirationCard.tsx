@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const IMAGE_URL =
@@ -7,13 +8,15 @@ const IMAGE_URL =
  * Featured inspiration image with overlay caption.
  */
 export function VisualInspirationCard() {
+  const { t } = useTranslation();
+
   return (
     <Card>
-      <img src={IMAGE_URL} alt="Heavy iron weights in a moody dark gym with red accents" />
+      <img src={IMAGE_URL} alt={t('exercises.imageAlt')} />
       <Overlay />
       <CaptionBlock>
-        <Eyebrow>Visual Inspiration</Eyebrow>
-        <Quote>&quot;Precision in movement creates power in execution.&quot;</Quote>
+        <Eyebrow>{t('exercises.visualInspiration')}</Eyebrow>
+        <Quote>{t('exercises.quote')}</Quote>
       </CaptionBlock>
     </Card>
   );

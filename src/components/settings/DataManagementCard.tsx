@@ -1,4 +1,5 @@
 import { Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CardSurface, SectionTitle } from './SettingsShell';
 
@@ -6,14 +7,15 @@ import { CardSurface, SectionTitle } from './SettingsShell';
  * Data management and connected services section with last sync indicator.
  */
 export function DataManagementCard() {
+  const { t } = useTranslation();
+
   return (
     <Wrapper>
       <HeaderRow>
         <SectionTitle>
-          <Settings size={18} color="#ffb3b1" /> Data Management &amp; Connected
-          Services
+          <Settings size={18} color="#ffb3b1" /> {t('settings.dataManagement')}
         </SectionTitle>
-        <SyncBadge>LAST SYNC: 2M AGO</SyncBadge>
+        <SyncBadge>{t('settings.lastSync')}</SyncBadge>
       </HeaderRow>
     </Wrapper>
   );

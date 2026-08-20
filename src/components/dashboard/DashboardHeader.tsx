@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type DashboardHeaderProps = {
@@ -8,14 +9,16 @@ type DashboardHeaderProps = {
  * Renders the introductory hero copy for the dashboard.
  */
 export function DashboardHeader({ username }: DashboardHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <Container>
-      <SectionLabel>Dashboard</SectionLabel>
-      <Greeting>Good Morning, {username.toUpperCase()}</Greeting>
+      <SectionLabel>{t('dashboard.label')}</SectionLabel>
+      <Greeting>{t('dashboard.greeting', { username: username.toUpperCase() })}</Greeting>
       <Headline>
-        YOU&apos;RE IN THE
-        <AccentLine>PEAK ZONE</AccentLine>
-        TODAY.
+        {t('dashboard.headlinePrefix')}
+        <AccentLine>{t('dashboard.accent')}</AccentLine>
+        {t('dashboard.headlineSuffix')}
       </Headline>
     </Container>
   );

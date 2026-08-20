@@ -1,34 +1,37 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Activity = {
   id: string;
-  when: string;
-  title: string;
-  meta: string;
+  whenKey: string;
+  titleKey: string;
+  metaKey: string;
 };
 
 const ACTIVITIES: Activity[] = [
-  { id: 'a1', when: 'Yesterday', title: 'Urban Trail Run', meta: '5.2 km - 28:14' },
-  { id: 'a2', when: '2 Days Ago', title: 'Recovery Flow', meta: '45 min - Low Intensity' },
-  { id: 'a3', when: '3 Days Ago', title: 'Power Lifting', meta: '65 min - 1,200kg Volume' },
+  { id: 'a1', whenKey: 'dashboard.yesterday', titleKey: 'dashboard.urbanTrailRun', metaKey: 'dashboard.activityRunMeta' },
+  { id: 'a2', whenKey: 'dashboard.twoDaysAgo', titleKey: 'dashboard.recoveryFlow', metaKey: 'dashboard.activityRecoveryMeta' },
+  { id: 'a3', whenKey: 'dashboard.threeDaysAgo', titleKey: 'dashboard.powerLifting', metaKey: 'dashboard.activityPowerMeta' },
 ];
 
 /**
  * Displays recent activity summary cards.
  */
 export function RecentActivity() {
+  const { t } = useTranslation();
+
   return (
     <Section>
       <SectionHeader>
-        <Title>Recent Activity</Title>
-        <HistoryLink href="#">View History</HistoryLink>
+        <Title>{t('dashboard.recentActivity')}</Title>
+        <HistoryLink href="#">{t('dashboard.viewHistory')}</HistoryLink>
       </SectionHeader>
       <Cards>
         {ACTIVITIES.map((activity, index) => (
           <Card key={activity.id} $muted={index === 2}>
-            <When>{activity.when}</When>
-            <CardTitle>{activity.title}</CardTitle>
-            <Meta>{activity.meta}</Meta>
+            <When>{t(activity.whenKey)}</When>
+            <CardTitle>{t(activity.titleKey)}</CardTitle>
+            <Meta>{t(activity.metaKey)}</Meta>
           </Card>
         ))}
       </Cards>

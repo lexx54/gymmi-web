@@ -1,17 +1,20 @@
 import { Video } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Dashed upload area for the exercise instructional video.
  */
 export function MediaUploadCard() {
+  const { t } = useTranslation();
+
   return (
     <Card type="button">
       <IconBadge>
         <Video size={26} />
       </IconBadge>
-      <Title>Upload Instructional Video</Title>
-      <Hint>Drag and drop or click to browse. Max size 250MB. MP4, MOV format.</Hint>
+      <Title>{t('exercises.uploadVideo')}</Title>
+      <Hint>{t('exercises.uploadHint')}</Hint>
       <Dots aria-hidden>
         <Dot $active />
         <Dot $active={false} />

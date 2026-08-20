@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ActivationMapCard, suggestSecondaryStabilizers } from '../components/exercises/ActivationMapCard';
 import { BasicInfoCard } from '../components/exercises/BasicInfoCard';
@@ -60,6 +61,7 @@ function draftToCreateParams(draft: ExerciseDraft): CreateExerciseParams {
  */
 export default function ExerciseBuilderPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const createExercise = useCreateExercise();
   const username = user?.username ?? 'Alex';
@@ -147,21 +149,21 @@ export default function ExerciseBuilderPage() {
 
   const handlePublish = () => {
     if (!draft.name.trim()) {
-      toast.error('Exercise name is required');
+      toast.error(t('exercises.nameRequired'));
       return;
     }
     if (!draft.instructions.trim()) {
-      toast.error('Instructions are required');
+      toast.error(t('exercises.instructionsRequired'));
       return;
     }
 
     createExercise.mutate(draftToCreateParams(draft), {
       onSuccess: () => {
-        toast.success('Exercise published');
+        toast.success(t('exercises.published'));
         navigate('/exercises');
       },
       onError: () => {
-        toast.error('Could not publish exercise');
+        toast.error(t('exercises.publishFailed'));
       },
     });
   };
@@ -170,7 +172,7 @@ export default function ExerciseBuilderPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title="Workout Builder" />
+        <ExercisesHeader title={t('workouts.builderTitle')} />
         <ExercisesContent>
           <BuilderPageHeader
             onDiscard={handleDiscard}

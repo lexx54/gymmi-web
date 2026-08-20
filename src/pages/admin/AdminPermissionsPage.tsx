@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { fetchRoles, fetchRolePermissions, updateRolePermissions } from '../../services/api/admin';
 import type { PermissionCell, RoleDto } from '../../types/rbac';
@@ -17,6 +18,7 @@ const ACTIONS = ['READ', 'CREATE', 'EDIT', 'DELETE'];
 
 export default function AdminPermissionsPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const username = user?.username ?? 'Admin';
   const queryClient = useQueryClient();
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
@@ -49,11 +51,11 @@ export default function AdminPermissionsPage() {
   const saveMutation = useMutation({
     mutationFn: () => updateRolePermissions(selectedRoleId!, matrix),
     onSuccess: () => {
-      toast.success('Permissions updated');
+      toast.success(t('admin.permissionsUpdated'));
       queryClient.invalidateQueries({ queryKey: ['admin', 'role', selectedRoleId] });
       queryClient.invalidateQueries({ queryKey: ['me', 'permissions'] });
     },
-    onError: () => toast.error('Failed to save permissions'),
+    onError: () => toast.error(t('admin.permissionsSaveFailed')),
   });
 
   const toggle = useCallback(
@@ -73,7 +75,7 @@ export default function AdminPermissionsPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title="Role Permissions" />
+        <ExercisesHeader title={t('admin.rolePermissions')} />
         <ExercisesContent>
           <Card>
             <TopBar>
@@ -93,16 +95,16 @@ export default function AdminPermissionsPage() {
                 disabled={saveMutation.isPending || !selectedRoleId || !!selectedRole?.isSystem}
                 onClick={() => saveMutation.mutate()}
               >
-                {saveMutation.isPending ? 'Saving...' : 'Save'}
+                {saveMutation.isPending ? t('admin.saving') : t('admin.save')}
               </SaveButton>
             </TopBar>
             {permsLoading ? (
-              <p style={{ color: '#e0e0fc', textAlign: 'center', padding: '2rem' }}>Loading...</p>
+              <p style={{ color: '#e0e0fc', textAlign: 'center', padding: '2rem' }}>{t('common.loading')}</p>
             ) : (
               <Table>
                 <thead>
                   <tr>
-                    <Th>Resource</Th>
+                    <Th>{t('admin.resource')}</Th>
                     {ACTIONS.map((a) => (
                       <Th key={a}>{a}</Th>
                     ))}

@@ -1,12 +1,15 @@
 import { Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
  * Floating round play button for starting the routine.
  */
 export function StartFab() {
+  const { t } = useTranslation();
+
   return (
-    <Fab type="button" aria-label="Start routine">
+    <Fab type="button" aria-label={t('workouts.startRoutine')}>
       <Play size={22} fill="currentColor" />
     </Fab>
   );

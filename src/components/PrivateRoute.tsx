@@ -1,15 +1,17 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext';
 
 export function PrivateRoute() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
       <Centered>
-        <Spinner aria-label="Loading" />
+        <Spinner aria-label={t('common.loading')} />
       </Centered>
     );
   }

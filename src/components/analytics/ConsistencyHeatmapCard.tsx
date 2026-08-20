@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
 
@@ -16,28 +17,30 @@ const HEATMAP: IntensityLevel[][] = [
 ];
 
 const SUMMARY = [
-  { value: '18', label: 'Day Streak' },
-  { value: '94%', label: 'Completion' },
-  { value: '28', label: 'Workouts' },
+  { value: '18', labelKey: 'analytics.dayStreak' },
+  { value: '94%', labelKey: 'analytics.completion' },
+  { value: '28', labelKey: 'analytics.workouts' },
 ];
 
 /**
  * Shows training consistency over a 5-week window and summary metrics.
  */
 export function ConsistencyHeatmapCard() {
+  const { t } = useTranslation();
+
   return (
     <AnalyticsCard>
       <HeaderRow>
         <div>
-          <Eyebrow>Commitment Tracking</Eyebrow>
-          <CardTitle>Consistency Heatmap</CardTitle>
+          <Eyebrow>{t('analytics.commitmentTracking')}</Eyebrow>
+          <CardTitle>{t('analytics.consistencyHeatmap')}</CardTitle>
         </div>
         <Legend>
-          <LegendLabel>Less</LegendLabel>
+          <LegendLabel>{t('analytics.less')}</LegendLabel>
           {INTENSITY_COLORS.map((color) => (
             <LegendCell key={color} style={{ background: color }} />
           ))}
-          <LegendLabel>More</LegendLabel>
+          <LegendLabel>{t('analytics.more')}</LegendLabel>
         </Legend>
       </HeaderRow>
 
@@ -53,9 +56,9 @@ export function ConsistencyHeatmapCard() {
 
       <SummaryRow>
         {SUMMARY.map((item) => (
-          <SummaryItem key={item.label}>
+          <SummaryItem key={item.labelKey}>
             <SummaryValue>{item.value}</SummaryValue>
-            <SummaryLabel>{item.label}</SummaryLabel>
+            <SummaryLabel>{t(item.labelKey)}</SummaryLabel>
           </SummaryItem>
         ))}
       </SummaryRow>

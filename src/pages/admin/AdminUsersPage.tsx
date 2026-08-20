@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { fetchAdminUsers, fetchRoles, patchAdminUser } from '../../services/api/admin';
 import type { PaginatedUsers, RoleDto } from '../../types/rbac';
@@ -15,6 +16,7 @@ import { useState } from 'react';
 
 export default function AdminUsersPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const username = user?.username ?? 'Admin';
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -36,12 +38,12 @@ export default function AdminUsersPage() {
     }) =>
       patchAdminUser(vars.userId, vars.body),
     onSuccess: () => {
-      toast.success('User updated');
+      toast.success(t('admin.userUpdated'));
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
     onError: (err) => {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(msg ?? 'Failed to update user');
+      toast.error(msg ?? t('admin.userUpdateFailed'));
     },
   });
 
@@ -51,21 +53,21 @@ export default function AdminUsersPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title="User Management" />
+        <ExercisesHeader title={t('admin.userManagement')} />
         <ExercisesContent>
           <Card>
             {isLoading ? (
-              <p style={{ color: '#e0e0fc', textAlign: 'center', padding: '2rem' }}>Loading...</p>
+              <p style={{ color: '#e0e0fc', textAlign: 'center', padding: '2rem' }}>{t('common.loading')}</p>
             ) : (
               <>
                 <Table>
                   <thead>
                     <tr>
-                      <Th>Username</Th>
-                      <Th>Email</Th>
-                      <Th>Role</Th>
-                      <Th>Active</Th>
-                      <Th>Paid</Th>
+                      <Th>{t('admin.username')}</Th>
+                      <Th>{t('admin.email')}</Th>
+                      <Th>{t('admin.role')}</Th>
+                      <Th>{t('admin.active')}</Th>
+                      <Th>{t('admin.paid')}</Th>
                     </tr>
                   </thead>
                   <tbody>
@@ -119,13 +121,13 @@ export default function AdminUsersPage() {
                 </Table>
                 <Pagination>
                   <PageButton disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-                    Prev
+                    {t('admin.prev')}
                   </PageButton>
                   <PageInfo>
-                    Page {page} of {totalPages}
+                    {t('admin.pageOf', { page, total: totalPages })}
                   </PageInfo>
                   <PageButton disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-                    Next
+                    {t('admin.next')}
                   </PageButton>
                 </Pagination>
               </>

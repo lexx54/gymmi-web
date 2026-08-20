@@ -1,5 +1,6 @@
 import { Dumbbell, MoreVertical, Play, Plus, Search, Sparkles, Timer } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
@@ -7,75 +8,82 @@ import { useAuth } from '../context/AuthContext';
 type Routine = {
   id: string;
   category: string;
-  title: string;
-  focus: string;
-  movements: string;
+  titleKey: string;
+  focusKey: string;
+  movementsKey: string;
   duration: string;
-  lastPerformed: string;
+  lastPerformedKey: string;
 };
 
 type Protocol = {
   id: string;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
+  eyebrowKey: string;
+  titleKey: string;
+  subtitleKey: string;
   tone: 'red' | 'athlete';
 };
 
 const filters = ['All', 'Strength', 'Hypertrophy', 'Recovery', 'Endurance'];
+const filterLabelKeys: Record<string, string> = {
+  All: 'workouts.categories.all',
+  Strength: 'workouts.categories.strength',
+  Hypertrophy: 'workouts.categories.hypertrophy',
+  Recovery: 'workouts.categories.recovery',
+  Endurance: 'workouts.categories.endurance',
+};
 
 const routines: Routine[] = [
   {
     id: 'push-day',
     category: 'Hypertrophy',
-    title: 'Hypertrophy A - Push Day',
-    focus: 'Chest / Shoulders / Triceps',
-    movements: '8 Movements',
+    titleKey: 'workouts.routines.pushDay',
+    focusKey: 'workouts.routines.pushFocus',
+    movementsKey: 'workouts.routines.pushMovements',
     duration: '65 min',
-    lastPerformed: '2 days ago',
+    lastPerformedKey: 'workouts.routines.twoDaysAgo',
   },
   {
     id: 'lower-b',
     category: 'Strength',
-    title: 'Elite Strength - Lower B',
-    focus: 'Quads / Glutes / Calves',
-    movements: '6 Movements',
+    titleKey: 'workouts.routines.lowerB',
+    focusKey: 'workouts.routines.lowerFocus',
+    movementsKey: 'workouts.routines.lowerMovements',
     duration: '50 min',
-    lastPerformed: 'Today',
+    lastPerformedKey: 'workouts.routines.today',
   },
   {
     id: 'mobility-flow',
     category: 'Recovery',
-    title: 'Mobility Flow 2.0',
-    focus: 'Full Body / Flexibility',
-    movements: '12 Flows',
+    titleKey: 'workouts.routines.mobilityFlow',
+    focusKey: 'workouts.routines.mobilityFocus',
+    movementsKey: 'workouts.routines.mobilityMovements',
     duration: '25 min',
-    lastPerformed: 'Last week',
+    lastPerformedKey: 'workouts.routines.lastWeek',
   },
   {
     id: 'back-bicep',
     category: 'Hypertrophy',
-    title: 'Back & Bicep Annihilation',
-    focus: 'Lats / Upper Back / Biceps',
-    movements: '9 Movements',
+    titleKey: 'workouts.routines.backBicep',
+    focusKey: 'workouts.routines.backFocus',
+    movementsKey: 'workouts.routines.backMovements',
     duration: '75 min',
-    lastPerformed: '5 days ago',
+    lastPerformedKey: 'workouts.routines.fiveDaysAgo',
   },
 ];
 
 const protocols: Protocol[] = [
   {
     id: 'overload',
-    eyebrow: 'Premium Track',
-    title: 'The Overload Principle',
-    subtitle: '12 Week Periodization Program',
+    eyebrowKey: 'workouts.premiumTrack',
+    titleKey: 'workouts.overloadPrinciple',
+    subtitleKey: 'workouts.periodizationProgram',
     tone: 'red',
   },
   {
     id: 'explosion',
-    eyebrow: 'Pro Series',
-    title: 'Kinetic Explosion',
-    subtitle: 'Plyometric & Power Efficiency',
+    eyebrowKey: 'workouts.proSeries',
+    titleKey: 'workouts.kineticExplosion',
+    subtitleKey: 'workouts.powerEfficiency',
     tone: 'athlete',
   },
 ];
@@ -85,6 +93,7 @@ const protocols: Protocol[] = [
  */
 export default function WorkoutLibraryPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const username = user?.username ?? 'Alex';
 
   return (
@@ -94,26 +103,26 @@ export default function WorkoutLibraryPage() {
       <MainPanel>
         <HeroRow>
           <div>
-            <Title>Routine Library</Title>
-            <Subtitle>Manage and execute your precision-engineered training protocols.</Subtitle>
+            <Title>{t('workouts.libraryTitle')}</Title>
+            <Subtitle>{t('workouts.librarySubtitle')}</Subtitle>
           </div>
           <CreateRoutineLink to="/workout/new">
             <Plus size={16} aria-hidden />
-            <span>Create Routine</span>
+            <span>{t('workouts.createRoutine')}</span>
           </CreateRoutineLink>
         </HeroRow>
 
-        <FilterRow aria-label="Routine filters">
+        <FilterRow aria-label={t('workouts.routineFilters')}>
           {filters.map((filter) => (
             <FilterButton key={filter} type="button" $active={filter === 'All'}>
-              {filter}
+              {t(filterLabelKeys[filter])}
             </FilterButton>
           ))}
         </FilterRow>
 
         <SearchShell>
           <Search size={18} aria-hidden />
-          <SearchInput placeholder="Search your library..." aria-label="Search your library" />
+          <SearchInput placeholder={t('workouts.searchLibrary')} aria-label={t('workouts.searchLibrary')} />
         </SearchShell>
 
         <RoutineGrid>
@@ -121,25 +130,25 @@ export default function WorkoutLibraryPage() {
             <RoutineCard key={routine.id}>
               <RoutineTopline>
                 <CategoryPill>{routine.category}</CategoryPill>
-                <IconButton type="button" aria-label={`More options for ${routine.title}`}>
+                <IconButton type="button" aria-label={t('workouts.moreOptions', { title: t(routine.titleKey) })}>
                   <MoreVertical size={18} aria-hidden />
                 </IconButton>
               </RoutineTopline>
-              <RoutineTitle>{routine.title}</RoutineTitle>
-              <RoutineFocus>{routine.focus}</RoutineFocus>
+              <RoutineTitle>{t(routine.titleKey)}</RoutineTitle>
+              <RoutineFocus>{t(routine.focusKey)}</RoutineFocus>
 
               <MetricRow>
                 <MetricTile>
                   <Dumbbell size={15} aria-hidden />
                   <MetricCopy>
-                    <MetricLabel>Exercises</MetricLabel>
-                    <MetricValue>{routine.movements}</MetricValue>
+                    <MetricLabel>{t('workouts.exercises')}</MetricLabel>
+                    <MetricValue>{t(routine.movementsKey)}</MetricValue>
                   </MetricCopy>
                 </MetricTile>
                 <MetricTile>
                   <Timer size={15} aria-hidden />
                   <MetricCopy>
-                    <MetricLabel>Duration</MetricLabel>
+                    <MetricLabel>{t('workouts.duration')}</MetricLabel>
                     <MetricValue>{routine.duration}</MetricValue>
                   </MetricCopy>
                 </MetricTile>
@@ -147,10 +156,10 @@ export default function WorkoutLibraryPage() {
 
               <RoutineFooter>
                 <LastPerformed>
-                  Last performed <strong>{routine.lastPerformed}</strong>
+                  {t('workouts.lastPerformed')} <strong>{t(routine.lastPerformedKey)}</strong>
                 </LastPerformed>
-                <PlayLink to="/workout/new" aria-label={`Play ${routine.title}`}>
-                  <span>Play</span>
+                <PlayLink to="/workout/new" aria-label={t('workouts.playRoutine', { title: t(routine.titleKey) })}>
+                  <span>{t('workouts.play')}</span>
                   <Play size={14} aria-hidden />
                 </PlayLink>
               </RoutineFooter>
@@ -161,21 +170,21 @@ export default function WorkoutLibraryPage() {
             <NewRoutineIcon>
               <Plus size={21} aria-hidden />
             </NewRoutineIcon>
-            <NewRoutineTitle>New Routine</NewRoutineTitle>
-            <NewRoutineCopy>Build a custom protocol</NewRoutineCopy>
+            <NewRoutineTitle>{t('workouts.newRoutine')}</NewRoutineTitle>
+            <NewRoutineCopy>{t('workouts.buildCustom')}</NewRoutineCopy>
           </NewRoutineLink>
         </RoutineGrid>
 
         <ProtocolsSection>
-          <SectionLabel>Expert Protocols</SectionLabel>
+          <SectionLabel>{t('workouts.expertProtocols')}</SectionLabel>
           <ProtocolGrid>
             {protocols.map((protocol) => (
               <ProtocolCard key={protocol.id} $tone={protocol.tone}>
                 <Sparkles size={18} aria-hidden />
                 <ProtocolCopy>
-                  <ProtocolEyebrow>{protocol.eyebrow}</ProtocolEyebrow>
-                  <ProtocolTitle>{protocol.title}</ProtocolTitle>
-                  <ProtocolSubtitle>{protocol.subtitle}</ProtocolSubtitle>
+                  <ProtocolEyebrow>{t(protocol.eyebrowKey)}</ProtocolEyebrow>
+                  <ProtocolTitle>{t(protocol.titleKey)}</ProtocolTitle>
+                  <ProtocolSubtitle>{t(protocol.subtitleKey)}</ProtocolSubtitle>
                 </ProtocolCopy>
               </ProtocolCard>
             ))}

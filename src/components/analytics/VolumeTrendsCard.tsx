@@ -1,7 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
 
-const WEEK_LABELS = ['Week 1', 'Week 2', 'Week 3', 'Week 4'] as const;
+const WEEK_LABELS = [1, 2, 3, 4] as const;
 
 const TREND_PATH = 'M0 170 C 80 160, 140 90, 210 95 S 330 175, 400 175 S 520 55, 620 45 S 760 150, 860 120 L 900 110';
 const TREND_AREA = `${TREND_PATH} L 900 210 L 0 210 Z`;
@@ -10,23 +11,25 @@ const TREND_AREA = `${TREND_PATH} L 900 210 L 0 210 Z`;
  * Displays the weekly workout intensity trend line with the total volume.
  */
 export function VolumeTrendsCard() {
+  const { t } = useTranslation();
+
   return (
     <AnalyticsCard>
       <HeaderRow>
         <div>
-          <Eyebrow>Workout Intensity</Eyebrow>
-          <CardTitle>Volume Trends</CardTitle>
+          <Eyebrow>{t('analytics.workoutIntensity')}</Eyebrow>
+          <CardTitle>{t('analytics.volumeTrends')}</CardTitle>
         </div>
         <TotalsWrap>
           <TotalValue>
-            142,500 <TotalUnit>KG</TotalUnit>
+            142,500 <TotalUnit>{t('analytics.kg')}</TotalUnit>
           </TotalValue>
-          <Delta>+12.4% VS LAST MONTH</Delta>
+          <Delta>{t('analytics.delta')}</Delta>
         </TotalsWrap>
       </HeaderRow>
 
       <ChartWrap>
-        <ChartSvg viewBox="0 0 900 220" preserveAspectRatio="none" role="img" aria-label="Volume trend">
+        <ChartSvg viewBox="0 0 900 220" preserveAspectRatio="none" role="img" aria-label={t('analytics.volumeTrend')}>
           <defs>
             <linearGradient id="volumeAreaGradient" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="#ef233c" stopOpacity="0.35" />
@@ -37,14 +40,14 @@ export function VolumeTrendsCard() {
           <path d={TREND_PATH} fill="none" stroke="#ef233c" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         </ChartSvg>
         <Marker>
-          <MarkerDate>Oct 24</MarkerDate>
-          <MarkerValue>4,820 KG</MarkerValue>
+          <MarkerDate>{t('analytics.oct24')}</MarkerDate>
+          <MarkerValue>{t('analytics.markerValue')}</MarkerValue>
         </Marker>
       </ChartWrap>
 
       <WeekLabels>
         {WEEK_LABELS.map((label) => (
-          <WeekLabel key={label}>{label}</WeekLabel>
+          <WeekLabel key={label}>{t('analytics.week', { number: label })}</WeekLabel>
         ))}
       </WeekLabels>
     </AnalyticsCard>

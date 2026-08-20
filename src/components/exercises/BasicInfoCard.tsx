@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { Equipment, TargetMuscle } from './types';
 
@@ -28,6 +29,7 @@ export function BasicInfoCard({
   onTargetMuscleChange,
   onEquipmentChange,
 }: BasicInfoCardProps) {
+  const { t } = useTranslation();
   const muscleOptions =
     targetMuscleOptions && targetMuscleOptions.length > 0 ? targetMuscleOptions : FALLBACK_TARGET_MUSCLES;
 
@@ -36,17 +38,17 @@ export function BasicInfoCard({
       <AccentBar />
       <Grid>
         <FullRow>
-          <FieldLabel htmlFor="exercise-name">Exercise Name</FieldLabel>
+          <FieldLabel htmlFor="exercise-name">{t('exercises.exerciseName')}</FieldLabel>
           <NameInput
             id="exercise-name"
             type="text"
-            placeholder="e.g. Bulgarian Split Squat"
+            placeholder={t('exercises.exerciseNamePlaceholder')}
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
           />
         </FullRow>
         <div>
-          <FieldLabel htmlFor="target-muscle">Target Muscle Group</FieldLabel>
+          <FieldLabel htmlFor="target-muscle">{t('exercises.targetMuscle')}</FieldLabel>
           <Select
             id="target-muscle"
             value={targetMuscle}
@@ -60,7 +62,7 @@ export function BasicInfoCard({
           </Select>
         </div>
         <div>
-          <FieldLabel htmlFor="equipment">Equipment Required</FieldLabel>
+          <FieldLabel htmlFor="equipment">{t('exercises.equipmentRequired')}</FieldLabel>
           <Select
             id="equipment"
             value={equipment}

@@ -1,4 +1,5 @@
 import { Bell, HelpCircle, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 /**
@@ -6,23 +7,25 @@ import styled from 'styled-components';
  * Includes the page title, global search, action icons, and avatar.
  */
 export function WorkoutsHeader() {
+  const { t } = useTranslation();
+
   return (
     <HeaderRoot>
       <TitleBlock>
-        <Title>Workout Builder</Title>
-        <Subtitle>Design your peak performance session</Subtitle>
+        <Title>{t('workouts.builderTitle')}</Title>
+        <Subtitle>{t('workouts.builderSubtitle')}</Subtitle>
       </TitleBlock>
       <ActionsRow>
         <SearchWrap>
           <SearchIcon>
             <Search size={16} aria-hidden />
           </SearchIcon>
-          <SearchInput type="text" placeholder="Search global routine..." aria-label="Search routine" />
+          <SearchInput type="text" placeholder={t('workouts.searchGlobal')} aria-label={t('workouts.searchRoutine')} />
         </SearchWrap>
-        <IconButton type="button" aria-label="Notifications">
+        <IconButton type="button" aria-label={t('common.notifications')}>
           <Bell size={16} />
         </IconButton>
-        <IconButton type="button" aria-label="Help">
+        <IconButton type="button" aria-label={t('common.help')}>
           <HelpCircle size={16} />
         </IconButton>
         <Avatar aria-hidden />

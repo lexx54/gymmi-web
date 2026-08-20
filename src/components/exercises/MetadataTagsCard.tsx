@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { Plus, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { ExerciseTag } from './types';
 
@@ -14,6 +15,7 @@ type MetadataTagsCardProps = {
  * Metadata tag chips with an inline add-tag affordance.
  */
 export function MetadataTagsCard({ tags, onAddTag, onRemoveTag }: MetadataTagsCardProps) {
+  const { t } = useTranslation();
   const [isAdding, setIsAdding] = useState(false);
   const [draft, setDraft] = useState('');
 
@@ -38,14 +40,14 @@ export function MetadataTagsCard({ tags, onAddTag, onRemoveTag }: MetadataTagsCa
 
   return (
     <Card>
-      <FieldLabel>Metadata Tags</FieldLabel>
+      <FieldLabel>{t('exercises.metadataTags')}</FieldLabel>
       <TagRow>
         {tags.map((tag) => (
           <Chip key={tag}>
             <span>{tag}</span>
             <RemoveButton
               type="button"
-              aria-label={`Remove tag ${tag}`}
+              aria-label={t('exercises.removeTag', { tag })}
               onClick={() => onRemoveTag(tag)}
             >
               <X size={12} />
@@ -60,12 +62,12 @@ export function MetadataTagsCard({ tags, onAddTag, onRemoveTag }: MetadataTagsCa
             onChange={(event) => setDraft(event.target.value)}
             onBlur={commit}
             onKeyDown={handleKey}
-            placeholder="Tag name"
+            placeholder={t('exercises.tagName')}
           />
         ) : (
           <AddChip type="button" onClick={() => setIsAdding(true)}>
             <Plus size={12} />
-            Add Tag
+            {t('exercises.addTag')}
           </AddChip>
         )}
       </TagRow>

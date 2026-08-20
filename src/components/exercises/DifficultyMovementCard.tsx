@@ -1,8 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { Difficulty, MovementType } from './types';
 
 const DIFFICULTIES: Difficulty[] = ['Novice', 'Intermediate', 'Elite'];
 const MOVEMENT_TYPES: MovementType[] = ['Compound', 'Isolation'];
+const DIFFICULTY_LABEL_KEYS: Record<Difficulty, string> = {
+  Novice: 'exercises.novice',
+  Intermediate: 'exercises.intermediate',
+  Elite: 'exercises.elite',
+};
+const MOVEMENT_TYPE_LABEL_KEYS: Record<NonNullable<MovementType>, string> = {
+  Compound: 'exercises.compound',
+  Isolation: 'exercises.isolation',
+};
 
 type DifficultyMovementCardProps = {
   difficulty: Difficulty;
@@ -20,11 +30,13 @@ export function DifficultyMovementCard({
   onDifficultyChange,
   onMovementTypeChange,
 }: DifficultyMovementCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card>
       <Field>
-        <FieldLabel>Difficulty Level</FieldLabel>
-        <SegmentedRow role="radiogroup" aria-label="Difficulty">
+        <FieldLabel>{t('exercises.difficultyLevel')}</FieldLabel>
+        <SegmentedRow role="radiogroup" aria-label={t('exercises.difficulty')}>
           {DIFFICULTIES.map((level) => (
             <SegmentButton
               key={level}
@@ -34,13 +46,13 @@ export function DifficultyMovementCard({
               $active={difficulty === level}
               onClick={() => onDifficultyChange(level)}
             >
-              {level}
+              {t(DIFFICULTY_LABEL_KEYS[level])}
             </SegmentButton>
           ))}
         </SegmentedRow>
       </Field>
       <Field>
-        <FieldLabel>Movement Type</FieldLabel>
+        <FieldLabel>{t('exercises.movementType')}</FieldLabel>
         <MovementGrid>
           {MOVEMENT_TYPES.map((type) => (
             <MovementOption key={type} $active={movementType === type}>
@@ -52,7 +64,7 @@ export function DifficultyMovementCard({
                 onChange={() => onMovementTypeChange(type)}
               />
               <OptionDot $active={movementType === type} aria-hidden />
-              <span>{type}</span>
+              <span>{t(MOVEMENT_TYPE_LABEL_KEYS[type])}</span>
             </MovementOption>
           ))}
         </MovementGrid>

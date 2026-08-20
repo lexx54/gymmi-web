@@ -1,37 +1,40 @@
 import { Droplets, Flame, Timer } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type StatItem = {
-  label: string;
+  labelKey: string;
   value: string;
-  unit: string;
+  unitKey: string;
   icon: LucideIcon;
 };
 
 const STATS: StatItem[] = [
-  { label: 'Calories', value: '1,842', unit: 'KCAL', icon: Flame },
-  { label: 'Active Time', value: '124', unit: 'MINS', icon: Timer },
-  { label: 'Hydration', value: '2.8', unit: 'LITERS', icon: Droplets },
+  { labelKey: 'dashboard.calories', value: '1,842', unitKey: 'dashboard.kcal', icon: Flame },
+  { labelKey: 'dashboard.activeTime', value: '124', unitKey: 'dashboard.mins', icon: Timer },
+  { labelKey: 'dashboard.hydration', value: '2.8', unitKey: 'dashboard.liters', icon: Droplets },
 ];
 
 /**
  * Renders the right-column stat cards.
  */
 export function StatStack() {
+  const { t } = useTranslation();
+
   return (
     <Stack>
       {STATS.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.label}>
+          <Card key={stat.labelKey}>
             <IconWrap>
               <Icon size={16} />
             </IconWrap>
-            <Label>{stat.label}</Label>
+            <Label>{t(stat.labelKey)}</Label>
             <ValueRow>
               <Value>{stat.value}</Value>
-              <Unit>{stat.unit}</Unit>
+              <Unit>{t(stat.unitKey)}</Unit>
             </ValueRow>
           </Card>
         );

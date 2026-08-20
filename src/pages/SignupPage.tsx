@@ -6,8 +6,9 @@ import { Mail, Lock, Eye, EyeOff, User, Apple, Loader2 } from 'lucide-react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { useSignup } from '../hooks/useAuthApi';
-import { signupSchema, SIGNUP_ROLES, type SignupFormValues } from '../schemas/auth';
+import { createSignupSchema, SIGNUP_ROLES, type SignupFormValues } from '../schemas/auth';
 
 const LOCKOUT_DURATION = 180_000;
 
@@ -20,6 +21,7 @@ function getMutationErrorMessage(err: unknown, fallback: string) {
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
@@ -31,7 +33,7 @@ export default function SignupPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(createSignupSchema(t)),
     defaultValues: {
       email: '',
       username: '',
@@ -68,18 +70,18 @@ export default function SignupPage() {
       { email: data.email, username: data.username, password: data.password, role: data.role },
       {
         onSuccess: () => {
-          toast.success('Account created successfully!');
+          toast.success(t('auth.accountCreated'));
           navigate('/login');
         },
         onError: (err) => {
           if ((err as AxiosError).response?.status === 429) {
             setLockedUntil(Date.now() + LOCKOUT_DURATION);
             toast.error(
-              `Too many attempts. Try again in ${formatCountdown(Math.ceil(LOCKOUT_DURATION / 1000))}`,
+              t('auth.lockout', { time: formatCountdown(Math.ceil(LOCKOUT_DURATION / 1000)) }),
             );
             return;
           }
-          toast.error(getMutationErrorMessage(err, 'Sign up failed. Please try again.'));
+          toast.error(getMutationErrorMessage(err, t('auth.signupFailed')));
         },
       },
     );
@@ -97,7 +99,7 @@ export default function SignupPage() {
             <HeroTitle>Gymmi</HeroTitle>
           </div>
           <HeroFooter>
-            <HeroQuote>"The only bad workout is the one that didn't happen."</HeroQuote>
+            <HeroQuote>{t('auth.quote')}</HeroQuote>
           </HeroFooter>
         </HeroContent>
       </HeroPanel>
@@ -109,8 +111,8 @@ export default function SignupPage() {
           </MobileBrand>
 
           <FormCard style={{ padding: '3rem' }}>
-            <FormTitle style={{ marginBottom: '0.25rem' }}>Create account</FormTitle>
-            <FormSubtitle style={{ marginBottom: '2.5rem' }}>Sign up with Email</FormSubtitle>
+            <FormTitle style={{ marginBottom: '0.25rem' }}>{t('auth.createAccount')}</FormTitle>
+            <FormSubtitle style={{ marginBottom: '2.5rem' }}>{t('auth.signUpWithEmail')}</FormSubtitle>
 
             <form noValidate onSubmit={handleSubmit(onSubmit)}>
               <div style={{ marginBottom: '1.25rem' }}>
@@ -130,7 +132,7 @@ export default function SignupPage() {
                   </span>
                   <input
                     type="email"
-                    placeholder="email@mail.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     autoComplete="email"
                     {...register('email')}
                     style={{
@@ -169,7 +171,7 @@ export default function SignupPage() {
                   </span>
                   <input
                     type="text"
-                    placeholder="username"
+                    placeholder={t('auth.usernamePlaceholder')}
                     autoComplete="username"
                     {...register('username')}
                     style={{
@@ -208,7 +210,7 @@ export default function SignupPage() {
                   </span>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     autoComplete="new-password"
                     {...register('password')}
                     style={{
@@ -266,7 +268,7 @@ export default function SignupPage() {
                   </span>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="confirm password"
+                    placeholder={t('auth.confirmPasswordPlaceholder')}
                     autoComplete="new-password"
                     {...register('confirmPassword')}
                     style={{
@@ -311,7 +313,7 @@ export default function SignupPage() {
 
               <div style={{ marginBottom: '1.25rem' }}>
                 <p style={{ color: '#2b2d42', fontSize: '0.75rem', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  I am a
+                  {t('auth.rolePrompt')}
                 </p>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   {SIGNUP_ROLES.map((r) => (
@@ -370,16 +372,16 @@ export default function SignupPage() {
               >
                 {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
                 {isLocked
-                  ? `WAIT ${formatCountdown(remainingSeconds)}`
+                  ? t('auth.wait', { time: formatCountdown(remainingSeconds) })
                   : loading
-                    ? 'CREATING ACCOUNT...'
-                    : 'SIGN UP'}
+                    ? t('auth.creatingAccount')
+                    : t('auth.signUpAction')}
               </button>
             </form>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.75rem 0' }}>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
-              <span style={{ fontSize: '0.75rem', color: '#8d99ae', textTransform: 'uppercase' }}>Or</span>
+              <span style={{ fontSize: '0.75rem', color: '#8d99ae', textTransform: 'uppercase' }}>{t('common.or')}</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
             </div>
 
@@ -454,12 +456,12 @@ export default function SignupPage() {
             </div>
 
             <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#8d99ae', marginTop: '2rem' }}>
-              Already have an account?{' '}
+              {t('auth.alreadyHaveAccount')}{' '}
               <Link
                 to="/login"
                 style={{ color: '#ef233c', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
               >
-                Login
+                {t('auth.login')}
               </Link>
             </p>
           </FormCard>
