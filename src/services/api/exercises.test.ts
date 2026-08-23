@@ -72,6 +72,27 @@ describe('resolveLocalizedText', () => {
     ).toBe('Cuádriceps');
     expect(resolveLocalizedText({ en: 'Quads', es: '' }, 'es')).toBe('Quads');
   });
+
+  it('should unwrap nested JSON strings stored in en/es', () => {
+    expect(
+      resolveLocalizedText(
+        {
+          en: '{"en": "Chest", "es": "Pecho"}',
+          es: '{"en": "Chest", "es": "Pecho"}',
+        },
+        'es',
+      ),
+    ).toBe('Pecho');
+    expect(
+      resolveLocalizedText(
+        {
+          en: '{"en": "Barbell", "es": "Barra"}',
+          es: '{"en": "Barbell", "es": "Barra"}',
+        },
+        'en',
+      ),
+    ).toBe('Barbell');
+  });
 });
 
 describe('fetchExercises', () => {

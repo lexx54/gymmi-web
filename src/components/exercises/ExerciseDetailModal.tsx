@@ -31,7 +31,7 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
   const slide = MEDIA_SLIDES[slideIndex];
   const isVideo = slide === 'video';
   const language = i18n.resolvedLanguage ?? i18n.language;
-  const localized = (value: LocalizedText) =>
+  const localized = (value: LocalizedText | string | null | undefined) =>
     resolveLocalizedText(value, language) || t('exercises.noMovementType');
 
   return (

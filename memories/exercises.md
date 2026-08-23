@@ -50,6 +50,7 @@ Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipme
 - List/create/bulk: **real API**.
 - Catalog filtering/pagination is client-side and does not change the `GET /exercises` API contract. Search and selected filters use AND semantics.
 - `ExercisesPage.tsx` resolves target muscle/equipment for the active i18next language (English fallback), then derives filter options from those displayed values. Free-text/custom CSV values remain filterable.
+- `resolveLocalizedText` / `unwrapLocalizedText` parse nested JSON strings and pick `en` or `es` so catalog cards and the detail modal never render raw `{en, es}` objects.
 - A page contains at most 10 exercises (`EXERCISES_PER_PAGE`). Search/filter changes reset to page 1; the displayed page is clamped after catalog changes. Pagination appears only with more than one page and reports the visible range.
 - "Clear filters" resets search and all three dropdowns. The existing no-results clear action uses the same reset.
 - Hooks exist for update/delete/fetch-one but no edit/delete UI or detail route yet.
