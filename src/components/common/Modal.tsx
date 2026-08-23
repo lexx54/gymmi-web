@@ -7,6 +7,7 @@ type ModalProps = {
   isOpen: boolean;
   title: string;
   description?: string;
+  size?: 'default' | 'wide';
   children: ReactNode;
   onClose: () => void;
 };
@@ -14,7 +15,14 @@ type ModalProps = {
 /**
  * Generic modal shell for focused overlay workflows.
  */
-export function Modal({ isOpen, title, description, children, onClose }: ModalProps) {
+export function Modal({
+  isOpen,
+  title,
+  description,
+  size = 'default',
+  children,
+  onClose,
+}: ModalProps) {
   const { t } = useTranslation();
 
   if (!isOpen) return null;
@@ -26,6 +34,7 @@ export function Modal({ isOpen, title, description, children, onClose }: ModalPr
         aria-modal="true"
         aria-labelledby="modal-title"
         aria-describedby={description ? 'modal-description' : undefined}
+        $wide={size === 'wide'}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <Header>
@@ -54,8 +63,10 @@ const Overlay = styled.div`
   backdrop-filter: blur(22px);
 `;
 
-const Dialog = styled.div`
-  width: min(100%, 34rem);
+const Dialog = styled.div<{ $wide: boolean }>`
+  width: min(100%, ${({ $wide }) => ($wide ? '42rem' : '34rem')});
+  max-height: min(90vh, 52rem);
+  overflow: auto;
   border-radius: 1.5rem;
   background:
     radial-gradient(circle at top right, rgba(255, 179, 177, 0.12), transparent 16rem),

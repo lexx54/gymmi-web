@@ -252,6 +252,18 @@
     "removeFile": "Remove file",
     "changeFile": "Choose a different file",
     "csvInvalidType": "That file is not a .csv. Choose a file with the .csv extension.",
+    "detailDescription": "Full exercise details",
+    "mediaCarousel": "Exercise media",
+    "mediaComingSoon": "Photos and video coming soon",
+    "mediaSlide": {
+      "front": "Front view",
+      "side": "Side view",
+      "video": "Demo video"
+    },
+    "mediaSlideDot": "Media {{current}} of {{total}}",
+    "previousMedia": "Previous media",
+    "nextMedia": "Next media",
+    "noMovementType": "Not specified",
     "activationMap": "Activation Map",
     "primary": "Primary",
     "secondary": "Secondary",

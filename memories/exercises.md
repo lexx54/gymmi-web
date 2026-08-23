@@ -53,13 +53,13 @@ Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `diffi
 - A page contains at most 10 exercises (`EXERCISES_PER_PAGE`). Search/filter changes reset to page 1; the displayed page is clamped after catalog changes. Pagination appears only with more than one page and reports the visible range.
 - "Clear filters" resets search and all three dropdowns. The existing no-results clear action uses the same reset.
 - Hooks exist for update/delete/fetch-one but no edit/delete UI or detail route yet.
-- Catalog cards are read-only (no navigate to edit).
+- Catalog cards open a read-only `ExerciseDetailModal` with all persisted fields. The top media carousel is a UI mock (front/side/video placeholders) until image/video upload exists; nothing is POSTed.
 - Muscle/equipment options from `useListMuscles` / `useListEquipments`.
 - Tag catalog from `useTags` / `useCreateTag`. Builder no longer accepts free-typed tags.
 - Media upload, visual inspiration, live preview, activation-map persistence: UI-only.
 
 ## E2E
 
-- Playwright: `e2e/exercises.spec.ts` (client cannot create; combined level/muscle/equipment filtering; 10-item pagination; paid gym publish; unpaid publish error; paid gym bulk CSV modal).
+- Playwright: `e2e/exercises.spec.ts` (client cannot create; combined level/muscle/equipment filtering; 10-item pagination; catalog card opens detail modal with media mock; paid gym publish; unpaid publish error; paid gym bulk CSV modal).
 - Playwright: `e2e/tags.spec.ts` (admin tag shared; user tag private).
 - See `memories/e2e.md`.

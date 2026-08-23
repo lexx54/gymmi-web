@@ -252,6 +252,18 @@
     "removeFile": "Quitar archivo",
     "changeFile": "Elegir otro archivo",
     "csvInvalidType": "Ese archivo no es un .csv. Elige un archivo con extensión .csv.",
+    "detailDescription": "Detalles completos del ejercicio",
+    "mediaCarousel": "Medios del ejercicio",
+    "mediaComingSoon": "Fotos y video próximamente",
+    "mediaSlide": {
+      "front": "Vista frontal",
+      "side": "Vista lateral",
+      "video": "Video de demostración"
+    },
+    "mediaSlideDot": "Medio {{current}} de {{total}}",
+    "previousMedia": "Medio anterior",
+    "nextMedia": "Medio siguiente",
+    "noMovementType": "No especificado",
     "activationMap": "Mapa de activación",
     "primary": "Principal",
     "secondary": "Secundario",

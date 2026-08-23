@@ -3,14 +3,27 @@ import type { ExerciseSummary } from './types';
 
 type ExerciseCatalogCardProps = {
   exercise: ExerciseSummary;
+  onSelect?: (exerciseId: string) => void;
 };
 
 /**
  * Compact summary card shown in the Exercises catalog grid.
  */
-export function ExerciseCatalogCard({ exercise }: ExerciseCatalogCardProps) {
+export function ExerciseCatalogCard({ exercise, onSelect }: ExerciseCatalogCardProps) {
   return (
-    <Card>
+    <Card
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      aria-label={onSelect ? exercise.name : undefined}
+      onClick={() => onSelect?.(exercise.id)}
+      onKeyDown={(event) => {
+        if (!onSelect) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect(exercise.id);
+        }
+      }}
+    >
       <Eyebrow>{exercise.targetMuscle}</Eyebrow>
       <Name>{exercise.name}</Name>
       <Meta>
@@ -30,12 +43,15 @@ export function ExerciseCatalogCard({ exercise }: ExerciseCatalogCardProps) {
 
 const Card = styled.article`
   background-color: #181a2e;
+  border: 0;
   border-radius: 0.85rem;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   min-height: 11rem;
+  text-align: left;
+  cursor: pointer;
   transition: background-color 150ms ease, transform 150ms ease;
 
   &:hover {

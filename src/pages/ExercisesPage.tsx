@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ExerciseCatalogCard } from '../components/exercises/ExerciseCatalogCard';
+import { ExerciseDetailModal } from '../components/exercises/ExerciseDetailModal';
 import { ExerciseBulkCsvModal } from '../components/exercises/ExerciseBulkCsvModal';
 import { NoExercises } from '../components/exercises/NoExercises';
 import { ExercisesHeader } from '../components/exercises/ExercisesHeader';
@@ -56,6 +57,7 @@ export default function ExercisesPage() {
   const [equipment, setEquipment] = useState('');
   const [page, setPage] = useState(1);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const { data: exercises, isLoading, isError } = useExercises();
   const bulkCsvMutation = useUploadExerciseBulkCsv();
 
@@ -110,6 +112,8 @@ export default function ExercisesPage() {
   };
 
   const showGrid = !isLoading && !isError && visible.length > 0;
+  const selectedExercise =
+    exercises?.find((exercise) => exercise.id === selectedExerciseId) ?? null;
 
   return (
     <ExercisesPageShell>
@@ -204,7 +208,11 @@ export default function ExercisesPage() {
             <>
               <Grid>
                 {visible.map((exercise) => (
-                  <ExerciseCatalogCard key={exercise.id} exercise={exercise} />
+                  <ExerciseCatalogCard
+                    key={exercise.id}
+                    exercise={exercise}
+                    onSelect={setSelectedExerciseId}
+                  />
                 ))}
               </Grid>
               {totalPages > 1 ? (
@@ -248,6 +256,10 @@ export default function ExercisesPage() {
             />
           )}
         </ExercisesContent>
+        <ExerciseDetailModal
+          exercise={selectedExercise}
+          onClose={() => setSelectedExerciseId(null)}
+        />
         <ExerciseBulkCsvModal
           isOpen={isBulkModalOpen}
           isUploading={bulkCsvMutation.isPending}

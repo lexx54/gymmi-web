@@ -81,6 +81,41 @@ test.describe('exercises', () => {
     await expect(page.getByText(/Page \d+ of \d+/)).toHaveCount(0);
   });
 
+  test('opens exercise details from a catalog card', async ({ page, request }) => {
+    const admin = await loginAdminViaApi(request);
+    const suffix = Date.now().toString();
+    const name = `E2E Detail Squat ${suffix}`;
+    const created = await request.post(`${apiUrl}/exercises`, {
+      headers: { Authorization: `Bearer ${admin.accessToken}` },
+      data: {
+        name,
+        targetMuscle: 'Quads',
+        equipment: 'Barbell',
+        instructions: 'Stand tall and squat to depth.',
+        difficulty: 'Intermediate',
+        movementType: 'Compound',
+        tags: ['Strength'],
+      },
+    });
+    expect(created.status()).toBe(201);
+
+    await applyAuthToPage(page, admin);
+    await page.goto('/exercises');
+
+    await page.getByRole('searchbox', { name: /filter exercises/i }).fill(name);
+    await page.getByRole('heading', { name }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('heading', { name })).toBeVisible();
+    await expect(dialog.getByText('Stand tall and squat to depth.')).toBeVisible();
+    await expect(dialog.getByText('Photos and video coming soon')).toBeVisible();
+    await expect(dialog.getByText('Front view')).toBeVisible();
+
+    await dialog.getByRole('button', { name: /next media/i }).click();
+    await expect(dialog.getByText('Side view')).toBeVisible();
+  });
+
   test('paid gym can publish an exercise from the builder', async ({
     page,
     request,
