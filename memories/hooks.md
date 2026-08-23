@@ -12,6 +12,7 @@ Cross-cutting React Query / mutation hooks that wrap API services for pages and 
 | `usePermissions.ts` | Current-user permission matrix + helpers | `GET /me/permissions` |
 | `useListData.ts` | Reference catalogs | `GET /list/:resource` |
 | `useExercises.ts` | List/get/create/update/delete + bulk CSV | `/exercises*` |
+| `useTags.ts` | List/create visible tags | `/tags` |
 
 ## Pattern
 

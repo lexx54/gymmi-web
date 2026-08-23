@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3000';
+const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3001';
 const password = 'secret12';
 
 function uniqueUser() {
@@ -25,7 +25,9 @@ test.describe('login', () => {
 
     await page.getByRole('button', { name: /^login$/i }).click();
 
-    await expect(page.getByText('Email is required')).toBeVisible();
+    await expect(
+      page.getByText('Email or username is required'),
+    ).toBeVisible();
     await expect(page.getByText('Password is required')).toBeVisible();
     await expect(page).toHaveURL(/\/login$/);
   });

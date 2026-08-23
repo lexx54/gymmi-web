@@ -1,6 +1,6 @@
 import { expect, type APIRequestContext, type Page } from '@playwright/test';
 
-export const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3000';
+export const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3001';
 export const password = 'secret12';
 
 /** Must match gymmi-api/test/helpers/auth.ts E2E_ADMIN_* (created by globalSetup). */
@@ -88,4 +88,25 @@ export async function loginViaUi(page: Page, email: string, pwd = password) {
   await page.locator('input[type="password"]').fill(pwd);
   await page.getByRole('button', { name: /^login$/i }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
+}
+
+/** Clears stored JWT so a different user can log in on the same page. */
+export async function clearUiSession(page: Page) {
+  await page.goto('/login');
+  await page.evaluate(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+}
+
+/** Injects API tokens into the browser so the next navigation is authenticated. */
+export async function applyAuthToPage(page: Page, auth: AuthResponse) {
+  await page.goto('/login');
+  await page.evaluate(
+    ({ accessToken, refreshToken }) => {
+      localStorage.setItem('@gymmi/access_token', accessToken);
+      localStorage.setItem('@gymmi/refresh_token', refreshToken);
+    },
+    { accessToken: auth.accessToken, refreshToken: auth.refreshToken },
+  );
 }

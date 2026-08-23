@@ -17,7 +17,7 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 2. **Create:** Multi-card builder → validate name/instructions → `POST /exercises` → redirect to catalog.
 3. **Bulk CSV:** Modal → `POST /exercises/bulk-csv` (multipart) → shows `created` count + per-row errors.
 
-Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `difficulty`, `movementType`, `tags`. Activation map extras and media are UI-only and not POSTed.
+Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `difficulty`, `movementType`, `tags`. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`). Activation map extras and media are UI-only and not POSTed.
 
 ## Key files
 
@@ -40,9 +40,11 @@ Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `diffi
 - Hooks exist for update/delete/fetch-one but no edit/delete UI or detail route yet.
 - Catalog cards are read-only (no navigate to edit).
 - Muscle/equipment options from `useListMuscles` / `useListEquipments`.
+- Tag catalog from `useTags` / `useCreateTag`. Builder no longer accepts free-typed tags.
 - Media upload, visual inspiration, live preview, activation-map persistence: UI-only.
 
 ## E2E
 
-- Playwright: `e2e/exercises.spec.ts` (client cannot create; paid gym publish; unpaid publish error).
+- Playwright: `e2e/exercises.spec.ts` (client cannot create; paid gym publish; unpaid publish error; paid gym bulk CSV modal).
+- Playwright: `e2e/tags.spec.ts` (admin tag shared; user tag private).
 - See `memories/e2e.md`.

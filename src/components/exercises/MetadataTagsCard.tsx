@@ -1,42 +1,29 @@
-import { useState } from 'react';
-import type { KeyboardEvent } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { ExerciseTag } from './types';
+import type { Tag } from '../../services/api/tags';
 
 type MetadataTagsCardProps = {
   tags: ExerciseTag[];
+  catalogTags: Tag[];
   onAddTag: (tag: ExerciseTag) => void;
   onRemoveTag: (tag: ExerciseTag) => void;
+  onCreateTag: () => void;
 };
 
 /**
- * Metadata tag chips with an inline add-tag affordance.
+ * Selected exercise tags plus the user's visible catalog, with a create-tag entry point.
  */
-export function MetadataTagsCard({ tags, onAddTag, onRemoveTag }: MetadataTagsCardProps) {
+export function MetadataTagsCard({
+  tags,
+  catalogTags,
+  onAddTag,
+  onRemoveTag,
+  onCreateTag,
+}: MetadataTagsCardProps) {
   const { t } = useTranslation();
-  const [isAdding, setIsAdding] = useState(false);
-  const [draft, setDraft] = useState('');
-
-  const commit = () => {
-    const trimmed = draft.trim();
-    if (trimmed) {
-      onAddTag(trimmed);
-    }
-    setDraft('');
-    setIsAdding(false);
-  };
-
-  const handleKey = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      commit();
-    } else if (event.key === 'Escape') {
-      setDraft('');
-      setIsAdding(false);
-    }
-  };
+  const availableTags = catalogTags.filter((tag) => !tags.includes(tag.name));
 
   return (
     <Card>
@@ -54,23 +41,27 @@ export function MetadataTagsCard({ tags, onAddTag, onRemoveTag }: MetadataTagsCa
             </RemoveButton>
           </Chip>
         ))}
-
-        {isAdding ? (
-          <TagInput
-            autoFocus
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onBlur={commit}
-            onKeyDown={handleKey}
-            placeholder={t('exercises.tagName')}
-          />
-        ) : (
-          <AddChip type="button" onClick={() => setIsAdding(true)}>
-            <Plus size={12} />
-            {t('exercises.addTag')}
-          </AddChip>
-        )}
+        <AddChip type="button" onClick={onCreateTag}>
+          <Plus size={12} />
+          {t('exercises.createTag')}
+        </AddChip>
       </TagRow>
+      {availableTags.length > 0 ? (
+        <>
+          <AvailableLabel>{t('exercises.availableTags')}</AvailableLabel>
+          <TagRow>
+            {availableTags.map((tag) => (
+              <AvailableChip
+                key={tag.id}
+                type="button"
+                onClick={() => onAddTag(tag.name)}
+              >
+                {tag.name}
+              </AvailableChip>
+            ))}
+          </TagRow>
+        </>
+      ) : null}
     </Card>
   );
 }
@@ -89,6 +80,16 @@ const FieldLabel = styled.span`
   font-size: 0.62rem;
   font-weight: 700;
   margin-bottom: 1rem;
+`;
+
+const AvailableLabel = styled.span`
+  display: block;
+  color: #9a8c8c;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.58rem;
+  font-weight: 700;
+  margin: 1.1rem 0 0.65rem;
 `;
 
 const TagRow = styled.div`
@@ -150,21 +151,22 @@ const AddChip = styled.button`
   }
 `;
 
-const TagInput = styled.input`
+const AvailableChip = styled.button`
+  display: inline-flex;
+  align-items: center;
   padding: 0.3rem 0.75rem;
-  border: 1px solid rgba(93, 63, 62, 0.45);
-  background-color: #1c1e32;
-  color: #e0e0fc;
+  border: 1px dashed rgba(93, 63, 62, 0.45);
+  background: transparent;
+  color: #c8c8e6;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.65rem;
   font-weight: 700;
   border-radius: 9999px;
-  outline: none;
-  min-width: 6rem;
-  transition: border-color 150ms ease;
+  cursor: pointer;
 
-  &:focus {
+  &:hover {
     border-color: #ffb3b1;
+    color: #ffb3b1;
   }
 `;

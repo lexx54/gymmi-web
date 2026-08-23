@@ -26,7 +26,7 @@ test.describe('signup', () => {
     await page.goto('/signup');
     await page.getByPlaceholder('email@mail.com').fill(user.email);
     await page.getByPlaceholder('username').fill(user.username);
-    await page.getByPlaceholder('••••••••••••').fill(password);
+    await page.getByPlaceholder('Password', { exact: true }).fill(password);
     await page.getByPlaceholder('confirm password').fill(password);
     await page.getByRole('radio', { name: 'Client' }).check();
     await page.getByRole('button', { name: /^sign up$/i }).click();

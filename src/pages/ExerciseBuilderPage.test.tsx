@@ -50,6 +50,17 @@ vi.mock('../hooks/useExercises', () => ({
   }),
 }));
 
+vi.mock('../hooks/useTags', () => ({
+  useTags: () => ({
+    data: [],
+    isLoading: false,
+  }),
+  useCreateTag: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
+}));
+
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),

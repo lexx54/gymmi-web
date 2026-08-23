@@ -16,6 +16,7 @@ import {
 import { InstructionsCard } from '../components/exercises/InstructionsCard';
 import { LivePreviewDock } from '../components/exercises/LivePreviewDock';
 import { MediaUploadCard } from '../components/exercises/MediaUploadCard';
+import { CreateTagModal } from '../components/exercises/CreateTagModal';
 import { MetadataTagsCard } from '../components/exercises/MetadataTagsCard';
 import { VisualInspirationCard } from '../components/exercises/VisualInspirationCard';
 import type {
@@ -30,6 +31,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useCreateExercise } from '../hooks/useExercises';
 import { useListEquipments, useListMuscles } from '../hooks/useListData';
+import { useCreateTag, useTags } from '../hooks/useTags';
 import type { CreateExerciseParams } from '../services/api/exercises';
 
 const INITIAL_DRAFT: ExerciseDraft = {
@@ -41,7 +43,7 @@ const INITIAL_DRAFT: ExerciseDraft = {
   instructions: '',
   difficulty: 'Intermediate',
   movementType: null,
-  tags: ['Strength', 'Hypertrophy', 'Leg Day'],
+  tags: [],
 };
 
 function draftToCreateParams(draft: ExerciseDraft): CreateExerciseParams {
@@ -64,8 +66,11 @@ export default function ExerciseBuilderPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const createExercise = useCreateExercise();
+  const { data: catalogTags = [] } = useTags();
+  const createTag = useCreateTag();
   const username = user?.username ?? 'Alex';
   const [draft, setDraft] = useState<ExerciseDraft>(INITIAL_DRAFT);
+  const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
   const { data: equipments } = useListEquipments();
   const { data: muscles } = useListMuscles();
   const equipmentOptions = equipments?.map((e) => e.name);
@@ -142,6 +147,22 @@ export default function ExerciseBuilderPage() {
     setDraft((prev) => ({ ...prev, tags: prev.tags.filter((existing) => existing !== tag) }));
   }, []);
 
+  const handleCreateTag = (name: string) => {
+    createTag.mutate(
+      { name },
+      {
+        onSuccess: (tag) => {
+          handleAddTag(tag.name);
+          setIsCreateTagOpen(false);
+          toast.success(t('exercises.tagCreated'));
+        },
+        onError: () => {
+          toast.error(t('exercises.tagCreateFailed'));
+        },
+      },
+    );
+  };
+
   const handleDiscard = () => {
     setDraft(INITIAL_DRAFT);
     navigate('/exercises');
@@ -212,8 +233,10 @@ export default function ExerciseBuilderPage() {
               />
               <MetadataTagsCard
                 tags={draft.tags}
+                catalogTags={catalogTags}
                 onAddTag={handleAddTag}
                 onRemoveTag={handleRemoveTag}
+                onCreateTag={() => setIsCreateTagOpen(true)}
               />
               <VisualInspirationCard />
             </RightColumn>
@@ -221,6 +244,12 @@ export default function ExerciseBuilderPage() {
         </ExercisesContent>
         <LivePreviewDock />
       </ExercisesMain>
+      <CreateTagModal
+        isOpen={isCreateTagOpen}
+        isSaving={createTag.isPending}
+        onClose={() => setIsCreateTagOpen(false)}
+        onSubmit={handleCreateTag}
+      />
     </ExercisesPageShell>
   );
 }

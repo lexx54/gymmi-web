@@ -3,6 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 const port = 5173;
 const baseURL = `http://127.0.0.1:${port}`;
 
+// Dedicated e2e API (gymmi_e2e on port 3001). Never the dev API on :3000.
+const apiURL = process.env.E2E_API_URL ?? 'http://localhost:3001';
+
 export default defineConfig({
   testDir: './e2e',
   globalSetup: './e2e/global-setup.ts',
@@ -16,14 +19,27 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
   },
-  webServer: {
-    command: `npm run dev -- --host 127.0.0.1 --port ${port}`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    env: {
-      VITE_API_URL: process.env.E2E_API_URL ?? 'http://localhost:3000',
+  webServer: [
+    {
+      // Own the API on gymmi_e2e; do not reuse the developer start:dev on :3000.
+      command: 'npm run start:e2e',
+      cwd: '../gymmi-api',
+      url: apiURL,
+      reuseExistingServer: false,
+      timeout: 120_000,
+      env: {
+        ENV_FILE: '.env.e2e',
+      },
     },
-  },
+    {
+      command: `npm run dev -- --host 127.0.0.1 --port ${port}`,
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      env: {
+        VITE_API_URL: apiURL,
+      },
+    },
+  ],
   projects: [
     {
       name: 'chromium',
