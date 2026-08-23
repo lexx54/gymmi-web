@@ -11,6 +11,8 @@ import {
 const csvHeaders =
   'name,targetMuscle,equipment,instructions,difficulty,movementType';
 
+const localized = (value: string) => ({ en: value, es: value });
+
 test.describe('exercises', () => {
   test('client can view catalog but cannot create', async ({ page, request }) => {
     const client = await signupViaApi(request, {
@@ -43,9 +45,15 @@ test.describe('exercises', () => {
           headers: { Authorization: `Bearer ${admin.accessToken}` },
           data: {
             name: `E2E Filter Exercise ${suffix}-${index + 1}`,
-            targetMuscle,
-            equipment,
-            instructions: 'Exercise used to verify catalog filtering and pagination.',
+            targetMuscle: localized(targetMuscle),
+            equipment: localized(equipment),
+            instructions: localized(
+              'Exercise used to verify catalog filtering and pagination.',
+            ),
+            activationMap: {
+              secondary: localized('Glutes'),
+              stabilizers: localized('Calves'),
+            },
             difficulty: index < 6 ? 'Novice' : 'Elite',
             movementType: 'Compound',
             tags: [],
@@ -89,9 +97,16 @@ test.describe('exercises', () => {
       headers: { Authorization: `Bearer ${admin.accessToken}` },
       data: {
         name,
-        targetMuscle: 'Quads',
-        equipment: 'Barbell',
-        instructions: 'Stand tall and squat to depth.',
+        targetMuscle: { en: 'Quads', es: 'Cuádriceps' },
+        equipment: { en: 'Barbell', es: 'Barra' },
+        instructions: {
+          en: 'Stand tall and squat to depth.',
+          es: 'Ponte de pie y baja en sentadilla.',
+        },
+        activationMap: {
+          secondary: { en: 'Glutes', es: 'Glúteos' },
+          stabilizers: { en: 'Calves', es: 'Pantorrillas' },
+        },
         difficulty: 'Intermediate',
         movementType: 'Compound',
         tags: ['Strength'],
@@ -109,11 +124,27 @@ test.describe('exercises', () => {
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole('heading', { name })).toBeVisible();
     await expect(dialog.getByText('Stand tall and squat to depth.')).toBeVisible();
+    await expect(dialog.getByText('Glutes')).toBeVisible();
+    await expect(dialog.getByText('Calves')).toBeVisible();
     await expect(dialog.getByText('Photos and video coming soon')).toBeVisible();
     await expect(dialog.getByText('Front view')).toBeVisible();
 
     await dialog.getByRole('button', { name: /next media/i }).click();
     await expect(dialog.getByText('Side view')).toBeVisible();
+
+    await page.evaluate(() => localStorage.setItem('gymmi.language', 'es'));
+    await page.reload();
+    await page.getByRole('searchbox', { name: /filtrar ejercicios/i }).fill(name);
+    await page.getByRole('heading', { name }).click();
+
+    const spanishDialog = page.getByRole('dialog');
+    await expect(spanishDialog.getByText('Cuádriceps')).toHaveCount(2);
+    await expect(spanishDialog.getByText('Barra')).toBeVisible();
+    await expect(spanishDialog.getByText('Glúteos')).toBeVisible();
+    await expect(spanishDialog.getByText('Pantorrillas')).toBeVisible();
+    await expect(
+      spanishDialog.getByText('Ponte de pie y baja en sentadilla.'),
+    ).toBeVisible();
   });
 
   test('paid gym can publish an exercise from the builder', async ({

@@ -46,12 +46,24 @@ const INITIAL_DRAFT: ExerciseDraft = {
   tags: [],
 };
 
+/**
+ * Temporary bilingual writer used until the translation service is available.
+ */
+function duplicateLocalizedText(value: string) {
+  const normalized = value.trim();
+  return { en: normalized, es: normalized };
+}
+
 function draftToCreateParams(draft: ExerciseDraft): CreateExerciseParams {
   return {
     name: draft.name.trim(),
-    targetMuscle: draft.targetMuscle,
-    equipment: draft.equipment,
-    instructions: draft.instructions.trim(),
+    targetMuscle: duplicateLocalizedText(draft.targetMuscle),
+    equipment: duplicateLocalizedText(draft.equipment),
+    instructions: duplicateLocalizedText(draft.instructions),
+    activationMap: {
+      secondary: duplicateLocalizedText(draft.activationSecondary),
+      stabilizers: duplicateLocalizedText(draft.activationStabilizers),
+    },
     difficulty: draft.difficulty,
     movementType: draft.movementType,
     tags: draft.tags,

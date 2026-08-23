@@ -28,7 +28,7 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 - Local state resets when the modal closes; picking a new file hides the previous result (`hasSubmitted` gate) so a stale banner never lingers.
 - i18n keys added: `exercises.fileSelected`, `removeFile`, `changeFile`, `csvInvalidType` (en + es).
 
-Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `difficulty`, `movementType`, `tags`. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`). Activation map extras and media are UI-only and not POSTed.
+Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipment`, and `instructions`, plus activation-map secondary/stabilizers, `name`, `difficulty`, `movementType`, and `tags`. Until the translation service exists, builder values are copied into both languages. The API derives activation principal from target muscle. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`).
 
 ## Key files
 
@@ -49,17 +49,17 @@ Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `diffi
 
 - List/create/bulk: **real API**.
 - Catalog filtering/pagination is client-side and does not change the `GET /exercises` API contract. Search and selected filters use AND semantics.
-- `ExercisesPage.tsx` derives level (`difficulty`), target-muscle, and equipment dropdown values from the loaded exercises, so free-text/custom values imported through CSV remain filterable. Values are unique and sorted case-insensitively.
+- `ExercisesPage.tsx` resolves target muscle/equipment for the active i18next language (English fallback), then derives filter options from those displayed values. Free-text/custom CSV values remain filterable.
 - A page contains at most 10 exercises (`EXERCISES_PER_PAGE`). Search/filter changes reset to page 1; the displayed page is clamped after catalog changes. Pagination appears only with more than one page and reports the visible range.
 - "Clear filters" resets search and all three dropdowns. The existing no-results clear action uses the same reset.
 - Hooks exist for update/delete/fetch-one but no edit/delete UI or detail route yet.
-- Catalog cards open a read-only `ExerciseDetailModal` with all persisted fields. The top media carousel is a UI mock (front/side/video placeholders) until image/video upload exists; nothing is POSTed.
+- Catalog cards open a read-only `ExerciseDetailModal` with localized target/equipment/instructions and persisted principal/secondary/stabilizer activation tiles. The top media carousel is a UI mock until image/video upload exists.
 - Muscle/equipment options from `useListMuscles` / `useListEquipments`.
 - Tag catalog from `useTags` / `useCreateTag`. Builder no longer accepts free-typed tags.
-- Media upload, visual inspiration, live preview, activation-map persistence: UI-only.
+- Media upload, visual inspiration, and live preview remain UI-only. Activation-map selections are persisted.
 
 ## E2E
 
-- Playwright: `e2e/exercises.spec.ts` (client cannot create; combined level/muscle/equipment filtering; 10-item pagination; catalog card opens detail modal with media mock; paid gym publish; unpaid publish error; paid gym bulk CSV modal).
+- Playwright: `e2e/exercises.spec.ts` (client cannot create; localized filtering/pagination; detail modal EN/ES rendering and activation map; paid/unpaid publish; bulk CSV modal).
 - Playwright: `e2e/tags.spec.ts` (admin tag shared; user tag private).
 - See `memories/e2e.md`.

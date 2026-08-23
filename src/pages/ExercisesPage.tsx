@@ -19,7 +19,10 @@ import { Can } from '../components/Can';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
-import type { Exercise } from '../services/api/exercises';
+import {
+  resolveLocalizedText,
+  type Exercise,
+} from '../services/api/exercises';
 
 const EXERCISES_PER_PAGE = 10;
 
@@ -32,12 +35,15 @@ function uniqueSorted(values: string[]): string[] {
   );
 }
 
-function toExerciseSummary(exercise: Exercise): ExerciseSummary {
+function toExerciseSummary(
+  exercise: Exercise,
+  language?: string,
+): ExerciseSummary {
   return {
     id: exercise.id,
     name: exercise.name,
-    targetMuscle: exercise.targetMuscle,
-    equipment: exercise.equipment,
+    targetMuscle: resolveLocalizedText(exercise.targetMuscle, language),
+    equipment: resolveLocalizedText(exercise.equipment, language),
     difficulty: exercise.difficulty as ExerciseSummary['difficulty'],
     tags: exercise.tags,
   };
@@ -48,7 +54,7 @@ function toExerciseSummary(exercise: Exercise): ExerciseSummary {
  */
 export default function ExercisesPage() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
   const [search, setSearch] = useState('');
@@ -62,8 +68,11 @@ export default function ExercisesPage() {
   const bulkCsvMutation = useUploadExerciseBulkCsv();
 
   const catalog = useMemo(
-    () => (exercises ?? []).map(toExerciseSummary),
-    [exercises],
+    () =>
+      (exercises ?? []).map((exercise) =>
+        toExerciseSummary(exercise, i18n.resolvedLanguage ?? i18n.language),
+      ),
+    [exercises, i18n.language, i18n.resolvedLanguage],
   );
 
   const filterOptions = useMemo(

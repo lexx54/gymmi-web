@@ -3,7 +3,11 @@ import { ChevronLeft, ChevronRight, ImageIcon, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Modal } from '../common/Modal';
-import type { Exercise } from '../../services/api/exercises';
+import {
+  resolveLocalizedText,
+  type Exercise,
+  type LocalizedText,
+} from '../../services/api/exercises';
 
 type ExerciseDetailModalProps = {
   exercise: Exercise | null;
@@ -17,7 +21,7 @@ const MEDIA_SLIDES = ['front', 'side', 'video'] as const;
  * image/video upload is wired to the API.
  */
 export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [slideIndex, setSlideIndex] = useState(0);
 
   useEffect(() => {
@@ -26,6 +30,9 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
 
   const slide = MEDIA_SLIDES[slideIndex];
   const isVideo = slide === 'video';
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  const localized = (value: LocalizedText) =>
+    resolveLocalizedText(value, language) || t('exercises.noMovementType');
 
   return (
     <Modal
@@ -87,11 +94,11 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
           <MetaGrid>
             <Field>
               <FieldLabel>{t('exercises.targetMuscle')}</FieldLabel>
-              <FieldValue>{exercise.targetMuscle}</FieldValue>
+              <FieldValue>{localized(exercise.targetMuscle)}</FieldValue>
             </Field>
             <Field>
               <FieldLabel>{t('exercises.equipmentRequired')}</FieldLabel>
-              <FieldValue>{exercise.equipment}</FieldValue>
+              <FieldValue>{localized(exercise.equipment)}</FieldValue>
             </Field>
             <Field>
               <FieldLabel>{t('exercises.difficulty')}</FieldLabel>
@@ -104,8 +111,32 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
           </MetaGrid>
 
           <Field>
+            <FieldLabel>{t('exercises.activationMap')}</FieldLabel>
+            <ActivationGrid>
+              <ActivationTile $tier="principal">
+                <ActivationLabel>{t('exercises.primary')}</ActivationLabel>
+                <ActivationValue>
+                  {localized(exercise.activationMap.principal)}
+                </ActivationValue>
+              </ActivationTile>
+              <ActivationTile $tier="secondary">
+                <ActivationLabel>{t('exercises.secondary')}</ActivationLabel>
+                <ActivationValue>
+                  {localized(exercise.activationMap.secondary)}
+                </ActivationValue>
+              </ActivationTile>
+              <ActivationTile $tier="stabilizers">
+                <ActivationLabel>{t('exercises.stabilizers')}</ActivationLabel>
+                <ActivationValue>
+                  {localized(exercise.activationMap.stabilizers)}
+                </ActivationValue>
+              </ActivationTile>
+            </ActivationGrid>
+          </Field>
+
+          <Field>
             <FieldLabel>{t('exercises.detailedInstructions')}</FieldLabel>
-            <Instructions>{exercise.instructions}</Instructions>
+            <Instructions>{localized(exercise.instructions)}</Instructions>
           </Field>
 
           {exercise.tags.length > 0 ? (
@@ -206,6 +237,54 @@ const MetaGrid = styled.div`
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
+`;
+
+const ActivationGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ActivationTile = styled.div<{
+  $tier: 'principal' | 'secondary' | 'stabilizers';
+}>`
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #181a2e;
+  padding: 0.9rem 1rem;
+
+  &::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: ${({ $tier }) => {
+      if ($tier === 'principal') return '#ff535a';
+      if ($tier === 'secondary') return '#bbc7dd';
+      return '#5d3f3e';
+    }};
+    content: '';
+  }
+`;
+
+const ActivationLabel = styled.p`
+  margin: 0 0 0.4rem;
+  color: #e7bdbb;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`;
+
+const ActivationValue = styled.p`
+  margin: 0;
+  color: #f7f7ff;
+  font-size: 0.9rem;
+  font-weight: 800;
 `;
 
 const Field = styled.div`

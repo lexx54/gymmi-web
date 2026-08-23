@@ -5,6 +5,7 @@ import {
   createExercise,
   updateExercise,
   deleteExercise,
+  resolveLocalizedText,
   uploadExerciseBulkCsv,
 } from './exercises';
 import apiClient from './client';
@@ -28,9 +29,14 @@ const exerciseId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 const sampleExercise = {
   id: exerciseId,
   name: 'Squat',
-  targetMuscle: 'Quads',
-  equipment: 'Barbell',
-  instructions: 'Descend and ascend',
+  targetMuscle: { en: 'Quads', es: 'Cuádriceps' },
+  equipment: { en: 'Barbell', es: 'Barra' },
+  instructions: { en: 'Descend and ascend', es: 'Desciende y asciende' },
+  activationMap: {
+    principal: { en: 'Quads', es: 'Cuádriceps' },
+    secondary: { en: 'Glutes', es: 'Glúteos' },
+    stabilizers: { en: 'Calves', es: 'Pantorrillas' },
+  },
   difficulty: 'Intermediate',
   movementType: 'Compound',
   tags: ['Strength'],
@@ -40,9 +46,13 @@ const sampleExercise = {
 
 const createParams = {
   name: 'Squat',
-  targetMuscle: 'Quads',
-  equipment: 'Barbell',
-  instructions: 'Descend and ascend',
+  targetMuscle: { en: 'Quads', es: 'Cuádriceps' },
+  equipment: { en: 'Barbell', es: 'Barra' },
+  instructions: { en: 'Descend and ascend', es: 'Desciende y asciende' },
+  activationMap: {
+    secondary: { en: 'Glutes', es: 'Glúteos' },
+    stabilizers: { en: 'Calves', es: 'Pantorrillas' },
+  },
   difficulty: 'Intermediate',
   movementType: 'Compound',
   tags: ['Strength'],
@@ -53,6 +63,15 @@ beforeEach(() => {
   mockPost.mockReset();
   mockPatch.mockReset();
   mockDelete.mockReset();
+});
+
+describe('resolveLocalizedText', () => {
+  it('should resolve Spanish and fall back to English when Spanish is empty', () => {
+    expect(
+      resolveLocalizedText({ en: 'Quads', es: 'Cuádriceps' }, 'es'),
+    ).toBe('Cuádriceps');
+    expect(resolveLocalizedText({ en: 'Quads', es: '' }, 'es')).toBe('Quads');
+  });
 });
 
 describe('fetchExercises', () => {

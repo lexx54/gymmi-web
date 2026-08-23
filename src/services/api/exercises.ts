@@ -1,11 +1,25 @@
 import apiClient from './client';
 
+export type LocalizedText = {
+  en: string;
+  es: string;
+};
+
+export type ExerciseActivationMap = {
+  principal: LocalizedText;
+  secondary: LocalizedText;
+  stabilizers: LocalizedText;
+};
+
+export type ExerciseActivationInput = Omit<ExerciseActivationMap, 'principal'>;
+
 export type Exercise = {
   id: string;
   name: string;
-  targetMuscle: string;
-  equipment: string;
-  instructions: string;
+  targetMuscle: LocalizedText;
+  equipment: LocalizedText;
+  instructions: LocalizedText;
+  activationMap: ExerciseActivationMap;
   difficulty: string;
   movementType: string | null;
   tags: string[];
@@ -15,9 +29,10 @@ export type Exercise = {
 
 export type CreateExerciseParams = {
   name: string;
-  targetMuscle: string;
-  equipment: string;
-  instructions: string;
+  targetMuscle: LocalizedText;
+  equipment: LocalizedText;
+  instructions: LocalizedText;
+  activationMap: ExerciseActivationInput;
   difficulty: string;
   movementType?: string | null;
   tags: string[];
@@ -29,6 +44,18 @@ export type BulkExerciseCsvResult = {
   created: number;
   errors: Array<{ row: number; message: string }>;
 };
+
+/**
+ * Resolves bilingual API content for the active UI language with English,
+ * then Spanish, fallback.
+ */
+export function resolveLocalizedText(
+  value: LocalizedText,
+  language?: string,
+): string {
+  const preferred = language?.toLowerCase().startsWith('es') ? value.es : value.en;
+  return preferred.trim() || value.en.trim() || value.es.trim();
+}
 
 export async function fetchExercises(): Promise<Exercise[]> {
   const { data } = await apiClient.get<Exercise[]>('/exercises');
