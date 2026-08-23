@@ -8,7 +8,8 @@ Shared Axios client with auth header injection and refresh-token queueing, plus 
 
 - Base URL: `VITE_API_URL` || `http://localhost:3000`
 - Default headers: `Content-Type: application/json`
-- Request interceptor: set per-browser `X-Client-Id` (`localStorage` key `gymmi-client-id`) and attach `Bearer` access token from `tokenStorage`
+- Request interceptor: set per-browser `X-Client-Id` (`localStorage` key `gymmi-client-id`), send `Accept-Language` (`en`/`es`) from the active i18next language (falls back to `getStoredLanguage()`), and attach `Bearer` access token from `tokenStorage`
+- The `Accept-Language` header drives localized API responses (see `gymmi-api/memories/i18n.md`); backend `message` strings come back in the current UI language.
 - Response interceptor on 401 (non-`/auth/*`): single-flight refresh via `POST /auth/refresh`, retry queued requests; failure clears tokens
 
 ## API modules

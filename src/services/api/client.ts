@@ -1,8 +1,22 @@
 import axios from 'axios';
 import { getTokens, saveTokens, clearTokens } from '../storage/tokenStorage';
+import i18n, { getStoredLanguage } from '../../i18n';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const CLIENT_ID_STORAGE_KEY = 'gymmi-client-id';
+
+/**
+ * Resolve the language sent to the API as `Accept-Language`, normalized to a
+ * supported value (`en` | `es`). Prefers the live i18next language and falls
+ * back to the persisted Settings preference.
+ */
+function getRequestLanguage(): string {
+  const active = i18n.language;
+  if (active === 'en' || active === 'es') {
+    return active;
+  }
+  return getStoredLanguage();
+}
 
 /**
  * Stable per-browser client id so auth throttling is not shared across
@@ -26,6 +40,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   config.headers['X-Client-Id'] = getClientId();
+  config.headers['Accept-Language'] = getRequestLanguage();
   const { accessToken } = getTokens();
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
