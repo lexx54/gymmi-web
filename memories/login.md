@@ -9,7 +9,9 @@
   - email or username input is registered as `identifier`
   - password input is registered as `password`
 - Successful login saves access and refresh tokens, sets the auth user, and redirects to `/dashboard`.
-- Invalid credentials show the API error message in a toast.
+- Invalid credentials show the API error message in a toast (currently
+  `Invalid email/password`). The web `auth.invalidCredentials` locale key mirrors
+  that wording but is not referenced by any component today.
 - A `429` response triggers the local lockout countdown UI.
 
 ## E2E Coverage
@@ -19,7 +21,7 @@
 - Covered cases:
   - login form renders
   - empty submit shows client validation errors
-  - invalid credentials stay on `/login` and show an error
+  - invalid credentials stay on `/login` and show `Invalid email/password`
   - successful login redirects to `/dashboard`
 - The happy-path test creates a disposable `Client` user through the API before logging in.
 - The signup helper uses `E2E_API_URL`, falling back to `http://localhost:3000`.

@@ -69,7 +69,7 @@
     "haveAccount": "Already have an account?",
     "needAccount": "Need an account?",
     "lockout": "Too many attempts. Try again in {{time}}",
-    "invalidCredentials": "Invalid credentials",
+    "invalidCredentials": "Invalid email/password",
     "loginFailed": "Login failed. Please check your credentials.",
     "accountCreated": "Account created successfully!",
     "signupFailed": "Sign up failed. Please try again.",

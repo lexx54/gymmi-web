@@ -39,7 +39,7 @@ test.describe('login', () => {
     await page.locator('input[type="password"]').fill('wrong12');
     await page.getByRole('button', { name: /^login$/i }).click();
 
-    await expect(page.getByText('Invalid credentials')).toBeVisible();
+    await expect(page.getByText('Invalid email/password')).toBeVisible();
     await expect(page).toHaveURL(/\/login$/);
   });
 

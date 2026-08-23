@@ -69,7 +69,7 @@
     "haveAccount": "¿Ya tienes una cuenta?",
     "needAccount": "¿Necesitas una cuenta?",
     "lockout": "Demasiados intentos. Inténtalo de nuevo en {{time}}",
-    "invalidCredentials": "Credenciales inválidas",
+    "invalidCredentials": "Correo/contraseña inválidos",
     "loginFailed": "No se pudo iniciar sesión. Revisa tus credenciales.",
     "accountCreated": "Cuenta creada correctamente.",
     "signupFailed": "No se pudo crear la cuenta. Inténtalo de nuevo.",
