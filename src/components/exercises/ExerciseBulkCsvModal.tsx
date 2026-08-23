@@ -80,14 +80,16 @@ export function ExerciseBulkCsvModal({
     if (inputRef.current) inputRef.current.value = '';
   };
 
+  // A finished import stays on screen until a different file is picked, so the
+  // upload action is withdrawn meanwhile to avoid importing the same rows twice.
+  const showResult = hasSubmitted && Boolean(result);
+  const errorCount = result?.errors.length ?? 0;
+
   const handleSubmit = () => {
-    if (!file) return;
+    if (!file || isUploading || showResult) return;
     setHasSubmitted(true);
     onUpload(file);
   };
-
-  const showResult = hasSubmitted && Boolean(result);
-  const errorCount = result?.errors.length ?? 0;
 
   return (
     <Modal
@@ -189,16 +191,18 @@ export function ExerciseBulkCsvModal({
           <SecondaryButton type="button" onClick={onClose}>
             {t('common.cancel')}
           </SecondaryButton>
-          <PrimaryButton type="button" disabled={!file || isUploading} onClick={handleSubmit}>
-            {isUploading ? (
-              <>
-                <Spinner size={16} aria-hidden />
-                {t('exercises.uploading')}
-              </>
-            ) : (
-              t('exercises.uploadCsv')
-            )}
-          </PrimaryButton>
+          {showResult ? null : (
+            <PrimaryButton type="button" disabled={!file || isUploading} onClick={handleSubmit}>
+              {isUploading ? (
+                <>
+                  <Spinner size={16} aria-hidden />
+                  {t('exercises.uploading')}
+                </>
+              ) : (
+                t('exercises.uploadCsv')
+              )}
+            </PrimaryButton>
+          )}
         </Actions>
       </Content>
     </Modal>

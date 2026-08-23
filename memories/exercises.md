@@ -24,6 +24,7 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 - **Invalid type:** non-`.csv` selections are rejected locally with an inline `role="alert"` message; the file is not set.
 - **Uploading:** file card shows an indeterminate progress bar and a spinner; the submit button shows a spinner + "Uploading...".
 - **Result:** banner with icon — green when all rows imported, amber when some were skipped — keeping the sentence `Created N exercises, skipped M rows.` intact, followed by the per-row error list.
+- **Duplicate guard:** once a result is shown the "Upload CSV" button is **removed** (not just disabled) and `handleSubmit` early-returns while `showResult` is true, so the same rows cannot be imported twice. Only "Cancel" plus the "Choose a different file" link remain; picking another file clears `hasSubmitted`, hides the result, and brings the upload button back.
 - Local state resets when the modal closes; picking a new file hides the previous result (`hasSubmitted` gate) so a stale banner never lingers.
 - i18n keys added: `exercises.fileSelected`, `removeFile`, `changeFile`, `csvInvalidType` (en + es).
 
