@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Plus, Upload } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight, Plus, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,17 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
 import type { Exercise } from '../services/api/exercises';
+
+const EXERCISES_PER_PAGE = 10;
+
+/**
+ * Returns unique catalog values in case-insensitive alphabetical order.
+ */
+function uniqueSorted(values: string[]): string[] {
+  return [...new Set(values.filter(Boolean))].sort((left, right) =>
+    left.localeCompare(right, undefined, { sensitivity: 'base' }),
+  );
+}
 
 function toExerciseSummary(exercise: Exercise): ExerciseSummary {
   return {
@@ -40,6 +51,10 @@ export default function ExercisesPage() {
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
   const [search, setSearch] = useState('');
+  const [difficulty, setDifficulty] = useState('');
+  const [targetMuscle, setTargetMuscle] = useState('');
+  const [equipment, setEquipment] = useState('');
+  const [page, setPage] = useState(1);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const { data: exercises, isLoading, isError } = useExercises();
   const bulkCsvMutation = useUploadExerciseBulkCsv();
@@ -49,16 +64,50 @@ export default function ExercisesPage() {
     [exercises],
   );
 
-  const visible = useMemo(() => {
+  const filterOptions = useMemo(
+    () => ({
+      difficulties: uniqueSorted(catalog.map((exercise) => exercise.difficulty)),
+      targetMuscles: uniqueSorted(catalog.map((exercise) => exercise.targetMuscle)),
+      equipments: uniqueSorted(catalog.map((exercise) => exercise.equipment)),
+    }),
+    [catalog],
+  );
+
+  const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return catalog;
-    return catalog.filter((exercise) =>
-      [exercise.name, exercise.targetMuscle, exercise.equipment, ...exercise.tags]
-        .join(' ')
-        .toLowerCase()
-        .includes(query),
-    );
-  }, [catalog, search]);
+    return catalog.filter((exercise) => {
+      const matchesSearch =
+        !query ||
+        [exercise.name, exercise.targetMuscle, exercise.equipment, ...exercise.tags]
+          .join(' ')
+          .toLowerCase()
+          .includes(query);
+      return (
+        matchesSearch &&
+        (!difficulty || exercise.difficulty === difficulty) &&
+        (!targetMuscle || exercise.targetMuscle === targetMuscle) &&
+        (!equipment || exercise.equipment === equipment)
+      );
+    });
+  }, [catalog, difficulty, equipment, search, targetMuscle]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [difficulty, equipment, search, targetMuscle]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / EXERCISES_PER_PAGE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * EXERCISES_PER_PAGE;
+  const visible = filtered.slice(pageStart, pageStart + EXERCISES_PER_PAGE);
+  const hasFilters = Boolean(search || difficulty || targetMuscle || equipment);
+
+  const clearFilters = () => {
+    setSearch('');
+    setDifficulty('');
+    setTargetMuscle('');
+    setEquipment('');
+    setPage(1);
+  };
 
   const showGrid = !isLoading && !isError && visible.length > 0;
 
@@ -88,20 +137,100 @@ export default function ExercisesPage() {
             </Can>
           </HeaderRow>
 
-          <SearchField
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder={t('exercises.filterPlaceholder')}
-            aria-label={t('exercises.filterLabel')}
-          />
+          <FilterPanel aria-label={t('exercises.catalogFilters')}>
+            <SearchField
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={t('exercises.filterPlaceholder')}
+              aria-label={t('exercises.filterLabel')}
+            />
+            <FilterSelect
+              value={difficulty}
+              onChange={(event) => setDifficulty(event.target.value)}
+              aria-label={t('exercises.filterByLevel')}
+            >
+              <option value="">{t('exercises.allLevels')}</option>
+              {filterOptions.difficulties.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </FilterSelect>
+            <FilterSelect
+              value={targetMuscle}
+              onChange={(event) => setTargetMuscle(event.target.value)}
+              aria-label={t('exercises.filterByTargetMuscle')}
+            >
+              <option value="">{t('exercises.allTargetMuscles')}</option>
+              {filterOptions.targetMuscles.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </FilterSelect>
+            <FilterSelect
+              value={equipment}
+              onChange={(event) => setEquipment(event.target.value)}
+              aria-label={t('exercises.filterByEquipment')}
+            >
+              <option value="">{t('exercises.allEquipment')}</option>
+              {filterOptions.equipments.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </FilterSelect>
+            {hasFilters ? (
+              <ClearFilters type="button" onClick={clearFilters}>
+                {t('exercises.clearFilters')}
+              </ClearFilters>
+            ) : null}
+          </FilterPanel>
+
+          {!isLoading && !isError && catalog.length > 0 ? (
+            <ResultCount aria-live="polite">
+              {filtered.length > 0
+                ? t('exercises.showingResults', {
+                    from: pageStart + 1,
+                    to: pageStart + visible.length,
+                    total: filtered.length,
+                  })
+                : t('exercises.noMatchingExercises')}
+            </ResultCount>
+          ) : null}
 
           {showGrid ? (
-            <Grid>
-              {visible.map((exercise) => (
-                <ExerciseCatalogCard key={exercise.id} exercise={exercise} />
-              ))}
-            </Grid>
+            <>
+              <Grid>
+                {visible.map((exercise) => (
+                  <ExerciseCatalogCard key={exercise.id} exercise={exercise} />
+                ))}
+              </Grid>
+              {totalPages > 1 ? (
+                <Pagination aria-label={t('exercises.pagination')}>
+                  <PageButton
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() => setPage((value) => Math.max(1, value - 1))}
+                  >
+                    <ChevronLeft size={16} aria-hidden />
+                    {t('exercises.previous')}
+                  </PageButton>
+                  <PageStatus>
+                    {t('exercises.pageOf', { page: currentPage, total: totalPages })}
+                  </PageStatus>
+                  <PageButton
+                    type="button"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
+                  >
+                    {t('exercises.next')}
+                    <ChevronRight size={16} aria-hidden />
+                  </PageButton>
+                </Pagination>
+              ) : null}
+            </>
           ) : (
             <NoExercises
               variant={
@@ -115,7 +244,7 @@ export default function ExercisesPage() {
               }
               onCreateExercise={() => navigate('/exercises/new')}
               onBulkUpload={() => setIsBulkModalOpen(true)}
-              onClearSearch={() => setSearch('')}
+              onClearSearch={clearFilters}
             />
           )}
         </ExercisesContent>
@@ -228,9 +357,9 @@ const SecondaryButton = styled(CreateButton)`
 
 const SearchField = styled.input`
   width: 100%;
-  max-width: 28rem;
+  min-width: 0;
   background-color: #181a2e;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 9999px;
   padding: 0.85rem 1.25rem;
   color: #e0e0fc;
@@ -243,12 +372,95 @@ const SearchField = styled.input`
   }
 
   &:focus {
+    border-color: #ffb3b1;
     box-shadow: 0 0 0 2px #ffb3b1;
   }
+`;
+
+const FilterPanel = styled.section`
+  display: grid;
+  grid-template-columns: minmax(13rem, 1.5fr) repeat(3, minmax(9rem, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: center;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FilterSelect = styled.select`
+  width: 100%;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background-color: #181a2e;
+  color: #e0e0fc;
+  padding: 0.85rem 2.25rem 0.85rem 1.1rem;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border-color: #ffb3b1;
+    box-shadow: 0 0 0 2px #ffb3b1;
+  }
+`;
+
+const ClearFilters = styled.button`
+  border: 0;
+  background: transparent;
+  color: #ffb3b1;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+  white-space: nowrap;
+`;
+
+const ResultCount = styled.p`
+  margin: -0.35rem 0 0;
+  color: #e7bdbb;
+  font-size: 0.8rem;
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
   gap: 1.25rem;
+`;
+
+const Pagination = styled.nav`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+`;
+
+const PageButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #313349;
+  border-radius: 9999px;
+  background: #181a2e;
+  color: #ffdad6;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.65rem 1rem;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+`;
+
+const PageStatus = styled.span`
+  color: #e7bdbb;
+  font-size: 0.8rem;
+  font-weight: 700;
 `;

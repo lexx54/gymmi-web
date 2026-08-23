@@ -13,7 +13,7 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 
 ## Main flows
 
-1. **Catalog:** `useExercises()` → `GET /exercises` → client-side search → grid cards.
+1. **Catalog:** `useExercises()` → `GET /exercises` → client-side search + exact filters → 10-card pages.
 2. **Create:** Multi-card builder → validate name/instructions → `POST /exercises` → redirect to catalog.
 3. **Bulk CSV:** Modal → `POST /exercises/bulk-csv` (multipart) → shows `created` count + per-row errors.
 
@@ -48,6 +48,10 @@ Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `diffi
 ## Constraints
 
 - List/create/bulk: **real API**.
+- Catalog filtering/pagination is client-side and does not change the `GET /exercises` API contract. Search and selected filters use AND semantics.
+- `ExercisesPage.tsx` derives level (`difficulty`), target-muscle, and equipment dropdown values from the loaded exercises, so free-text/custom values imported through CSV remain filterable. Values are unique and sorted case-insensitively.
+- A page contains at most 10 exercises (`EXERCISES_PER_PAGE`). Search/filter changes reset to page 1; the displayed page is clamped after catalog changes. Pagination appears only with more than one page and reports the visible range.
+- "Clear filters" resets search and all three dropdowns. The existing no-results clear action uses the same reset.
 - Hooks exist for update/delete/fetch-one but no edit/delete UI or detail route yet.
 - Catalog cards are read-only (no navigate to edit).
 - Muscle/equipment options from `useListMuscles` / `useListEquipments`.
@@ -56,6 +60,6 @@ Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `diffi
 
 ## E2E
 
-- Playwright: `e2e/exercises.spec.ts` (client cannot create; paid gym publish; unpaid publish error; paid gym bulk CSV modal).
+- Playwright: `e2e/exercises.spec.ts` (client cannot create; combined level/muscle/equipment filtering; 10-item pagination; paid gym publish; unpaid publish error; paid gym bulk CSV modal).
 - Playwright: `e2e/tags.spec.ts` (admin tag shared; user tag private).
 - See `memories/e2e.md`.
