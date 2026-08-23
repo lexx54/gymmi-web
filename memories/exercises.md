@@ -28,7 +28,7 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 - Local state resets when the modal closes; picking a new file hides the previous result (`hasSubmitted` gate) so a stale banner never lingers.
 - i18n keys added: `exercises.fileSelected`, `removeFile`, `changeFile`, `csvInvalidType` (en + es).
 
-Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipment`, and `instructions`, plus activation-map secondary/stabilizers, `name`, `difficulty`, `movementType`, and `tags`. Until the translation service exists, builder values are copied into both languages. The API derives activation principal from target muscle. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`).
+Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipment`, and `instructions`, plus activation-map secondary/stabilizers, `name`, `difficulty`, `movementType`, and `tags`. The builder copies its source value into both locales; the API detects that duplication and generates EN/ES translations through Gemini. The API derives activation principal from translated target muscle. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`).
 
 ## Key files
 
