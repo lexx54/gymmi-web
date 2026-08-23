@@ -17,6 +17,16 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 2. **Create:** Multi-card builder → validate name/instructions → `POST /exercises` → redirect to catalog.
 3. **Bulk CSV:** Modal → `POST /exercises/bulk-csv` (multipart) → shows `created` count + per-row errors.
 
+### Bulk CSV modal feedback (`ExerciseBulkCsvModal.tsx`)
+
+- **No file:** dashed drop zone with "Choose CSV file" + hint; upload button disabled.
+- **File selected:** replaces the drop zone with a green card showing a file icon, file name, `File selected · <size>`, and an X to remove it, plus a "Choose a different file" label link. This is the main selection feedback (previously only the file name swapped inside the same label, which read as "nothing happened").
+- **Invalid type:** non-`.csv` selections are rejected locally with an inline `role="alert"` message; the file is not set.
+- **Uploading:** file card shows an indeterminate progress bar and a spinner; the submit button shows a spinner + "Uploading...".
+- **Result:** banner with icon — green when all rows imported, amber when some were skipped — keeping the sentence `Created N exercises, skipped M rows.` intact, followed by the per-row error list.
+- Local state resets when the modal closes; picking a new file hides the previous result (`hasSubmitted` gate) so a stale banner never lingers.
+- i18n keys added: `exercises.fileSelected`, `removeFile`, `changeFile`, `csvInvalidType` (en + es).
+
 Create payload sent: `name`, `targetMuscle`, `equipment`, `instructions`, `difficulty`, `movementType`, `tags`. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`). Activation map extras and media are UI-only and not POSTed.
 
 ## Key files
