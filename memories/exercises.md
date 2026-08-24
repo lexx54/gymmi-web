@@ -28,7 +28,7 @@ Exercise catalog (list/search), create builder, and bulk CSV import — backed b
 - Local state resets when the modal closes; picking a new file hides the previous result (`hasSubmitted` gate) so a stale banner never lingers.
 - i18n keys added: `exercises.fileSelected`, `removeFile`, `changeFile`, `csvInvalidType` (en + es).
 
-Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipment`, and `instructions`, plus activation-map secondary/stabilizers, `name`, `difficulty`, `movementType`, and `tags`. The builder copies its source value into both locales; the API detects that duplication and generates EN/ES translations through Gemini. The API derives activation principal from translated target muscle. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`).
+Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipment`, and `instructions`, plus activation-map secondary/stabilizers, `name`, `difficulty`, `movementType`, and `tags`. The builder copies its source value into both locales. Gemini translation is currently disabled on the API, so that duplicate is stored as-is rather than being translated. The API derives activation principal from the target muscle. Tags are chosen from `GET /tags` (global + own). New tags are created in a modal (`POST /tags`).
 
 ## Key files
 
@@ -58,6 +58,17 @@ Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipme
 - Muscle/equipment options from `useListMuscles` / `useListEquipments`.
 - Tag catalog from `useTags` / `useCreateTag`. Builder no longer accepts free-typed tags.
 - Media upload, visual inspiration, and live preview remain UI-only. Activation-map selections are persisted.
+
+## Mobile layout
+
+The catalog used to overflow horizontally on phones (a 390px viewport produced a 611px document), which showed as a white gutter down the right side because `body` has no background and only `ExercisesPageShell` paints the dark color. Causes and fixes:
+
+- `ExercisesMain` is a flex child; its default `min-width: auto` blocked shrinking below content width. It now sets `min-width: 0`, which is the load-bearing fix.
+- `ExercisesHeader` had a fixed `15.5rem` search input plus `2.5rem` side padding. The header search is decorative (no state, no filtering), so it is hidden under 900px; the page's own `SearchField` does the real filtering. Padding, title size, and gaps shrink under 640px, and the icon buttons/avatar use `flex-shrink: 0`.
+- `ExercisesContent` drops to `1.15rem` side padding under 640px.
+- Page `Title` uses `clamp(1.75rem, 7vw, 2.4rem)`; catalog `Grid` uses `minmax(min(14rem, 100%), 1fr)`; `Pagination` wraps; header action buttons go full width under 640px so their uppercase labels stay on one line.
+
+Regression guard: `e2e/exercises.spec.ts` has a 390x844 test asserting `documentElement.scrollWidth <= clientWidth`. It was verified to fail without these style changes.
 
 ## E2E
 

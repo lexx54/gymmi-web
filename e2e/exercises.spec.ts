@@ -147,6 +147,46 @@ test.describe('exercises', () => {
     ).toBeVisible();
   });
 
+  test('renders the catalog without horizontal overflow on a phone viewport', async ({
+    page,
+    request,
+  }) => {
+    const admin = await loginAdminViaApi(request);
+    const suffix = Date.now().toString();
+    const created = await request.post(`${apiUrl}/exercises`, {
+      headers: { Authorization: `Bearer ${admin.accessToken}` },
+      data: {
+        name: `E2E Mobile Squat ${suffix}`,
+        targetMuscle: localized('Quads'),
+        equipment: localized('Barbell'),
+        instructions: localized('Stand tall and squat to depth.'),
+        activationMap: {
+          secondary: localized('Glutes'),
+          stabilizers: localized('Calves'),
+        },
+        difficulty: 'Intermediate',
+        movementType: 'Compound',
+        tags: ['strength'],
+      },
+    });
+    expect(created.status()).toBe(201);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await applyAuthToPage(page, admin);
+    await page.goto('/exercises');
+
+    await expect(page.getByText('Design your movement catalog')).toBeVisible();
+    await expect(
+      page.getByRole('searchbox', { name: /filter exercises/i }),
+    ).toBeVisible();
+
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
+  });
+
   test('paid gym can publish an exercise from the builder', async ({
     page,
     request,

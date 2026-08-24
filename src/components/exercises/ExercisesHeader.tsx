@@ -54,28 +54,50 @@ const HeaderRoot = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 1.4rem 2.5rem;
   background-color: rgba(16, 18, 37, 0.8);
   backdrop-filter: blur(20px);
+
+  @media (max-width: 640px) {
+    padding: 1rem 1.15rem;
+    gap: 0.75rem;
+  }
 `;
 
 const Title = styled.h1`
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: #ffb3b1;
   font-size: 1.7rem;
   font-weight: 800;
   letter-spacing: -0.01em;
+
+  @media (max-width: 640px) {
+    font-size: 1.25rem;
+  }
 `;
 
 const Actions = styled.div`
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  min-width: 0;
+
+  @media (max-width: 640px) {
+    gap: 0.6rem;
+  }
 `;
 
 const SearchWrap = styled.div`
   position: relative;
+
+  /* The page's own filter field covers search on small screens. */
+  @media (max-width: 900px) {
+    display: none;
+  }
 `;
 
 const SearchIcon = styled.span`
@@ -111,6 +133,7 @@ const SearchInput = styled.input`
 const IconButton = styled.button`
   width: 2rem;
   height: 2rem;
+  flex-shrink: 0;
   border: none;
   background: transparent;
   color: #e7bdbb;
@@ -143,6 +166,7 @@ const NotificationDot = styled.span`
 const Avatar = styled.div`
   width: 2.25rem;
   height: 2.25rem;
+  flex-shrink: 0;
   border-radius: 9999px;
   background: linear-gradient(135deg, #ff535a 0%, #680011 100%);
   box-shadow: 0 0 0 2px rgba(255, 179, 177, 0.2);

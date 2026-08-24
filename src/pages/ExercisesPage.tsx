@@ -308,6 +308,7 @@ const HeaderRow = styled.div`
 
 const Copy = styled.div`
   max-width: 34rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -326,9 +327,10 @@ const Title = styled.h2`
   margin: 0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: #e0e0fc;
-  font-size: 2.4rem;
+  font-size: clamp(1.75rem, 7vw, 2.4rem);
   font-weight: 800;
   line-height: 1.1;
+  overflow-wrap: break-word;
 `;
 
 const Subtitle = styled.p`
@@ -342,11 +344,16 @@ const ActionGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
 `;
 
 const CreateButton = styled.button`
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.85rem 1.6rem;
   border: none;
@@ -367,6 +374,12 @@ const CreateButton = styled.button`
 
   &:active {
     transform: scale(0.97);
+  }
+
+  @media (max-width: 640px) {
+    flex: 1 1 100%;
+    padding: 0.85rem 1rem;
+    letter-spacing: 0.12em;
   }
 `;
 
@@ -450,15 +463,20 @@ const ResultCount = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
   gap: 1.25rem;
 `;
 
 const Pagination = styled.nav`
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 1rem;
+
+  @media (max-width: 640px) {
+    gap: 0.6rem;
+  }
 `;
 
 const PageButton = styled.button`
