@@ -17,7 +17,9 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 ## Main flows
 
 - Library: `GET /workouts`, functional name/description search, Mine/Assigned filters, ownership/read-only/assigned badges.
-- Builder: real exercise catalog, Monday–Sunday canvases, add/remove/reorder exercises and sets, editable weight/reps/rest seconds/RPE, fixed superset palette, validation, and create/update mutations.
+- Empty/status states use `NoRoutines` (loading, error, empty catalog, no-results), matching `NoExercises`: empty offers create; no-results offers clear filters.
+- Builder: real exercise catalog, Monday–Sunday canvases, add/remove/reorder exercises and sets, editable weight/reps/rest seconds/RPE, fixed superset palette, validation, and create/update mutations. Adding a set uses default values; a second action copies the latest set. Both actions apply to every exercise in the same-day superset group.
+- Builder layout: from 901px up, `LibraryPane` is sticky with `height: 0; min-height: 100%` so it matches the routine column height instead of driving the grid row, capped at `calc(100vh - 4rem)`; the exercise list scrolls inside it. Below 901px the pane keeps its `max-height: 25rem`. The category tab row sets `flex-shrink: 0` (it is an `overflow-x: auto` flex item, so it would otherwise collapse inside the bounded pane) plus vertical padding for the pill focus ring.
 - Creator actions: detail, edit, and delete. Trainer creators can replace the trainer share list; trainers can assign visible routines to eligible clients.
 - Client actions: self-assignment with WEEK/BIWEEK/MONTH/TRIMESTER/CUSTOM periods. The current assignment is highlighted in the library and dashboard.
 - Dashboard: `ActiveWorkoutCard` links the single active client assignment to read-only detail.
@@ -25,7 +27,7 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 ## Key files
 
 - `src/pages/WorkoutsPage.tsx`, `WorkoutLibraryPage.tsx`
-- `src/components/workouts/*` (`WorkoutsShell`, `ExerciseLibrary`, `ExerciseCard`, `RoutineToolbar`, `SetRow`, `StartFab`, etc.)
+- `src/components/workouts/*` (`NoRoutines`, `WorkoutsShell`, `ExerciseLibrary`, `ExerciseCard`, `RoutineToolbar`, `SetRow`, `StartFab`, etc.)
 - `src/components/workouts/types.ts`
 - `src/services/api/workouts.ts`, `src/hooks/useWorkouts.ts`
 - `src/components/dashboard/ActiveWorkoutCard.tsx`
@@ -46,5 +48,5 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 
 ## Tests
 
-- Vitest: workout API contract and editable/read-only `ExerciseCard` snapshot coverage.
+- Vitest: workout API contract, editable/read-only `ExerciseCard` snapshot coverage, and `NoRoutines` empty/no-results actions.
 - Playwright: trainer creator actions, 390px overflow regression, active client assignment, and read-only detail.

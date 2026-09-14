@@ -291,39 +291,87 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
           </tbody>
         </table>
       </div>
-      <button
-        class="sc-bkbknG cqFwjj"
-        type="button"
+      <div
+        class="sc-bkbknG efFMWH"
       >
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-square-plus"
-          fill="none"
-          height="14"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="14"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          class="sc-ienaaN gHSyXc"
+          type="button"
         >
-          <rect
-            height="18"
-            rx="2"
-            width="18"
-            x="3"
-            y="3"
-          />
-          <path
-            d="M8 12h8"
-          />
-          <path
-            d="M12 8v8"
-          />
-        </svg>
-        Add Set
-      </button>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-square-plus"
+            fill="none"
+            height="14"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="14"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              height="18"
+              rx="2"
+              width="18"
+              x="3"
+              y="3"
+            />
+            <path
+              d="M8 12h8"
+            />
+            <path
+              d="M12 8v8"
+            />
+          </svg>
+          Add Set
+        </button>
+        <button
+          class="sc-ienaaN gHSyXc"
+          disabled=""
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-copy-plus"
+            fill="none"
+            height="14"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="14"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="15"
+              x2="15"
+              y1="12"
+              y2="18"
+            />
+            <line
+              x1="12"
+              x2="18"
+              y1="15"
+              y2="15"
+            />
+            <rect
+              height="14"
+              rx="2"
+              ry="2"
+              width="14"
+              x="8"
+              y="8"
+            />
+            <path
+              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+            />
+          </svg>
+          Add set from last
+        </button>
+      </div>
     </div>
   </article>
 </div>

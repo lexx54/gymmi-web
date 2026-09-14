@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, PlusSquare, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, CopyPlus, PlusSquare, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { SetRow } from './SetRow';
@@ -9,6 +9,7 @@ type ExerciseCardProps = {
   exercise: RoutineExercise;
   position: number;
   onAddSet: () => void;
+  onAddSetFromLast?: () => void;
   onRemoveSet: (setId: string) => void;
   onRemoveExercise: () => void;
   onUpdateSet: (setId: string, field: SetField, value: number) => void;
@@ -24,6 +25,7 @@ export function ExerciseCard({
   exercise,
   position,
   onAddSet,
+  onAddSetFromLast,
   onRemoveSet,
   onRemoveExercise,
   onUpdateSet,
@@ -94,10 +96,22 @@ export function ExerciseCard({
           </tbody>
         </SetsTable></TableScroll>
 
-        {!readOnly && <AddSetButton type="button" onClick={onAddSet}>
-          <PlusSquare size={14} />
-          {t('workouts.addSet')}
-        </AddSetButton>}
+        {!readOnly && (
+          <AddSetRow>
+            <AddSetButton type="button" onClick={onAddSet}>
+              <PlusSquare size={14} />
+              {t('workouts.addSet')}
+            </AddSetButton>
+            <AddSetButton
+              type="button"
+              onClick={onAddSetFromLast}
+              disabled={!onAddSetFromLast || exercise.sets.length === 0}
+            >
+              <CopyPlus size={14} />
+              {t('workouts.addSetFromLast')}
+            </AddSetButton>
+          </AddSetRow>
+        )}
       </CardBody>
     </Card>
   );
@@ -221,8 +235,14 @@ const Th = styled.th`
   font-weight: 700;
 `;
 
-const AddSetButton = styled.button`
+const AddSetRow = styled.div`
   margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.4rem;
+`;
+
+const AddSetButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -237,7 +257,12 @@ const AddSetButton = styled.button`
   padding: 0;
   transition: transform 150ms ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateX(2px);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
   }
 `;

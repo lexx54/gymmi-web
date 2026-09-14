@@ -32,6 +32,29 @@ describe('ExerciseCard', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('offers a default add-set action and a copy of the last set', () => {
+    const onAddSet = vi.fn();
+    const onAddSetFromLast = vi.fn();
+    render(
+      <ExerciseCard
+        exercise={exercise}
+        position={1}
+        onAddSet={onAddSet}
+        onAddSetFromLast={onAddSetFromLast}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Set' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add set from last' }));
+    expect(onAddSet).toHaveBeenCalledTimes(1);
+    expect(onAddSetFromLast).toHaveBeenCalledTimes(1);
+  });
+
   it('hides creator controls in read-only state', () => {
     render(
       <ExerciseCard

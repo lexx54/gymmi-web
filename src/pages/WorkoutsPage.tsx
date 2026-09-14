@@ -17,6 +17,7 @@ import {
 } from '../components/workouts/WorkoutsShell';
 import { WorkoutsHeader } from '../components/workouts/WorkoutsHeader';
 import type { LibraryExercise, RoutineExercise, SetField } from '../components/workouts/types';
+import { DEFAULT_SET, isInSupersetAddGroup } from '../components/workouts/addSet';
 import { useAuth } from '../context/AuthContext';
 import { useExercises } from '../hooks/useExercises';
 import { useCreateWorkout, useUpdateWorkout, useWorkout } from '../hooks/useWorkouts';
@@ -146,7 +147,7 @@ export default function WorkoutsPage() {
           name: exercise.name,
           target: exercise.category,
           supersetColor: null,
-          sets: [{ id: nextId('set'), weight: 0, reps: 10, restSeconds: 60, rpe: 7 }],
+          sets: [{ id: nextId('set'), ...DEFAULT_SET }],
         },
       ]);
     },
@@ -154,26 +155,28 @@ export default function WorkoutsPage() {
   );
 
   const handleAddSet = useCallback(
-    (exerciseId: string) => {
-      updateActiveExercises((current) =>
-        current.map((exercise) => {
-          if (exercise.id !== exerciseId) return exercise;
-          const previous = exercise.sets.at(-1);
+    (exerciseId: string, repeatLast = false) => {
+      updateActiveExercises((current) => {
+        const source = current.find((exercise) => exercise.id === exerciseId);
+        if (!source) return current;
+        return current.map((exercise) => {
+          if (!isInSupersetAddGroup(exercise, source)) return exercise;
+          const previous = repeatLast ? exercise.sets.at(-1) : undefined;
           return {
             ...exercise,
             sets: [
               ...exercise.sets,
               {
                 id: nextId('set'),
-                weight: previous?.weight ?? 0,
-                reps: previous?.reps ?? 10,
-                restSeconds: previous?.restSeconds ?? 60,
-                rpe: previous?.rpe ?? 7,
+                weight: previous?.weight ?? DEFAULT_SET.weight,
+                reps: previous?.reps ?? DEFAULT_SET.reps,
+                restSeconds: previous?.restSeconds ?? DEFAULT_SET.restSeconds,
+                rpe: previous?.rpe ?? DEFAULT_SET.rpe,
               },
             ],
           };
-        }),
-      );
+        });
+      });
     },
     [updateActiveExercises],
   );
@@ -302,6 +305,7 @@ export default function WorkoutsPage() {
                   exercise={exercise}
                   position={index + 1}
                   onAddSet={() => handleAddSet(exercise.id)}
+                  onAddSetFromLast={() => handleAddSet(exercise.id, true)}
                   onRemoveSet={(setId) => updateExercise(exercise.id, (item) => ({
                     ...item,
                     sets: item.sets.filter((set) => set.id !== setId),

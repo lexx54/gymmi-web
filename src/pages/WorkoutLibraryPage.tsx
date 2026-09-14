@@ -1,10 +1,11 @@
 import { CalendarPlus, Dumbbell, Edit3, Eye, Plus, Search, Share2, Trash2, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { Sidebar } from '../components/layout/Sidebar';
+import { NoRoutines } from '../components/workouts/NoRoutines';
 import { useAuth } from '../context/AuthContext';
 import {
   useAssignWorkout,
@@ -26,6 +27,7 @@ type LibraryFilter = 'all' | 'mine' | 'assigned';
  */
 export default function WorkoutLibraryPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: routines = [], isLoading, isError } = useWorkouts();
   const isClient = user?.role.name === 'Client';
@@ -89,9 +91,25 @@ export default function WorkoutLibraryPage() {
           </SearchField>
         </Controls>
 
-        {isLoading && <Status>{t('common.loading')}</Status>}
-        {isError && <Status role="alert">{t('workouts.loadFailed')}</Status>}
-        {!isLoading && !isError && <Grid>
+        {isLoading || isError || visible.length === 0 ? (
+          <NoRoutines
+            variant={
+              isLoading
+                ? 'loading'
+                : isError
+                  ? 'error'
+                  : routines.length === 0
+                    ? 'empty'
+                    : 'no-results'
+            }
+            onCreateRoutine={() => navigate('/workout/new')}
+            onClearFilters={() => {
+              setSearch('');
+              setFilter('all');
+            }}
+          />
+        ) : (
+        <Grid>
           {visible.map((routine) => {
             const owned = routine.createdById === user?.id;
             const assigned = assignment?.routineId === routine.id;
@@ -127,8 +145,8 @@ export default function WorkoutLibraryPage() {
               </Card>
             );
           })}
-          {!visible.length && <Empty>{t('workouts.noRoutines')}</Empty>}
-        </Grid>}
+        </Grid>
+        )}
       </Main>
       {dialog && <WorkoutAccessDialog mode={dialog.mode} routine={dialog.routine} onClose={() => setDialog(null)} />}
     </PageShell>
@@ -258,8 +276,6 @@ const Actions = styled.footer`display: flex; flex-wrap: wrap; gap: .5rem; margin
 const ActionLink = styled(Link)`display: inline-flex; align-items: center; gap: .35rem; border-radius: .55rem; padding: .55rem .65rem; background: #313349; color: #fff; text-decoration: none; font-size: .75rem;`;
 const ActionButton = styled.button`display: inline-flex; align-items: center; gap: .35rem; border: 0; border-radius: .55rem; padding: .55rem .65rem; background: #313349; color: #fff; cursor: pointer;`;
 const DangerButton = styled(ActionButton)`margin-left: auto; color: #ffb3b1;`;
-const Status = styled.p`margin: 4rem 0; color: #e7bdbb; text-align: center;`;
-const Empty = styled(Status)`grid-column: 1 / -1;`;
 const Backdrop = styled.div`position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 1rem; background: rgba(5,6,18,.78);`;
 const Dialog = styled.div`width: min(100%, 30rem); max-height: 85vh; overflow: auto; border-radius: 1.25rem; padding: 1.4rem; background: #1c1e32; box-shadow: 0 2rem 5rem rgba(0,0,0,.45);`;
 const DialogTitle = styled.h2`margin: 0 0 1rem;`;

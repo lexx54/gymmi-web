@@ -126,9 +126,11 @@ const CountPill = styled.span`
 
 const Tabs = styled.div`
   display: flex;
+  align-items: center;
   gap: 0.4rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  flex-shrink: 0;
+  padding: 0.2rem 0 0.45rem;
 `;
 
 const SearchField = styled.label`

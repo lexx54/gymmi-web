@@ -48,6 +48,16 @@ export const LibraryPane = styled.section`
   flex-direction: column;
   gap: 1.1rem;
   min-height: 0;
+  overflow: hidden;
+
+  /* Match the routine column height without driving the grid row taller. */
+  @media (min-width: 901px) {
+    position: sticky;
+    top: 1.5rem;
+    height: 0;
+    min-height: 100%;
+    max-height: calc(100vh - 4rem);
+  }
 
   @media (max-width: 900px) {
     max-height: 25rem;
