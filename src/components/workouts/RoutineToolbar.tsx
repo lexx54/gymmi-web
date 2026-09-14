@@ -32,6 +32,7 @@ export function RoutineToolbar({
         <TitleInput
           value={title}
           onChange={(event) => onTitleChange(event.target.value)}
+          placeholder={t('workouts.routineTitlePlaceholder')}
           aria-label={t('workouts.routineTitle')}
           disabled={readOnly}
         />
@@ -67,9 +68,10 @@ const TitleBlock = styled.div`
 `;
 
 const TitleInput = styled.input`
-  background: transparent;
-  border: none;
-  padding: 0;
+  background: #181a2e;
+  border: 1px solid rgba(231, 189, 187, 0.15);
+  border-radius: 0.85rem;
+  padding: 0.5rem 0.85rem;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-style: italic;
   font-weight: 800;
@@ -80,6 +82,28 @@ const TitleInput = styled.input`
   outline: none;
   width: 100%;
   max-width: 28rem;
+  transition: border-color 150ms ease;
+
+  &::placeholder {
+    color: rgba(231, 189, 187, 0.7);
+    font-weight: 700;
+    text-transform: none;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: rgba(231, 189, 187, 0.3);
+  }
+
+  &:focus {
+    border-color: #ffb3b1;
+  }
+
+  &:disabled {
+    background: transparent;
+    border-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 const Meta = styled.p`

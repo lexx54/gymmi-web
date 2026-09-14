@@ -20,6 +20,9 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 - Empty/status states use `NoRoutines` (loading, error, empty catalog, no-results), matching `NoExercises`: empty offers create; no-results offers clear filters.
 - Builder: real exercise catalog, Monday–Sunday canvases, add/remove/reorder exercises and sets, editable weight/reps/rest seconds/RPE, fixed superset palette, validation, and create/update mutations. Adding a set uses default values; a second action copies the latest set. Both actions apply to every exercise in the same-day superset group.
 - Builder layout: from 901px up, `LibraryPane` is sticky with `height: 0; min-height: 100%` so it matches the routine column height instead of driving the grid row, capped at `calc(100vh - 4rem)`; the exercise list scrolls inside it. Below 901px the pane keeps its `max-height: 25rem`. The category tab row sets `flex-shrink: 0` (it is an `overflow-x: auto` flex item, so it would otherwise collapse inside the bounded pane) plus vertical padding for the pill focus ring.
+- The builder title field (`RoutineToolbar`) renders as a bordered input with a `workouts.routineTitlePlaceholder` hint while editable, and drops its border/background/padding when `disabled` (read-only detail) so it reads as a heading.
+- Superset indicator: `ExerciseCard` is a flex row with a colored vertical `SupersetTab` (group number from `SUPERSET_COLORS.indexOf(color) + 1`, vertical `workouts.supersetTag` label, `title` = `workouts.supersetNumber`) rendered only when the exercise has a superset color. Shown in both edit and read-only modes.
+- Read-only detail view: `WorkoutsBuilderGrid` takes `$singleColumn` (one `minmax(0, 64rem)` track) because the library pane is not rendered; the description becomes a text block, weekday tabs list only days that have exercises, empty days show `workouts.emptyDay`, and `SetRow` renders static values with no remove column or `min-width` on the set table instead of disabled inputs. The title stays a disabled input (Playwright asserts `getByLabel('Routine title')` value + disabled state).
 - Creator actions: detail, edit, and delete. Trainer creators can replace the trainer share list; trainers can assign visible routines to eligible clients.
 - Client actions: self-assignment with WEEK/BIWEEK/MONTH/TRIMESTER/CUSTOM periods. The current assignment is highlighted in the library and dashboard.
 - Dashboard: `ActiveWorkoutCard` links the single active client assignment to read-only detail.
@@ -48,5 +51,5 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 
 ## Tests
 
-- Vitest: workout API contract, editable/read-only `ExerciseCard` snapshot coverage, and `NoRoutines` empty/no-results actions.
+- Vitest: workout API contract, editable `ExerciseCard` snapshot, read-only static set values, superset side tab presence/absence, and `NoRoutines` empty/no-results actions.
 - Playwright: trainer creator actions, 390px overflow regression, active client assignment, and read-only detail.

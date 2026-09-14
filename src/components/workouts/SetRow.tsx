@@ -19,60 +19,67 @@ export function SetRow({ index, set, onChange, onRemove, readOnly }: SetRowProps
       <Cell>
         <SetChip>{index + 1}</SetChip>
       </Cell>
-      <Cell>
-        <NumberInput
-          type="number"
-          value={set.weight}
-          min={0}
-          step="0.5"
-          disabled={readOnly}
-          onChange={(event) => onChange('weight', Number(event.target.value))}
-          aria-label={`Set ${index + 1} weight`}
-          $width="5rem"
-        />
-      </Cell>
-      <Cell>
-        <NumberInput
-          type="number"
-          value={set.reps}
-          min={0}
-          step="1"
-          disabled={readOnly}
-          onChange={(event) => onChange('reps', Number(event.target.value))}
-          aria-label={`Set ${index + 1} reps`}
-          $width="4rem"
-        />
-      </Cell>
-      <Cell>
-        <NumberInput
-          type="number"
-          value={set.restSeconds}
-          min={0}
-          step="5"
-          disabled={readOnly}
-          onChange={(event) => onChange('restSeconds', Number(event.target.value))}
-          aria-label={`Set ${index + 1} rest seconds`}
-          $width="4.5rem"
-        />
-      </Cell>
-      <Cell>
-        <NumberInput
-          type="number"
-          value={set.rpe}
-          min={0}
-          max={10}
-          step="0.5"
-          disabled={readOnly}
-          onChange={(event) => onChange('rpe', Number(event.target.value))}
-          aria-label={`Set ${index + 1} RPE`}
-          $width="4rem"
-        />
-      </Cell>
-      <RemoveCell>
-        {!readOnly && <RemoveButton type="button" aria-label={`Remove set ${index + 1}`} onClick={onRemove}>
-          <X size={14} />
-        </RemoveButton>}
-      </RemoveCell>
+      {readOnly ? (
+        <>
+          <Cell><Value>{set.weight}</Value></Cell>
+          <Cell><Value>{set.reps}</Value></Cell>
+          <Cell><Value>{set.restSeconds}</Value></Cell>
+          <Cell><Value>{set.rpe}</Value></Cell>
+        </>
+      ) : (
+        <>
+          <Cell>
+            <NumberInput
+              type="number"
+              value={set.weight}
+              min={0}
+              step="0.5"
+              onChange={(event) => onChange('weight', Number(event.target.value))}
+              aria-label={`Set ${index + 1} weight`}
+              $width="5rem"
+            />
+          </Cell>
+          <Cell>
+            <NumberInput
+              type="number"
+              value={set.reps}
+              min={0}
+              step="1"
+              onChange={(event) => onChange('reps', Number(event.target.value))}
+              aria-label={`Set ${index + 1} reps`}
+              $width="4rem"
+            />
+          </Cell>
+          <Cell>
+            <NumberInput
+              type="number"
+              value={set.restSeconds}
+              min={0}
+              step="5"
+              onChange={(event) => onChange('restSeconds', Number(event.target.value))}
+              aria-label={`Set ${index + 1} rest seconds`}
+              $width="4.5rem"
+            />
+          </Cell>
+          <Cell>
+            <NumberInput
+              type="number"
+              value={set.rpe}
+              min={0}
+              max={10}
+              step="0.5"
+              onChange={(event) => onChange('rpe', Number(event.target.value))}
+              aria-label={`Set ${index + 1} RPE`}
+              $width="4rem"
+            />
+          </Cell>
+          <RemoveCell>
+            <RemoveButton type="button" aria-label={`Remove set ${index + 1}`} onClick={onRemove}>
+              <X size={14} />
+            </RemoveButton>
+          </RemoveCell>
+        </>
+      )}
     </Row>
   );
 }
@@ -104,6 +111,15 @@ const SetChip = styled.span`
   font-weight: 800;
 `;
 
+const Value = styled.span`
+  display: inline-block;
+  min-width: 2.75rem;
+  color: #e0e0fc;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+`;
+
 const NumberInput = styled.input<{ $width: string }>`
   width: ${({ $width }) => $width};
   padding: 0.45rem 0.65rem;
@@ -117,10 +133,6 @@ const NumberInput = styled.input<{ $width: string }>`
 
   &:focus {
     box-shadow: 0 0 0 1px #ffb3b1;
-  }
-
-  &:disabled {
-    opacity: 0.8;
   }
 `;
 

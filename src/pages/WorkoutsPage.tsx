@@ -246,13 +246,17 @@ export default function WorkoutsPage() {
 
   const loading = exercisesLoading || (Boolean(id) && routineLoading);
   const dayLabel = (weekday: number) => t(`workouts.weekdays.${weekday}`);
+  const visibleWeekdays = readOnly
+    ? WEEKDAYS.filter((weekday) =>
+        days.some((day) => day.weekday === weekday && day.exercises.length > 0))
+    : WEEKDAYS;
 
   return (
     <WorkoutsPageShell>
       <Sidebar username={user?.username ?? 'Alex'} />
       <WorkoutsMain>
         <WorkoutsHeader />
-        <WorkoutsBuilderGrid>
+        <WorkoutsBuilderGrid $singleColumn={readOnly}>
           {!readOnly && <LibraryPane>
             <ExerciseLibrary
               exercises={libraryExercises}
@@ -277,15 +281,18 @@ export default function WorkoutsPage() {
                 isSaving={createMutation.isPending || updateMutation.isPending}
                 readOnly={readOnly}
               />
-              <Description
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                placeholder={t('workouts.descriptionPlaceholder')}
-                aria-label={t('workouts.description')}
-                disabled={readOnly}
-              />
+              {readOnly ? (
+                description.trim() ? <DescriptionText>{description}</DescriptionText> : null
+              ) : (
+                <Description
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  placeholder={t('workouts.descriptionPlaceholder')}
+                  aria-label={t('workouts.description')}
+                />
+              )}
               <WeekdayTabs aria-label={t('workouts.trainingDays')}>
-                {WEEKDAYS.map((weekday) => {
+                {visibleWeekdays.map((weekday) => {
                   const count = days.find((day) => day.weekday === weekday)?.exercises.length ?? 0;
                   return (
                     <WeekdayButton
@@ -324,7 +331,9 @@ export default function WorkoutsPage() {
                   readOnly={readOnly}
                 />
               ))}
-              {!routine.length && <RoutineDropzone />}
+              {!routine.length && (readOnly
+                ? <Status>{t('workouts.emptyDay')}</Status>
+                : <RoutineDropzone />)}
             </>}
           </RoutinePane>
         </WorkoutsBuilderGrid>
@@ -343,6 +352,15 @@ const Description = styled.textarea`
   padding: 0.85rem;
   background: #181a2e;
   color: #e0e0fc;
+`;
+
+const DescriptionText = styled.p`
+  margin: 0;
+  max-width: 48rem;
+  color: #e7bdbb;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
 `;
 
 const WeekdayTabs = styled.div`

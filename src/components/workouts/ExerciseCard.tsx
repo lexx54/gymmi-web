@@ -35,84 +35,98 @@ export function ExerciseCard({
 }: ExerciseCardProps) {
   const { t } = useTranslation();
   const positionLabel = position.toString().padStart(2, '0');
+  const supersetNumber = exercise.supersetColor
+    ? SUPERSET_COLORS.indexOf(exercise.supersetColor) + 1
+    : 0;
 
   return (
     <Card>
-      <CardHeader>
-        <HeaderLeft>
-          <PositionChip>{positionLabel}</PositionChip>
-          <HeaderText>
-            <Title>{exercise.name}</Title>
-            <Target>{t('workouts.target', { target: exercise.target })}</Target>
-          </HeaderText>
-        </HeaderLeft>
-        <HeaderActions>
-          {!readOnly && <SupersetSelect
-            value={exercise.supersetColor ?? ''}
-            onChange={(event) => onSupersetChange((event.target.value || null) as SupersetColor | null)}
-            aria-label={t('workouts.supersetGroup')}
-            $color={exercise.supersetColor}
-          >
-            <option value="">{t('workouts.noSuperset')}</option>
-            {SUPERSET_COLORS.map((color, index) => (
-              <option key={color} value={color}>{t('workouts.supersetNumber', { number: index + 1 })}</option>
-            ))}
-          </SupersetSelect>}
-          {!readOnly && <IconButton type="button" aria-label={t('workouts.moveExerciseUp')} onClick={() => onMove(-1)}>
-            <ArrowUp size={16} />
-          </IconButton>}
-          {!readOnly && <IconButton type="button" aria-label={t('workouts.moveExerciseDown')} onClick={() => onMove(1)}>
-            <ArrowDown size={16} />
-          </IconButton>}
-          {!readOnly && <IconButton type="button" aria-label={t('workouts.removeExercise')} onClick={onRemoveExercise} $danger>
-            <Trash2 size={16} />
-          </IconButton>}
-        </HeaderActions>
-      </CardHeader>
-
-      <CardBody>
-        <TableScroll><SetsTable>
-          <thead>
-            <tr>
-              <Th>{t('workouts.set')}</Th>
-              <Th>{t('workouts.weight')}</Th>
-              <Th>{t('workouts.reps')}</Th>
-              <Th>{t('workouts.rest')}</Th>
-              <Th>{t('workouts.rpe')}</Th>
-              <Th aria-hidden />
-            </tr>
-          </thead>
-          <tbody>
-            {exercise.sets.map((set, index) => (
-              <SetRow
-                key={set.id}
-                index={index}
-                set={set}
-                onRemove={() => onRemoveSet(set.id)}
-                onChange={(field, value) => onUpdateSet(set.id, field, value)}
-                readOnly={readOnly}
-              />
-            ))}
-          </tbody>
-        </SetsTable></TableScroll>
-
-        {!readOnly && (
-          <AddSetRow>
-            <AddSetButton type="button" onClick={onAddSet}>
-              <PlusSquare size={14} />
-              {t('workouts.addSet')}
-            </AddSetButton>
-            <AddSetButton
-              type="button"
-              onClick={onAddSetFromLast}
-              disabled={!onAddSetFromLast || exercise.sets.length === 0}
+      {exercise.supersetColor && supersetNumber > 0 && (
+        <SupersetTab
+          $color={exercise.supersetColor}
+          title={t('workouts.supersetNumber', { number: supersetNumber })}
+        >
+          <SupersetTabNumber>{supersetNumber}</SupersetTabNumber>
+          <SupersetTabLabel>{t('workouts.supersetTag')}</SupersetTabLabel>
+        </SupersetTab>
+      )}
+      <CardContent>
+        <CardHeader>
+          <HeaderLeft>
+            <PositionChip>{positionLabel}</PositionChip>
+            <HeaderText>
+              <Title>{exercise.name}</Title>
+              <Target>{t('workouts.target', { target: exercise.target })}</Target>
+            </HeaderText>
+          </HeaderLeft>
+          {!readOnly && <HeaderActions>
+            <SupersetSelect
+              value={exercise.supersetColor ?? ''}
+              onChange={(event) => onSupersetChange((event.target.value || null) as SupersetColor | null)}
+              aria-label={t('workouts.supersetGroup')}
+              $color={exercise.supersetColor}
             >
-              <CopyPlus size={14} />
-              {t('workouts.addSetFromLast')}
-            </AddSetButton>
-          </AddSetRow>
-        )}
-      </CardBody>
+              <option value="">{t('workouts.noSuperset')}</option>
+              {SUPERSET_COLORS.map((color, index) => (
+                <option key={color} value={color}>{t('workouts.supersetNumber', { number: index + 1 })}</option>
+              ))}
+            </SupersetSelect>
+            <IconButton type="button" aria-label={t('workouts.moveExerciseUp')} onClick={() => onMove(-1)}>
+              <ArrowUp size={16} />
+            </IconButton>
+            <IconButton type="button" aria-label={t('workouts.moveExerciseDown')} onClick={() => onMove(1)}>
+              <ArrowDown size={16} />
+            </IconButton>
+            <IconButton type="button" aria-label={t('workouts.removeExercise')} onClick={onRemoveExercise} $danger>
+              <Trash2 size={16} />
+            </IconButton>
+          </HeaderActions>}
+        </CardHeader>
+
+        <CardBody>
+          <TableScroll><SetsTable $readOnly={readOnly}>
+            <thead>
+              <tr>
+                <Th>{t('workouts.set')}</Th>
+                <Th>{t('workouts.weight')}</Th>
+                <Th>{t('workouts.reps')}</Th>
+                <Th>{t('workouts.rest')}</Th>
+                <Th>{t('workouts.rpe')}</Th>
+                {!readOnly && <Th aria-hidden />}
+              </tr>
+            </thead>
+            <tbody>
+              {exercise.sets.map((set, index) => (
+                <SetRow
+                  key={set.id}
+                  index={index}
+                  set={set}
+                  onRemove={() => onRemoveSet(set.id)}
+                  onChange={(field, value) => onUpdateSet(set.id, field, value)}
+                  readOnly={readOnly}
+                />
+              ))}
+            </tbody>
+          </SetsTable></TableScroll>
+
+          {!readOnly && (
+            <AddSetRow>
+              <AddSetButton type="button" onClick={onAddSet}>
+                <PlusSquare size={14} />
+                {t('workouts.addSet')}
+              </AddSetButton>
+              <AddSetButton
+                type="button"
+                onClick={onAddSetFromLast}
+                disabled={!onAddSetFromLast || exercise.sets.length === 0}
+              >
+                <CopyPlus size={14} />
+                {t('workouts.addSetFromLast')}
+              </AddSetButton>
+            </AddSetRow>
+          )}
+        </CardBody>
+      </CardContent>
     </Card>
   );
 }
@@ -121,6 +135,41 @@ const Card = styled.article`
   background-color: #1c1e32;
   border-radius: 1.4rem;
   overflow: hidden;
+  display: flex;
+  align-items: stretch;
+`;
+
+const CardContent = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const SupersetTab = styled.div<{ $color: SupersetColor }>`
+  flex: 0 0 1.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.9rem 0;
+  background: ${({ $color }) => $color};
+  color: #14121f;
+`;
+
+const SupersetTabNumber = styled.span`
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1;
+`;
+
+const SupersetTabLabel = styled.span`
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.55rem;
+  font-weight: 800;
 `;
 
 const CardHeader = styled.div`
@@ -218,9 +267,9 @@ const TableScroll = styled.div`
   overflow-x: auto;
 `;
 
-const SetsTable = styled.table`
+const SetsTable = styled.table<{ $readOnly?: boolean }>`
   width: 100%;
-  min-width: 31rem;
+  min-width: ${({ $readOnly }) => ($readOnly ? '0' : '31rem')};
   text-align: left;
   border-collapse: separate;
   border-spacing: 0;

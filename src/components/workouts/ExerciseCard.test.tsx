@@ -55,7 +55,7 @@ describe('ExerciseCard', () => {
     expect(onAddSetFromLast).toHaveBeenCalledTimes(1);
   });
 
-  it('hides creator controls in read-only state', () => {
+  it('shows static set values in read-only state', () => {
     render(
       <ExerciseCard
         exercise={exercise}
@@ -71,6 +71,44 @@ describe('ExerciseCard', () => {
     );
 
     expect(screen.queryByRole('button', { name: /remove exercise/i })).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Set 1 weight')).toBeDisabled();
+    expect(screen.queryByLabelText('Set 1 weight')).not.toBeInTheDocument();
+    expect(screen.getByText('80')).toBeInTheDocument();
+    expect(screen.getByText('90')).toBeInTheDocument();
+  });
+
+  it('marks superset membership with a numbered side tab', () => {
+    const { rerender } = render(
+      <ExerciseCard
+        exercise={exercise}
+        position={1}
+        onAddSet={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+        readOnly
+      />,
+    );
+
+    const tab = screen.getByTitle('Superset 1');
+    expect(tab).toHaveTextContent('1');
+    expect(tab).toHaveTextContent(/superset/i);
+
+    rerender(
+      <ExerciseCard
+        exercise={{ ...exercise, supersetColor: null }}
+        position={1}
+        onAddSet={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+        readOnly
+      />,
+    );
+
+    expect(screen.queryByTitle(/superset \d/i)).not.toBeInTheDocument();
   });
 });

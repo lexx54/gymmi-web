@@ -24,10 +24,11 @@ export const WorkoutsMain = styled.main`
 /**
  * Two-column workspace area beneath the page header.
  */
-export const WorkoutsBuilderGrid = styled.div`
+export const WorkoutsBuilderGrid = styled.div<{ $singleColumn?: boolean }>`
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+  grid-template-columns: ${({ $singleColumn }) =>
+    $singleColumn ? 'minmax(0, 64rem)' : 'minmax(0, 22rem) minmax(0, 1fr)'};
   gap: 1.5rem;
   padding: 1.5rem 2rem 2.5rem;
 
