@@ -7,6 +7,9 @@ type RoutineToolbarProps = {
   onTitleChange: (value: string) => void;
   durationLabel: string;
   intensityLabel: string;
+  onSave: () => void;
+  isSaving?: boolean;
+  readOnly?: boolean;
 };
 
 /**
@@ -17,6 +20,9 @@ export function RoutineToolbar({
   onTitleChange,
   durationLabel,
   intensityLabel,
+  onSave,
+  isSaving,
+  readOnly,
 }: RoutineToolbarProps) {
   const { t } = useTranslation();
 
@@ -27,16 +33,16 @@ export function RoutineToolbar({
           value={title}
           onChange={(event) => onTitleChange(event.target.value)}
           aria-label={t('workouts.routineTitle')}
+          disabled={readOnly}
         />
         <Meta>{t('workouts.durationEst', { duration: durationLabel, intensity: intensityLabel })}</Meta>
       </TitleBlock>
-      <Actions>
-        <SecondaryButton type="button">
+      {!readOnly && <Actions>
+        <PrimaryButton type="button" onClick={onSave} disabled={isSaving}>
           <Save size={16} />
-          {t('workouts.saveDraft')}
-        </SecondaryButton>
-        <PrimaryButton type="button">{t('workouts.finishRoutine')}</PrimaryButton>
-      </Actions>
+          {isSaving ? t('common.saving') : t('workouts.saveRoutine')}
+        </PrimaryButton>
+      </Actions>}
     </Container>
   );
 }
@@ -46,6 +52,11 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+
+  @media (max-width: 700px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
 `;
 
 const TitleBlock = styled.div`
@@ -85,28 +96,10 @@ const Actions = styled.div`
   gap: 0.85rem;
 `;
 
-const SecondaryButton = styled.button`
+const PrimaryButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.65rem 1rem;
-  border: none;
-  border-radius: 0.65rem;
-  background-color: #26283d;
-  color: #e0e0fc;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: background-color 150ms ease;
-
-  &:hover {
-    background-color: #313349;
-  }
-`;
-
-const PrimaryButton = styled.button`
   padding: 0.65rem 1.4rem;
   border: none;
   border-radius: 9999px;
@@ -126,5 +119,10 @@ const PrimaryButton = styled.button`
 
   &:active {
     transform: scale(0.97);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.65;
   }
 `;

@@ -1,22 +1,19 @@
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 import styled from 'styled-components';
 import { ExerciseLibraryItem } from './ExerciseLibraryItem';
-import type { Category, LibraryExercise } from './types';
-
-const CATEGORIES: Category[] = ['All', 'Chest', 'Back', 'Legs', 'Core'];
-const CATEGORY_LABEL_KEYS: Record<Category, string> = {
-  All: 'workouts.categories.all',
-  Chest: 'workouts.categories.chest',
-  Back: 'workouts.categories.back',
-  Legs: 'workouts.categories.legs',
-  Core: 'workouts.categories.core',
-};
+import type { LibraryExercise } from './types';
 
 type ExerciseLibraryProps = {
   exercises: LibraryExercise[];
-  activeCategory: Category;
-  onCategoryChange: (category: Category) => void;
+  activeCategory: string;
+  onCategoryChange: (category: string) => void;
   totalCount: number;
+  search: string;
+  onSearchChange: (value: string) => void;
+  onAdd: (exercise: LibraryExercise) => void;
+  addedExerciseIds: string[];
+  readOnly?: boolean;
 };
 
 /**
@@ -27,12 +24,21 @@ export function ExerciseLibrary({
   activeCategory,
   onCategoryChange,
   totalCount,
+  search,
+  onSearchChange,
+  onAdd,
+  addedExerciseIds,
+  readOnly,
 }: ExerciseLibraryProps) {
   const { t } = useTranslation();
-  const visible =
-    activeCategory === 'All'
-      ? exercises
-      : exercises.filter((exercise) => exercise.category === activeCategory);
+  const categories = ['All', ...new Set(exercises.map((exercise) => exercise.category).filter(Boolean))];
+  const normalizedSearch = search.trim().toLowerCase();
+  const visible = exercises.filter(
+    (exercise) =>
+      (activeCategory === 'All' || exercise.category === activeCategory) &&
+      (!normalizedSearch ||
+        `${exercise.name} ${exercise.category} ${exercise.modality}`.toLowerCase().includes(normalizedSearch)),
+  );
 
   return (
     <Container>
@@ -41,8 +47,19 @@ export function ExerciseLibrary({
         <CountPill>{t('workouts.count', { count: totalCount })}</CountPill>
       </Header>
 
+      <SearchField>
+        <Search size={16} aria-hidden />
+        <input
+          type="search"
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder={t('workouts.searchExercises')}
+          aria-label={t('workouts.searchExercises')}
+        />
+      </SearchField>
+
       <Tabs role="tablist" aria-label={t('workouts.exerciseCategories')}>
-        {CATEGORIES.map((category) => (
+        {categories.map((category) => (
           <Tab
             key={category}
             type="button"
@@ -51,15 +68,21 @@ export function ExerciseLibrary({
             $active={activeCategory === category}
             onClick={() => onCategoryChange(category)}
           >
-            {t(CATEGORY_LABEL_KEYS[category])}
+            {category === 'All' ? t('workouts.categories.all') : category}
           </Tab>
         ))}
       </Tabs>
 
       <List>
         {visible.map((exercise) => (
-          <ExerciseLibraryItem key={exercise.id} exercise={exercise} />
+          <ExerciseLibraryItem
+            key={exercise.id}
+            exercise={exercise}
+            onAdd={() => onAdd(exercise)}
+            disabled={readOnly || addedExerciseIds.includes(exercise.id)}
+          />
         ))}
+        {!visible.length && <Empty>{t('workouts.noExercisesFound')}</Empty>}
       </List>
     </Container>
   );
@@ -108,6 +131,25 @@ const Tabs = styled.div`
   padding-bottom: 0.25rem;
 `;
 
+const SearchField = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: #101225;
+  color: #e7bdbb;
+
+  input {
+    min-width: 0;
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #e0e0fc;
+  }
+`;
+
 const Tab = styled.button<{ $active: boolean }>`
   white-space: nowrap;
   padding: 0.35rem 0.95rem;
@@ -131,4 +173,10 @@ const List = styled.div`
   gap: 0.85rem;
   overflow-y: auto;
   padding-right: 0.25rem;
+`;
+
+const Empty = styled.p`
+  margin: 1rem 0;
+  color: #e7bdbb;
+  text-align: center;
 `;

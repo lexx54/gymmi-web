@@ -1,568 +1,271 @@
-import { Dumbbell, MoreVertical, Play, Plus, Search, Sparkles, Timer } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { CalendarPlus, Dumbbell, Edit3, Eye, Plus, Search, Share2, Trash2, Users } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import styled from 'styled-components';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
+import {
+  useAssignWorkout,
+  useDeleteWorkout,
+  useEligibleClients,
+  useEligibleTrainers,
+  useMyWorkoutAssignment,
+  useSelfAssignWorkout,
+  useShareWorkout,
+  useWorkouts,
+} from '../hooks/useWorkouts';
+import { WORKOUT_PERIODS, type WorkoutPeriod, type WorkoutRoutine } from '../services/api/workouts';
 
-type Routine = {
-  id: string;
-  category: string;
-  titleKey: string;
-  focusKey: string;
-  movementsKey: string;
-  duration: string;
-  lastPerformedKey: string;
-};
-
-type Protocol = {
-  id: string;
-  eyebrowKey: string;
-  titleKey: string;
-  subtitleKey: string;
-  tone: 'red' | 'athlete';
-};
-
-const filters = ['All', 'Strength', 'Hypertrophy', 'Recovery', 'Endurance'];
-const filterLabelKeys: Record<string, string> = {
-  All: 'workouts.categories.all',
-  Strength: 'workouts.categories.strength',
-  Hypertrophy: 'workouts.categories.hypertrophy',
-  Recovery: 'workouts.categories.recovery',
-  Endurance: 'workouts.categories.endurance',
-};
-
-const routines: Routine[] = [
-  {
-    id: 'push-day',
-    category: 'Hypertrophy',
-    titleKey: 'workouts.routines.pushDay',
-    focusKey: 'workouts.routines.pushFocus',
-    movementsKey: 'workouts.routines.pushMovements',
-    duration: '65 min',
-    lastPerformedKey: 'workouts.routines.twoDaysAgo',
-  },
-  {
-    id: 'lower-b',
-    category: 'Strength',
-    titleKey: 'workouts.routines.lowerB',
-    focusKey: 'workouts.routines.lowerFocus',
-    movementsKey: 'workouts.routines.lowerMovements',
-    duration: '50 min',
-    lastPerformedKey: 'workouts.routines.today',
-  },
-  {
-    id: 'mobility-flow',
-    category: 'Recovery',
-    titleKey: 'workouts.routines.mobilityFlow',
-    focusKey: 'workouts.routines.mobilityFocus',
-    movementsKey: 'workouts.routines.mobilityMovements',
-    duration: '25 min',
-    lastPerformedKey: 'workouts.routines.lastWeek',
-  },
-  {
-    id: 'back-bicep',
-    category: 'Hypertrophy',
-    titleKey: 'workouts.routines.backBicep',
-    focusKey: 'workouts.routines.backFocus',
-    movementsKey: 'workouts.routines.backMovements',
-    duration: '75 min',
-    lastPerformedKey: 'workouts.routines.fiveDaysAgo',
-  },
-];
-
-const protocols: Protocol[] = [
-  {
-    id: 'overload',
-    eyebrowKey: 'workouts.premiumTrack',
-    titleKey: 'workouts.overloadPrinciple',
-    subtitleKey: 'workouts.periodizationProgram',
-    tone: 'red',
-  },
-  {
-    id: 'explosion',
-    eyebrowKey: 'workouts.proSeries',
-    titleKey: 'workouts.kineticExplosion',
-    subtitleKey: 'workouts.powerEfficiency',
-    tone: 'athlete',
-  },
-];
+type DialogMode = 'share' | 'assign' | 'selfAssign';
+type LibraryFilter = 'all' | 'mine' | 'assigned';
 
 /**
- * Routine library landing page for browsing and starting workout protocols.
+ * Browses visible API routines and exposes role-safe routine actions.
  */
 export default function WorkoutLibraryPage() {
-  const { user } = useAuth();
   const { t } = useTranslation();
-  const username = user?.username ?? 'Alex';
+  const { user } = useAuth();
+  const { data: routines = [], isLoading, isError } = useWorkouts();
+  const isClient = user?.role.name === 'Client';
+  const isTrainer = user?.role.name === 'Trainer';
+  const { data: assignment } = useMyWorkoutAssignment(isClient);
+  const deleteMutation = useDeleteWorkout();
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<LibraryFilter>('all');
+  const [dialog, setDialog] = useState<{ mode: DialogMode; routine: WorkoutRoutine } | null>(null);
+
+  const visible = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    return routines.filter((routine) => {
+      const matchesSearch = !needle || `${routine.name} ${routine.description ?? ''}`.toLowerCase().includes(needle);
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'mine' && routine.createdById === user?.id) ||
+        (filter === 'assigned' && routine.id === assignment?.routineId);
+      return matchesSearch && matchesFilter;
+    });
+  }, [assignment?.routineId, filter, routines, search, user?.id]);
+
+  const removeRoutine = async (routine: WorkoutRoutine) => {
+    if (!window.confirm(t('workouts.confirmDelete', { name: routine.name }))) return;
+    try {
+      await deleteMutation.mutateAsync(routine.id);
+      toast.success(t('workouts.deleted'));
+    } catch {
+      toast.error(t('workouts.deleteFailed'));
+    }
+  };
 
   return (
     <PageShell>
-      <Sidebar username={username} />
-
-      <MainPanel>
-        <HeroRow>
+      <Sidebar username={user?.username ?? 'Alex'} />
+      <Main>
+        <Hero>
           <div>
             <Title>{t('workouts.libraryTitle')}</Title>
             <Subtitle>{t('workouts.librarySubtitle')}</Subtitle>
           </div>
-          <CreateRoutineLink to="/workout/new">
-            <Plus size={16} aria-hidden />
-            <span>{t('workouts.createRoutine')}</span>
-          </CreateRoutineLink>
-        </HeroRow>
-
-        <FilterRow aria-label={t('workouts.routineFilters')}>
-          {filters.map((filter) => (
-            <FilterButton key={filter} type="button" $active={filter === 'All'}>
-              {t(filterLabelKeys[filter])}
-            </FilterButton>
-          ))}
-        </FilterRow>
-
-        <SearchShell>
-          <Search size={18} aria-hidden />
-          <SearchInput placeholder={t('workouts.searchLibrary')} aria-label={t('workouts.searchLibrary')} />
-        </SearchShell>
-
-        <RoutineGrid>
-          {routines.map((routine) => (
-            <RoutineCard key={routine.id}>
-              <RoutineTopline>
-                <CategoryPill>{routine.category}</CategoryPill>
-                <IconButton type="button" aria-label={t('workouts.moreOptions', { title: t(routine.titleKey) })}>
-                  <MoreVertical size={18} aria-hidden />
-                </IconButton>
-              </RoutineTopline>
-              <RoutineTitle>{t(routine.titleKey)}</RoutineTitle>
-              <RoutineFocus>{t(routine.focusKey)}</RoutineFocus>
-
-              <MetricRow>
-                <MetricTile>
-                  <Dumbbell size={15} aria-hidden />
-                  <MetricCopy>
-                    <MetricLabel>{t('workouts.exercises')}</MetricLabel>
-                    <MetricValue>{t(routine.movementsKey)}</MetricValue>
-                  </MetricCopy>
-                </MetricTile>
-                <MetricTile>
-                  <Timer size={15} aria-hidden />
-                  <MetricCopy>
-                    <MetricLabel>{t('workouts.duration')}</MetricLabel>
-                    <MetricValue>{routine.duration}</MetricValue>
-                  </MetricCopy>
-                </MetricTile>
-              </MetricRow>
-
-              <RoutineFooter>
-                <LastPerformed>
-                  {t('workouts.lastPerformed')} <strong>{t(routine.lastPerformedKey)}</strong>
-                </LastPerformed>
-                <PlayLink to="/workout/new" aria-label={t('workouts.playRoutine', { title: t(routine.titleKey) })}>
-                  <span>{t('workouts.play')}</span>
-                  <Play size={14} aria-hidden />
-                </PlayLink>
-              </RoutineFooter>
-            </RoutineCard>
-          ))}
-
-          <NewRoutineLink to="/workout/new">
-            <NewRoutineIcon>
-              <Plus size={21} aria-hidden />
-            </NewRoutineIcon>
-            <NewRoutineTitle>{t('workouts.newRoutine')}</NewRoutineTitle>
-            <NewRoutineCopy>{t('workouts.buildCustom')}</NewRoutineCopy>
-          </NewRoutineLink>
-        </RoutineGrid>
-
-        <ProtocolsSection>
-          <SectionLabel>{t('workouts.expertProtocols')}</SectionLabel>
-          <ProtocolGrid>
-            {protocols.map((protocol) => (
-              <ProtocolCard key={protocol.id} $tone={protocol.tone}>
-                <Sparkles size={18} aria-hidden />
-                <ProtocolCopy>
-                  <ProtocolEyebrow>{t(protocol.eyebrowKey)}</ProtocolEyebrow>
-                  <ProtocolTitle>{t(protocol.titleKey)}</ProtocolTitle>
-                  <ProtocolSubtitle>{t(protocol.subtitleKey)}</ProtocolSubtitle>
-                </ProtocolCopy>
-              </ProtocolCard>
+          <CreateLink to="/workout/new"><Plus size={16} />{t('workouts.createRoutine')}</CreateLink>
+        </Hero>
+        <Controls>
+          <FilterGroup aria-label={t('workouts.routineFilters')}>
+            {(['all', 'mine', ...(isClient ? ['assigned'] : [])] as LibraryFilter[]).map((item) => (
+              <FilterButton key={item} type="button" $active={filter === item} onClick={() => setFilter(item)}>
+                {t(`workouts.filters.${item}`)}
+              </FilterButton>
             ))}
-          </ProtocolGrid>
-        </ProtocolsSection>
-      </MainPanel>
+          </FilterGroup>
+          <SearchField>
+            <Search size={17} aria-hidden />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={t('workouts.searchLibrary')}
+              aria-label={t('workouts.searchLibrary')}
+            />
+          </SearchField>
+        </Controls>
+
+        {isLoading && <Status>{t('common.loading')}</Status>}
+        {isError && <Status role="alert">{t('workouts.loadFailed')}</Status>}
+        {!isLoading && !isError && <Grid>
+          {visible.map((routine) => {
+            const owned = routine.createdById === user?.id;
+            const assigned = assignment?.routineId === routine.id;
+            const exerciseCount = routine.days.reduce((count, day) => count + day.exercises.length, 0);
+            return (
+              <Card key={routine.id} $assigned={assigned}>
+                <CardTop>
+                  <Badge>{assigned ? t('workouts.assigned') : owned ? t('workouts.owned') : t('workouts.readOnly')}</Badge>
+                  <Dumbbell size={20} aria-hidden />
+                </CardTop>
+                <CardTitle>{routine.name}</CardTitle>
+                <CardDescription>{routine.description || t('workouts.noDescription')}</CardDescription>
+                <Metrics>
+                  <span>{t('workouts.dayCount', { count: routine.days.length })}</span>
+                  <span>{t('workouts.exerciseCount', { count: exerciseCount })}</span>
+                </Metrics>
+                <Actions>
+                  <ActionLink to={`/workout/${routine.id}`}><Eye size={15} />{t('workouts.view')}</ActionLink>
+                  {owned && <ActionLink to={`/workout/${routine.id}/edit`}><Edit3 size={15} />{t('workouts.edit')}</ActionLink>}
+                  {owned && isTrainer && <ActionButton type="button" onClick={() => setDialog({ mode: 'share', routine })}>
+                    <Share2 size={15} />{t('workouts.share')}
+                  </ActionButton>}
+                  {isTrainer && <ActionButton type="button" onClick={() => setDialog({ mode: 'assign', routine })}>
+                    <Users size={15} />{t('workouts.assign')}
+                  </ActionButton>}
+                  {isClient && !assigned && <ActionButton type="button" onClick={() => setDialog({ mode: 'selfAssign', routine })}>
+                    <CalendarPlus size={15} />{t('workouts.selfAssign')}
+                  </ActionButton>}
+                  {owned && <DangerButton type="button" onClick={() => removeRoutine(routine)} aria-label={t('workouts.deleteNamed', { name: routine.name })}>
+                    <Trash2 size={15} />
+                  </DangerButton>}
+                </Actions>
+              </Card>
+            );
+          })}
+          {!visible.length && <Empty>{t('workouts.noRoutines')}</Empty>}
+        </Grid>}
+      </Main>
+      {dialog && <WorkoutAccessDialog mode={dialog.mode} routine={dialog.routine} onClose={() => setDialog(null)} />}
     </PageShell>
   );
 }
 
+function WorkoutAccessDialog({
+  mode,
+  routine,
+  onClose,
+}: {
+  mode: DialogMode;
+  routine: WorkoutRoutine;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const { data: trainers = [] } = useEligibleTrainers(mode === 'share');
+  const { data: clients = [] } = useEligibleClients(mode === 'assign');
+  const shareMutation = useShareWorkout();
+  const assignMutation = useAssignWorkout();
+  const selfAssignMutation = useSelfAssignWorkout();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [clientId, setClientId] = useState('');
+  const [period, setPeriod] = useState<WorkoutPeriod>('WEEK');
+  const [customEndDate, setCustomEndDate] = useState('');
+
+  const submit = async () => {
+    try {
+      if (mode === 'share') {
+        await shareMutation.mutateAsync({ id: routine.id, trainerIds: selectedIds });
+      } else if (mode === 'assign') {
+        if (!clientId) return;
+        await assignMutation.mutateAsync({
+          id: routine.id,
+          clientId,
+          period,
+          ...(period === 'CUSTOM' ? { customEndDate } : {}),
+        });
+      } else {
+        await selfAssignMutation.mutateAsync({
+          routineId: routine.id,
+          period,
+          ...(period === 'CUSTOM' ? { customEndDate } : {}),
+        });
+      }
+      toast.success(t(`workouts.${mode}Success`));
+      onClose();
+    } catch {
+      toast.error(t(`workouts.${mode}Failed`));
+    }
+  };
+  const pending = shareMutation.isPending || assignMutation.isPending || selfAssignMutation.isPending;
+  const invalid = mode === 'assign' && !clientId || period === 'CUSTOM' && !customEndDate;
+
+  return (
+    <Backdrop onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <Dialog role="dialog" aria-modal="true" aria-labelledby="workout-dialog-title">
+        <DialogTitle id="workout-dialog-title">{t(`workouts.dialogs.${mode}`, { name: routine.name })}</DialogTitle>
+        {mode === 'share' ? <>
+          <Hint>{t('workouts.shareReplacementHint')}</Hint>
+          <CheckboxList>
+            {trainers.map((trainer) => (
+              <label key={trainer.id}>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(trainer.id)}
+                  onChange={() => setSelectedIds((current) =>
+                    current.includes(trainer.id) ? current.filter((id) => id !== trainer.id) : [...current, trainer.id])}
+                />
+                {trainer.username} · {trainer.email}
+              </label>
+            ))}
+          </CheckboxList>
+        </> : <>
+          {mode === 'assign' && <Field>
+            {t('workouts.client')}
+            <select value={clientId} onChange={(event) => setClientId(event.target.value)}>
+              <option value="">{t('workouts.selectClient')}</option>
+              {clients.map((client) => <option key={client.id} value={client.id}>{client.username}</option>)}
+            </select>
+          </Field>}
+          <Field>
+            {t('workouts.period')}
+            <select value={period} onChange={(event) => setPeriod(event.target.value as WorkoutPeriod)}>
+              {WORKOUT_PERIODS.map((value) => <option key={value} value={value}>{t(`workouts.periods.${value}`)}</option>)}
+            </select>
+          </Field>
+          {period === 'CUSTOM' && <Field>
+            {t('workouts.customEndDate')}
+            <input type="date" min={new Date().toISOString().slice(0, 10)} value={customEndDate} onChange={(event) => setCustomEndDate(event.target.value)} />
+          </Field>}
+        </>}
+        <DialogActions>
+          <CancelButton type="button" onClick={onClose}>{t('common.cancel')}</CancelButton>
+          <SubmitButton type="button" onClick={submit} disabled={pending || invalid}>
+            {pending ? t('common.saving') : t('common.confirm')}
+          </SubmitButton>
+        </DialogActions>
+      </Dialog>
+    </Backdrop>
+  );
+}
+
 const PageShell = styled.div`
+  display: flex;
   min-height: 100vh;
-  display: flex;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(255, 83, 90, 0.12), transparent 28rem),
-    linear-gradient(135deg, #101225 0%, #111326 48%, #0d1021 100%);
+  background: #101225;
   color: #f7f7ff;
-  font-family: Inter, "Plus Jakarta Sans", system-ui, sans-serif;
 `;
-
-const MainPanel = styled.main`
-  width: min(100%, 66rem);
-  padding: 2.4rem 1.35rem 4rem;
-
-  @media (min-width: 768px) {
-    padding: 2.8rem 3rem 4.8rem;
-  }
-`;
-
-const HeroRow = styled.header`
-  display: grid;
-  gap: 1.5rem;
-
-  @media (min-width: 720px) {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-  }
-`;
-
-const Title = styled.h1`
-  margin: 0;
-  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  font-size: clamp(2.2rem, 5vw, 3.45rem);
-  font-weight: 900;
-  letter-spacing: -0.06em;
-  line-height: 0.95;
-`;
-
-const Subtitle = styled.p`
-  margin: 0.55rem 0 0;
-  color: #e7bdbb;
-  font-size: 0.92rem;
-`;
-
-const CreateRoutineLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  border-radius: 0.85rem;
-  padding: 1.05rem 1.55rem;
-  background: linear-gradient(135deg, #ffb3b1, #ff535a);
-  color: #2a0911;
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  text-transform: uppercase;
-  box-shadow: 0 35px 58px -36px rgba(255, 83, 90, 0.95);
-`;
-
-const FilterRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.85rem;
-  margin-top: 2.4rem;
-`;
-
-const FilterButton = styled.button<{ $active?: boolean }>`
-  border: 0;
-  border-radius: 999px;
-  padding: 0.72rem 1.35rem;
-  background: ${({ $active }) =>
-    $active ? 'linear-gradient(135deg, #ffb3b1, #ff535a)' : 'rgba(49, 51, 73, 0.62)'};
-  color: ${({ $active }) => ($active ? '#2a0911' : '#e7bdbb')};
-  cursor: pointer;
-  font-size: 0.64rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-`;
-
-const SearchShell = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  width: min(100%, 27rem);
-  margin-top: 1.25rem;
-  border-radius: 0.85rem;
-  padding: 0.95rem 1rem;
-  background: #181a2e;
-  color: rgba(231, 189, 187, 0.76);
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #f7f7ff;
-  font: inherit;
-
-  &::placeholder {
-    color: rgba(231, 189, 187, 0.45);
-  }
-`;
-
-const RoutineGrid = styled.section`
-  display: grid;
-  gap: 1.55rem;
-  margin-top: 2.1rem;
-
-  @media (min-width: 820px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-`;
-
-const RoutineCard = styled.article`
-  min-height: 15.9rem;
-  border-radius: 0.55rem;
-  padding: 1.45rem 1.45rem 1.25rem;
-  background:
-    radial-gradient(circle at 88% 0%, rgba(255, 179, 177, 0.08), transparent 13rem),
-    #1c1e32;
-  box-shadow: inset 0.16rem 0 0 rgba(255, 179, 177, 0.12);
-`;
-
-const RoutineTopline = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-`;
-
-const CategoryPill = styled.span`
-  border-radius: 0.2rem;
-  padding: 0.35rem 0.58rem;
-  background: rgba(255, 83, 90, 0.1);
-  color: #ffdad6;
-  font-size: 0.57rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-`;
-
-const IconButton = styled.button`
-  display: grid;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  color: #ffdad6;
-  cursor: pointer;
-`;
-
-const RoutineTitle = styled.h2`
-  margin: 1.3rem 0 0;
-  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-`;
-
-const RoutineFocus = styled.p`
-  margin: 0.25rem 0 0;
-  color: #e7bdbb;
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-`;
-
-const MetricRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-top: 1.55rem;
-`;
-
-const MetricTile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.72rem;
-  min-width: 8.4rem;
-`;
-
-const MetricCopy = styled.span`
-  display: grid;
-  gap: 0.1rem;
-`;
-
-const MetricLabel = styled.span`
-  color: rgba(231, 189, 187, 0.55);
-  font-size: 0.52rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-`;
-
-const MetricValue = styled.span`
-  color: #f7f7ff;
-  font-size: 0.78rem;
-  font-weight: 900;
-`;
-
-const RoutineFooter = styled.footer`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 2.55rem;
-`;
-
-const LastPerformed = styled.p`
-  margin: 0;
-  color: rgba(231, 189, 187, 0.5);
-  font-size: 0.56rem;
-  font-weight: 900;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-
-  strong {
-    color: #ffdad6;
-  }
-`;
-
-const PlayLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: #ffffff;
-  font-size: 0.66rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-decoration: none;
-  text-transform: uppercase;
-
-  svg {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.55rem;
-    padding: 0.55rem;
-    background: #313349;
-    color: #ffdad6;
-  }
-`;
-
-const NewRoutineLink = styled(Link)`
-  display: grid;
-  min-height: 10.7rem;
-  place-items: center;
-  align-content: center;
-  gap: 0.55rem;
-  border-radius: 0.55rem;
-  background:
-    linear-gradient(90deg, rgba(255, 179, 177, 0.08) 50%, transparent 0) top / 1rem 0.12rem repeat-x,
-    linear-gradient(90deg, rgba(255, 179, 177, 0.08) 50%, transparent 0) bottom / 1rem 0.12rem repeat-x,
-    linear-gradient(0deg, rgba(255, 179, 177, 0.08) 50%, transparent 0) left / 0.12rem 1rem repeat-y,
-    linear-gradient(0deg, rgba(255, 179, 177, 0.08) 50%, transparent 0) right / 0.12rem 1rem repeat-y,
-    rgba(24, 26, 46, 0.55);
-  color: #f7f7ff;
-  text-align: center;
-  text-decoration: none;
-`;
-
-const NewRoutineIcon = styled.span`
-  display: grid;
-  width: 3.15rem;
-  height: 3.15rem;
-  place-items: center;
-  border-radius: 0.9rem;
-  background: #313349;
-  color: #ffb3b1;
-`;
-
-const NewRoutineTitle = styled.span`
-  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 900;
-`;
-
-const NewRoutineCopy = styled.span`
-  color: rgba(231, 189, 187, 0.62);
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-`;
-
-const ProtocolsSection = styled.section`
-  margin-top: 3.1rem;
-`;
-
-const SectionLabel = styled.p`
-  margin: 0 0 1rem;
-  color: #ffdad6;
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-`;
-
-const ProtocolGrid = styled.div`
-  display: grid;
-  gap: 1.55rem;
-
-  @media (min-width: 820px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-`;
-
-const ProtocolCard = styled.article<{ $tone: Protocol['tone'] }>`
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  min-height: 11.4rem;
-  align-items: end;
-  gap: 0.9rem;
-  border-radius: 0.65rem;
-  padding: 1.45rem;
-  background:
-    linear-gradient(180deg, rgba(16, 18, 37, 0.08), rgba(16, 18, 37, 0.92)),
-    ${({ $tone }) =>
-      $tone === 'red'
-        ? 'repeating-linear-gradient(90deg, rgba(255, 83, 90, 0.42) 0 0.35rem, transparent 0.35rem 2.1rem), radial-gradient(circle at 40% 0%, rgba(255, 179, 177, 0.5), transparent 13rem), #1c1e32'
-        : 'radial-gradient(circle at 72% 8%, rgba(255, 83, 90, 0.65), transparent 8rem), linear-gradient(135deg, #313349, #15182b 58%, #1c1e32)'};
-
-  &::before {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(135deg, rgba(255, 179, 177, 0.12), transparent 48%),
-      radial-gradient(circle at 18% 20%, rgba(255, 83, 90, 0.22), transparent 10rem);
-    content: '';
-  }
-
-  > * {
-    position: relative;
-  }
-
-  svg {
-    color: #ffb3b1;
-  }
-`;
-
-const ProtocolCopy = styled.div`
-  display: grid;
-  gap: 0.15rem;
-`;
-
-const ProtocolEyebrow = styled.span`
-  color: #ffdad6;
-  font-size: 0.56rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-`;
-
-const ProtocolTitle = styled.h3`
-  margin: 0;
-  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  font-size: clamp(1.35rem, 3vw, 2rem);
-  font-style: italic;
-  font-weight: 900;
-  letter-spacing: -0.07em;
-  text-transform: uppercase;
-`;
-
-const ProtocolSubtitle = styled.span`
-  color: #e7bdbb;
-  font-size: 0.82rem;
-`;
+const Main = styled.main`flex: 1; min-width: 0; padding: 2.5rem; @media (max-width: 640px) { padding: 1.1rem; }`;
+const Hero = styled.header`display: flex; justify-content: space-between; gap: 1rem; align-items: start; @media (max-width: 640px) { flex-direction: column; }`;
+const Title = styled.h1`margin: 0; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; letter-spacing: -0.06em;`;
+const Subtitle = styled.p`color: #e7bdbb;`;
+const CreateLink = styled(Link)`display: inline-flex; align-items: center; gap: .5rem; padding: .9rem 1.2rem; border-radius: .8rem; background: linear-gradient(135deg,#ffb3b1,#ff535a); color: #46000b; text-decoration: none; font-weight: 900;`;
+const Controls = styled.div`display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; margin: 2rem 0;`;
+const FilterGroup = styled.div`display: flex; flex-wrap: wrap; gap: .55rem;`;
+const FilterButton = styled.button<{ $active: boolean }>`border: 0; border-radius: 999px; padding: .65rem 1rem; background: ${({ $active }) => $active ? '#ffb3b1' : '#1c1e32'}; color: ${({ $active }) => $active ? '#680011' : '#e7bdbb'}; cursor: pointer;`;
+const SearchField = styled.label`display: flex; align-items: center; gap: .6rem; min-width: min(100%, 18rem); border-radius: .8rem; padding: .75rem; background: #181a2e; color: #e7bdbb; input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: #fff; }`;
+const Grid = styled.section`display: grid; grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr)); gap: 1.25rem;`;
+const Card = styled.article<{ $assigned: boolean }>`min-width: 0; border: 1px solid ${({ $assigned }) => $assigned ? '#ff535a' : 'rgba(231,189,187,.12)'}; border-radius: 1.25rem; padding: 1.3rem; background: #1c1e32;`;
+const CardTop = styled.div`display: flex; justify-content: space-between; color: #ffb3b1;`;
+const Badge = styled.span`border-radius: 999px; padding: .35rem .65rem; background: #313349; font-size: .68rem; font-weight: 800; text-transform: uppercase;`;
+const CardTitle = styled.h2`margin: 1rem 0 .35rem;`;
+const CardDescription = styled.p`min-height: 2.5rem; color: #e7bdbb;`;
+const Metrics = styled.div`display: flex; gap: 1rem; color: #ffdad6; font-size: .78rem;`;
+const Actions = styled.footer`display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem;`;
+const ActionLink = styled(Link)`display: inline-flex; align-items: center; gap: .35rem; border-radius: .55rem; padding: .55rem .65rem; background: #313349; color: #fff; text-decoration: none; font-size: .75rem;`;
+const ActionButton = styled.button`display: inline-flex; align-items: center; gap: .35rem; border: 0; border-radius: .55rem; padding: .55rem .65rem; background: #313349; color: #fff; cursor: pointer;`;
+const DangerButton = styled(ActionButton)`margin-left: auto; color: #ffb3b1;`;
+const Status = styled.p`margin: 4rem 0; color: #e7bdbb; text-align: center;`;
+const Empty = styled(Status)`grid-column: 1 / -1;`;
+const Backdrop = styled.div`position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 1rem; background: rgba(5,6,18,.78);`;
+const Dialog = styled.div`width: min(100%, 30rem); max-height: 85vh; overflow: auto; border-radius: 1.25rem; padding: 1.4rem; background: #1c1e32; box-shadow: 0 2rem 5rem rgba(0,0,0,.45);`;
+const DialogTitle = styled.h2`margin: 0 0 1rem;`;
+const Hint = styled.p`color: #e7bdbb; font-size: .82rem;`;
+const CheckboxList = styled.div`display: grid; gap: .7rem; label { display: flex; gap: .6rem; }`;
+const Field = styled.label`display: grid; gap: .45rem; margin-top: .8rem; color: #e7bdbb; select, input { border: 0; border-radius: .65rem; padding: .75rem; background: #101225; color: #fff; }`;
+const DialogActions = styled.div`display: flex; justify-content: end; gap: .7rem; margin-top: 1.2rem;`;
+const CancelButton = styled.button`border: 0; border-radius: .65rem; padding: .7rem 1rem; background: #313349; color: #fff; cursor: pointer;`;
+const SubmitButton = styled(CancelButton)`background: #ff535a; color: #270007; font-weight: 900; &:disabled { opacity: .5; }`;

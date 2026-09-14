@@ -4,16 +4,18 @@ import type { LibraryExercise } from './types';
 
 type ExerciseLibraryItemProps = {
   exercise: LibraryExercise;
+  onAdd: () => void;
+  disabled?: boolean;
 };
 
 /**
  * Single exercise row inside the exercise library list.
  */
-export function ExerciseLibraryItem({ exercise }: ExerciseLibraryItemProps) {
+export function ExerciseLibraryItem({ exercise, onAdd, disabled }: ExerciseLibraryItemProps) {
   return (
-    <Row>
+    <Row type="button" onClick={onAdd} disabled={disabled} aria-label={`Add ${exercise.name}`}>
       <Thumb>
-        <img src={exercise.imageUrl} alt={exercise.name} />
+        {exercise.imageUrl ? <img src={exercise.imageUrl} alt="" /> : <PlusCircle size={22} />}
       </Thumb>
       <Body>
         <Name>{exercise.name}</Name>
@@ -28,7 +30,10 @@ export function ExerciseLibraryItem({ exercise }: ExerciseLibraryItemProps) {
   );
 }
 
-const Row = styled.div`
+const Row = styled.button`
+  width: 100%;
+  border: 0;
+  text-align: left;
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -45,6 +50,11 @@ const Row = styled.div`
   &:active {
     transform: scale(0.98);
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
 `;
 
 const Thumb = styled.div`
@@ -54,6 +64,9 @@ const Thumb = styled.div`
   overflow: hidden;
   background-color: #313349;
   flex-shrink: 0;
+  color: #ffb3b1;
+  display: grid;
+  place-items: center;
 
   img {
     width: 100%;

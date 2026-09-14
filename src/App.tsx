@@ -28,9 +28,11 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/workouts" element={<Navigate to="/workout/new" replace />} />
+          <Route path="/workouts" element={<Navigate to="/workout" replace />} />
           <Route path="/workout" element={<WorkoutLibraryPage />} />
           <Route path="/workout/new" element={<WorkoutsPage />} />
+          <Route path="/workout/:id" element={<WorkoutsPage />} />
+          <Route path="/workout/:id/edit" element={<WorkoutsPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/settings" element={<SettingsPage />} />

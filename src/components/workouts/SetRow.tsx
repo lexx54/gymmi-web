@@ -7,12 +7,13 @@ type SetRowProps = {
   set: SetEntry;
   onChange: (field: SetField, value: number) => void;
   onRemove: () => void;
+  readOnly?: boolean;
 };
 
 /**
  * Editable set row inside an ExerciseCard. Updates flow back through `onChange`.
  */
-export function SetRow({ index, set, onChange, onRemove }: SetRowProps) {
+export function SetRow({ index, set, onChange, onRemove, readOnly }: SetRowProps) {
   return (
     <Row>
       <Cell>
@@ -22,6 +23,9 @@ export function SetRow({ index, set, onChange, onRemove }: SetRowProps) {
         <NumberInput
           type="number"
           value={set.weight}
+          min={0}
+          step="0.5"
+          disabled={readOnly}
           onChange={(event) => onChange('weight', Number(event.target.value))}
           aria-label={`Set ${index + 1} weight`}
           $width="5rem"
@@ -31,27 +35,43 @@ export function SetRow({ index, set, onChange, onRemove }: SetRowProps) {
         <NumberInput
           type="number"
           value={set.reps}
+          min={0}
+          step="1"
+          disabled={readOnly}
           onChange={(event) => onChange('reps', Number(event.target.value))}
           aria-label={`Set ${index + 1} reps`}
           $width="4rem"
         />
       </Cell>
       <Cell>
-        <RestText>{set.rest}</RestText>
+        <NumberInput
+          type="number"
+          value={set.restSeconds}
+          min={0}
+          step="5"
+          disabled={readOnly}
+          onChange={(event) => onChange('restSeconds', Number(event.target.value))}
+          aria-label={`Set ${index + 1} rest seconds`}
+          $width="4.5rem"
+        />
       </Cell>
       <Cell>
         <NumberInput
           type="number"
           value={set.rpe}
+          min={0}
+          max={10}
+          step="0.5"
+          disabled={readOnly}
           onChange={(event) => onChange('rpe', Number(event.target.value))}
           aria-label={`Set ${index + 1} RPE`}
           $width="4rem"
         />
       </Cell>
       <RemoveCell>
-        <RemoveButton type="button" aria-label={`Remove set ${index + 1}`} onClick={onRemove}>
+        {!readOnly && <RemoveButton type="button" aria-label={`Remove set ${index + 1}`} onClick={onRemove}>
           <X size={14} />
-        </RemoveButton>
+        </RemoveButton>}
       </RemoveCell>
     </Row>
   );
@@ -98,12 +118,10 @@ const NumberInput = styled.input<{ $width: string }>`
   &:focus {
     box-shadow: 0 0 0 1px #ffb3b1;
   }
-`;
 
-const RestText = styled.span`
-  color: #e7bdbb;
-  font-size: 0.8rem;
-  font-weight: 700;
+  &:disabled {
+    opacity: 0.8;
+  }
 `;
 
 const RemoveButton = styled.button`

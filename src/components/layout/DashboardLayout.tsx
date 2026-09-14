@@ -4,6 +4,7 @@ import { RecentActivity } from '../dashboard/RecentActivity';
 import { StartWorkoutButton } from '../dashboard/StartWorkoutButton';
 import { StatStack } from '../dashboard/StatStack';
 import { WeeklyProgressCard } from '../dashboard/WeeklyProgressCard';
+import { ActiveWorkoutCard } from '../dashboard/ActiveWorkoutCard';
 import { useAuth } from '../../context/AuthContext';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -23,6 +24,7 @@ export function DashboardLayout() {
         <ContentGrid>
           <MainColumn>
             <DashboardHeader username={username} />
+            <ActiveWorkoutCard enabled={user?.role.name === 'Client'} />
             <WeeklyProgressCard />
             <RecentActivity />
           </MainColumn>
@@ -46,8 +48,13 @@ const LayoutShell = styled.div`
 
 const MainPanel = styled.main`
   flex: 1;
+  min-width: 0;
   padding: 1.4rem 2rem 2rem;
   position: relative;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
 `;
 
 const ContentGrid = styled.div`
@@ -55,6 +62,10 @@ const ContentGrid = styled.div`
   grid-template-columns: minmax(0, 1fr) 19rem;
   gap: 1.3rem;
   margin-top: 0.75rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const MainColumn = styled.div`
@@ -65,4 +76,8 @@ const MainColumn = styled.div`
 
 const SideColumn = styled.aside`
   padding-top: 13.7rem;
+
+  @media (max-width: 900px) {
+    padding-top: 0;
+  }
 `;

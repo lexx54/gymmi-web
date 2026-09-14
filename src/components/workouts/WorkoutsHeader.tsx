@@ -44,6 +44,10 @@ const HeaderRoot = styled.header`
   padding: 1.4rem 2rem;
   background-color: rgba(16, 18, 37, 0.85);
   backdrop-filter: blur(20px);
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
 `;
 
 const TitleBlock = styled.div`
@@ -59,6 +63,10 @@ const Title = styled.h1`
   font-size: 1.85rem;
   font-weight: 800;
   letter-spacing: -0.02em;
+
+  @media (max-width: 640px) {
+    font-size: 1.35rem;
+  }
 `;
 
 const Subtitle = styled.p`
@@ -78,6 +86,10 @@ const ActionsRow = styled.div`
 
 const SearchWrap = styled.div`
   position: relative;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
 `;
 
 const SearchIcon = styled.span`

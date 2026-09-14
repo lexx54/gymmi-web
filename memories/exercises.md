@@ -83,3 +83,4 @@ Regression guard: `e2e/exercises.spec.ts` has a 390x844 test asserting `document
 - The custom SVG uses a broad athletic silhouette and segmented anatomical plates inspired by MuscleWiki's presentation; no MuscleWiki assets or code are bundled.
 - Preserved the existing activation tiles and added the nested map-dialog trigger to `ExerciseDetailModal.tsx`.
 - Added EN/ES map labels plus focused mapping, locale, and Playwright interaction coverage.
+- `CreateTagModal` uses a semantic styled `label`, fixing its `htmlFor` TypeScript build error without changing behavior.

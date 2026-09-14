@@ -1,0 +1,330 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ExerciseCard > renders editable set controls and emits rest changes 1`] = `
+<div>
+  <article
+    class="sc-gKzYWW hfnlWq"
+  >
+    <div
+      class="sc-iCoKjR clxtqg"
+    >
+      <div
+        class="sc-fujBio cXhUSJ"
+      >
+        <span
+          class="sc-pNYLI giDTIA"
+        >
+          01
+        </span>
+        <div
+          class="sc-jrsLQV iftrld"
+        >
+          <h3
+            class="sc-kEqYZi iyztmq"
+          >
+            Incline Bench Press
+          </h3>
+          <p
+            class="sc-iqAcFz bzouh"
+          >
+            Target: Chest
+          </p>
+        </div>
+      </div>
+      <div
+        class="sc-crzogQ iJzDR"
+      >
+        <select
+          aria-label="Superset group"
+          class="sc-dIrNh jzPXLp"
+        >
+          <option
+            value=""
+          >
+            No superset
+          </option>
+          <option
+            value="#ff535a"
+          >
+            Superset 1
+          </option>
+          <option
+            value="#ffb347"
+          >
+            Superset 2
+          </option>
+          <option
+            value="#55c2ff"
+          >
+            Superset 3
+          </option>
+          <option
+            value="#9b7bff"
+          >
+            Superset 4
+          </option>
+        </select>
+        <button
+          aria-label="Move exercise up"
+          class="sc-bqGEVu fBuIrs"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-arrow-up"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m5 12 7-7 7 7"
+            />
+            <path
+              d="M12 19V5"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="Move exercise down"
+          class="sc-bqGEVu fBuIrs"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-arrow-down"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 5v14"
+            />
+            <path
+              d="m19 12-7 7-7-7"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="Remove exercise"
+          class="sc-bqGEVu fCGWOC"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-trash2 lucide-trash-2"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 11v6"
+            />
+            <path
+              d="M14 11v6"
+            />
+            <path
+              d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+            />
+            <path
+              d="M3 6h18"
+            />
+            <path
+              d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="sc-kslsaH hRDUbW"
+    >
+      <div
+        class="sc-hBMXrk jYMvKR"
+      >
+        <table
+          class="sc-fnWaXB hLHJyT"
+        >
+          <thead>
+            <tr>
+              <th
+                class="sc-fFSRQT dwdOaN"
+              >
+                Set
+              </th>
+              <th
+                class="sc-fFSRQT dwdOaN"
+              >
+                Weight (kg)
+              </th>
+              <th
+                class="sc-fFSRQT dwdOaN"
+              >
+                Reps
+              </th>
+              <th
+                class="sc-fFSRQT dwdOaN"
+              >
+                Rest
+              </th>
+              <th
+                class="sc-fFSRQT dwdOaN"
+              >
+                RPE
+              </th>
+              <th
+                aria-hidden="true"
+                class="sc-fFSRQT dwdOaN"
+              />
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="sc-bdnAzI cqAGYA"
+            >
+              <td
+                class="sc-gtstET dmYezx"
+              >
+                <span
+                  class="sc-hKFxUR kZSMxr"
+                >
+                  1
+                </span>
+              </td>
+              <td
+                class="sc-gtstET dmYezx"
+              >
+                <input
+                  aria-label="Set 1 weight"
+                  class="sc-eCAoTo fulkPH"
+                  min="0"
+                  step="0.5"
+                  type="number"
+                  value="80"
+                />
+              </td>
+              <td
+                class="sc-gtstET dmYezx"
+              >
+                <input
+                  aria-label="Set 1 reps"
+                  class="sc-eCAoTo gWEFkC"
+                  min="0"
+                  step="1"
+                  type="number"
+                  value="10"
+                />
+              </td>
+              <td
+                class="sc-gtstET dmYezx"
+              >
+                <input
+                  aria-label="Set 1 rest seconds"
+                  class="sc-eCAoTo fRBuGp"
+                  min="0"
+                  step="5"
+                  type="number"
+                  value="90"
+                />
+              </td>
+              <td
+                class="sc-gtstET dmYezx"
+              >
+                <input
+                  aria-label="Set 1 RPE"
+                  class="sc-eCAoTo gWEFkC"
+                  max="10"
+                  min="0"
+                  step="0.5"
+                  type="number"
+                  value="8"
+                />
+              </td>
+              <td
+                class="sc-dlnkDq AQPDS"
+              >
+                <button
+                  aria-label="Remove set 1"
+                  class="sc-jSFhYz eJuWpX"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-x"
+                    fill="none"
+                    height="14"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="14"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 6 6 18"
+                    />
+                    <path
+                      d="m6 6 12 12"
+                    />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button
+        class="sc-bkbknG cqFwjj"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-square-plus"
+          fill="none"
+          height="14"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="14"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            height="18"
+            rx="2"
+            width="18"
+            x="3"
+            y="3"
+          />
+          <path
+            d="M8 12h8"
+          />
+          <path
+            d="M12 8v8"
+          />
+        </svg>
+        Add Set
+      </button>
+    </div>
+  </article>
+</div>
+`;

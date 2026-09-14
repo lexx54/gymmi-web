@@ -1,7 +1,8 @@
-import { GripVertical, PlusSquare, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, PlusSquare, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { SetRow } from './SetRow';
+import { SUPERSET_COLORS, type SupersetColor } from '../../services/api/workouts';
 import type { RoutineExercise, SetField } from './types';
 
 type ExerciseCardProps = {
@@ -11,6 +12,9 @@ type ExerciseCardProps = {
   onRemoveSet: (setId: string) => void;
   onRemoveExercise: () => void;
   onUpdateSet: (setId: string, field: SetField, value: number) => void;
+  onMove: (direction: -1 | 1) => void;
+  onSupersetChange: (color: SupersetColor | null) => void;
+  readOnly?: boolean;
 };
 
 /**
@@ -23,6 +27,9 @@ export function ExerciseCard({
   onRemoveSet,
   onRemoveExercise,
   onUpdateSet,
+  onMove,
+  onSupersetChange,
+  readOnly,
 }: ExerciseCardProps) {
   const { t } = useTranslation();
   const positionLabel = position.toString().padStart(2, '0');
@@ -38,17 +45,31 @@ export function ExerciseCard({
           </HeaderText>
         </HeaderLeft>
         <HeaderActions>
-          <IconButton type="button" aria-label={t('workouts.reorderExercise')}>
-            <GripVertical size={16} />
-          </IconButton>
-          <IconButton type="button" aria-label={t('workouts.removeExercise')} onClick={onRemoveExercise} $danger>
+          {!readOnly && <SupersetSelect
+            value={exercise.supersetColor ?? ''}
+            onChange={(event) => onSupersetChange((event.target.value || null) as SupersetColor | null)}
+            aria-label={t('workouts.supersetGroup')}
+            $color={exercise.supersetColor}
+          >
+            <option value="">{t('workouts.noSuperset')}</option>
+            {SUPERSET_COLORS.map((color, index) => (
+              <option key={color} value={color}>{t('workouts.supersetNumber', { number: index + 1 })}</option>
+            ))}
+          </SupersetSelect>}
+          {!readOnly && <IconButton type="button" aria-label={t('workouts.moveExerciseUp')} onClick={() => onMove(-1)}>
+            <ArrowUp size={16} />
+          </IconButton>}
+          {!readOnly && <IconButton type="button" aria-label={t('workouts.moveExerciseDown')} onClick={() => onMove(1)}>
+            <ArrowDown size={16} />
+          </IconButton>}
+          {!readOnly && <IconButton type="button" aria-label={t('workouts.removeExercise')} onClick={onRemoveExercise} $danger>
             <Trash2 size={16} />
-          </IconButton>
+          </IconButton>}
         </HeaderActions>
       </CardHeader>
 
       <CardBody>
-        <SetsTable>
+        <TableScroll><SetsTable>
           <thead>
             <tr>
               <Th>{t('workouts.set')}</Th>
@@ -67,15 +88,16 @@ export function ExerciseCard({
                 set={set}
                 onRemove={() => onRemoveSet(set.id)}
                 onChange={(field, value) => onUpdateSet(set.id, field, value)}
+                readOnly={readOnly}
               />
             ))}
           </tbody>
-        </SetsTable>
+        </SetsTable></TableScroll>
 
-        <AddSetButton type="button" onClick={onAddSet}>
+        {!readOnly && <AddSetButton type="button" onClick={onAddSet}>
           <PlusSquare size={14} />
           {t('workouts.addSet')}
-        </AddSetButton>
+        </AddSetButton>}
       </CardBody>
     </Card>
   );
@@ -100,6 +122,7 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  min-width: 0;
 `;
 
 const PositionChip = styled.span`
@@ -145,6 +168,16 @@ const HeaderActions = styled.div`
   gap: 0.4rem;
 `;
 
+const SupersetSelect = styled.select<{ $color: SupersetColor | null }>`
+  max-width: 7.5rem;
+  border: 1px solid ${({ $color }) => $color ?? 'rgba(231, 189, 187, 0.25)'};
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  background: #26283d;
+  color: #e0e0fc;
+  font-size: 0.68rem;
+`;
+
 const IconButton = styled.button<{ $danger?: boolean }>`
   width: 2.25rem;
   height: 2.25rem;
@@ -166,8 +199,14 @@ const CardBody = styled.div`
   padding: 1.6rem 1.6rem 1.5rem;
 `;
 
+const TableScroll = styled.div`
+  max-width: 100%;
+  overflow-x: auto;
+`;
+
 const SetsTable = styled.table`
   width: 100%;
+  min-width: 31rem;
   text-align: left;
   border-collapse: separate;
   border-spacing: 0;

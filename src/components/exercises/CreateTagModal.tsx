@@ -25,7 +25,7 @@ export function CreateTagModal({
 
   useEffect(() => {
     if (!isOpen) {
-      setName('');
+      queueMicrotask(() => setName(''));
     }
   }, [isOpen]);
 
@@ -85,7 +85,7 @@ const Field = styled.label`
   gap: 0.5rem;
 `;
 
-const Label = styled.span`
+const Label = styled.label`
   color: #e7bdbb;
   font-size: 0.68rem;
   font-weight: 800;
