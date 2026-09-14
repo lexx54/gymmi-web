@@ -15,7 +15,7 @@ export const createLoginSchema = (t: TFunction) =>
 
 export type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>;
 
-export const SIGNUP_ROLES = ['Gym', 'Trainer', 'Client'] as const;
+export const SIGNUP_ROLES = ['Trainer', 'Client'] as const;
 
 export const createSignupSchema = (t: TFunction) =>
   z

@@ -8,7 +8,7 @@ JWT session management, login/signup UI, token persistence, and auth API wrapper
 
 1. **Cold start:** `AuthContext` reads access token from localStorage, decodes JWT (`sub`, `email`, `username`, `hasPaid`, `roleId`, `roleName`), sets `user`. Invalid token → clear storage.
 2. **Login (`/login`):** `useLogin` → `AuthContext.signIn` → `POST /auth/login` → save tokens → navigate `/dashboard`.
-3. **Signup (`/signup`):** `useSignup` → `signupApi` (`POST /auth/signup`) → toast → navigate `/login`. Does **not** call `AuthContext.signUp` or persist tokens (no auto-login).
+3. **Signup (`/signup`):** `useSignup` → `signupApi` (`POST /auth/signup`) → toast → navigate `/login`. Does **not** call `AuthContext.signUp` or persist tokens (no auto-login). Role chips are Trainer and User (API value remains `Client`). Gym is not offered in the form.
 4. **Logout:** Sidebar → `signOut` → `POST /auth/logout` (best-effort) → clear tokens → `/login`.
 5. **429 lockout:** Login/Signup show a 3-minute local countdown UI when API returns 429.
 

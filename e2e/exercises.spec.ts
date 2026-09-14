@@ -129,6 +129,19 @@ test.describe('exercises', () => {
     await expect(dialog.getByText('Photos and video coming soon')).toBeVisible();
     await expect(dialog.getByText('Front view')).toBeVisible();
 
+    await dialog.getByRole('button', { name: /view body map/i }).click();
+    const bodyMapDialog = page.getByRole('dialog', {
+      name: /body activation map/i,
+    });
+    await expect(bodyMapDialog).toBeVisible();
+    await expect(bodyMapDialog.getByRole('img', { name: 'Front' })).toBeVisible();
+    await expect(bodyMapDialog.getByRole('img', { name: 'Back' })).toBeVisible();
+    await bodyMapDialog
+      .getByRole('button', { name: /close body activation map/i })
+      .click();
+    await expect(bodyMapDialog).toHaveCount(0);
+    await expect(dialog.getByRole('heading', { name })).toBeVisible();
+
     await dialog.getByRole('button', { name: /next media/i }).click();
     await expect(dialog.getByText('Side view')).toBeVisible();
 

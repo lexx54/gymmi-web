@@ -102,7 +102,7 @@ describe('SignupPage', () => {
     await user.type(screen.getByPlaceholderText('username'), 'user');
     await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password13');
-    await user.click(screen.getByLabelText('Client'));
+    await user.click(screen.getByLabelText('User'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
 
     await waitFor(() => {
@@ -119,12 +119,12 @@ describe('SignupPage', () => {
     await user.type(screen.getByPlaceholderText('username'), 'newuser');
     await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
-    await user.click(screen.getByLabelText('Gym'));
+    await user.click(screen.getByLabelText('User'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
 
     await waitFor(() => {
       expect(mockMutate).toHaveBeenCalledWith(
-        { email: 'new@user.com', username: 'newuser', password: 'password12', role: 'Gym' },
+        { email: 'new@user.com', username: 'newuser', password: 'password12', role: 'Client' },
         expect.any(Object),
       );
     });
@@ -166,7 +166,7 @@ describe('SignupPage', () => {
     await user.type(screen.getByPlaceholderText('username'), 'user');
     await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
-    await user.click(screen.getByLabelText('Client'));
+    await user.click(screen.getByLabelText('User'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
 
     await waitFor(() => {

@@ -28,7 +28,7 @@ test.describe('signup', () => {
     await page.getByPlaceholder('username').fill(user.username);
     await page.getByPlaceholder('Password', { exact: true }).fill(password);
     await page.getByPlaceholder('confirm password').fill(password);
-    await page.getByRole('radio', { name: 'Client' }).check();
+    await page.getByRole('radio', { name: 'User' }).check();
     await page.getByRole('button', { name: /^sign up$/i }).click();
 
     await expect(page.getByText('Account created successfully!')).toBeVisible();

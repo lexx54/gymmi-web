@@ -64,6 +64,10 @@
     "creatingAccount": "CREANDO CUENTA...",
     "signUpAction": "REGISTRARSE",
     "rolePrompt": "Soy",
+    "roles": {
+      "Trainer": "Trainer",
+      "Client": "Usuario"
+    },
     "apple": "Continuar con Apple",
     "google": "Continuar con Google",
     "haveAccount": "¿Ya tienes una cuenta?",
@@ -265,6 +269,12 @@
     "nextMedia": "Medio siguiente",
     "noMovementType": "No especificado",
     "activationMap": "Mapa de activación",
+    "viewBodyMap": "Ver mapa corporal",
+    "bodyMapTitle": "Mapa corporal de activación",
+    "closeBodyMap": "Cerrar mapa corporal de activación",
+    "frontView": "Frente",
+    "backView": "Espalda",
+    "activationHierarchy": "Jerarquía de activación",
     "primary": "Principal",
     "secondary": "Secundario",
     "stabilizers": "Estabilizadores",

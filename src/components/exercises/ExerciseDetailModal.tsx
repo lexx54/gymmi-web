@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, ImageIcon, Play } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, ImageIcon, Play, Scan } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Modal } from '../common/Modal';
+import { ExerciseBodyMapModal } from './ExerciseBodyMapModal';
 import {
   resolveLocalizedText,
   type Exercise,
@@ -23,16 +24,18 @@ const MEDIA_SLIDES = ['front', 'side', 'video'] as const;
 export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalProps) {
   const { t, i18n } = useTranslation();
   const [slideIndex, setSlideIndex] = useState(0);
-
-  useEffect(() => {
-    setSlideIndex(0);
-  }, [exercise?.id]);
+  const [bodyMapOpen, setBodyMapOpen] = useState(false);
 
   const slide = MEDIA_SLIDES[slideIndex];
   const isVideo = slide === 'video';
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localized = (value: LocalizedText | string | null | undefined) =>
     resolveLocalizedText(value, language) || t('exercises.noMovementType');
+  const closeModal = () => {
+    setSlideIndex(0);
+    setBodyMapOpen(false);
+    onClose();
+  };
 
   return (
     <Modal
@@ -40,10 +43,11 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
       title={exercise?.name ?? ''}
       description={exercise ? t('exercises.detailDescription') : undefined}
       size="wide"
-      onClose={onClose}
+      onClose={closeModal}
     >
       {exercise ? (
-        <Content>
+        <>
+          <Content>
           <Carousel aria-roledescription="carousel" aria-label={t('exercises.mediaCarousel')}>
             <Slide>
               {isVideo ? <Play size={42} aria-hidden /> : <ImageIcon size={42} aria-hidden />}
@@ -111,7 +115,13 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
           </MetaGrid>
 
           <Field>
-            <FieldLabel>{t('exercises.activationMap')}</FieldLabel>
+            <ActivationHeader>
+              <FieldLabel>{t('exercises.activationMap')}</FieldLabel>
+              <BodyMapButton type="button" onClick={() => setBodyMapOpen(true)}>
+                <Scan size={15} aria-hidden />
+                {t('exercises.viewBodyMap')}
+              </BodyMapButton>
+            </ActivationHeader>
             <ActivationGrid>
               <ActivationTile $tier="principal">
                 <ActivationLabel>{t('exercises.primary')}</ActivationLabel>
@@ -149,7 +159,16 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
               </Tags>
             </Field>
           ) : null}
-        </Content>
+          </Content>
+          <ExerciseBodyMapModal
+            isOpen={bodyMapOpen}
+            exerciseName={exercise.name}
+            primary={resolveLocalizedText(exercise.activationMap.principal, 'en')}
+            secondary={resolveLocalizedText(exercise.activationMap.secondary, 'en')}
+            stabilizers={resolveLocalizedText(exercise.activationMap.stabilizers, 'en')}
+            onClose={() => setBodyMapOpen(false)}
+          />
+        </>
       ) : null}
     </Modal>
   );
@@ -236,6 +255,33 @@ const MetaGrid = styled.div`
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
+  }
+`;
+
+const ActivationHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+`;
+
+const BodyMapButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #5d3f3e;
+  border-radius: 999px;
+  background: #26283d;
+  color: #ffb3b1;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #ffb3b1;
+    outline-offset: 2px;
   }
 `;
 

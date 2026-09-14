@@ -335,7 +335,7 @@ export default function SignupPage() {
                       }}
                     >
                       <input type="radio" value={r} {...register('role')} style={{ accentColor: '#ef233c' }} />
-                      {r}
+                      {t(`auth.roles.${r}`)}
                     </label>
                   ))}
                 </div>

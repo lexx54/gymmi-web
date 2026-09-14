@@ -54,7 +54,8 @@ Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipme
 - A page contains at most 10 exercises (`EXERCISES_PER_PAGE`). Search/filter changes reset to page 1; the displayed page is clamped after catalog changes. Pagination appears only with more than one page and reports the visible range.
 - "Clear filters" resets search and all three dropdowns. The existing no-results clear action uses the same reset.
 - Hooks exist for update/delete/fetch-one but no edit/delete UI or detail route yet.
-- Catalog cards open a read-only `ExerciseDetailModal` with localized target/equipment/instructions and persisted principal/secondary/stabilizer activation tiles. The top media carousel is a UI mock until image/video upload exists.
+- Catalog cards open a read-only `ExerciseDetailModal` with localized target/equipment/instructions and persisted principal/secondary/stabilizer activation tiles. A "View body map" button opens a dedicated nested dialog with front/back SVG activation silhouettes. The top media carousel is a UI mock until image/video upload exists.
+- `ExerciseBodyMap` supports the fixed 12-muscle catalog only and maps canonical English activation values, independent of UI locale. Region precedence is primary (`#ff535a`) over secondary (`#bbc7dd`) over stabilizers (`#5d3f3e`); unknown values remain inactive.
 - Muscle/equipment options from `useListMuscles` / `useListEquipments`.
 - Tag catalog from `useTags` / `useCreateTag`. Builder no longer accepts free-typed tags.
 - Media upload, visual inspiration, and live preview remain UI-only. Activation-map selections are persisted.
@@ -72,6 +73,13 @@ Regression guard: `e2e/exercises.spec.ts` has a 390x844 test asserting `document
 
 ## E2E
 
-- Playwright: `e2e/exercises.spec.ts` (client cannot create; localized filtering/pagination; detail modal EN/ES rendering and activation map; paid/unpaid publish; bulk CSV modal).
+- Playwright: `e2e/exercises.spec.ts` (client cannot create; localized filtering/pagination; detail modal EN/ES rendering; nested front/back body-map dialog; paid/unpaid publish; bulk CSV modal).
 - Playwright: `e2e/tags.spec.ts` (admin tag shared; user tag private).
 - See `memories/e2e.md`.
+
+## Current task changes
+
+- Added `ExerciseBodyMap.tsx`, `ExerciseBodyMapModal.tsx`, and `exerciseBodyMapUtils.ts`.
+- The custom SVG uses a broad athletic silhouette and segmented anatomical plates inspired by MuscleWiki's presentation; no MuscleWiki assets or code are bundled.
+- Preserved the existing activation tiles and added the nested map-dialog trigger to `ExerciseDetailModal.tsx`.
+- Added EN/ES map labels plus focused mapping, locale, and Playwright interaction coverage.

@@ -11,8 +11,8 @@ Zod validation schemas for auth forms (used with React Hook Form).
 ## Schemas
 
 - `loginSchema`: `identifier` (email), `password` (min 6)
-- `signupSchema`: email, username (min 3), password (min 8), confirmPassword, role enum `Gym | Trainer | Client`
-- `SIGNUP_ROLES` drives signup role radio options
+- `signupSchema`: email, username (min 3), password (min 8), confirmPassword, role enum `Trainer | Client`
+- `SIGNUP_ROLES` drives signup role radio options. The Client option is labelled User in the UI.
 
 ## Constraints
 
