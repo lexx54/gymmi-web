@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { CalendarPlus, Dumbbell, Edit3, Eye, Plus, Search, Share2, Trash2, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,13 @@ import { WORKOUT_PERIODS, type WorkoutPeriod, type WorkoutRoutine } from '../ser
 
 type DialogMode = 'share' | 'assign' | 'selfAssign';
 type LibraryFilter = 'all' | 'mine' | 'assigned';
+
+/** Reads the API message so blocked actions explain themselves (402, 403, 400). */
+function apiErrorMessage(error: unknown): string {
+  const message = (error as AxiosError<{ message?: string | string[] }>).response?.data?.message;
+  if (Array.isArray(message)) return message[0] ?? '';
+  return message ?? '';
+}
 
 /**
  * Browses visible API routines and exposes role-safe routine actions.
@@ -194,8 +202,8 @@ function WorkoutAccessDialog({
       }
       toast.success(t(`workouts.${mode}Success`));
       onClose();
-    } catch {
-      toast.error(t(`workouts.${mode}Failed`));
+    } catch (error) {
+      toast.error(apiErrorMessage(error) || t(`workouts.${mode}Failed`));
     }
   };
   const pending = shareMutation.isPending || assignMutation.isPending || selfAssignMutation.isPending;
