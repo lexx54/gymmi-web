@@ -167,6 +167,12 @@
     "description": "Routine description",
     "descriptionPlaceholder": "Describe this training plan...",
     "trainingDays": "Training days",
+    "assignmentWeeks": "Assignment weeks",
+    "weekTag": "Week {{number}}",
+    "weekRange": "{{start}} – {{end}}",
+    "dayDone": "Done",
+    "dayIncomplete": "Incomplete",
+    "stopReasonLabel": "Stopped",
     "weekdays": {
       "0": "Sun",
       "1": "Mon",

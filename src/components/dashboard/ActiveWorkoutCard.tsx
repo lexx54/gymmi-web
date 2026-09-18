@@ -12,7 +12,15 @@ export function ActiveWorkoutCard({ enabled }: { enabled: boolean }) {
   const { data: assignment } = useMyWorkoutAssignment(enabled);
   if (!enabled || !assignment?.routine) return null;
 
-  const exerciseCount = assignment.routine.days.reduce(
+  const firstWeek = assignment.routine.days.find(
+    (day) => day.weekStartDate,
+  )?.weekStartDate;
+  const displayDays = firstWeek
+    ? assignment.routine.days.filter(
+        (day) => day.weekStartDate === firstWeek,
+      )
+    : assignment.routine.days;
+  const exerciseCount = displayDays.reduce(
     (count, day) => count + day.exercises.length,
     0,
   );

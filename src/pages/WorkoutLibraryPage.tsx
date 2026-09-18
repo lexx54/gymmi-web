@@ -121,7 +121,14 @@ export default function WorkoutLibraryPage() {
           {visible.map((routine) => {
             const owned = routine.createdById === user?.id;
             const assigned = assignment?.routineId === routine.id;
-            const exerciseCount = routine.days.reduce((count, day) => count + day.exercises.length, 0);
+            const firstWeek = routine.days.find((day) => day.weekStartDate)?.weekStartDate;
+            const displayDays = firstWeek
+              ? routine.days.filter((day) => day.weekStartDate === firstWeek)
+              : routine.days;
+            const exerciseCount = displayDays.reduce(
+              (count, day) => count + day.exercises.length,
+              0,
+            );
             return (
               <Card key={routine.id} $assigned={assigned}>
                 <CardTop>
@@ -131,7 +138,7 @@ export default function WorkoutLibraryPage() {
                 <CardTitle>{routine.name}</CardTitle>
                 <CardDescription>{routine.description || t('workouts.noDescription')}</CardDescription>
                 <Metrics>
-                  <span>{t('workouts.dayCount', { count: routine.days.length })}</span>
+                  <span>{t('workouts.dayCount', { count: displayDays.length })}</span>
                   <span>{t('workouts.exerciseCount', { count: exerciseCount })}</span>
                 </Metrics>
                 <Actions>

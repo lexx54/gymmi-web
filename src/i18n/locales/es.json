@@ -167,6 +167,12 @@
     "description": "Descripción de rutina",
     "descriptionPlaceholder": "Describe este plan de entrenamiento...",
     "trainingDays": "Días de entrenamiento",
+    "assignmentWeeks": "Semanas de la asignación",
+    "weekTag": "Semana {{number}}",
+    "weekRange": "{{start}} – {{end}}",
+    "dayDone": "Hecho",
+    "dayIncomplete": "Incompleto",
+    "stopReasonLabel": "Detenido",
     "weekdays": {
       "0": "Dom",
       "1": "Lun",

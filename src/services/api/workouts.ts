@@ -22,6 +22,7 @@ export type WorkoutExerciseWrite = {
 
 export type WorkoutDayWrite = {
   weekday: number;
+  weekStartDate?: string | null;
   exercises: WorkoutExerciseWrite[];
 };
 
@@ -48,6 +49,7 @@ export type WorkoutRoutineExercise = {
 export type WorkoutDay = {
   id: string;
   weekday: number;
+  weekStartDate: string | null;
   position: number;
   exercises: WorkoutRoutineExercise[];
 };
@@ -60,6 +62,26 @@ export type WorkoutRoutine = {
   days: WorkoutDay[];
   createdAt: string;
   updatedAt: string;
+  assignment?: WorkoutAssignmentWindow | null;
+};
+
+export type WorkoutAssignmentWindow = {
+  id: string;
+  clientId: string;
+  assignedById: string;
+  startDate: string;
+  endDate: string;
+  period: WorkoutPeriod;
+};
+
+export type WorkoutSessionNote = {
+  id: string;
+  clientId: string;
+  routineId: string;
+  weekday: number;
+  weekStartDate: string;
+  status: 'COMPLETED' | 'INCOMPLETE';
+  stopReason: string | null;
 };
 
 export type EligibleWorkoutUser = {
@@ -150,5 +172,11 @@ export async function fetchEligibleClients(): Promise<EligibleWorkoutUser[]> {
 
 export async function fetchEligibleTrainers(): Promise<EligibleWorkoutUser[]> {
   const { data } = await apiClient.get<EligibleWorkoutUser[]>('/workouts/eligible-trainers');
+  return data;
+}
+
+/** Fetches every logged day on an assignment fork for the assigning trainer. */
+export async function fetchRoutineSessions(id: string): Promise<WorkoutSessionNote[]> {
+  const { data } = await apiClient.get<WorkoutSessionNote[]>(`/workouts/${id}/sessions`);
   return data;
 }

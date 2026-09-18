@@ -8,6 +8,7 @@ import {
   fetchMyWorkoutAssignment,
   fetchWorkout,
   fetchWorkouts,
+  fetchRoutineSessions,
   selfAssignWorkout,
   shareWorkout,
   updateWorkout,
@@ -112,6 +113,14 @@ export function useMyWorkoutAssignment(enabled = true) {
     queryKey: myWorkoutAssignmentQueryKey,
     queryFn: fetchMyWorkoutAssignment,
     enabled,
+  });
+}
+
+export function useRoutineSessions(id: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: [...workoutQueryKey(id ?? ''), 'sessions'],
+    queryFn: () => fetchRoutineSessions(id!),
+    enabled: Boolean(id) && enabled,
   });
 }
 

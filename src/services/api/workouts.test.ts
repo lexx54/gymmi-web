@@ -4,6 +4,7 @@ import {
   assignWorkout,
   createWorkout,
   fetchMyWorkoutAssignment,
+  fetchRoutineSessions,
   fetchWorkouts,
   selfAssignWorkout,
   shareWorkout,
@@ -68,5 +69,11 @@ describe('workout API', () => {
       customEndDate: '2026-12-31',
     });
     expect(get).toHaveBeenCalledWith('/workouts/assignments/me');
+  });
+
+  it('fetches trainer assignment sessions for a fork', async () => {
+    get.mockResolvedValue({ data: [] });
+    await fetchRoutineSessions(routineId);
+    expect(get).toHaveBeenCalledWith(`/workouts/${routineId}/sessions`);
   });
 });

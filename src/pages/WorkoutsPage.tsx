@@ -20,7 +20,7 @@ import type { LibraryExercise, RoutineExercise, SetField } from '../components/w
 import { DEFAULT_SET, isInSupersetAddGroup } from '../components/workouts/addSet';
 import { useAuth } from '../context/AuthContext';
 import { useExercises } from '../hooks/useExercises';
-import { useCreateWorkout, useUpdateWorkout, useWorkout } from '../hooks/useWorkouts';
+import { useCreateWorkout, useRoutineSessions, useUpdateWorkout, useWorkout } from '../hooks/useWorkouts';
 import { resolveLocalizedText } from '../services/api/exercises';
 import type {
   SupersetColor,
@@ -28,9 +28,16 @@ import type {
   WorkoutRoutine,
   WorkoutRoutineWrite,
 } from '../services/api/workouts';
+import {
+  assignmentWeekStarts,
+  defaultAssignmentWeek,
+  sessionForDay,
+  utcWeekEnd,
+} from '../utils/assignmentWeeks';
 
 type BuilderDay = {
   weekday: number;
+  weekStartDate: string | null;
   exercises: RoutineExercise[];
 };
 
@@ -41,6 +48,7 @@ const nextId = (prefix: string) => `${prefix}-${Date.now()}-${localId += 1}`;
 function routineToDays(routine: WorkoutRoutine): BuilderDay[] {
   return routine.days.map((day) => ({
     weekday: day.weekday,
+    weekStartDate: day.weekStartDate ?? null,
     exercises: day.exercises.map((item) => ({
       id: item.id,
       exerciseId: item.exerciseId,
@@ -63,6 +71,7 @@ function toWriteDays(days: BuilderDay[]): WorkoutDayWrite[] {
     .filter((day) => day.exercises.length > 0)
     .map((day) => ({
       weekday: day.weekday,
+      weekStartDate: day.weekStartDate,
       exercises: day.exercises.map((exercise) => ({
         exerciseId: exercise.exerciseId,
         supersetColor: exercise.supersetColor,
@@ -93,12 +102,35 @@ export default function WorkoutsPage() {
   const [description, setDescription] = useState('');
   const [days, setDays] = useState<BuilderDay[]>([]);
   const [activeWeekday, setActiveWeekday] = useState(1);
+  const [activeWeekStart, setActiveWeekStart] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
 
   const requestedEdit = !id || location.pathname.endsWith('/edit');
   const isOwner = !persistedRoutine || persistedRoutine.createdById === user?.id;
   const readOnly = Boolean(id) && (!requestedEdit || !isOwner);
+  const assignment = persistedRoutine?.assignment ?? null;
+  const hasAssignmentWeeks = Boolean(assignment);
+  const showWeeks = hasAssignmentWeeks && user?.role?.name !== 'Client';
+  const weeks = useMemo(
+    () =>
+      assignment
+        ? assignmentWeekStarts(assignment.startDate, assignment.endDate)
+        : [],
+    [assignment],
+  );
+  const { data: routineSessions = [] } = useRoutineSessions(id, showWeeks);
+
+  useEffect(() => {
+    if (!weeks.length) {
+      return;
+    }
+    queueMicrotask(() => {
+      setActiveWeekStart((current) =>
+        weeks.includes(current) ? current : defaultAssignmentWeek(weeks),
+      );
+    });
+  }, [weeks]);
 
   useEffect(() => {
     if (!persistedRoutine) return;
@@ -121,24 +153,44 @@ export default function WorkoutsPage() {
       })),
     [exercises, i18n.language, t],
   );
-  const activeDay = days.find((day) => day.weekday === activeWeekday);
+  const activeDay = days.find(
+    (day) =>
+      day.weekday === activeWeekday &&
+      day.weekStartDate === (hasAssignmentWeeks ? activeWeekStart : null),
+  );
   const routine = activeDay?.exercises ?? [];
+  const activeSession = sessionForDay(routineSessions, activeWeekStart, activeWeekday);
+  const dayLocked = Boolean(activeSession);
+  const dayReadOnly = readOnly || dayLocked;
 
   const updateActiveExercises = useCallback(
     (updater: (current: RoutineExercise[]) => RoutineExercise[]) => {
       setDays((current) => {
-        const exists = current.some((day) => day.weekday === activeWeekday);
-        if (!exists) return [...current, { weekday: activeWeekday, exercises: updater([]) }];
+        const weekStartDate = hasAssignmentWeeks ? activeWeekStart : null;
+        const exists = current.some(
+          (day) =>
+            day.weekday === activeWeekday &&
+            day.weekStartDate === weekStartDate,
+        );
+        if (!exists) {
+          return [
+            ...current,
+            { weekday: activeWeekday, weekStartDate, exercises: updater([]) },
+          ];
+        }
         return current.map((day) =>
-          day.weekday === activeWeekday ? { ...day, exercises: updater(day.exercises) } : day,
+          day.weekday === activeWeekday && day.weekStartDate === weekStartDate
+            ? { ...day, exercises: updater(day.exercises) }
+            : day,
         );
       });
     },
-    [activeWeekday],
+    [activeWeekStart, activeWeekday, hasAssignmentWeeks],
   );
 
   const handleAddExercise = useCallback(
     (exercise: LibraryExercise) => {
+      if (dayLocked) return;
       updateActiveExercises((current) => [
         ...current,
         {
@@ -151,7 +203,7 @@ export default function WorkoutsPage() {
         },
       ]);
     },
-    [updateActiveExercises],
+    [dayLocked, updateActiveExercises],
   );
 
   const handleAddSet = useCallback(
@@ -246,9 +298,15 @@ export default function WorkoutsPage() {
 
   const loading = exercisesLoading || (Boolean(id) && routineLoading);
   const dayLabel = (weekday: number) => t(`workouts.weekdays.${weekday}`);
-  const visibleWeekdays = readOnly
+  const visibleWeekdays = dayReadOnly
     ? WEEKDAYS.filter((weekday) =>
-        days.some((day) => day.weekday === weekday && day.exercises.length > 0))
+        days.some(
+          (day) =>
+            day.weekday === weekday &&
+            day.weekStartDate ===
+              (hasAssignmentWeeks ? activeWeekStart : null) &&
+            day.exercises.length > 0,
+        ))
     : WEEKDAYS;
 
   return (
@@ -256,8 +314,8 @@ export default function WorkoutsPage() {
       <Sidebar username={user?.username ?? 'Alex'} />
       <WorkoutsMain>
         <WorkoutsHeader />
-        <WorkoutsBuilderGrid $singleColumn={readOnly}>
-          {!readOnly && <LibraryPane>
+        <WorkoutsBuilderGrid $singleColumn={readOnly || dayLocked}>
+          {!readOnly && !dayLocked && <LibraryPane>
             <ExerciseLibrary
               exercises={libraryExercises}
               activeCategory={activeCategory}
@@ -275,8 +333,25 @@ export default function WorkoutsPage() {
               <RoutineToolbar
                 title={title}
                 onTitleChange={setTitle}
-                durationLabel={t('workouts.dayCount', { count: days.filter((day) => day.exercises.length).length })}
-                intensityLabel={readOnly ? t('workouts.readOnly') : t('workouts.editable')}
+                durationLabel={t('workouts.dayCount', {
+                  count: days.filter(
+                    (day) =>
+                      day.weekStartDate ===
+                        (hasAssignmentWeeks ? activeWeekStart : null) &&
+                      day.exercises.length,
+                  ).length,
+                })}
+                intensityLabel={
+                  dayLocked
+                    ? t(
+                        activeSession?.status === 'INCOMPLETE'
+                          ? 'workouts.dayIncomplete'
+                          : 'workouts.dayDone',
+                      )
+                    : readOnly
+                      ? t('workouts.readOnly')
+                      : t('workouts.editable')
+                }
                 onSave={handleSave}
                 isSaving={createMutation.isPending || updateMutation.isPending}
                 readOnly={readOnly}
@@ -291,9 +366,36 @@ export default function WorkoutsPage() {
                   aria-label={t('workouts.description')}
                 />
               )}
+              {showWeeks && weeks.length ? (
+                <WeekdayTabs aria-label={t('workouts.assignmentWeeks')}>
+                  {weeks.map((weekStart, index) => (
+                    <WeekdayButton
+                      key={weekStart}
+                      type="button"
+                      $active={activeWeekStart === weekStart}
+                      onClick={() => setActiveWeekStart(weekStart)}
+                    >
+                      {t('workouts.weekTag', { number: index + 1 })}
+                      <WeekRange>
+                        {t('workouts.weekRange', {
+                          start: weekStart,
+                          end: utcWeekEnd(weekStart),
+                        })}
+                      </WeekRange>
+                    </WeekdayButton>
+                  ))}
+                </WeekdayTabs>
+              ) : null}
               <WeekdayTabs aria-label={t('workouts.trainingDays')}>
                 {visibleWeekdays.map((weekday) => {
-                  const count = days.find((day) => day.weekday === weekday)?.exercises.length ?? 0;
+                  const count =
+                    days.find(
+                      (day) =>
+                        day.weekday === weekday &&
+                        day.weekStartDate ===
+                          (hasAssignmentWeeks ? activeWeekStart : null),
+                    )?.exercises.length ?? 0;
+                  const logged = sessionForDay(routineSessions, activeWeekStart, weekday);
                   return (
                     <WeekdayButton
                       key={weekday}
@@ -301,11 +403,21 @@ export default function WorkoutsPage() {
                       $active={activeWeekday === weekday}
                       onClick={() => setActiveWeekday(weekday)}
                     >
-                      {dayLabel(weekday)}{count ? ` · ${count}` : ''}
+                      {dayLabel(weekday)}
+                      {logged
+                        ? ` · ${t(logged.status === 'INCOMPLETE' ? 'workouts.dayIncomplete' : 'workouts.dayDone')}`
+                        : count
+                          ? ` · ${count}`
+                          : ''}
                     </WeekdayButton>
                   );
                 })}
               </WeekdayTabs>
+              {dayLocked && activeSession?.status === 'INCOMPLETE' && activeSession.stopReason ? (
+                <DescriptionText>
+                  {t('workouts.stopReasonLabel')}: {activeSession.stopReason}
+                </DescriptionText>
+              ) : null}
               {routine.map((exercise, index) => (
                 <ExerciseCard
                   key={exercise.id}
@@ -328,10 +440,10 @@ export default function WorkoutsPage() {
                     exercise.id,
                     (item) => ({ ...item, supersetColor: color }),
                   )}
-                  readOnly={readOnly}
+                  readOnly={dayReadOnly}
                 />
               ))}
-              {!routine.length && (readOnly
+              {!routine.length && (dayReadOnly
                 ? <Status>{t('workouts.emptyDay')}</Status>
                 : <RoutineDropzone />)}
             </>}
@@ -372,6 +484,10 @@ const WeekdayTabs = styled.div`
 
 const WeekdayButton = styled.button<{ $active: boolean }>`
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
   border: 0;
   border-radius: 999px;
   padding: 0.65rem 0.85rem;
@@ -379,6 +495,12 @@ const WeekdayButton = styled.button<{ $active: boolean }>`
   color: ${({ $active }) => $active ? '#680011' : '#e7bdbb'};
   font-weight: 800;
   cursor: pointer;
+`;
+
+const WeekRange = styled.span`
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0.8;
 `;
 
 const Status = styled.p`

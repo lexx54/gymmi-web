@@ -1,4 +1,14 @@
-import { Check, Inbox, UserPlus, X } from 'lucide-react';
+import {
+  CalendarClock,
+  Check,
+  ChevronRight,
+  History,
+  Inbox,
+  NotebookPen,
+  UserPlus,
+  Users,
+  X,
+} from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -104,19 +114,36 @@ export default function ClientsPage() {
                   </EmptyState>
                 )}
               </PendingCard>
-              <CardSurface>
-                <h2>{t('contracts.roster')}</h2>
+              <PendingCard>
+                <SectionTitle>
+                  <Users size={18} color="#ffb3b1" />
+                  {t('contracts.roster')}
+                  {roster.data?.length ? <CountBadge>{roster.data.length}</CountBadge> : null}
+                </SectionTitle>
                 {roster.data?.length ? (
-                  roster.data.map((item) => (
-                    <Row key={item.client.id}>
-                      <Link to={`/clients/${item.client.id}`}>{item.client.username}</Link>
-                      <span>{item.client.email}</span>
-                    </Row>
-                  ))
+                  <PendingList>
+                    {roster.data.map((item) => (
+                      <li key={item.client.id}>
+                        <ClientRowLink to={`/clients/${item.client.id}`}>
+                          <Avatar aria-hidden>
+                            {item.client.username.slice(0, 1).toUpperCase()}
+                          </Avatar>
+                          <Identity>
+                            <ClientName>{item.client.username}</ClientName>
+                            <ClientEmail>{item.client.email}</ClientEmail>
+                          </Identity>
+                          <ChevronRight size={16} color="#9096b6" aria-hidden />
+                        </ClientRowLink>
+                      </li>
+                    ))}
+                  </PendingList>
                 ) : (
-                  <p>{t('contracts.noClients')}</p>
+                  <EmptyState>
+                    <Users size={18} />
+                    {t('contracts.noClients')}
+                  </EmptyState>
                 )}
-              </CardSurface>
+              </PendingCard>
             </>
           ) : selected ? (
             <ClientDetail item={selected} />
@@ -144,50 +171,94 @@ function ClientDetail({ item }: { item: ContractClientRoster }) {
 
   return (
     <>
-      <CardSurface>
-        <h2>{t('contracts.currentPlan')}</h2>
+      <PendingCard>
+        <SectionTitle>
+          <CalendarClock size={18} color="#ffb3b1" />
+          {t('contracts.currentPlan')}
+        </SectionTitle>
         {current ? (
-          <Row>
-            <span>{current.routine?.name ?? current.routineId}</span>
-            <span>
-              {current.startDate} – {current.endDate}
-            </span>
-            <Link to={`/workout/${current.routineId}/edit`}>{t('contracts.editPlan')}</Link>
-          </Row>
+          <PendingItem>
+            <Identity>
+              <ClientName>{current.routine?.name ?? current.routineId}</ClientName>
+              <DateRange>
+                {current.startDate} – {current.endDate}
+              </DateRange>
+            </Identity>
+            <MetaGroup>
+              <PeriodPill>{t(`workouts.periods.${current.period}`)}</PeriodPill>
+            </MetaGroup>
+            <Actions>
+              <OutlinedLink to={`/workout/${current.routineId}`}>
+                {t('contracts.viewPlan')}
+              </OutlinedLink>
+              <PrimaryLink to={`/workout/${current.routineId}/edit`}>
+                {t('contracts.editPlan')}
+              </PrimaryLink>
+            </Actions>
+          </PendingItem>
         ) : (
-          <p>{t('contracts.noCurrentPlan')}</p>
+          <EmptyState>
+            <CalendarClock size={18} />
+            {t('contracts.noCurrentPlan')}
+          </EmptyState>
         )}
-      </CardSurface>
-      <CardSurface>
-        <h2>{t('contracts.history')}</h2>
+      </PendingCard>
+      <PendingCard>
+        <SectionTitle>
+          <History size={18} color="#ffb3b1" />
+          {t('contracts.history')}
+          {item.assignments.length ? <CountBadge>{item.assignments.length}</CountBadge> : null}
+        </SectionTitle>
         {item.assignments.length ? (
-          item.assignments.map((assignment) => (
-            <Row key={assignment.id}>
-              <span>{assignment.routine?.name ?? assignment.routineId}</span>
-              <span>{t(`workouts.periods.${assignment.period}`)}</span>
-              <span>
-                {assignment.startDate} – {assignment.endDate}
-              </span>
-              <Link to={`/workout/${assignment.routineId}`}>{t('contracts.viewPlan')}</Link>
-            </Row>
-          ))
+          <PendingList>
+            {item.assignments.map((assignment) => (
+              <PendingItem key={assignment.id}>
+                <Identity>
+                  <ClientName>{assignment.routine?.name ?? assignment.routineId}</ClientName>
+                  <DateRange>
+                    {assignment.startDate} – {assignment.endDate}
+                  </DateRange>
+                </Identity>
+                <MetaGroup>
+                  <PeriodPill>{t(`workouts.periods.${assignment.period}`)}</PeriodPill>
+                </MetaGroup>
+                <Actions>
+                  <OutlinedLink to={`/workout/${assignment.routineId}`}>
+                    {t('contracts.viewPlan')}
+                  </OutlinedLink>
+                </Actions>
+              </PendingItem>
+            ))}
+          </PendingList>
         ) : (
-          <p>{t('contracts.noHistory')}</p>
+          <EmptyState>
+            <History size={18} />
+            {t('contracts.noHistory')}
+          </EmptyState>
         )}
-      </CardSurface>
-      <CardSurface>
-        <h2>{t('contracts.notes')}</h2>
+      </PendingCard>
+      <PendingCard>
+        <SectionTitle>
+          <NotebookPen size={18} color="#ffb3b1" />
+          {t('contracts.notes')}
+          {notes.length ? <CountBadge>{notes.length}</CountBadge> : null}
+        </SectionTitle>
         {notes.length ? (
-          notes.map((session) => (
-            <Row key={session.id}>
-              <span>{session.weekStartDate}</span>
-              <span>{session.stopReason}</span>
-            </Row>
-          ))
+          <PendingList>
+            {notes.map((session) => (
+              <PendingItem key={session.id}>
+                <DatePill>{session.weekStartDate}</DatePill>
+                <MessageNote>{session.stopReason}</MessageNote>
+              </PendingItem>
+            ))}
+          </PendingList>
         ) : (
-          <p>{t('contracts.noNotes')}</p>
+          <EmptyState>
+            <NotebookPen size={18} />
+            {t('contracts.noNotes')}
+          </EmptyState>
         )}
-      </CardSurface>
+      </PendingCard>
     </>
   );
 }
@@ -225,7 +296,7 @@ const PendingList = styled.ul`
   gap: 0.75rem;
 `;
 
-const PendingItem = styled.li`
+const itemSurface = `
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -234,6 +305,21 @@ const PendingItem = styled.li`
   border-radius: 1rem;
   border: 1px solid rgba(126, 136, 175, 0.16);
   background: #181a2e;
+`;
+
+const PendingItem = styled.li`
+  ${itemSurface}
+`;
+
+const ClientRowLink = styled(Link)`
+  ${itemSurface}
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &:hover {
+    border-color: rgba(255, 179, 177, 0.4);
+    background: rgba(255, 83, 90, 0.08);
+  }
 `;
 
 const Avatar = styled.div`
@@ -253,6 +339,23 @@ const Identity = styled.div`
   flex-direction: column;
   gap: 0.15rem;
   min-width: 9rem;
+`;
+
+const DateRange = styled.span`
+  color: #9096b6;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+`;
+
+const DatePill = styled.span`
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(126, 136, 175, 0.24);
+  background: rgba(126, 136, 175, 0.12);
+  color: #cfd3ea;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 `;
 
 const ClientName = styled.span`
@@ -334,6 +437,38 @@ const RejectButton = styled(ActionButton)`
   }
 `;
 
+const linkButton = `
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 150ms ease, background 150ms ease;
+`;
+
+const PrimaryLink = styled(Link)`
+  ${linkButton}
+  background: linear-gradient(135deg, #ffb3b1, #ff535a);
+  color: #1b0d12;
+
+  &:hover {
+    opacity: 0.88;
+  }
+`;
+
+const OutlinedLink = styled(Link)`
+  ${linkButton}
+  border: 1px solid rgba(126, 136, 175, 0.3);
+  color: #cfd3ea;
+
+  &:hover {
+    background: rgba(126, 136, 175, 0.12);
+  }
+`;
+
 const EmptyState = styled.p`
   display: flex;
   align-items: center;
@@ -355,15 +490,6 @@ const MessageNote = styled.p`
   color: #cfd3ea;
   font-size: 0.85rem;
   line-height: 1.4;
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid rgba(126, 136, 175, 0.14);
 `;
 
 const ErrorText = styled.p`
