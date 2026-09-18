@@ -1,3 +1,4 @@
+import { Check, Pause } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -341,17 +342,7 @@ export default function WorkoutsPage() {
                       day.exercises.length,
                   ).length,
                 })}
-                intensityLabel={
-                  dayLocked
-                    ? t(
-                        activeSession?.status === 'INCOMPLETE'
-                          ? 'workouts.dayIncomplete'
-                          : 'workouts.dayDone',
-                      )
-                    : readOnly
-                      ? t('workouts.readOnly')
-                      : t('workouts.editable')
-                }
+                intensityLabel={readOnly || dayLocked ? t('workouts.readOnly') : t('workouts.editable')}
                 onSave={handleSave}
                 isSaving={createMutation.isPending || updateMutation.isPending}
                 readOnly={readOnly}
@@ -396,19 +387,29 @@ export default function WorkoutsPage() {
                           (hasAssignmentWeeks ? activeWeekStart : null),
                     )?.exercises.length ?? 0;
                   const logged = sessionForDay(routineSessions, activeWeekStart, weekday);
+                  const statusLabel = logged
+                    ? t(
+                        logged.status === 'INCOMPLETE'
+                          ? 'workouts.dayIncomplete'
+                          : 'workouts.dayDone',
+                      )
+                    : count
+                      ? String(count)
+                      : '';
                   return (
                     <WeekdayButton
                       key={weekday}
                       type="button"
                       $active={activeWeekday === weekday}
+                      aria-label={statusLabel ? `${dayLabel(weekday)} · ${statusLabel}` : dayLabel(weekday)}
                       onClick={() => setActiveWeekday(weekday)}
                     >
-                      {dayLabel(weekday)}
-                      {logged
-                        ? ` · ${t(logged.status === 'INCOMPLETE' ? 'workouts.dayIncomplete' : 'workouts.dayDone')}`
-                        : count
-                          ? ` · ${count}`
-                          : ''}
+                      <ChipInner>
+                        {dayLabel(weekday)}
+                        {logged?.status === 'COMPLETED' ? <Check size={13} aria-hidden /> : null}
+                        {logged?.status === 'INCOMPLETE' ? <Pause size={13} aria-hidden /> : null}
+                        {!logged && count ? ` · ${count}` : null}
+                      </ChipInner>
                     </WeekdayButton>
                   );
                 })}
@@ -495,6 +496,12 @@ const WeekdayButton = styled.button<{ $active: boolean }>`
   color: ${({ $active }) => $active ? '#680011' : '#e7bdbb'};
   font-weight: 800;
   cursor: pointer;
+`;
+
+const ChipInner = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 `;
 
 const WeekRange = styled.span`
