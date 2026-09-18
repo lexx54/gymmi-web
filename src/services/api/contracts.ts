@@ -18,6 +18,7 @@ export type TrainerContract = {
   startDate: string | null;
   endDate: string | null;
   status: ContractStatus;
+  message: string | null;
   respondedAt: string | null;
   createdAt: string;
   client?: ContractParty;
@@ -48,6 +49,7 @@ export type CreateContractWrite = {
   trainerId: string;
   period: WorkoutPeriod;
   customEndDate?: string;
+  message?: string;
 };
 
 /** Lists trainers a client can request a contract with. */

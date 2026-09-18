@@ -515,6 +515,7 @@
   "contracts": {
     "pending": "Solicitudes pendientes",
     "noPending": "No hay solicitudes pendientes.",
+    "requested": "Solicitado el {{date}}",
     "roster": "Clientes",
     "noClients": "Aún no hay clientes contratados.",
     "clientMissing": "Cliente no encontrado.",
@@ -530,11 +531,19 @@
     "selectTrainer": "Selecciona un entrenador",
     "sendRequest": "Enviar solicitud",
     "requestFailed": "No se pudo enviar la solicitud.",
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "Nota opcional para tu entrenador",
     "myContracts": "Mis contratos",
     "noContracts": "Aún no hay contratos.",
     "accept": "Aceptar",
     "reject": "Rechazar",
     "cancel": "Cancelar solicitud",
-    "loadFailed": "No se pudieron cargar los contratos."
+    "loadFailed": "No se pudieron cargar los contratos.",
+    "status": {
+      "PENDING": "Pendiente",
+      "ACCEPTED": "Aceptado",
+      "REJECTED": "Rechazado",
+      "CANCELLED": "Cancelado"
+    }
   }
 }

@@ -515,6 +515,7 @@
   "contracts": {
     "pending": "Pending requests",
     "noPending": "No pending contract requests.",
+    "requested": "Requested {{date}}",
     "roster": "Clients",
     "noClients": "No contracted clients yet.",
     "clientMissing": "Client not found.",
@@ -530,11 +531,19 @@
     "selectTrainer": "Select a trainer",
     "sendRequest": "Send request",
     "requestFailed": "Could not send the contract request.",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Optional note for your trainer",
     "myContracts": "My contracts",
     "noContracts": "No contracts yet.",
     "accept": "Accept",
     "reject": "Reject",
     "cancel": "Cancel request",
-    "loadFailed": "Could not load contracts."
+    "loadFailed": "Could not load contracts.",
+    "status": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled"
+    }
   }
 }

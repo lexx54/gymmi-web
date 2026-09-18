@@ -1,3 +1,4 @@
+import { Check, Inbox, UserPlus, X } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -5,6 +6,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
 import {
   CardSurface,
+  SectionTitle,
   SettingsContent,
   SettingsMain,
   SettingsPageShell,
@@ -17,7 +19,7 @@ import type { ContractClientRoster } from '../services/api/contracts';
 /** Trainer roster: pending contracts, clients, assignment history, and session notes. */
 export default function ClientsPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { clientId } = useParams();
   const roster = useContractClients(user?.role?.name === 'Trainer');
   const mine = useMyContracts(user?.role?.name === 'Trainer');
@@ -41,25 +43,67 @@ export default function ClientsPage() {
           {roster.error ? <ErrorText>{t('contracts.loadFailed')}</ErrorText> : null}
           {!clientId ? (
             <>
-              <CardSurface>
-                <h2>{t('contracts.pending')}</h2>
+              <PendingCard>
+                <SectionTitle>
+                  <UserPlus size={18} color="#ffb3b1" />
+                  {t('contracts.pending')}
+                  {pending?.length ? <CountBadge>{pending.length}</CountBadge> : null}
+                </SectionTitle>
                 {pending?.length ? (
-                  pending.map((contract) => (
-                    <Row key={contract.id}>
-                      <span>{contract.client?.username ?? contract.clientId}</span>
-                      <span>{t(`workouts.periods.${contract.period}`)}</span>
-                      <button type="button" onClick={() => accept.mutate(contract.id)}>
-                        {t('contracts.accept')}
-                      </button>
-                      <button type="button" onClick={() => reject.mutate(contract.id)}>
-                        {t('contracts.reject')}
-                      </button>
-                    </Row>
-                  ))
+                  <PendingList>
+                    {pending.map((contract) => {
+                      const name = contract.client?.username ?? contract.clientId;
+                      const busy =
+                        (accept.isPending && accept.variables === contract.id) ||
+                        (reject.isPending && reject.variables === contract.id);
+
+                      return (
+                        <PendingItem key={contract.id}>
+                          <Avatar aria-hidden>{name.slice(0, 1).toUpperCase()}</Avatar>
+                          <Identity>
+                            <ClientName>{name}</ClientName>
+                            {contract.client?.email ? (
+                              <ClientEmail>{contract.client.email}</ClientEmail>
+                            ) : null}
+                          </Identity>
+                          <MetaGroup>
+                            <PeriodPill>{t(`workouts.periods.${contract.period}`)}</PeriodPill>
+                            <RequestedAt>
+                              {t('contracts.requested', {
+                                date: formatRequestDate(contract.createdAt, i18n.language),
+                              })}
+                            </RequestedAt>
+                          </MetaGroup>
+                          <Actions>
+                            <AcceptButton
+                              type="button"
+                              disabled={busy}
+                              onClick={() => accept.mutate(contract.id)}
+                            >
+                              <Check size={15} />
+                              {t('contracts.accept')}
+                            </AcceptButton>
+                            <RejectButton
+                              type="button"
+                              disabled={busy}
+                              onClick={() => reject.mutate(contract.id)}
+                            >
+                              <X size={15} />
+                              {t('contracts.reject')}
+                            </RejectButton>
+                          </Actions>
+                          {contract.message ? <MessageNote>{contract.message}</MessageNote> : null}
+                        </PendingItem>
+                      );
+                    })}
+                  </PendingList>
                 ) : (
-                  <p>{t('contracts.noPending')}</p>
+                  <EmptyState>
+                    <Inbox size={18} />
+                    {t('contracts.noPending')}
+                  </EmptyState>
                 )}
-              </CardSurface>
+              </PendingCard>
               <CardSurface>
                 <h2>{t('contracts.roster')}</h2>
                 {roster.data?.length ? (
@@ -83,6 +127,12 @@ export default function ClientsPage() {
       </SettingsMain>
     </SettingsPageShell>
   );
+}
+
+function formatRequestDate(value: string, locale: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(date);
 }
 
 function ClientDetail({ item }: { item: ContractClientRoster }) {
@@ -147,6 +197,164 @@ const HeaderRow = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+`;
+
+const PendingCard = styled(CardSurface)`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const CountBadge = styled.span`
+  min-width: 1.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #ffb3b1, #ff535a);
+  color: #1b0d12;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+`;
+
+const PendingList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const PendingItem = styled.li`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(126, 136, 175, 0.16);
+  background: #181a2e;
+`;
+
+const Avatar = styled.div`
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #ffb3b1, #ff535a);
+  color: #1b0d12;
+  font-size: 1rem;
+  font-weight: 700;
+`;
+
+const Identity = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 9rem;
+`;
+
+const ClientName = styled.span`
+  color: #f5f6ff;
+  font-size: 0.95rem;
+  font-weight: 600;
+`;
+
+const ClientEmail = styled.span`
+  color: #9096b6;
+  font-size: 0.78rem;
+`;
+
+const MetaGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+`;
+
+const PeriodPill = styled.span`
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 179, 177, 0.3);
+  background: rgba(255, 83, 90, 0.12);
+  color: #ffb3b1;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+`;
+
+const RequestedAt = styled.span`
+  color: #9096b6;
+  font-size: 0.75rem;
+`;
+
+const Actions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+`;
+
+const ActionButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease, background 150ms ease;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+`;
+
+const AcceptButton = styled(ActionButton)`
+  border: none;
+  background: linear-gradient(135deg, #ffb3b1, #ff535a);
+  color: #1b0d12;
+
+  &:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+`;
+
+const RejectButton = styled(ActionButton)`
+  border: 1px solid rgba(126, 136, 175, 0.3);
+  background: transparent;
+  color: #cfd3ea;
+
+  &:hover:not(:disabled) {
+    background: rgba(126, 136, 175, 0.12);
+  }
+`;
+
+const EmptyState = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1.1rem 1rem;
+  border-radius: 1rem;
+  border: 1px dashed rgba(126, 136, 175, 0.25);
+  color: #9096b6;
+  font-size: 0.85rem;
+`;
+
+const MessageNote = styled.p`
+  flex: 1 1 100%;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.7rem;
+  background: rgba(126, 136, 175, 0.1);
+  color: #cfd3ea;
+  font-size: 0.85rem;
+  line-height: 1.4;
 `;
 
 const Row = styled.div`
