@@ -55,7 +55,7 @@ describe('Sidebar', () => {
       </MemoryRouter>,
     );
 
-    fireEvent.click(screen.getByText('Sign Out'));
+    fireEvent.click(screen.getByText(/sign out/i));
 
     await vi.waitFor(() => {
       expect(mockSignOut).toHaveBeenCalledTimes(1);

@@ -13,6 +13,8 @@ Nav for all authenticated users:
 - Exercises → `/exercises`
 - Analytics → `/analytics`
 - Settings → `/settings`
+- Trainer only: Clients → `/clients`
+- Client only: Trainers → `/trainers`
 
 Admin-only section when `user.role.name === 'Admin'`:
 

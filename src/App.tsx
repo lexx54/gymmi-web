@@ -13,6 +13,8 @@ import SettingsPage from './pages/SettingsPage'
 import SignupPage from './pages/SignupPage'
 import WorkoutLibraryPage from './pages/WorkoutLibraryPage'
 import WorkoutsPage from './pages/WorkoutsPage'
+import ClientsPage from './pages/ClientsPage'
+import TrainersPage from './pages/TrainersPage'
 import AdminPermissionsPage from './pages/admin/AdminPermissionsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 
@@ -33,6 +35,9 @@ function App() {
           <Route path="/workout/new" element={<WorkoutsPage />} />
           <Route path="/workout/:id" element={<WorkoutsPage />} />
           <Route path="/workout/:id/edit" element={<WorkoutsPage />} />
+          <Route path="/clients" element={<RoleRoute role="Trainer"><ClientsPage /></RoleRoute>} />
+          <Route path="/clients/:clientId" element={<RoleRoute role="Trainer"><ClientsPage /></RoleRoute>} />
+          <Route path="/trainers" element={<RoleRoute role="Client"><TrainersPage /></RoleRoute>} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/settings" element={<SettingsPage />} />

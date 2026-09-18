@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -35,6 +35,13 @@ export function Sidebar({ username }: SidebarProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isAdmin = user?.role?.name === 'Admin';
+  const isTrainer = user?.role?.name === 'Trainer';
+  const isClient = user?.role?.name === 'Client';
+  const roleItems: SidebarItem[] = isTrainer
+    ? [{ labelKey: 'nav.clients', to: '/clients', icon: Users }]
+    : isClient
+      ? [{ labelKey: 'nav.trainers', to: '/trainers', icon: Handshake }]
+      : [];
 
   const handleSignOut = async () => {
     await signOut();
@@ -60,6 +67,17 @@ export function Sidebar({ username }: SidebarProps) {
             return (
               <li key={item.labelKey}>
                 <NavItemLink to={item.to} end>
+                  <Icon size={16} aria-hidden />
+                  <span>{t(item.labelKey)}</span>
+                </NavItemLink>
+              </li>
+            );
+          })}
+          {roleItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.labelKey}>
+                <NavItemLink to={item.to}>
                   <Icon size={16} aria-hidden />
                   <span>{t(item.labelKey)}</span>
                 </NavItemLink>

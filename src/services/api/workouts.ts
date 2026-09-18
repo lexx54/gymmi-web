@@ -74,6 +74,7 @@ export type WorkoutAssignment = {
   routineId: string;
   clientId: string;
   assignedById: string;
+  sourceRoutineId?: string | null;
   period: WorkoutPeriod;
   startDate: string;
   endDate: string;
