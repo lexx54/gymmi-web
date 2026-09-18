@@ -40,3 +40,8 @@ Sidebar is desktop-only (`display` from `1024px` up).
 
 - Nav + sign-out are real; dashboard content and streak are mock.
 - Brand label in sidebar is currently “KINETIC”.
+- Nav/sign-out labels use `1rem` with non-shrinking icons and wrappable text, so long translations (`Entrenamientos`) keep their icon and stay inside the 15.5rem rail.
+
+## Current task changes
+
+- Fixed sidebar rows squeezing their icon to zero width and overflowing on long labels.

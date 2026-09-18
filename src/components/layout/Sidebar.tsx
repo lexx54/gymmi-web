@@ -200,12 +200,21 @@ const NavItemLink = styled(NavLink)`
   gap: 0.75rem;
   border-radius: 0.8rem;
   padding: 0.92rem 0.9rem;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 500;
   text-transform: uppercase;
   text-decoration: none;
   color: #cfd4ef;
   transition: background-color 150ms ease, color 150ms ease;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 
   &:hover {
     background-color: #1b2138;
@@ -243,13 +252,23 @@ const SignOutButton = styled.button`
   border: none;
   border-radius: 0.8rem;
   padding: 0.92rem 0.9rem;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 500;
   text-transform: uppercase;
   background: transparent;
   color: #cfd4ef;
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
 
   &:hover {
     background-color: rgba(239, 35, 60, 0.12);
