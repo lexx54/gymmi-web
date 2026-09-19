@@ -1,8 +1,11 @@
+import type { PlanName } from './rbac';
+
 export type AuthUser = {
   id: string;
   email: string;
   username: string;
   hasPaid: boolean;
+  plan?: PlanName;
   role: { id: string; name: string };
 };
 

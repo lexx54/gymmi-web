@@ -7,6 +7,8 @@ import styled from 'styled-components';
 import { ExerciseCatalogCard } from '../components/exercises/ExerciseCatalogCard';
 import { ExerciseDetailModal } from '../components/exercises/ExerciseDetailModal';
 import { ExerciseBulkCsvModal } from '../components/exercises/ExerciseBulkCsvModal';
+import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
+import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { NoExercises } from '../components/exercises/NoExercises';
 import { ExercisesHeader } from '../components/exercises/ExercisesHeader';
 import {
@@ -19,6 +21,12 @@ import { Can } from '../components/Can';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
+import {
+  hasAnyEntitlementCapability,
+  isEntitlementLimitReached,
+  useEntitlements,
+} from '../hooks/usePermissions';
+import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import {
   resolveLocalizedText,
   type Exercise,
@@ -66,6 +74,31 @@ export default function ExercisesPage() {
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const { data: exercises, isLoading, isError } = useExercises();
   const bulkCsvMutation = useUploadExerciseBulkCsv();
+  const { data: entitlements } = useEntitlements();
+  const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
+  const canCreateCustomExercise =
+    !entitlements?.isCoveredClient &&
+    hasAnyEntitlementCapability(entitlements?.capabilities, ['canCreateCustomExercise', 'canCreateCustomExercises']) &&
+    !isEntitlementLimitReached(entitlements?.limits, entitlements?.usage, 'customExercises');
+
+  const requestCustomExercise = (action: 'create' | 'bulk') => {
+    if (!canCreateCustomExercise) {
+      if (entitlements?.isCoveredClient) {
+        toast.error(t('entitlements.coveredClient'));
+        return;
+      }
+      setUpsell({
+        code: 'PLAN_LIMIT',
+        resource: 'customExercises',
+        limit: entitlements?.limits?.customExercises,
+        usage: entitlements?.usage?.customExercises,
+        message: t('entitlements.customExerciseLimit'),
+      });
+      return;
+    }
+    if (action === 'create') navigate('/exercises/new');
+    else setIsBulkModalOpen(true);
+  };
 
   const catalog = useMemo(
     () =>
@@ -130,6 +163,7 @@ export default function ExercisesPage() {
       <ExercisesMain>
         <ExercisesHeader title={t('nav.exercises')} />
         <ExercisesContent>
+          <EntitlementGraceWarning />
           <HeaderRow>
             <Copy>
               <Eyebrow>{t('exercises.catalog')}</Eyebrow>
@@ -138,17 +172,23 @@ export default function ExercisesPage() {
             </Copy>
             <Can resource="exercises" action="CREATE">
               <ActionGroup>
-                <SecondaryButton type="button" onClick={() => setIsBulkModalOpen(true)}>
+                <SecondaryButton type="button" onClick={() => requestCustomExercise('bulk')}>
                   <Upload size={16} />
                   {t('exercises.bulkCsv')}
                 </SecondaryButton>
-                <CreateButton type="button" onClick={() => navigate('/exercises/new')}>
+                <CreateButton type="button" onClick={() => requestCustomExercise('create')}>
                   <Plus size={16} />
                   {t('exercises.createExercise')}
                 </CreateButton>
               </ActionGroup>
             </Can>
           </HeaderRow>
+          {typeof entitlements?.limits?.customExercises === 'number' ? (
+            <UsageText>{t('entitlements.exerciseUsage', {
+              usage: entitlements.usage?.customExercises ?? 0,
+              limit: entitlements.limits.customExercises,
+            })}</UsageText>
+          ) : null}
 
           <FilterPanel aria-label={t('exercises.catalogFilters')}>
             <SearchField
@@ -259,8 +299,8 @@ export default function ExercisesPage() {
                       ? 'empty'
                       : 'no-results'
               }
-              onCreateExercise={() => navigate('/exercises/new')}
-              onBulkUpload={() => setIsBulkModalOpen(true)}
+              onCreateExercise={() => requestCustomExercise('create')}
+              onBulkUpload={() => requestCustomExercise('bulk')}
               onClearSearch={clearFilters}
             />
           )}
@@ -282,11 +322,22 @@ export default function ExercisesPage() {
               onSuccess: (result) => {
                 toast.success(t('exercises.createdCsv', { count: result.created }));
               },
-              onError: () => {
-                toast.error(t('exercises.csvFailed'));
+              onError: (error) => {
+                const details = getApiErrorDetails(error);
+                if (details?.code === 'PLAN_LIMIT') {
+                  setIsBulkModalOpen(false);
+                  setUpsell(details);
+                } else {
+                  toast.error(getApiErrorMessage(error, t('exercises.csvFailed')));
+                }
               },
             })
           }
+        />
+        <PlusUpsellModal
+          isOpen={Boolean(upsell)}
+          details={upsell ?? undefined}
+          onClose={() => setUpsell(null)}
         />
       </ExercisesMain>
     </ExercisesPageShell>
@@ -304,6 +355,12 @@ const HeaderRow = styled.div`
     flex-direction: row;
     align-items: flex-end;
   }
+`;
+
+const UsageText = styled.p`
+  margin: 0;
+  color: #e7bdbb;
+  font-size: 0.85rem;
 `;
 
 const Copy = styled.div`

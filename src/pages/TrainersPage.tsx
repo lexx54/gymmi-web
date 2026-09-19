@@ -2,6 +2,8 @@ import { Inbox, Send, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
 import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
 import {
@@ -19,6 +21,8 @@ import {
   useMyContracts,
   useRespondContract,
 } from '../hooks/useContracts';
+import { useEntitlements } from '../hooks/usePermissions';
+import { getApiErrorMessage } from '../services/api/errors';
 import { WORKOUT_PERIODS, type WorkoutPeriod } from '../services/api/workouts';
 import type { ContractStatus } from '../services/api/contracts';
 
@@ -29,13 +33,15 @@ export default function TrainersPage() {
   const trainers = useContractTrainers(user?.role?.name === 'Client');
   const contracts = useMyContracts(user?.role?.name === 'Client');
   const create = useCreateContract();
-  const { cancel } = useRespondContract();
+  const { cancel, end } = useRespondContract();
+  const { data: entitlements } = useEntitlements();
   const [trainerId, setTrainerId] = useState('');
   const [period, setPeriod] = useState<WorkoutPeriod>('MONTH');
   const [customEndDate, setCustomEndDate] = useState('');
   const [message, setMessage] = useState('');
   const username = user?.username ?? 'Alex';
   const canRequest =
+    !entitlements?.isCoveredClient &&
     Boolean(trainerId) && (period !== 'CUSTOM' || Boolean(customEndDate)) && !create.isPending;
 
   const request = () => {
@@ -49,7 +55,10 @@ export default function TrainersPage() {
         customEndDate: period === 'CUSTOM' ? customEndDate : undefined,
         message: message.trim() || undefined,
       },
-      { onSuccess: () => setMessage('') },
+      {
+        onSuccess: () => setMessage(''),
+        onError: (error) => toast.error(getApiErrorMessage(error, t('contracts.requestFailed'))),
+      },
     );
   };
 
@@ -62,6 +71,7 @@ export default function TrainersPage() {
           <TopBar />
         </HeaderRow>
         <SettingsContent>
+          <EntitlementGraceWarning />
           <StyledCard>
             <SectionTitle>
               <Send size={18} color="#ffb3b1" />
@@ -124,7 +134,7 @@ export default function TrainersPage() {
               <Send size={15} />
               {t('contracts.sendRequest')}
             </SendButton>
-            {create.error ? <ErrorText>{t('contracts.requestFailed')}</ErrorText> : null}
+            {entitlements?.isCoveredClient ? <ErrorText>{t('entitlements.coveredContract')}</ErrorText> : null}
           </StyledCard>
           <StyledCard>
             <SectionTitle>
@@ -165,6 +175,19 @@ export default function TrainersPage() {
                           >
                             <X size={15} />
                             {t('contracts.cancel')}
+                          </RejectButton>
+                        </Actions>
+                      ) : contract.status === 'ACCEPTED' ? (
+                        <Actions>
+                          <RejectButton
+                            type="button"
+                            disabled={end.isPending && end.variables === contract.id}
+                            onClick={() => end.mutate(contract.id, {
+                              onError: (error) => toast.error(getApiErrorMessage(error, t('contracts.endFailed'))),
+                            })}
+                          >
+                            <X size={15} />
+                            {t('contracts.end')}
                           </RejectButton>
                         </Actions>
                       ) : null}

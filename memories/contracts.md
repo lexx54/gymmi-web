@@ -1,6 +1,6 @@
 # Contracts Module
 
-Trainer Clients page (`/clients`, `/clients/:id`) and client Trainers page (`/trainers`). Basic list/detail: pending accept/reject, roster, assignment history, session stop notes, edit assignment fork via `/workout/:id/edit`. Clients request/cancel contracts.
+Trainer Clients page (`/clients`, `/clients/:id`) and client Trainers page (`/trainers`). Includes pending accept/reject, roster, assignment history, session stop notes, assignment-fork editing, client request/cancel, and accepted-contract End.
 
 ## Key files
 
@@ -19,3 +19,4 @@ Trainer Clients page (`/clients`, `/clients/:id`) and client Trainers page (`/tr
 - Client `/trainers` uses the same card language: selectable trainer rows with avatar + email, period chips, optional message textarea, gradient Send, contract rows with period/status pills, requested date, client message, outlined Cancel, dashed empty states. Status copy lives in `contracts.status.*`.
 - Trainer pending rows show the client message when present.
 - Restyled the remaining `/clients` cards (roster, current assignment, history, session notes) to match the pending-request card; no new i18n keys were needed.
+- Trainer seat usage comes from entitlements. Full-seat accepts open the Plus modal, server messages remain authoritative, covered clients cannot request a second trainer, and successful accept/end/request mutations refresh entitlement state.

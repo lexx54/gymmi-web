@@ -25,13 +25,13 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 - Read-only detail view: `WorkoutsBuilderGrid` takes `$singleColumn` (one `minmax(0, 64rem)` track) because the library pane is not rendered; the description becomes a text block, weekday tabs list only days that have exercises, empty days show `workouts.emptyDay`, and `SetRow` renders static values with no remove column or `min-width` on the set table instead of disabled inputs. The title stays a disabled input (Playwright asserts `getByLabel('Routine title')` value + disabled state).
 - Trainers assign only contracted eligible clients. Assign creates a per-assignment routine fork; edit that fork from Clients detail without changing the library template. Current assignment shows View (`/workout/:forkId`) and Edit (`/workout/:forkId/edit`).
 - Assignment forks return an `assignment` window on `GET /workouts/:id`. The builder shows week tags for Mondays overlapping `startDate`–`endDate`; each week owns independent day/exercise/set data through `WorkoutDay.weekStartDate`. A logged client day (`COMPLETED` or `INCOMPLETE`) makes that weekday read-only only in that calendar week. Trainer weekday chips use a check icon for completed and a pause icon for incomplete, matching mobile. Trainer session list is `GET /workouts/:id/sessions`.
-- Share/assign/self-assign failures in `WorkoutLibraryPage` toast the API's own message (`response.data.message`, first entry when validation returns an array), falling back to `workouts.<mode>Failed`. This is what makes payment gating legible: those endpoints are `@RequiresPayment()`, so an unpaid trainer or client gets 402 `PAYMENT_REQUIRED` ("Payment required to access this resource") instead of a generic toast. Admins bypass the guard; everyone else needs `hasPaid` true (Admin → Users page).
+- Create/edit/share/self-assign controls use optional entitlement capabilities and template usage as advisory hints. `PLAN_LIMIT` opens the shared Plus modal with API details; coverage and other failures display the API message. Assignment-fork editing remains available when `canEditAssignmentFork` allows it.
 - Client actions: self-assignment with WEEK/BIWEEK/MONTH/TRIMESTER/CUSTOM periods. The current assignment is highlighted in the library and dashboard.
 - Dashboard: `ActiveWorkoutCard` links the single active client assignment to read-only detail.
 
 ## Current task changes
 
-- Added independent assignment-week data and per-calendar-day lock on the builder/detail. Editing Week 1 Monday does not alter another week's Monday. Clients page current assignment has View plus Edit.
+- Added independent assignment-week data and per-calendar-day lock on the builder/detail. Added Free/Plus action hints, quota handling, downgrade warning, exact API-message handling, and entitlement cache refreshes. Active workout access remains independent of `hasPaid`.
 
 ## Key files
 
@@ -45,7 +45,7 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 
 - Typed API supports routine CRUD, shares, trainer assignment, self-assignment, active assignment, and eligible user lists.
 - React Query invalidates routine/detail and active-assignment caches after writes.
-- API permission/payment failures remain authoritative; UI action visibility additionally follows role and routine ownership.
+- API entitlement/authorization failures remain authoritative; UI action visibility additionally follows role, routine ownership, and the optional `/me/permissions` snapshot.
 - Sidebar nav points to `/workout`.
 
 ## Constraints

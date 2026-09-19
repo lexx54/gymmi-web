@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: payload.email,
         username: payload.username ?? payload.email,
         hasPaid: payload.hasPaid ?? false,
+        plan: payload.plan,
         role: { id: payload.roleId ?? '', name: payload.roleName ?? '' },
       });
     } catch {

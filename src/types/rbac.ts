@@ -10,6 +10,48 @@ export type PermissionCell = {
   allowed: boolean;
 };
 
+export type PlanName = 'free' | 'plus';
+
+export type EntitlementResource =
+  | 'templates'
+  | 'trainerSeats'
+  | 'customExercises'
+  | 'sharing';
+
+export type EntitlementCapabilities = {
+  canCreateTemplate?: boolean;
+  canEditTemplate?: boolean;
+  canEditOwnedTemplate?: boolean;
+  canEditAssignmentFork?: boolean;
+  canShare?: boolean;
+  canAssign?: boolean;
+  canSelfBuild?: boolean;
+  canSelfAssign?: boolean;
+  canCreateCustomExercise?: boolean;
+  canCreateCustomExercises?: boolean;
+  [capability: string]: boolean | undefined;
+};
+
+export type EntitlementAmounts = Partial<
+  Record<Exclude<EntitlementResource, 'sharing'>, number>
+>;
+
+export type EntitlementSnapshot = {
+  capabilities?: EntitlementCapabilities;
+  limits?: EntitlementAmounts;
+  usage?: EntitlementAmounts;
+  isCoveredClient?: boolean;
+  downgradeEffectiveAt?: string | null;
+};
+
+export type MyPermissionsResponse = {
+  permissions: PermissionCell[];
+  hasPaid?: boolean;
+  plan?: PlanName;
+  role?: RoleName | string;
+  entitlements?: EntitlementSnapshot | null;
+};
+
 export type RoleDto = {
   id: string;
   name: RoleName;
@@ -30,6 +72,9 @@ export type AdminUserDto = {
   username: string;
   isActive: boolean;
   hasPaid: boolean;
+  plan?: PlanName;
+  entitlementDowngradedAt?: string | null;
+  downgradeEffectiveAt?: string | null;
   roleId: string;
   role: { id: string; name: string };
   createdAt: string;

@@ -18,7 +18,7 @@ Shared Axios client with auth header injection and refresh-token queueing, plus 
 |------|---------|
 | `auth.ts` | Login, signup, logout, refresh, forgot/reset |
 | `exercises.ts` | CRUD + bulk CSV |
-| `permissions.ts` | `GET /me/permissions` |
+| `permissions.ts` | `GET /me/permissions` full permissions/plan/entitlement response |
 | `admin.ts` | Roles, role permissions, users |
 
 Storage: `src/services/storage/tokenStorage.ts` (access + refresh tokens in localStorage).
@@ -27,4 +27,5 @@ Storage: `src/services/storage/tokenStorage.ts` (access + refresh tokens in loca
 
 - Keep refresh logic only in `client.ts` — do not duplicate elsewhere.
 - Tests: `client.test.ts`, `auth.test.ts`, `exercises.test.ts`.
-- Only modules above call the backend; workouts/settings/analytics have no API modules.
+- Workouts and contracts also have API modules; settings/analytics remain mock UI.
+- `errors.ts` normalizes structured API error details and `response.data.message` (including validation arrays) for entitlement-aware surfaces.

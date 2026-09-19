@@ -15,7 +15,7 @@ Sidebar shows Admin section only when `user.role.name === 'Admin'`.
 
 ## Main flows
 
-- **Users:** Paginated table; inline role select, active checkbox, paid checkbox → `PATCH /admin/users/:id` (`roleId`, `isActive`, `hasPaid`).
+- **Users:** Paginated table; inline role select, active checkbox, and Free/Plus checkbox → `PATCH /admin/users/:id` (`roleId`, `isActive`, `hasPaid`). Rows display the derived plan and optional downgrade grace time.
 - **Permissions:** Select non-system role → checkbox matrix → `PUT /admin/roles/:roleId/permissions`.
 
 ## Key files
@@ -38,7 +38,7 @@ Sidebar shows Admin section only when `user.role.name === 'Admin'`.
 - Reuses exercises page shell (`ExercisesPageShell`, `ExercisesHeader`) for layout consistency.
 - System roles excluded from permissions editor; save disabled for system roles.
 - Default selected role: first non-system role.
-- `hasPaid` is admin-toggled here — primary frontend surface for the payment flag.
+- `hasPaid` remains the Admin write field, but the UI labels it Free/Plus and reads optional derived plan/grace metadata. Downgrade-block API messages are displayed verbatim.
 - Fully real API integration.
 
 ## E2E

@@ -59,6 +59,7 @@ export type WorkoutRoutine = {
   name: string;
   description: string | null;
   createdById: string;
+  forkedFromId?: string | null;
   days: WorkoutDay[];
   createdAt: string;
   updatedAt: string;

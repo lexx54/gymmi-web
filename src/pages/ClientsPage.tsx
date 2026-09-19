@@ -10,8 +10,12 @@ import {
   X,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
+import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
 import {
@@ -24,6 +28,8 @@ import {
 } from '../components/settings/SettingsShell';
 import { useAuth } from '../context/AuthContext';
 import { useContractClients, useMyContracts, useRespondContract } from '../hooks/useContracts';
+import { isEntitlementLimitReached, useEntitlements } from '../hooks/usePermissions';
+import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import type { ContractClientRoster } from '../services/api/contracts';
 
 /** Trainer roster: pending contracts, clients, assignment history, and session notes. */
@@ -34,9 +40,36 @@ export default function ClientsPage() {
   const roster = useContractClients(user?.role?.name === 'Trainer');
   const mine = useMyContracts(user?.role?.name === 'Trainer');
   const { accept, reject } = useRespondContract();
+  const { data: entitlements } = useEntitlements();
+  const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
   const username = user?.username ?? 'Alex';
   const selected = roster.data?.find((item) => item.client.id === clientId);
   const pending = mine.data?.filter((contract) => contract.status === 'PENDING');
+  const seatsFull = isEntitlementLimitReached(
+    entitlements?.limits,
+    entitlements?.usage,
+    'trainerSeats',
+  );
+
+  const acceptContract = (id: string) => {
+    if (seatsFull) {
+      setUpsell({
+        code: 'PLAN_LIMIT',
+        resource: 'trainerSeats',
+        limit: entitlements?.limits?.trainerSeats,
+        usage: entitlements?.usage?.trainerSeats,
+        message: t('entitlements.trainerSeats'),
+      });
+      return;
+    }
+    accept.mutate(id, {
+      onError: (error) => {
+        const details = getApiErrorDetails(error);
+        if (details?.code === 'PLAN_LIMIT') setUpsell(details);
+        else toast.error(getApiErrorMessage(error, t('contracts.acceptFailed')));
+      },
+    });
+  };
 
   return (
     <SettingsPageShell>
@@ -49,6 +82,13 @@ export default function ClientsPage() {
           <TopBar />
         </HeaderRow>
         <SettingsContent>
+          <EntitlementGraceWarning />
+          {typeof entitlements?.limits?.trainerSeats === 'number' ? (
+            <UsageText>{t('entitlements.seatUsage', {
+              usage: entitlements.usage?.trainerSeats ?? 0,
+              limit: entitlements.limits.trainerSeats,
+            })}</UsageText>
+          ) : null}
           {roster.isLoading ? <p>{t('common.loading')}</p> : null}
           {roster.error ? <ErrorText>{t('contracts.loadFailed')}</ErrorText> : null}
           {!clientId ? (
@@ -88,7 +128,7 @@ export default function ClientsPage() {
                             <AcceptButton
                               type="button"
                               disabled={busy}
-                              onClick={() => accept.mutate(contract.id)}
+                              onClick={() => acceptContract(contract.id)}
                             >
                               <Check size={15} />
                               {t('contracts.accept')}
@@ -152,6 +192,11 @@ export default function ClientsPage() {
           ) : null}
         </SettingsContent>
       </SettingsMain>
+      <PlusUpsellModal
+        isOpen={Boolean(upsell)}
+        details={upsell ?? undefined}
+        onClose={() => setUpsell(null)}
+      />
     </SettingsPageShell>
   );
 }
@@ -164,6 +209,8 @@ function formatRequestDate(value: string, locale: string) {
 
 function ClientDetail({ item }: { item: ContractClientRoster }) {
   const { t } = useTranslation();
+  const { end } = useRespondContract();
+  const acceptedContract = item.contracts.find((contract) => contract.status === 'ACCEPTED');
   const notes = item.sessions.filter(
     (session) => session.status === 'INCOMPLETE' && session.stopReason,
   );
@@ -194,6 +241,17 @@ function ClientDetail({ item }: { item: ContractClientRoster }) {
               <PrimaryLink to={`/workout/${current.routineId}/edit`}>
                 {t('contracts.editPlan')}
               </PrimaryLink>
+              {acceptedContract ? (
+                <RejectButton
+                  type="button"
+                  disabled={end.isPending}
+                  onClick={() => end.mutate(acceptedContract.id, {
+                    onError: (error) => toast.error(getApiErrorMessage(error, t('contracts.endFailed'))),
+                  })}
+                >
+                  {t('contracts.end')}
+                </RejectButton>
+              ) : null}
             </Actions>
           </PendingItem>
         ) : (
@@ -202,6 +260,19 @@ function ClientDetail({ item }: { item: ContractClientRoster }) {
             {t('contracts.noCurrentPlan')}
           </EmptyState>
         )}
+        {acceptedContract && !current ? (
+          <Actions>
+            <RejectButton
+              type="button"
+              disabled={end.isPending}
+              onClick={() => end.mutate(acceptedContract.id, {
+                onError: (error) => toast.error(getApiErrorMessage(error, t('contracts.endFailed'))),
+              })}
+            >
+              {t('contracts.end')}
+            </RejectButton>
+          </Actions>
+        ) : null}
       </PendingCard>
       <PendingCard>
         <SectionTitle>
@@ -268,6 +339,12 @@ const HeaderRow = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+`;
+
+const UsageText = styled.p`
+  margin: 0;
+  color: #e7bdbb;
+  font-size: 0.85rem;
 `;
 
 const PendingCard = styled(CardSurface)`

@@ -10,6 +10,7 @@ import {
   type Exercise,
   type UpdateExerciseParams,
 } from '../services/api/exercises';
+import { myPermissionsQueryKey } from './usePermissions';
 
 const exercisesQueryKey = ['exercises'] as const;
 
@@ -41,6 +42,7 @@ export function useCreateExercise() {
     mutationFn: (params: CreateExerciseParams) => createExercise(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: exercisesQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
     },
   });
 }
@@ -53,6 +55,7 @@ export function useUpdateExercise() {
       updateExercise(id, params),
     onSuccess: (exercise) => {
       queryClient.invalidateQueries({ queryKey: exercisesQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
       queryClient.setQueryData(exerciseQueryKey(exercise.id), exercise);
     },
   });
@@ -65,6 +68,7 @@ export function useDeleteExercise() {
     mutationFn: (id: string) => deleteExercise(id),
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: exercisesQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
       queryClient.removeQueries({ queryKey: exerciseQueryKey(id) });
     },
   });
@@ -77,6 +81,7 @@ export function useUploadExerciseBulkCsv() {
     mutationFn: uploadExerciseBulkCsv,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: exercisesQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
     },
   });
 }

@@ -4,6 +4,7 @@ import {
   acceptContract,
   cancelContract,
   createContract,
+  endContract,
   fetchContractClients,
   fetchContractTrainers,
   fetchMyContracts,
@@ -36,6 +37,7 @@ describe('contracts API', () => {
     await acceptContract('c1');
     await rejectContract('c1');
     await cancelContract('c1');
+    await endContract('c1');
 
     expect(get.mock.calls.map((call) => call[0])).toEqual([
       '/contracts/trainers',
@@ -47,5 +49,6 @@ describe('contracts API', () => {
       period: 'WEEK',
     });
     expect(post).toHaveBeenCalledWith('/contracts/c1/accept');
+    expect(post).toHaveBeenCalledWith('/contracts/c1/end');
   });
 });

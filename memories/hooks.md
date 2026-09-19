@@ -17,6 +17,7 @@ Cross-cutting React Query / mutation hooks that wrap API services for pages and 
 ## Pattern
 
 - Queries for reads; mutations invalidate related query keys.
+- Workout, contract, and exercise writes also invalidate `['me', 'permissions']` so entitlement usage/capability hints refresh.
 - Auth login goes through `AuthContext.signIn`; signup page uses `signupApi` via `useSignup` without auto-login.
 
 ## Key files
@@ -26,4 +27,4 @@ Cross-cutting React Query / mutation hooks that wrap API services for pages and 
 
 ## Constraints
 
-- No workout/settings/analytics hooks (those features are mock UI).
+- Workout and contract hooks are API-backed. Settings/analytics remain mock UI.

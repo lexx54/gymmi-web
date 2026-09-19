@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ActivationMapCard, suggestSecondaryStabilizers } from '../components/exercises/ActivationMapCard';
+import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
+import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { BasicInfoCard } from '../components/exercises/BasicInfoCard';
 import { BuilderPageHeader } from '../components/exercises/BuilderPageHeader';
 import { DifficultyMovementCard } from '../components/exercises/DifficultyMovementCard';
@@ -30,9 +32,15 @@ import type {
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useCreateExercise } from '../hooks/useExercises';
+import {
+  hasAnyEntitlementCapability,
+  isEntitlementLimitReached,
+  useEntitlements,
+} from '../hooks/usePermissions';
 import { useListEquipments, useListMuscles } from '../hooks/useListData';
 import { useCreateTag, useTags } from '../hooks/useTags';
 import type { CreateExerciseParams } from '../services/api/exercises';
+import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -78,11 +86,13 @@ export default function ExerciseBuilderPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const createExercise = useCreateExercise();
+  const { data: entitlements } = useEntitlements();
   const { data: catalogTags = [] } = useTags();
   const createTag = useCreateTag();
   const username = user?.username ?? 'Alex';
   const [draft, setDraft] = useState<ExerciseDraft>(INITIAL_DRAFT);
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
+  const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
   const { data: equipments } = useListEquipments();
   const { data: muscles } = useListMuscles();
   const equipmentOptions = equipments?.map((e) => e.name);
@@ -92,6 +102,25 @@ export default function ExerciseBuilderPage() {
     [muscles],
   );
   const prevMuscleKeyRef = useRef('');
+  const canCreateCustomExercise =
+    !entitlements?.isCoveredClient &&
+    hasAnyEntitlementCapability(entitlements?.capabilities, ['canCreateCustomExercise', 'canCreateCustomExercises']) &&
+    !isEntitlementLimitReached(entitlements?.limits, entitlements?.usage, 'customExercises');
+
+  useEffect(() => {
+    if (entitlements && !canCreateCustomExercise) {
+      queueMicrotask(() => {
+        if (entitlements.isCoveredClient) toast.error(t('entitlements.coveredClient'));
+        else setUpsell({
+          code: 'PLAN_LIMIT',
+          resource: 'customExercises',
+          limit: entitlements.limits?.customExercises,
+          usage: entitlements.usage?.customExercises,
+          message: t('entitlements.customExerciseLimit'),
+        });
+      });
+    }
+  }, [canCreateCustomExercise, entitlements, t]);
 
   useEffect(() => {
     if (!muscles?.length) return;
@@ -181,6 +210,20 @@ export default function ExerciseBuilderPage() {
   };
 
   const handlePublish = () => {
+    if (!canCreateCustomExercise) {
+      if (entitlements?.isCoveredClient) {
+        toast.error(t('entitlements.coveredClient'));
+        return;
+      }
+      setUpsell({
+        code: 'PLAN_LIMIT',
+        resource: 'customExercises',
+        limit: entitlements?.limits?.customExercises,
+        usage: entitlements?.usage?.customExercises,
+        message: t('entitlements.customExerciseLimit'),
+      });
+      return;
+    }
     if (!draft.name.trim()) {
       toast.error(t('exercises.nameRequired'));
       return;
@@ -195,8 +238,10 @@ export default function ExerciseBuilderPage() {
         toast.success(t('exercises.published'));
         navigate('/exercises');
       },
-      onError: () => {
-        toast.error(t('exercises.publishFailed'));
+      onError: (error) => {
+        const details = getApiErrorDetails(error);
+        if (details?.code === 'PLAN_LIMIT') setUpsell(details);
+        else toast.error(getApiErrorMessage(error, t('exercises.publishFailed')));
       },
     });
   };
@@ -207,6 +252,7 @@ export default function ExerciseBuilderPage() {
       <ExercisesMain>
         <ExercisesHeader title={t('workouts.builderTitle')} />
         <ExercisesContent>
+          <EntitlementGraceWarning />
           <BuilderPageHeader
             onDiscard={handleDiscard}
             onPublish={handlePublish}
@@ -261,6 +307,11 @@ export default function ExerciseBuilderPage() {
         isSaving={createTag.isPending}
         onClose={() => setIsCreateTagOpen(false)}
         onSubmit={handleCreateTag}
+      />
+      <PlusUpsellModal
+        isOpen={Boolean(upsell)}
+        details={upsell ?? undefined}
+        onClose={() => setUpsell(null)}
       />
     </ExercisesPageShell>
   );

@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { fetchAdminUsers, fetchRoles, patchAdminUser } from '../../services/api/admin';
+import { getApiErrorMessage } from '../../services/api/errors';
 import type { PaginatedUsers, RoleDto } from '../../types/rbac';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { useAuth } from '../../context/AuthContext';
@@ -42,8 +43,7 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
     onError: (err) => {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(msg ?? t('admin.userUpdateFailed'));
+      toast.error(getApiErrorMessage(err, t('admin.userUpdateFailed')));
     },
   });
 
@@ -67,7 +67,7 @@ export default function AdminUsersPage() {
                       <Th>{t('admin.email')}</Th>
                       <Th>{t('admin.role')}</Th>
                       <Th>{t('admin.active')}</Th>
-                      <Th>{t('admin.paid')}</Th>
+                      <Th>{t('admin.plan')}</Th>
                     </tr>
                   </thead>
                   <tbody>
@@ -103,9 +103,13 @@ export default function AdminUsersPage() {
                           />
                         </Td>
                         <Td>
+                          <PlanLabel $plus={(u.plan ?? (u.hasPaid ? 'plus' : 'free')) === 'plus'}>
+                            {t(`entitlements.${u.plan ?? (u.hasPaid ? 'plus' : 'free')}`)}
+                          </PlanLabel>
                           <input
                             type="checkbox"
                             checked={u.hasPaid}
+                            aria-label={t('admin.togglePlan', { username: u.username })}
                             onChange={(e) =>
                               patchMutation.mutate({
                                 userId: u.id,
@@ -114,6 +118,13 @@ export default function AdminUsersPage() {
                             }
                             style={{ accentColor: '#ff535a', width: 18, height: 18 }}
                           />
+                          {u.downgradeEffectiveAt ? (
+                            <GraceText>
+                              {t('admin.graceUntil', {
+                                date: new Date(u.downgradeEffectiveAt).toLocaleString(),
+                              })}
+                            </GraceText>
+                          ) : null}
                         </Td>
                       </tr>
                     ))}
@@ -166,6 +177,21 @@ const Td = styled.td`
   color: #e0e0fc;
   font-size: 0.9rem;
   border-bottom: 1px solid #1c1e32;
+`;
+
+const PlanLabel = styled.span<{ $plus: boolean }>`
+  display: inline-block;
+  min-width: 2.8rem;
+  margin-right: 0.65rem;
+  color: ${({ $plus }) => ($plus ? '#9ee0c0' : '#e7bdbb')};
+  font-size: 0.78rem;
+  font-weight: 800;
+`;
+
+const GraceText = styled.small`
+  display: block;
+  margin-top: 0.3rem;
+  color: #ffc774;
 `;
 
 const RoleSelect = styled.select`

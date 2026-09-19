@@ -1,0 +1,179 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PlusUpsellModal > renders API limit details and closes accessibly 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdnAzI gTlocx"
+    role="presentation"
+  >
+    <div
+      aria-describedby="modal-description"
+      aria-labelledby="modal-title"
+      aria-modal="true"
+      class="sc-gtstET jvZYDa"
+      role="dialog"
+    >
+      <header
+        class="sc-dlnkDq hDsyXa"
+      >
+        <div>
+          <h2
+            class="sc-hKFxUR bmCGMH"
+            id="modal-title"
+          >
+            Unlock more with Plus
+          </h2>
+          <p
+            class="sc-eCAoTo gSeimc"
+            id="modal-description"
+          >
+            Free includes two routines.
+          </p>
+        </div>
+        <button
+          aria-label="Close modal"
+          class="sc-jSFhYz gWcoOr"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-x"
+            fill="none"
+            height="18"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 6 6 18"
+            />
+            <path
+              d="m6 6 12 12"
+            />
+          </svg>
+        </button>
+      </header>
+      <div
+        class="sc-gKzYWW bpVkyZ"
+      >
+        <p
+          class="sc-iCoKjR dmQqjQ"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sparkles"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+            />
+            <path
+              d="M20 2v4"
+            />
+            <path
+              d="M22 4h-4"
+            />
+            <circle
+              cx="4"
+              cy="20"
+              r="2"
+            />
+          </svg>
+          Plus
+        </p>
+        <ul
+          class="sc-fujBio ca-deeu"
+        >
+          <li>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-check"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 6 9 17l-5-5"
+              />
+            </svg>
+            Up to 8 routine templates
+          </li>
+          <li>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-check"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 6 9 17l-5-5"
+              />
+            </svg>
+            Up to 5 private custom exercises
+          </li>
+          <li>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-check"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 6 9 17l-5-5"
+              />
+            </svg>
+            Routine sharing and trainer template editing
+          </li>
+        </ul>
+        <p
+          class="sc-pNYLI dekHZJ"
+        >
+          2 of 2 used
+        </p>
+        <div
+          class="sc-jrsLQV ilJpZS"
+        >
+          <button
+            class="sc-kEqYZi ibRmFl"
+            type="button"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -3,12 +3,14 @@ import {
   acceptContract,
   cancelContract,
   createContract,
+  endContract,
   fetchContractClients,
   fetchContractTrainers,
   fetchMyContracts,
   rejectContract,
   type CreateContractWrite,
 } from '../services/api/contracts';
+import { myPermissionsQueryKey } from './usePermissions';
 
 export const myContractsQueryKey = ['contracts', 'me'] as const;
 export const contractClientsQueryKey = ['contracts', 'clients'] as const;
@@ -44,6 +46,7 @@ export function useCreateContract() {
     mutationFn: (params: CreateContractWrite) => createContract(params),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: myContractsQueryKey });
+      void queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
     },
   });
 }
@@ -53,10 +56,13 @@ export function useRespondContract() {
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: myContractsQueryKey });
     void queryClient.invalidateQueries({ queryKey: contractClientsQueryKey });
+    void queryClient.invalidateQueries({ queryKey: contractTrainersQueryKey });
+    void queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
   };
   return {
     accept: useMutation({ mutationFn: acceptContract, onSuccess: invalidate }),
     reject: useMutation({ mutationFn: rejectContract, onSuccess: invalidate }),
     cancel: useMutation({ mutationFn: cancelContract, onSuccess: invalidate }),
+    end: useMutation({ mutationFn: endContract, onSuccess: invalidate }),
   };
 }

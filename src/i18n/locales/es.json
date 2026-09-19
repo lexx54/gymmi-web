@@ -5,6 +5,7 @@
     "and": "y",
     "back": "Atrás",
     "cancel": "Cancelar",
+    "close": "Cerrar",
     "closeModal": "Cerrar modal",
     "disabled": "Desactivado",
     "enabled": "Activado",
@@ -509,6 +510,9 @@
     "role": "Rol",
     "active": "Activo",
     "paid": "Pagado",
+    "plan": "Free / Plus",
+    "togglePlan": "Cambiar plan de {{username}}",
+    "graceUntil": "Gracia hasta {{date}}",
     "resource": "Recurso",
     "userManagement": "Gestión de usuarios",
     "rolePermissions": "Permisos de rol",
@@ -537,6 +541,9 @@
     "selectTrainer": "Selecciona un entrenador",
     "sendRequest": "Enviar solicitud",
     "requestFailed": "No se pudo enviar la solicitud.",
+    "acceptFailed": "No se pudo aceptar el contrato.",
+    "end": "Finalizar contrato",
+    "endFailed": "No se pudo finalizar el contrato.",
     "messageLabel": "Mensaje",
     "messagePlaceholder": "Nota opcional para tu entrenador",
     "myContracts": "Mis contratos",
@@ -550,6 +557,29 @@
       "ACCEPTED": "Aceptado",
       "REJECTED": "Rechazado",
       "CANCELLED": "Cancelado"
+      ,"ENDED": "Finalizado"
+    }
+  },
+  "entitlements": {
+    "free": "Free",
+    "plus": "Plus",
+    "upsellTitle": "Obtén más con Plus",
+    "usage": "{{usage}} de {{limit}} usados",
+    "trainerTemplateLimit": "Puedes mantener dos rutinas con Free. Plus incluye 8 rutinas y 5 ejercicios personalizados.",
+    "clientTemplateLimit": "Puedes mantener una rutina con Free. Plus incluye 8 rutinas y 5 ejercicios personalizados.",
+    "trainerSeats": "Free incluye 2 clientes aceptados. Plus incluye hasta 8.",
+    "customExerciseLimit": "Plus incluye hasta 5 ejercicios personalizados.",
+    "sharing": "Compartir rutinas y editar plantillas de entrenador están incluidos con Plus.",
+    "editTemplate": "Editar plantillas de entrenador está incluido con Plus.",
+    "coveredClient": "Tu entrenador administra tu plan activo mientras el contrato esté vigente. Aún puedes completar y registrar entrenamientos asignados.",
+    "coveredContract": "Finaliza tu contrato activo antes de solicitar otro entrenador.",
+    "graceWarning": "Tu contenido Plus estará disponible hasta {{date}}. Después, las rutinas y ejercicios excedentes se ocultarán, no se eliminarán.",
+    "seatUsage": "{{usage}} de {{limit}} plazas de clientes aceptados usadas",
+    "exerciseUsage": "{{usage}} de {{limit}} ejercicios personalizados usados",
+    "benefits": {
+      "templates": "Hasta 8 plantillas de rutinas",
+      "exercises": "Hasta 5 ejercicios personalizados privados",
+      "sharing": "Compartir rutinas y editar plantillas de entrenador"
     }
   }
 }

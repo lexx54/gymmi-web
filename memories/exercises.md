@@ -38,12 +38,12 @@ Create payload sends bilingual `{ en, es }` objects for `targetMuscle`, `equipme
 - Components under `src/components/exercises/` (catalog, bulk modal, builder cards, shell/header)
 - Types: `src/components/exercises/types.ts`
 
-## Permissions / payment
+## Permissions / entitlements
 
 - Create/bulk buttons gated by `<Can resource="exercises" action="CREATE">`.
 - Route `/exercises/new` is reachable by any authenticated user; publish button hidden without permission.
-- Errors use generic toasts — no special UX for payment-required (402).
-- `hasPaid` is not checked client-side.
+- Trainer/Client custom create and bulk actions use optional capability plus `customExercises` limit/usage hints. `PLAN_LIMIT` opens the shared Plus modal; covered-client and other failures use the API message.
+- Admin/Gym behavior is unchanged when no custom-exercise entitlement snapshot is supplied. `hasPaid` is not used directly for gating.
 
 ## Constraints
 
@@ -84,3 +84,4 @@ Regression guard: `e2e/exercises.spec.ts` has a 390x844 test asserting `document
 - Preserved the existing activation tiles and added the nested map-dialog trigger to `ExerciseDetailModal.tsx`.
 - Added EN/ES map labels plus focused mapping, locale, and Playwright interaction coverage.
 - `CreateTagModal` uses a semantic styled `label`, fixing its `htmlFor` TypeScript build error without changing behavior.
+- Added custom-exercise usage, create/bulk route hints, downgrade warning, entitlement cache invalidation, and exact API error-message handling.

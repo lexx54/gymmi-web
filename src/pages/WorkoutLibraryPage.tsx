@@ -1,4 +1,3 @@
-import type { AxiosError } from 'axios';
 import { CalendarPlus, Dumbbell, Edit3, Eye, Plus, Search, Share2, Trash2, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { Sidebar } from '../components/layout/Sidebar';
+import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
+import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { NoRoutines } from '../components/workouts/NoRoutines';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -18,17 +19,21 @@ import {
   useShareWorkout,
   useWorkouts,
 } from '../hooks/useWorkouts';
+import {
+  hasEntitlementCapability,
+  hasAnyEntitlementCapability,
+  isEntitlementLimitReached,
+  useEntitlements,
+} from '../hooks/usePermissions';
+import {
+  getApiErrorDetails,
+  getApiErrorMessage,
+  type ApiErrorDetails,
+} from '../services/api/errors';
 import { WORKOUT_PERIODS, type WorkoutPeriod, type WorkoutRoutine } from '../services/api/workouts';
 
 type DialogMode = 'share' | 'assign' | 'selfAssign';
 type LibraryFilter = 'all' | 'mine' | 'assigned';
-
-/** Reads the API message so blocked actions explain themselves (402, 403, 400). */
-function apiErrorMessage(error: unknown): string {
-  const message = (error as AxiosError<{ message?: string | string[] }>).response?.data?.message;
-  if (Array.isArray(message)) return message[0] ?? '';
-  return message ?? '';
-}
 
 /**
  * Browses visible API routines and exposes role-safe routine actions.
@@ -38,6 +43,7 @@ export default function WorkoutLibraryPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: routines = [], isLoading, isError } = useWorkouts();
+  const { data: entitlements } = useEntitlements();
   const isClient = user?.role.name === 'Client';
   const isTrainer = user?.role.name === 'Trainer';
   const { data: assignment } = useMyWorkoutAssignment(isClient);
@@ -45,6 +51,22 @@ export default function WorkoutLibraryPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<LibraryFilter>('all');
   const [dialog, setDialog] = useState<{ mode: DialogMode; routine: WorkoutRoutine } | null>(null);
+  const [upsell, setUpsell] = useState<{ details?: ApiErrorDetails; message?: string } | null>(null);
+  const canCreateTemplate =
+    !entitlements?.isCoveredClient &&
+    hasAnyEntitlementCapability(entitlements?.capabilities, ['canCreateTemplate', 'canSelfBuild']) &&
+    !isEntitlementLimitReached(entitlements?.limits, entitlements?.usage, 'templates');
+  const canShare = hasEntitlementCapability(entitlements?.capabilities, 'canShare');
+  const canAssign = hasEntitlementCapability(entitlements?.capabilities, 'canAssign');
+  const canSelfAssign =
+    !entitlements?.isCoveredClient &&
+    hasEntitlementCapability(entitlements?.capabilities, 'canSelfAssign');
+
+  const requestCreate = () => {
+    if (canCreateTemplate) navigate('/workout/new');
+    else if (entitlements?.isCoveredClient) toast.error(t('entitlements.coveredClient'));
+    else setUpsell({ message: t(isTrainer ? 'entitlements.trainerTemplateLimit' : 'entitlements.clientTemplateLimit') });
+  };
 
   const visible = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -77,8 +99,9 @@ export default function WorkoutLibraryPage() {
             <Title>{t('workouts.libraryTitle')}</Title>
             <Subtitle>{t('workouts.librarySubtitle')}</Subtitle>
           </div>
-          <CreateLink to="/workout/new"><Plus size={16} />{t('workouts.createRoutine')}</CreateLink>
+          <CreateButton type="button" onClick={requestCreate}><Plus size={16} />{t('workouts.createRoutine')}</CreateButton>
         </Hero>
+        <EntitlementGraceWarning />
         <Controls>
           <FilterGroup aria-label={t('workouts.routineFilters')}>
             {(['all', 'mine', ...(isClient ? ['assigned'] : [])] as LibraryFilter[]).map((item) => (
@@ -110,7 +133,7 @@ export default function WorkoutLibraryPage() {
                     ? 'empty'
                     : 'no-results'
             }
-            onCreateRoutine={() => navigate('/workout/new')}
+            onCreateRoutine={requestCreate}
             onClearFilters={() => {
               setSearch('');
               setFilter('all');
@@ -121,6 +144,13 @@ export default function WorkoutLibraryPage() {
           {visible.map((routine) => {
             const owned = routine.createdById === user?.id;
             const assigned = assignment?.routineId === routine.id;
+            const assignmentFork = Boolean(routine.forkedFromId || routine.assignment);
+            const canEdit =
+              owned &&
+              (assignmentFork
+                ? hasEntitlementCapability(entitlements?.capabilities, 'canEditAssignmentFork')
+                : hasAnyEntitlementCapability(entitlements?.capabilities, ['canEditOwnedTemplate', 'canEditTemplate'])) &&
+              !(isClient && entitlements?.isCoveredClient);
             const firstWeek = routine.days.find((day) => day.weekStartDate)?.weekStartDate;
             const displayDays = firstWeek
               ? routine.days.filter((day) => day.weekStartDate === firstWeek)
@@ -143,14 +173,16 @@ export default function WorkoutLibraryPage() {
                 </Metrics>
                 <Actions>
                   <ActionLink to={`/workout/${routine.id}`}><Eye size={15} />{t('workouts.view')}</ActionLink>
-                  {owned && <ActionLink to={`/workout/${routine.id}/edit`}><Edit3 size={15} />{t('workouts.edit')}</ActionLink>}
-                  {owned && isTrainer && <ActionButton type="button" onClick={() => setDialog({ mode: 'share', routine })}>
+                  {owned && (canEdit
+                    ? <ActionLink to={`/workout/${routine.id}/edit`}><Edit3 size={15} />{t('workouts.edit')}</ActionLink>
+                    : <ActionButton type="button" onClick={() => entitlements?.isCoveredClient ? toast.error(t('entitlements.coveredClient')) : setUpsell({ message: t('entitlements.editTemplate') })}><Edit3 size={15} />{t('workouts.edit')}</ActionButton>)}
+                  {owned && isTrainer && <ActionButton type="button" onClick={() => canShare ? setDialog({ mode: 'share', routine }) : setUpsell({ message: t('entitlements.sharing') })}>
                     <Share2 size={15} />{t('workouts.share')}
                   </ActionButton>}
-                  {isTrainer && <ActionButton type="button" onClick={() => setDialog({ mode: 'assign', routine })}>
+                  {isTrainer && <ActionButton type="button" onClick={() => canAssign ? setDialog({ mode: 'assign', routine }) : toast.error(t('workouts.assignFailed'))}>
                     <Users size={15} />{t('workouts.assign')}
                   </ActionButton>}
-                  {isClient && !assigned && <ActionButton type="button" onClick={() => setDialog({ mode: 'selfAssign', routine })}>
+                  {isClient && !assigned && <ActionButton type="button" onClick={() => canSelfAssign ? setDialog({ mode: 'selfAssign', routine }) : toast.error(t('entitlements.coveredClient'))}>
                     <CalendarPlus size={15} />{t('workouts.selfAssign')}
                   </ActionButton>}
                   {owned && <DangerButton type="button" onClick={() => removeRoutine(routine)} aria-label={t('workouts.deleteNamed', { name: routine.name })}>
@@ -163,7 +195,24 @@ export default function WorkoutLibraryPage() {
         </Grid>
         )}
       </Main>
-      {dialog && <WorkoutAccessDialog mode={dialog.mode} routine={dialog.routine} onClose={() => setDialog(null)} />}
+      {dialog && (
+        <WorkoutAccessDialog
+          mode={dialog.mode}
+          routine={dialog.routine}
+          onClose={() => setDialog(null)}
+          onPlanLimit={(details) => {
+            setDialog(null);
+            setUpsell({ details });
+          }}
+        />
+      )}
+      <PlusUpsellModal
+        isOpen={Boolean(upsell)}
+        details={upsell?.details}
+        resource="templates"
+        message={upsell?.message}
+        onClose={() => setUpsell(null)}
+      />
     </PageShell>
   );
 }
@@ -172,10 +221,12 @@ function WorkoutAccessDialog({
   mode,
   routine,
   onClose,
+  onPlanLimit,
 }: {
   mode: DialogMode;
   routine: WorkoutRoutine;
   onClose: () => void;
+  onPlanLimit: (details: ApiErrorDetails) => void;
 }) {
   const { t } = useTranslation();
   const { data: trainers = [] } = useEligibleTrainers(mode === 'share');
@@ -210,7 +261,9 @@ function WorkoutAccessDialog({
       toast.success(t(`workouts.${mode}Success`));
       onClose();
     } catch (error) {
-      toast.error(apiErrorMessage(error) || t(`workouts.${mode}Failed`));
+      const details = getApiErrorDetails(error);
+      if (details?.code === 'PLAN_LIMIT') onPlanLimit(details);
+      else toast.error(getApiErrorMessage(error, t(`workouts.${mode}Failed`)));
     }
   };
   const pending = shareMutation.isPending || assignMutation.isPending || selfAssignMutation.isPending;
@@ -275,7 +328,7 @@ const Main = styled.main`flex: 1; min-width: 0; padding: 2.5rem; @media (max-wid
 const Hero = styled.header`display: flex; justify-content: space-between; gap: 1rem; align-items: start; @media (max-width: 640px) { flex-direction: column; }`;
 const Title = styled.h1`margin: 0; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; letter-spacing: -0.06em;`;
 const Subtitle = styled.p`color: #e7bdbb;`;
-const CreateLink = styled(Link)`display: inline-flex; align-items: center; gap: .5rem; padding: .9rem 1.2rem; border-radius: .8rem; background: linear-gradient(135deg,#ffb3b1,#ff535a); color: #46000b; text-decoration: none; font-weight: 900;`;
+const CreateButton = styled.button`display: inline-flex; align-items: center; gap: .5rem; border: 0; padding: .9rem 1.2rem; border-radius: .8rem; background: linear-gradient(135deg,#ffb3b1,#ff535a); color: #46000b; font-weight: 900; cursor: pointer;`;
 const Controls = styled.div`display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; margin: 2rem 0;`;
 const FilterGroup = styled.div`display: flex; flex-wrap: wrap; gap: .55rem;`;
 const FilterButton = styled.button<{ $active: boolean }>`border: 0; border-radius: 999px; padding: .65rem 1rem; background: ${({ $active }) => $active ? '#ffb3b1' : '#1c1e32'}; color: ${({ $active }) => $active ? '#680011' : '#e7bdbb'}; cursor: pointer;`;

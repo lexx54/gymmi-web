@@ -1,7 +1,7 @@
 import apiClient from './client';
-import type { PermissionCell } from '../../types/rbac';
+import type { MyPermissionsResponse } from '../../types/rbac';
 
-export async function fetchMyPermissions(): Promise<PermissionCell[]> {
-  const { data } = await apiClient.get<{ permissions: PermissionCell[] }>('/me/permissions');
-  return data.permissions;
+export async function fetchMyPermissions(): Promise<MyPermissionsResponse> {
+  const { data } = await apiClient.get<MyPermissionsResponse>('/me/permissions');
+  return data;
 }

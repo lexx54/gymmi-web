@@ -5,6 +5,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { Sidebar } from '../components/layout/Sidebar';
+import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
+import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { ExerciseCard } from '../components/workouts/ExerciseCard';
 import { ExerciseLibrary } from '../components/workouts/ExerciseLibrary';
 import { RoutineDropzone } from '../components/workouts/RoutineDropzone';
@@ -21,8 +23,14 @@ import type { LibraryExercise, RoutineExercise, SetField } from '../components/w
 import { DEFAULT_SET, isInSupersetAddGroup } from '../components/workouts/addSet';
 import { useAuth } from '../context/AuthContext';
 import { useExercises } from '../hooks/useExercises';
+import {
+  hasAnyEntitlementCapability,
+  hasEntitlementCapability,
+  useEntitlements,
+} from '../hooks/usePermissions';
 import { useCreateWorkout, useRoutineSessions, useUpdateWorkout, useWorkout } from '../hooks/useWorkouts';
 import { resolveLocalizedText } from '../services/api/exercises';
+import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import type {
   SupersetColor,
   WorkoutDayWrite,
@@ -96,6 +104,7 @@ export default function WorkoutsPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { data: exercises = [], isLoading: exercisesLoading } = useExercises();
+  const { data: entitlements } = useEntitlements();
   const { data: persistedRoutine, isLoading: routineLoading } = useWorkout(id);
   const createMutation = useCreateWorkout();
   const updateMutation = useUpdateWorkout();
@@ -106,11 +115,20 @@ export default function WorkoutsPage() {
   const [activeWeekStart, setActiveWeekStart] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const [upsell, setUpsell] = useState<{ details?: ApiErrorDetails; message?: string } | null>(null);
 
   const requestedEdit = !id || location.pathname.endsWith('/edit');
   const isOwner = !persistedRoutine || persistedRoutine.createdById === user?.id;
-  const readOnly = Boolean(id) && (!requestedEdit || !isOwner);
   const assignment = persistedRoutine?.assignment ?? null;
+  const assignmentFork = Boolean(persistedRoutine?.forkedFromId || assignment);
+  const entitlementAllowsEdit = id
+    ? assignmentFork
+      ? hasEntitlementCapability(entitlements?.capabilities, 'canEditAssignmentFork')
+      : hasAnyEntitlementCapability(entitlements?.capabilities, ['canEditOwnedTemplate', 'canEditTemplate']) &&
+        !(user?.role.name === 'Client' && entitlements?.isCoveredClient)
+    : !entitlements?.isCoveredClient &&
+      hasAnyEntitlementCapability(entitlements?.capabilities, ['canCreateTemplate', 'canSelfBuild']);
+  const readOnly = (Boolean(id) && (!requestedEdit || !isOwner)) || !entitlementAllowsEdit;
   const hasAssignmentWeeks = Boolean(assignment);
   const showWeeks = hasAssignmentWeeks && user?.role?.name !== 'Client';
   const weeks = useMemo(
@@ -121,6 +139,21 @@ export default function WorkoutsPage() {
     [assignment],
   );
   const { data: routineSessions = [] } = useRoutineSessions(id, showWeeks);
+
+  useEffect(() => {
+    if (requestedEdit && entitlements && !entitlementAllowsEdit) {
+      queueMicrotask(() => {
+        if (entitlements.isCoveredClient) toast.error(t('entitlements.coveredClient'));
+        else setUpsell({
+          message: t(id
+            ? 'entitlements.editTemplate'
+            : user?.role.name === 'Trainer'
+              ? 'entitlements.trainerTemplateLimit'
+              : 'entitlements.clientTemplateLimit'),
+        });
+      });
+    }
+  }, [entitlementAllowsEdit, entitlements, id, requestedEdit, t, user?.role.name]);
 
   useEffect(() => {
     if (!weeks.length) {
@@ -292,8 +325,10 @@ export default function WorkoutsPage() {
         : await createMutation.mutateAsync(params);
       toast.success(t(id ? 'workouts.updated' : 'workouts.created'));
       navigate(`/workout/${saved.id}`);
-    } catch {
-      toast.error(t('workouts.saveFailed'));
+    } catch (error) {
+      const details = getApiErrorDetails(error);
+      if (details?.code === 'PLAN_LIMIT') setUpsell({ details });
+      else toast.error(getApiErrorMessage(error, t('workouts.saveFailed')));
     }
   };
 
@@ -315,6 +350,7 @@ export default function WorkoutsPage() {
       <Sidebar username={user?.username ?? 'Alex'} />
       <WorkoutsMain>
         <WorkoutsHeader />
+        <EntitlementGraceWarning />
         <WorkoutsBuilderGrid $singleColumn={readOnly || dayLocked}>
           {!readOnly && !dayLocked && <LibraryPane>
             <ExerciseLibrary
@@ -451,6 +487,13 @@ export default function WorkoutsPage() {
           </RoutinePane>
         </WorkoutsBuilderGrid>
       </WorkoutsMain>
+      <PlusUpsellModal
+        isOpen={Boolean(upsell)}
+        details={upsell?.details}
+        resource="templates"
+        message={upsell?.message}
+        onClose={() => setUpsell(null)}
+      />
     </WorkoutsPageShell>
   );
 }

@@ -15,6 +15,7 @@ import {
   type AssignmentWrite,
   type WorkoutRoutineWrite,
 } from '../services/api/workouts';
+import { myPermissionsQueryKey } from './usePermissions';
 
 export const workoutsQueryKey = ['workouts'] as const;
 export const myWorkoutAssignmentQueryKey = ['workouts', 'assignments', 'me'] as const;
@@ -38,6 +39,7 @@ export function useCreateWorkout() {
     mutationFn: createWorkout,
     onSuccess: (routine) => {
       queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
       queryClient.setQueryData(workoutQueryKey(routine.id), routine);
     },
   });
@@ -50,6 +52,7 @@ export function useUpdateWorkout() {
       updateWorkout(id, params),
     onSuccess: (routine) => {
       queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
       queryClient.setQueryData(workoutQueryKey(routine.id), routine);
     },
   });
@@ -61,6 +64,7 @@ export function useDeleteWorkout() {
     mutationFn: deleteWorkout,
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
       queryClient.removeQueries({ queryKey: workoutQueryKey(id) });
     },
   });
@@ -83,16 +87,24 @@ export function useEligibleTrainers(enabled: boolean) {
 }
 
 export function useShareWorkout() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, trainerIds }: { id: string; trainerIds: string[] }) =>
       shareWorkout(id, trainerIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
+    },
   });
 }
 
 export function useAssignWorkout() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, clientId, ...params }: AssignmentWrite & { id: string; clientId: string }) =>
       assignWorkout(id, { clientId, ...params }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
+    },
   });
 }
 
@@ -104,6 +116,7 @@ export function useSelfAssignWorkout() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: myWorkoutAssignmentQueryKey });
       queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+      queryClient.invalidateQueries({ queryKey: myPermissionsQueryKey });
     },
   });
 }

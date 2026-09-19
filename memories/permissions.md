@@ -6,8 +6,9 @@ Fine-grained permission checks from the API matrix, plus a coarse Admin role rou
 
 ## Main flows
 
-- `useMyPermissions()` → `GET /me/permissions` → `PermissionCell[]` (`resource`, `action`, `allowed`)
+- `useMyPermissions()` → `GET /me/permissions` → full response (`permissions`, optional `hasPaid`, `plan`, `role`, `entitlements`)
 - `useHasPermission(resource, action)` → memoized lookup
+- `useEntitlements()` exposes the optional rollout-safe snapshot while sharing the same query/cache.
 - `<Can resource action fallback?>` → conditional render
 - `<RoleRoute role="Admin">` → compares `user.role.name`; else redirect `/dashboard`
 
@@ -32,7 +33,7 @@ Fine-grained permission checks from the API matrix, plus a coarse Admin role rou
 
 ## Constraints
 
-- Permissions query: `staleTime: 0`, refetch on window focus.
+- Permissions query: `staleTime: 0`, refetch on window focus. Relevant workout, contract, and exercise mutations invalidate it.
 - Admin permission saves invalidate `['me', 'permissions']`.
 - `workouts` is typed but no workout UI consumes it yet.
-- Real API integration.
+- Capability hints fail open when an optional rollout field is absent; limits only block locally when both limit and usage are numeric. API enforcement remains authoritative.

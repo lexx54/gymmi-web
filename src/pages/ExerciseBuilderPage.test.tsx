@@ -25,6 +25,9 @@ vi.mock('../context/AuthContext', () => ({
 vi.mock('../hooks/usePermissions', () => ({
   useMyPermissions: () => ({ data: [], isLoading: false }),
   useHasPermission: () => true,
+  useEntitlements: () => ({ data: undefined }),
+  hasAnyEntitlementCapability: () => true,
+  isEntitlementLimitReached: () => false,
 }));
 
 vi.mock('../hooks/useListData', () => ({

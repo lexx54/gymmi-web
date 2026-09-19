@@ -5,6 +5,7 @@
     "and": "and",
     "back": "Back",
     "cancel": "Cancel",
+    "close": "Close",
     "closeModal": "Close modal",
     "disabled": "Disabled",
     "enabled": "Enabled",
@@ -509,6 +510,9 @@
     "role": "Role",
     "active": "Active",
     "paid": "Paid",
+    "plan": "Free / Plus",
+    "togglePlan": "Toggle plan for {{username}}",
+    "graceUntil": "Grace until {{date}}",
     "resource": "Resource",
     "userManagement": "User Management",
     "rolePermissions": "Role Permissions",
@@ -537,6 +541,9 @@
     "selectTrainer": "Select a trainer",
     "sendRequest": "Send request",
     "requestFailed": "Could not send the contract request.",
+    "acceptFailed": "Could not accept the contract.",
+    "end": "End contract",
+    "endFailed": "Could not end the contract.",
     "messageLabel": "Message",
     "messagePlaceholder": "Optional note for your trainer",
     "myContracts": "My contracts",
@@ -550,6 +557,29 @@
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected",
       "CANCELLED": "Cancelled"
+      ,"ENDED": "Ended"
+    }
+  },
+  "entitlements": {
+    "free": "Free",
+    "plus": "Plus",
+    "upsellTitle": "Unlock more with Plus",
+    "usage": "{{usage}} of {{limit}} used",
+    "trainerTemplateLimit": "You can keep two routines on Free. Plus includes 8 routines and 5 custom exercises.",
+    "clientTemplateLimit": "You can keep one routine on Free. Plus includes 8 routines and 5 custom exercises.",
+    "trainerSeats": "Free includes 2 accepted clients. Plus includes up to 8.",
+    "customExerciseLimit": "Custom exercises are included with Plus, up to 5.",
+    "sharing": "Sharing routines and editing trainer templates are included with Plus.",
+    "editTemplate": "Editing trainer templates is included with Plus.",
+    "coveredClient": "Your trainer manages your active plan while your contract is active. You can still complete and log assigned workouts.",
+    "coveredContract": "End your active trainer contract before requesting another trainer.",
+    "graceWarning": "Your Plus content stays available until {{date}}. After that, overflow routines and custom exercises will be hidden, not deleted.",
+    "seatUsage": "{{usage}} of {{limit}} accepted client seats used",
+    "exerciseUsage": "{{usage}} of {{limit}} custom exercises used",
+    "benefits": {
+      "templates": "Up to 8 routine templates",
+      "exercises": "Up to 5 private custom exercises",
+      "sharing": "Routine sharing and trainer template editing"
     }
   }
 }

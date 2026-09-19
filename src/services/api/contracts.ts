@@ -1,7 +1,7 @@
 import apiClient from './client';
 import type { WorkoutAssignment, WorkoutPeriod } from './workouts';
 
-export type ContractStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED';
+export type ContractStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'ENDED';
 
 export type ContractParty = {
   id: string;
@@ -91,5 +91,11 @@ export async function rejectContract(id: string): Promise<TrainerContract> {
 /** Client cancels a pending contract. */
 export async function cancelContract(id: string): Promise<TrainerContract> {
   const { data } = await apiClient.post<TrainerContract>(`/contracts/${id}/cancel`);
+  return data;
+}
+
+/** Either contract party ends an accepted contract. */
+export async function endContract(id: string): Promise<TrainerContract> {
+  const { data } = await apiClient.post<TrainerContract>(`/contracts/${id}/end`);
   return data;
 }
