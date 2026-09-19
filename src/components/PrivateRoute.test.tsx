@@ -62,7 +62,7 @@ describe('PrivateRoute', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByLabelText('Loading')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading...')).toBeInTheDocument();
     expect(screen.queryByText('Protected content')).not.toBeInTheDocument();
   });
 });

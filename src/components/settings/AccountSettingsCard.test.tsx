@@ -18,12 +18,12 @@ describe('AccountSettingsCard', () => {
   it('renders 2FA toggle as enabled', () => {
     render(<AccountSettingsCard />);
 
-    expect(screen.getByText('ENABLED')).toBeInTheDocument();
+    expect(screen.getByText('Enabled')).toBeInTheDocument();
   });
 
   it('renders location sync as disabled', () => {
     render(<AccountSettingsCard />);
 
-    expect(screen.getByText('DISABLED')).toBeInTheDocument();
+    expect(screen.getByText('Disabled')).toBeInTheDocument();
   });
 });

@@ -62,7 +62,7 @@ describe('PublicRoute', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByLabelText('Loading')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading...')).toBeInTheDocument();
     expect(screen.queryByText('Login form')).not.toBeInTheDocument();
   });
 });

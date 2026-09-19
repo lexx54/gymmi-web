@@ -55,7 +55,7 @@ describe('LoginPage', () => {
     render(<LoginPage />, { wrapper: createWrapper() });
 
     expect(screen.getByPlaceholderText('email@mail.com')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('••••••••••••')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^login$/i })).toBeInTheDocument();
   });
 
@@ -66,7 +66,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Email is required')).toBeInTheDocument();
+      expect(screen.getByText('Email or username is required')).toBeInTheDocument();
     });
     expect(screen.getByText('Password is required')).toBeInTheDocument();
     expect(mockMutate).not.toHaveBeenCalled();
@@ -77,7 +77,7 @@ describe('LoginPage', () => {
     render(<LoginPage />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'bad');
-    await user.type(screen.getByPlaceholderText('••••••••••••'), 'secret1');
+    await user.type(screen.getByPlaceholderText('Password'), 'secret1');
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
@@ -91,7 +91,7 @@ describe('LoginPage', () => {
     render(<LoginPage />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'user@test.com');
-    await user.type(screen.getByPlaceholderText('••••••••••••'), 'secret12');
+    await user.type(screen.getByPlaceholderText('Password'), 'secret12');
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
@@ -111,7 +111,7 @@ describe('LoginPage', () => {
     render(<LoginPage />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'user@test.com');
-    await user.type(screen.getByPlaceholderText('••••••••••••'), 'secret12');
+    await user.type(screen.getByPlaceholderText('Password'), 'secret12');
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
@@ -131,7 +131,7 @@ describe('LoginPage', () => {
     render(<LoginPage />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'user@test.com');
-    await user.type(screen.getByPlaceholderText('••••••••••••'), 'wrong12');
+    await user.type(screen.getByPlaceholderText('Password'), 'wrong12');
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
@@ -153,7 +153,7 @@ describe('LoginPage', () => {
     render(<LoginPage />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'user@test.com');
-    await user.type(screen.getByPlaceholderText('••••••••••••'), 'secret12');
+    await user.type(screen.getByPlaceholderText('Password'), 'secret12');
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {

@@ -59,7 +59,7 @@ describe('SignupPage', () => {
 
     expect(screen.getByPlaceholderText('email@mail.com')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('username')).toBeInTheDocument();
-    expect(screen.getAllByPlaceholderText('••••••••••••').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('confirm password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
   });
@@ -84,7 +84,7 @@ describe('SignupPage', () => {
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'not-an-email');
     await user.type(screen.getByPlaceholderText('username'), 'abc');
-    await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
+    await user.type(screen.getByPlaceholderText('Password'), 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
     await user.click(screen.getByRole('button', { name: /sign up/i }));
 
@@ -100,7 +100,7 @@ describe('SignupPage', () => {
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'a@b.com');
     await user.type(screen.getByPlaceholderText('username'), 'user');
-    await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
+    await user.type(screen.getByPlaceholderText('Password'), 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password13');
     await user.click(screen.getByLabelText('User'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
@@ -117,7 +117,7 @@ describe('SignupPage', () => {
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'new@user.com');
     await user.type(screen.getByPlaceholderText('username'), 'newuser');
-    await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
+    await user.type(screen.getByPlaceholderText('Password'), 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
     await user.click(screen.getByLabelText('User'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
@@ -140,7 +140,7 @@ describe('SignupPage', () => {
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'new@user.com');
     await user.type(screen.getByPlaceholderText('username'), 'newuser');
-    await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
+    await user.type(screen.getByPlaceholderText('Password'), 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
     await user.click(screen.getByLabelText('Trainer'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
@@ -164,7 +164,7 @@ describe('SignupPage', () => {
 
     await user.type(screen.getByPlaceholderText('email@mail.com'), 'taken@b.com');
     await user.type(screen.getByPlaceholderText('username'), 'user');
-    await user.type(screen.getAllByPlaceholderText('••••••••••••')[0], 'password12');
+    await user.type(screen.getByPlaceholderText('Password'), 'password12');
     await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
     await user.click(screen.getByLabelText('User'));
     await user.click(screen.getByRole('button', { name: /sign up/i }));
