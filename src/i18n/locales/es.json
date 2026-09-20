@@ -581,5 +581,176 @@
       "exercises": "Hasta 5 ejercicios personalizados privados",
       "sharing": "Compartir rutinas y editar plantillas de entrenador"
     }
+  },
+  "landing": {
+    "nav": {
+      "features": "Funciones",
+      "ecosystem": "Ecosistema",
+      "pricing": "Precios",
+      "faq": "Preguntas",
+      "login": "Iniciar Sesión",
+      "signup": "Registrarse",
+      "dashboard": "Ir al Panel"
+    },
+    "hero": {
+      "tag": "La Plataforma de Entrenamiento del Futuro",
+      "titleLine1": "El Entrenamiento se Une a la Ejecución.",
+      "titleHighlight": "Eleva Cada Repetición.",
+      "subtitle": "El ecosistema integral que conecta entrenadores con atletas dedicados. Diseña rutinas de precisión en la web, ejecútalas con seguimiento en tiempo real en el móvil y alcanza tus metas.",
+      "ctaPrimary": "Comienza Gratis",
+      "ctaSecondary": "Explorar Funciones",
+      "statExercises": "Ejercicios Curados",
+      "statLogging": "Registro en Vivo",
+      "statAi": "Motor de IA Multilingüe"
+    },
+    "preview": {
+      "badge": "Entrenamiento Activo",
+      "routineName": "Hipertrofia Tren Superior",
+      "meta": "Asignado por Entrenador • Día 1 • 45m",
+      "ex1Name": "Press de Banca con Barra",
+      "ex1Detail": "4 series × 8-10 reps • RPE 8.5",
+      "ex2Name": "Aperturas Inclinadas con Mancuernas",
+      "ex2Detail": "3 series × 12 reps • RPE 8.0",
+      "ex3Name": "Extensiones de Tríceps en Polea",
+      "ex3Detail": "3 series × 15 reps • RPE 9.0",
+      "timer": "Activo: 28:45",
+      "completed": "2 de 3 Series Completadas"
+    },
+    "features": {
+      "tag": "Capacidades de la Plataforma",
+      "title": "Diseñado para Entrenamiento Riguroso",
+      "subtitle": "Desde gestionar un grupo de 8 clientes hasta registrar tus mejores marcas en solitario, Gymmi ofrece herramientas profesionales para el alto rendimiento.",
+      "tabRoutine": "Creador de Rutinas",
+      "tabBodyMap": "Mapa Muscular",
+      "tabActive": "Entrenamiento Activo",
+      "tabTrainer": "Sistema Coach-Atleta",
+      "tabAi": "IA Gemini",
+      "routineTitle": "Programación Visual de Rutinas",
+      "routineDesc": "Construye rutinas de varios días con precisión quirúrgica. Configura series, rangos de repeticiones y RPE objetivo mediante un creador intuitivo y ágil.",
+      "bodyMapTitle": "Enfoque Muscular Interactivo",
+      "bodyMapDesc": "Explora nuestro mapa anatómico interactivo. Selecciona grupos musculares (Pectorales, Dorsales, Cuádriceps, Isquiotibiales, Hombros, Core) y filtra ejercicios por equipo sin esfuerzo.",
+      "activeTitle": "Ejecución de Entrenamientos en Vivo",
+      "activeDesc": "Registra series, repeticiones y esfuerzo percibido en tiempo real. Temporizadores de descanso dinámicos e indicadores de serie mantienen al atleta concentrado en cada levantamiento.",
+      "trainerTitle": "Arquitectura Entrenador-Cliente",
+      "trainerDesc": "Establece contratos de asesoría estructurados, envía planes de entrenamiento directamente a los móviles de tus clientes y mantén el control con bifurcación automática de rutinas.",
+      "aiTitle": "IA Multilingüe Impulsada por Gemini",
+      "aiDesc": "Supera las barreras del idioma al instante. Los ejercicios personalizados y las indicaciones técnicas se traducen automáticamente entre inglés y español con Google Gemini AI."
+    },
+    "audience": {
+      "coachTag": "Para Entrenadores",
+      "coachTitle": "Escala Tu Asesoría Sin Complicaciones",
+      "coachDesc": "Dedica menos tiempo a hojas de cálculo y más tiempo a transformar los resultados de tus clientes con un portal pensado para entrenadores.",
+      "coachF1": "Gestiona hasta 8 contratos activos de clientes con el plan Plus",
+      "coachF2": "Crea programas de varias semanas y asígnalos con un solo clic",
+      "coachF3": "Añade ejercicios personalizados con notas técnicas e instrucciones privadas",
+      "coachF4": "Comparte plantillas probadas con otros entrenadores de tu red",
+      "clientTag": "Para Atletas Dedicados",
+      "clientTitle": "Entrena Con Propósito. Solo o Guiado.",
+      "clientDesc": "Supera tus marcas personales, sigue los planes asignados por tu entrenador y mantén control total de tu evolución física.",
+      "clientF1": "Ejecuta entrenamientos en vivo con temporizadores y registro de RPE",
+      "clientF2": "Conéctate con entrenadores certificados que guían tu progreso de cerca",
+      "clientF3": "Diseña rutinas individuales adaptadas a tus horarios y equipamiento",
+      "clientF4": "El mapa muscular anatómico te ayuda a mantener un desarrollo equilibrado"
+    },
+    "pricing": {
+      "tag": "Precios Transparentes",
+      "title": "Planes Que Crecen Con Tu Progreso",
+      "subtitle": "Comienza gratis hoy. Mejora tu plan cuando requieras más capacidad de clientes o plantillas.",
+      "tabTrainer": "Para Entrenadores",
+      "tabClient": "Para Atletas y Clientes",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "save20": "Ahorra 20%",
+      "perMonth": "/mes",
+      "billedAnnually": "facturado anualmente",
+      "popularBadge": "Más Popular",
+      "comingSoonBadge": "Próximamente",
+      "startFree": "Comenzar Gratis",
+      "upgradePlus": "Actualizar a Plus",
+      "joinWaitlist": "Próximamente",
+      "disclaimer": "La integración de pagos estará disponible muy pronto. Los planes Plus actualmente se activan mediante invitación o administración.",
+      "trainer": {
+        "free": {
+          "title": "Entrenador Free",
+          "desc": "Herramientas esenciales para entrenadores que inician con sus primeros clientes.",
+          "f1": "2 Contratos de clientes aceptados",
+          "f2": "2 Plantillas de rutinas propias",
+          "f3": "Acceso total a la biblioteca de ejercicios",
+          "f4": "Edición de plantillas (Solo en Plus)",
+          "f5": "Ejercicios personalizados (Solo en Plus)",
+          "f6": "Compartir rutinas (Solo en Plus)"
+        },
+        "plus": {
+          "title": "Entrenador Plus",
+          "desc": "Para entrenadores activos que expanden su lista de clientes y programas.",
+          "f1": "Hasta 8 clientes aceptados",
+          "f2": "Hasta 8 plantillas de rutinas propias",
+          "f3": "Hasta 5 ejercicios personalizados privados",
+          "f4": "Edición completa de plantillas de rutinas",
+          "f5": "Compartir rutinas con otros entrenadores",
+          "f6": "Personalización de gimnasio (Solo en Pro)"
+        },
+        "pro": {
+          "title": "Entrenador Pro",
+          "desc": "Para gimnasios de alto volumen y organizaciones de entrenamiento.",
+          "f1": "Contratos de clientes ilimitados",
+          "f2": "Plantillas de rutinas ilimitadas",
+          "f3": "Ejercicios personalizados ilimitados",
+          "f4": "Analíticas avanzadas de cumplimiento",
+          "f5": "Colaboración en equipo y múltiples entrenadores",
+          "f6": "Marca personalizada y exportación a PDF"
+        }
+      },
+      "client": {
+        "free": {
+          "title": "Atleta Free",
+          "desc": "Registro de entrenamientos directo para atletas independientes.",
+          "f1": "1 Plantilla de rutina propia",
+          "f2": "1 Conexión activa con entrenador",
+          "f3": "Modo completo de Entrenamiento Activo",
+          "f4": "Ejercicios personalizados (Solo en Plus)",
+          "f5": "Biblioteca de rutinas expandida (Solo en Plus)"
+        },
+        "plus": {
+          "title": "Atleta Plus",
+          "desc": "Para atletas comprometidos que buscan mayor variedad y personalización.",
+          "f1": "Hasta 8 rutinas propias",
+          "f2": "Hasta 5 ejercicios personalizados privados",
+          "f3": "1 Conexión activa con entrenador",
+          "f4": "Modo de Entrenamiento Activo e historial",
+          "f5": "Acceso total a catálogo de ejercicios"
+        },
+        "pro": {
+          "title": "Atleta Pro",
+          "desc": "Para deportistas de alto nivel que requieren métricas avanzadas.",
+          "f1": "Rutinas propias ilimitadas",
+          "f2": "Ejercicios personalizados ilimitados",
+          "f3": "Múltiples entrenadores simultáneos",
+          "f4": "Gráficas de progresión de 1RM y volumen",
+          "f5": "Recomendaciones prioritarias con IA"
+        }
+      }
+    },
+    "faq": {
+      "tag": "¿Preguntas Frecuentes?",
+      "title": "Todo lo que Necesitas Saber",
+      "q1": "¿Qué significa ser un 'Cliente Cubierto'?",
+      "a1": "Cuando un atleta acepta un contrato con un entrenador, se convierte en Cliente Cubierto. El entrenador asume la planificación y asignación de rutinas, pausando temporalmente la creación de rutinas en solitario mientras permite al atleta ejecutar y registrar todas las sesiones asignadas.",
+      "q2": "¿Puedo alternar entre Free y Plus?",
+      "a2": "Sí. Las mejoras a Plus se aplican de inmediato, aumentando tus límites. Si reduces tu plan, dispones de un período de gracia de 24 horas antes de que las rutinas o ejercicios adicionales se oculten temporalmente—nunca se borran.",
+      "q3": "¿Dónde descargan los atletas la app móvil?",
+      "a3": "Gymmi Mobile está desarrollada de forma nativa para iOS y Android, permitiendo a los atletas registrar pesos, RPE y cronómetros de descanso directamente en el gimnasio.",
+      "q4": "¿Cómo funciona la traducción con IA Gemini?",
+      "a4": "Gymmi integra Google Gemini AI para traducir al instante ejercicios personalizados e instrucciones entre inglés y español, facilitando el entrenamiento bilingüe.",
+      "q5": "¿Cuándo estará disponible el plan Pro?",
+      "a5": "El plan Pro está actualmente en fase de desarrollo activo. Incorporará capacidad ilimitada de clientes, cuentas colaborativas para gimnasios y analíticas avanzadas."
+    },
+    "footer": {
+      "tagline": "Potenciando a entrenadores y atletas con herramientas de precisión.",
+      "copyright": "© 2026 Gymmi. Todos los derechos reservados.",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    }
   }
 }
+

@@ -581,5 +581,177 @@
       "exercises": "Up to 5 private custom exercises",
       "sharing": "Routine sharing and trainer template editing"
     }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "ecosystem": "Ecosystem",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log In",
+      "signup": "Get Started",
+      "dashboard": "Go to Dashboard"
+    },
+    "hero": {
+      "tag": "The Modern Fitness Platform",
+      "titleLine1": "Coaching Meets Execution.",
+      "titleHighlight": "Elevate Every Rep.",
+      "subtitle": "The all-in-one platform connecting fitness coaches and dedicated athletes. Build precision workouts on the web, execute with real-time tracking on mobile, and achieve measurable gains.",
+      "ctaPrimary": "Start Free Today",
+      "ctaSecondary": "Explore Features",
+      "statExercises": "Curated Exercises",
+      "statLogging": "Active Session Logging",
+      "statAi": "AI Translation Engine"
+    },
+    "preview": {
+      "badge": "Live Workout",
+      "routineName": "Upper Body Hypertrophy",
+      "meta": "Coach Assigned • Day 1 • 45m",
+      "ex1Name": "Barbell Bench Press",
+      "ex1Detail": "4 sets × 8-10 reps • RPE 8.5",
+      "ex2Name": "Incline Dumbbell Fly",
+      "ex2Detail": "3 sets × 12 reps • RPE 8.0",
+      "ex3Name": "Triceps Rope Pushdown",
+      "ex3Detail": "3 sets × 15 reps • RPE 9.0",
+      "timer": "Active: 28:45",
+      "completed": "2 of 3 Sets Completed"
+    },
+    "features": {
+      "tag": "Core Capabilities",
+      "title": "Engineered for Serious Training",
+      "subtitle": "From programming 8-client rosters to tracking personal PRs solo, Gymmi provides professional tools built for performance.",
+      "tabRoutine": "Routine Builder",
+      "tabBodyMap": "Muscle Body Map",
+      "tabActive": "Active Workout",
+      "tabTrainer": "Coaching Pipeline",
+      "tabAi": "Gemini AI",
+      "routineTitle": "Visual Workout Programming",
+      "routineDesc": "Construct high-impact, multi-day routines with surgical precision. Configure supersets, rest intervals, target rep ranges, and target RPE with an intuitive, flexible builder.",
+      "bodyMapTitle": "Interactive Muscle Targeting",
+      "bodyMapDesc": "Explore our anatomical muscle map. Target specific muscle groups—Chest, Lats, Quads, Hamstrings, Deltoids, Core—and filter exercises by equipment with zero friction.",
+      "activeTitle": "Real-Time Workout Execution",
+      "activeDesc": "Track sets, reps, and perceived exertion in real time. Dynamic rest timers and completion checkmarks keep athletes focused on every single set.",
+      "trainerTitle": "Coach-to-Client Architecture",
+      "trainerDesc": "Establish structured coaching contracts, deliver bespoke training blocks directly to client mobile devices, and maintain automated routine forking for customized progression.",
+      "aiTitle": "Multilingual AI Powered by Gemini",
+      "aiDesc": "Break language barriers instantly. Custom exercises, descriptions, and coaching notes are automatically translated between English and Spanish using Google Gemini AI."
+    },
+    "audience": {
+      "coachTag": "For Fitness Coaches",
+      "coachTitle": "Scale Your Coaching. Zero Friction.",
+      "coachDesc": "Spend less time updating spreadsheets and more time guiding client breakthroughs with a purpose-built coaching portal.",
+      "coachF1": "Manage up to 8 active client contracts seamlessly on the Plus tier",
+      "coachF2": "Build multi-week programs and deploy them with single-click routine assignments",
+      "coachF3": "Create proprietary custom exercises with specialized cues and targets",
+      "coachF4": "Share vetted training templates across fellow coaches in your network",
+      "clientTag": "For Dedicated Athletes",
+      "clientTitle": "Train With Direction. Solo or Coached.",
+      "clientDesc": "Log your personal PRs, follow coach-prescribed routines, and maintain full visibility over your strength journey.",
+      "clientF1": "Execute workouts in real-time with automated timers and RPE logging",
+      "clientF2": "Connect with certified personal trainers who program and supervise your progress",
+      "clientF3": "Design solo routines tailored to your schedule and gym equipment",
+      "clientF4": "Interactive anatomical muscle map ensures balanced, injury-free training"
+    },
+    "pricing": {
+      "tag": "Transparent Pricing",
+      "title": "Plans That Scale With You",
+      "subtitle": "Start free today. Upgrade whenever you need expanded client seats or workout templates.",
+      "tabTrainer": "For Coaches & Trainers",
+      "tabClient": "For Athletes & Clients",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "save20": "Save 20%",
+      "perMonth": "/mo",
+      "billedAnnually": "billed annually",
+      "popularBadge": "Most Popular",
+      "comingSoonBadge": "Coming Soon",
+      "startFree": "Get Started Free",
+      "upgradePlus": "Upgrade to Plus",
+      "joinWaitlist": "Coming Soon",
+      "disclaimer": "Self-serve billing integration is coming soon. Plus plans are currently activated through admin controls and platform invitations.",
+      "trainer": {
+        "free": {
+          "title": "Free Coach",
+          "desc": "Essential tools for personal trainers working with initial clients.",
+          "f1": "2 Accepted client contracts",
+          "f2": "2 Owned workout templates",
+          "f3": "Complete exercise library access",
+          "f4": "Template editing (Plus only)",
+          "f5": "Custom exercises (Plus only)",
+          "f6": "Routine sharing (Plus only)"
+        },
+        "plus": {
+          "title": "Coach Plus",
+          "desc": "Engineered for active trainers scaling their roster and programs.",
+          "f1": "Up to 8 accepted client contracts",
+          "f2": "Up to 8 owned workout templates",
+          "f3": "Up to 5 private custom exercises",
+          "f4": "Full routine template editing",
+          "f5": "Routine sharing with other coaches",
+          "f6": "Custom gym branding (Pro only)"
+        },
+        "pro": {
+          "title": "Coach Pro",
+          "desc": "For high-volume studios and coaching organizations.",
+          "f1": "Unlimited client contracts",
+          "f2": "Unlimited workout templates",
+          "f3": "Unlimited custom exercises",
+          "f4": "Advanced client compliance analytics",
+          "f5": "Team collaboration & coach roster",
+          "f6": "Custom branding & PDF export"
+        }
+      },
+      "client": {
+        "free": {
+          "title": "Solo Athlete",
+          "desc": "Frictionless workout logging for athletes training independently.",
+          "f1": "1 Owned solo routine template",
+          "f2": "1 Active trainer connection",
+          "f3": "Full Active Workout logging mode",
+          "f4": "Custom exercises (Plus only)",
+          "f5": "Expanded routine library (Plus only)"
+        },
+        "plus": {
+          "title": "Athlete Plus",
+          "desc": "For serious athletes wanting deeper customization and routine variety.",
+          "f1": "Up to 8 owned solo routines",
+          "f2": "Up to 5 private custom exercises",
+          "f3": "1 Active trainer connection",
+          "f4": "Full Active Workout & history",
+          "f5": "Complete exercise catalog access"
+        },
+        "pro": {
+          "title": "Athlete Pro",
+          "desc": "Elite athletes seeking performance telemetry and coaching flexibility.",
+          "f1": "Unlimited solo routines",
+          "f2": "Unlimited custom exercises",
+          "f3": "Multiple simultaneous coaches",
+          "f4": "1RM progression & volume charts",
+          "f5": "Priority AI workout recommendations"
+        }
+      }
+    },
+    "faq": {
+      "tag": "Got Questions?",
+      "title": "Frequently Asked Questions",
+      "q1": "What is a 'Covered Client'?",
+      "a1": "When an athlete enters an active training contract with a coach, they become a Covered Client. The coach manages their active training program, temporarily locking solo routine creation while giving the athlete full access to execute and log their coach's prescribed workouts.",
+      "q2: Can I switch between Free and Plus?": "Can I switch between Free and Plus?",
+      "q2": "Can I switch between Free and Plus?",
+      "a2": "Yes. Upgrades immediately expand your client capacity and template limits. If you downgrade, a 24-hour grace period is granted before overflow routines or exercises are softly hidden—never deleted.",
+      "q3": "Where do athletes access the mobile app?",
+      "a3": "Gymmi Mobile is built natively for iOS and Android, allowing athletes to log weights, record RPE, and check off sets in real-time right on the gym floor.",
+      "q4": "How does Gemini AI translation work?",
+      "a4": "Gymmi utilizes Google Gemini AI to translate custom exercises and routine instructions automatically between English and Spanish, enabling seamless bilingual coaching.",
+      "q5": "When will the Pro tier be available?",
+      "a5": "The Pro tier is currently in active development. It will introduce unlimited client capacity, team collaboration for fitness studios, and advanced analytics."
+    },
+    "footer": {
+      "tagline": "Empowering coaches and athletes with precision fitness tools.",
+      "copyright": "© 2026 Gymmi. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
   }
 }
+

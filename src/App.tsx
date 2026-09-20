@@ -17,12 +17,14 @@ import ClientsPage from './pages/ClientsPage'
 import TrainersPage from './pages/TrainersPage'
 import AdminPermissionsPage from './pages/admin/AdminPermissionsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
+import LandingPage from './pages/LandingPage'
 
 function App() {
   return (
     <>
       <Toaster position="top-right" richColors />
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
@@ -44,10 +46,11 @@ function App() {
           <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />
           <Route path="/admin/users" element={<RoleRoute role="Admin"><AdminUsersPage /></RoleRoute>} />
         </Route>
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   )
 }
 
 export default App
+
