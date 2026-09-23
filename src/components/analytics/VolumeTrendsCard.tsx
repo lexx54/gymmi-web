@@ -1,17 +1,58 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import type { VolumeTrends } from '../../services/api/analytics';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
+
+interface VolumeTrendsCardProps {
+  data?: VolumeTrends;
+  isLoading?: boolean;
+}
 
 const WEEK_LABELS = [1, 2, 3, 4] as const;
 
-const TREND_PATH = 'M0 170 C 80 160, 140 90, 210 95 S 330 175, 400 175 S 520 55, 620 45 S 760 150, 860 120 L 900 110';
-const TREND_AREA = `${TREND_PATH} L 900 210 L 0 210 Z`;
+function generatePath(weeks: { volumeKg: number }[]): { path: string; area: string } {
+  const points = weeks.map((w, index) => ({
+    x: 75 + index * 250,
+    vol: w.volumeKg,
+  }));
 
-/**
- * Displays the weekly workout intensity trend line with the total volume.
- */
-export function VolumeTrendsCard() {
+  const maxVol = Math.max(...points.map((p) => p.vol), 1);
+  const coords = points.map((p) => ({
+    x: p.x,
+    y: Math.round(180 - (p.vol / maxVol) * 140),
+  }));
+
+  if (coords.length < 4) {
+    const flat = 'M 0 180 L 900 180';
+    return { path: flat, area: `${flat} L 900 210 L 0 210 Z` };
+  }
+
+  // Smooth cubic bezier through coords
+  const p0 = coords[0];
+  const p1 = coords[1];
+  const p2 = coords[2];
+  const p3 = coords[3];
+
+  const path = `M 0 ${p0.y} C ${p0.x / 2} ${p0.y}, ${p0.x - 40} ${p0.y}, ${p0.x} ${p0.y} S ${p1.x - 80} ${p1.y}, ${p1.x} ${p1.y} S ${p2.x - 80} ${p2.y}, ${p2.x} ${p2.y} S ${p3.x - 80} ${p3.y}, ${p3.x} ${p3.y} L 900 ${p3.y}`;
+  const area = `${path} L 900 210 L 0 210 Z`;
+
+  return { path, area };
+}
+
+export function VolumeTrendsCard({ data, isLoading }: VolumeTrendsCardProps) {
   const { t } = useTranslation();
+
+  const total = data?.totalVolumeKg ?? 0;
+  const delta = data?.deltaPercent ?? 0;
+  const deltaFormatted = delta > 0 ? `+${delta}%` : `${delta}%`;
+  const weeks = data?.weeks || [];
+
+  const { path, area } = useMemo(() => {
+    return generatePath(weeks);
+  }, [weeks]);
+
+  const peak = data?.peakSession;
 
   return (
     <AnalyticsCard>
@@ -22,9 +63,11 @@ export function VolumeTrendsCard() {
         </div>
         <TotalsWrap>
           <TotalValue>
-            142,500 <TotalUnit>{t('analytics.kg')}</TotalUnit>
+            {isLoading ? '...' : total.toLocaleString()} <TotalUnit>{t('analytics.kg')}</TotalUnit>
           </TotalValue>
-          <Delta>{t('analytics.delta')}</Delta>
+          <Delta $positive={delta >= 0}>
+            {deltaFormatted} {t('analytics.vsLastMonth', 'vs previous period')}
+          </Delta>
         </TotalsWrap>
       </HeaderRow>
 
@@ -36,13 +79,15 @@ export function VolumeTrendsCard() {
               <stop offset="100%" stopColor="#ef233c" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <path d={TREND_AREA} fill="url(#volumeAreaGradient)" />
-          <path d={TREND_PATH} fill="none" stroke="#ef233c" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={area} fill="url(#volumeAreaGradient)" />
+          <path d={path} fill="none" stroke="#ef233c" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         </ChartSvg>
-        <Marker>
-          <MarkerDate>{t('analytics.oct24')}</MarkerDate>
-          <MarkerValue>{t('analytics.markerValue')}</MarkerValue>
-        </Marker>
+        {peak && peak.volumeKg > 0 ? (
+          <Marker>
+            <MarkerDate>{peak.date}</MarkerDate>
+            <MarkerValue>{peak.volumeKg.toLocaleString()} {t('analytics.kg')}</MarkerValue>
+          </Marker>
+        ) : null}
       </ChartWrap>
 
       <WeekLabels>
@@ -80,9 +125,9 @@ const TotalUnit = styled.span`
   font-weight: 600;
 `;
 
-const Delta = styled.p`
+const Delta = styled.p<{ $positive: boolean }>`
   margin: 0.2rem 0 0;
-  color: #f28b98;
+  color: ${({ $positive }) => ($positive ? '#55c2ff' : '#f28b98')};
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.7rem;

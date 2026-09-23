@@ -1,30 +1,26 @@
-import { ArrowUp, Minus, TrendingUp } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { ArrowUp, Minus, TrendingUp, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import type { PersonalRecord, PersonalRecordStatus } from '../../services/api/analytics';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
 
-type Status = 'ELITE' | 'ADVANCED';
+interface PersonalRecordsCardProps {
+  records?: PersonalRecord[];
+  isLoading?: boolean;
+}
 
-type RecordRow = {
-  id: string;
-  exerciseKey: string;
-  date: string;
-  weight: string;
-  status: Status;
-  icon: LucideIcon;
-};
+function getStatusIcon(status: PersonalRecordStatus) {
+  switch (status) {
+    case 'ALL-TIME BEST':
+      return TrendingUp;
+    case 'NEW PR':
+      return ArrowUp;
+    default:
+      return Minus;
+  }
+}
 
-const RECORDS: RecordRow[] = [
-  { id: 'squat', exerciseKey: 'analytics.backSquat', date: 'Oct 12, 2024', weight: '185.0', status: 'ELITE', icon: TrendingUp },
-  { id: 'bench', exerciseKey: 'analytics.benchPress', date: 'Sep 28, 2024', weight: '120.0', status: 'ADVANCED', icon: Minus },
-  { id: 'deadlift', exerciseKey: 'analytics.deadlift', date: 'Nov 02, 2024', weight: '220.0', status: 'ELITE', icon: ArrowUp },
-];
-
-/**
- * Lists the athlete's personal records in a compact table-like layout.
- */
-export function PersonalRecordsCard() {
+export function PersonalRecordsCard({ records = [], isLoading }: PersonalRecordsCardProps) {
   const { t } = useTranslation();
 
   return (
@@ -32,38 +28,53 @@ export function PersonalRecordsCard() {
       <Eyebrow>{t('analytics.hallOfFame')}</Eyebrow>
       <CardTitle>{t('analytics.personalRecords')}</CardTitle>
 
-      <HeaderRow>
-        <HeaderCell>{t('analytics.exercise')}</HeaderCell>
-        <HeaderCell>{t('analytics.lastPrDate')}</HeaderCell>
-        <HeaderCell>{t('analytics.weight')}</HeaderCell>
-        <HeaderCell>{t('analytics.status')}</HeaderCell>
-      </HeaderRow>
+      {records.length > 0 ? (
+        <>
+          <HeaderRow>
+            <HeaderCell>{t('analytics.exercise')}</HeaderCell>
+            <HeaderCell>{t('analytics.lastPrDate')}</HeaderCell>
+            <HeaderCell>{t('analytics.weight')}</HeaderCell>
+            <HeaderCell>{t('analytics.status')}</HeaderCell>
+          </HeaderRow>
 
-      <List>
-        {RECORDS.map((record) => {
-          const Icon = record.icon;
-          return (
-            <Row key={record.id}>
-              <ExerciseCell>
-                <IconWrap>
-                  <Icon size={16} />
-                </IconWrap>
-                <ExerciseName>{t(record.exerciseKey)}</ExerciseName>
-              </ExerciseCell>
-              <DateCell>{record.date}</DateCell>
-              <WeightCell>
-                {record.weight} <WeightUnit>{t('analytics.kg')}</WeightUnit>
-              </WeightCell>
-              <StatusCell>
-                <StatusBadge $status={record.status}>
-                  <StatusDot />
-                  {record.status === 'ELITE' ? t('analytics.elite') : t('analytics.advanced')}
-                </StatusBadge>
-              </StatusCell>
-            </Row>
-          );
-        })}
-      </List>
+          <List>
+            {records.map((record) => {
+              const Icon = getStatusIcon(record.status);
+              return (
+                <Row key={record.exerciseId}>
+                  <ExerciseCell>
+                    <IconWrap>
+                      <Icon size={16} />
+                    </IconWrap>
+                    <ExerciseName>{record.exerciseName}</ExerciseName>
+                  </ExerciseCell>
+                  <DateCell>{record.date}</DateCell>
+                  <WeightCell>
+                    {record.weightKg} <WeightUnit>{t('analytics.kg')}</WeightUnit>
+                  </WeightCell>
+                  <StatusCell>
+                    <StatusBadge $status={record.status}>
+                      <StatusDot />
+                      {record.status === 'ALL-TIME BEST'
+                        ? t('analytics.allTimeBest', 'ALL-TIME BEST')
+                        : record.status === 'NEW PR'
+                          ? t('analytics.newPr', 'NEW PR')
+                          : t('analytics.steady', 'STEADY')}
+                    </StatusBadge>
+                  </StatusCell>
+                </Row>
+              );
+            })}
+          </List>
+        </>
+      ) : (
+        <EmptyState>
+          <Trophy size={32} color="#5e6787" />
+          <EmptyText>
+            {isLoading ? t('common.loading', 'Loading...') : t('analytics.noPrs', 'No personal records logged yet')}
+          </EmptyText>
+        </EmptyState>
+      )}
     </AnalyticsCard>
   );
 }
@@ -147,7 +158,7 @@ const WeightUnit = styled.span`
 
 const StatusCell = styled.span``;
 
-const StatusBadge = styled.span<{ $status: Status }>`
+const StatusBadge = styled.span<{ $status: PersonalRecordStatus }>`
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -158,8 +169,17 @@ const StatusBadge = styled.span<{ $status: Status }>`
   text-transform: uppercase;
   letter-spacing: 0.12em;
   background: ${({ $status }) =>
-    $status === 'ELITE' ? 'rgba(239, 35, 60, 0.22)' : 'rgba(239, 35, 60, 0.12)'};
-  color: ${({ $status }) => ($status === 'ELITE' ? '#ff8994' : '#f5a7ad')};
+    $status === 'ALL-TIME BEST'
+      ? 'rgba(239, 35, 60, 0.22)'
+      : $status === 'NEW PR'
+        ? 'rgba(85, 194, 255, 0.22)'
+        : 'rgba(255, 255, 255, 0.08)'};
+  color: ${({ $status }) =>
+    $status === 'ALL-TIME BEST'
+      ? '#ff8994'
+      : $status === 'NEW PR'
+        ? '#55c2ff'
+        : '#bdc2e1'};
 `;
 
 const StatusDot = styled.span`
@@ -167,4 +187,19 @@ const StatusDot = styled.span`
   height: 0.35rem;
   border-radius: 9999px;
   background: currentColor;
+`;
+
+const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  gap: 0.75rem;
+`;
+
+const EmptyText = styled.p`
+  margin: 0;
+  color: #8e94b4;
+  font-size: 0.9rem;
 `;

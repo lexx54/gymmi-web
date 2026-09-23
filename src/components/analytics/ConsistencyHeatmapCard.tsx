@@ -1,32 +1,37 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import type { ConsistencyHeatmap } from '../../services/api/analytics';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
+
+interface ConsistencyHeatmapCardProps {
+  data?: ConsistencyHeatmap;
+  isLoading?: boolean;
+}
 
 const INTENSITY_COLORS = ['#2a2f4d', '#3a405f', '#614c5c', '#ae5565', '#ef233c'] as const;
 
-type IntensityLevel = 0 | 1 | 2 | 3 | 4;
-
-const HEATMAP: IntensityLevel[][] = [
-  [4, 4, 3, 0, 4],
-  [2, 3, 1, 2, 0],
-  [3, 1, 2, 2, 3],
-  [2, 0, 4, 3, 1],
-  [0, 3, 2, 1, 4],
-  [4, 4, 3, 3, 2],
-  [1, 0, 4, 2, 4],
-];
-
-const SUMMARY = [
-  { value: '18', labelKey: 'analytics.dayStreak' },
-  { value: '94%', labelKey: 'analytics.completion' },
-  { value: '28', labelKey: 'analytics.workouts' },
-];
-
-/**
- * Shows training consistency over a 5-week window and summary metrics.
- */
-export function ConsistencyHeatmapCard() {
+export function ConsistencyHeatmapCard({ data, isLoading }: ConsistencyHeatmapCardProps) {
   const { t } = useTranslation();
+
+  const grid = data?.grid && data.grid.length > 0 ? data.grid : Array.from({ length: 7 }, () =>
+    Array.from({ length: 5 }, () => ({
+      weekday: 0,
+      weekIndex: 0,
+      date: '',
+      durationMinutes: 0,
+      intensityLevel: 0 as const,
+    })),
+  );
+
+  const streak = data?.streak ?? 0;
+  const completion = data?.completionPercent ?? 0;
+  const workouts = data?.totalWorkouts ?? 0;
+
+  const summary = [
+    { value: isLoading ? '...' : String(streak), labelKey: 'analytics.dayStreak' },
+    { value: isLoading ? '...' : `${completion}%`, labelKey: 'analytics.completion' },
+    { value: isLoading ? '...' : String(workouts), labelKey: 'analytics.workouts' },
+  ];
 
   return (
     <AnalyticsCard>
@@ -45,17 +50,21 @@ export function ConsistencyHeatmapCard() {
       </HeaderRow>
 
       <Grid>
-        {HEATMAP.map((row, rowIndex) => (
-          <Row key={rowIndex}>
-            {row.map((level, cellIndex) => (
-              <Cell key={cellIndex} style={{ background: INTENSITY_COLORS[level] }} />
-            ))}
-          </Row>
+        {/* We have 5 week columns. Each column has 7 days. */}
+        {Array.from({ length: 5 }).map((_, colIndex) => (
+          <Column key={colIndex}>
+            {grid.map((row, rowIndex) => {
+              const cell = row[colIndex] || { intensityLevel: 0, date: '', durationMinutes: 0 };
+              const color = INTENSITY_COLORS[cell.intensityLevel] || INTENSITY_COLORS[0];
+              const tooltip = cell.date ? `${cell.date}: ${cell.durationMinutes}m` : undefined;
+              return <Cell key={rowIndex} style={{ background: color }} title={tooltip} />;
+            })}
+          </Column>
         ))}
       </Grid>
 
       <SummaryRow>
-        {SUMMARY.map((item) => (
+        {summary.map((item) => (
           <SummaryItem key={item.labelKey}>
             <SummaryValue>{item.value}</SummaryValue>
             <SummaryLabel>{t(item.labelKey)}</SummaryLabel>
@@ -100,7 +109,7 @@ const Grid = styled.div`
   gap: 0.85rem;
 `;
 
-const Row = styled.div`
+const Column = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -109,6 +118,11 @@ const Row = styled.div`
 const Cell = styled.span`
   height: 1.65rem;
   border-radius: 0.35rem;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
 `;
 
 const SummaryRow = styled.div`

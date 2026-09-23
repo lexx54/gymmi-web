@@ -32,3 +32,9 @@ Web training analytics dashboard powered by the authoritative `/analytics` backe
 - Trainer client roster is loaded from `/contracts/clients` and gates the client picker.
 - Empty states are provided for athletes with no recorded sessions or personal records.
 - React Query manages cache and loading states.
+- The `MuscleLoadCard` donut center uses flexbox column layout to keep the sets count and "SERIES" unit label vertically and horizontally centered inside the SVG donut hole.
+
+## Recent Changes
+
+- Fixed donut center alignment in `MuscleLoadCard.tsx`: Replaced multi-row grid layout on `DonutCenter` with a centered flex column (`display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;`) to prevent the set count number and label from splitting across opposing edges of the donut hole.
+

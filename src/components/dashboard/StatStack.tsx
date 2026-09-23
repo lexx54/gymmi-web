@@ -1,40 +1,71 @@
-import { Droplets, Flame, Timer } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Dumbbell, Flame, Timer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-type StatItem = {
-  labelKey: string;
-  value: string;
-  unitKey: string;
-  icon: LucideIcon;
-};
-
-const STATS: StatItem[] = [
-  { labelKey: 'dashboard.calories', value: '1,842', unitKey: 'dashboard.kcal', icon: Flame },
-  { labelKey: 'dashboard.activeTime', value: '124', unitKey: 'dashboard.mins', icon: Timer },
-  { labelKey: 'dashboard.hydration', value: '2.8', unitKey: 'dashboard.liters', icon: Droplets },
-];
+import { useAuth } from '../../context/AuthContext';
+import { useMyAnalytics } from '../../hooks/useAnalytics';
 
 /**
- * Renders the right-column stat cards.
+ * Renders the right-column stat cards (Weekly Volume, Active Time, Daily Streak).
  */
 export function StatStack() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isClient = user?.role?.name === 'Client';
+  const { data: analytics, isLoading } = useMyAnalytics(isClient);
+
+  // Weekly workout volume for current week (sum of dailyVolume or 4th week)
+  const weeklyVolume = analytics?.volumeTrends?.dailyVolume?.length
+    ? analytics.volumeTrends.dailyVolume.reduce((acc, d) => acc + d.volumeKg, 0)
+    : (analytics?.volumeTrends?.weeks?.[3]?.volumeKg ?? 0);
+
+  // Active time for the current week (weekIndex: 4 across Monday-Sunday)
+  const currentWeekActiveMinutes = analytics?.consistency?.grid
+    ? analytics.consistency.grid.reduce((sum, row) => sum + (row[4]?.durationMinutes ?? 0), 0)
+    : 0;
+
+  // Consecutive day streak
+  const streak = analytics?.consistency?.streak ?? 0;
+
+  const stats = [
+    {
+      id: 'volume',
+      label: t('dashboard.weeklyVolume'),
+      value: isLoading && !analytics ? '...' : weeklyVolume.toLocaleString(),
+      unit: t('dashboard.kg'),
+      icon: Dumbbell,
+      iconColor: '#ff8a93',
+    },
+    {
+      id: 'activeTime',
+      label: t('dashboard.activeTime'),
+      value: isLoading && !analytics ? '...' : String(currentWeekActiveMinutes),
+      unit: t('dashboard.mins'),
+      icon: Timer,
+      iconColor: '#f7c873',
+    },
+    {
+      id: 'streak',
+      label: t('dashboard.dailyStreak'),
+      value: isLoading && !analytics ? '...' : String(streak),
+      unit: t('dashboard.days'),
+      icon: Flame,
+      iconColor: '#ef233c',
+    },
+  ];
 
   return (
     <Stack>
-      {STATS.map((stat) => {
+      {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.labelKey}>
-            <IconWrap>
-              <Icon size={16} />
+          <Card key={stat.id} data-testid={`stat-${stat.id}`}>
+            <IconWrap $color={stat.iconColor}>
+              <Icon size={18} />
             </IconWrap>
-            <Label>{t(stat.labelKey)}</Label>
+            <Label>{stat.label}</Label>
             <ValueRow>
               <Value>{stat.value}</Value>
-              <Unit>{t(stat.unitKey)}</Unit>
+              <Unit>{stat.unit}</Unit>
             </ValueRow>
           </Card>
         );
@@ -60,8 +91,8 @@ const Card = styled.article`
   justify-content: space-between;
 `;
 
-const IconWrap = styled.div`
-  color: #f5b9bf;
+const IconWrap = styled.div<{ $color?: string }>`
+  color: ${({ $color }) => $color ?? '#f5b9bf'};
 `;
 
 const Label = styled.p`

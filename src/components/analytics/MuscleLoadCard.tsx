@@ -1,27 +1,26 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import type { MuscleLoad, MuscleSegment } from '../../services/api/analytics';
 import { AnalyticsCard, CardTitle, Eyebrow } from './AnalyticsShell';
 
-type Segment = {
-  id: string;
-  labelKey: string;
-  percent: number;
-  color: string;
-};
+interface MuscleLoadCardProps {
+  data?: MuscleLoad;
+  isLoading?: boolean;
+}
 
-const SEGMENTS: Segment[] = [
-  { id: 'legs', labelKey: 'analytics.legsLower', percent: 45, color: '#ef233c' },
-  { id: 'push', labelKey: 'analytics.pushChest', percent: 30, color: '#f5a7ad' },
-  { id: 'core', labelKey: 'analytics.coreStability', percent: 15, color: '#5e6787' },
-  { id: 'other', labelKey: 'analytics.other', percent: 10, color: '#3d4463' },
+const DEFAULT_SEGMENTS: MuscleSegment[] = [
+  { id: 'lower', labelKey: 'analytics.lowerBody', sets: 0, percent: 0, color: '#ef233c' },
+  { id: 'upper', labelKey: 'analytics.upperBody', sets: 0, percent: 0, color: '#f5a7ad' },
+  { id: 'arms', labelKey: 'analytics.arms', sets: 0, percent: 0, color: '#5e6787' },
+  { id: 'core', labelKey: 'analytics.core', sets: 0, percent: 0, color: '#3d4463' },
 ];
 
 const RADIUS = 72;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-type SegmentSlice = Segment & { dash: number; offset: number };
+type SegmentSlice = MuscleSegment & { dash: number; offset: number };
 
-function computeSlices(segments: Segment[]): SegmentSlice[] {
+function computeSlices(segments: MuscleSegment[]): SegmentSlice[] {
   let cursor = 0;
   return segments.map((segment) => {
     const dash = (segment.percent / 100) * CIRCUMFERENCE;
@@ -31,12 +30,11 @@ function computeSlices(segments: Segment[]): SegmentSlice[] {
   });
 }
 
-/**
- * Shows training load distribution across muscle groups.
- */
-export function MuscleLoadCard() {
+export function MuscleLoadCard({ data, isLoading }: MuscleLoadCardProps) {
   const { t } = useTranslation();
-  const slices = computeSlices(SEGMENTS);
+  const segments = data?.distribution && data.distribution.length > 0 ? data.distribution : DEFAULT_SEGMENTS;
+  const totalSets = data?.totalSets ?? 0;
+  const slices = computeSlices(segments);
 
   return (
     <AnalyticsCard>
@@ -46,33 +44,34 @@ export function MuscleLoadCard() {
       <DonutWrap>
         <DonutSvg viewBox="0 0 200 200" role="img" aria-label={t('analytics.muscleLoadDistribution')}>
           <circle cx="100" cy="100" r={RADIUS} stroke="#23284a" strokeWidth="20" fill="none" />
-          {slices.map((slice) => (
-            <circle
-              key={slice.id}
-              cx="100"
-              cy="100"
-              r={RADIUS}
-              stroke={slice.color}
-              strokeWidth="20"
-              fill="none"
-              strokeDasharray={`${slice.dash} ${CIRCUMFERENCE - slice.dash}`}
-              strokeDashoffset={-slice.offset}
-              transform="rotate(-90 100 100)"
-              strokeLinecap="butt"
-            />
-          ))}
+          {totalSets > 0 &&
+            slices.map((slice) => (
+              <circle
+                key={slice.id}
+                cx="100"
+                cy="100"
+                r={RADIUS}
+                stroke={slice.color}
+                strokeWidth="20"
+                fill="none"
+                strokeDasharray={`${slice.dash} ${CIRCUMFERENCE - slice.dash}`}
+                strokeDashoffset={-slice.offset}
+                transform="rotate(-90 100 100)"
+                strokeLinecap="butt"
+              />
+            ))}
         </DonutSvg>
         <DonutCenter>
-          <CenterValue>84</CenterValue>
+          <CenterValue>{isLoading ? '...' : totalSets}</CenterValue>
           <CenterLabel>{t('analytics.sets')}</CenterLabel>
         </DonutCenter>
       </DonutWrap>
 
       <Legend>
-        {SEGMENTS.map((segment) => (
+        {segments.map((segment) => (
           <LegendItem key={segment.id}>
             <LegendDot style={{ background: segment.color }} />
-            <LegendLabel>{t(segment.labelKey)}</LegendLabel>
+            <LegendLabel>{t(segment.labelKey, segment.id)}</LegendLabel>
             <LegendValue>{segment.percent}%</LegendValue>
           </LegendItem>
         ))}
@@ -96,26 +95,31 @@ const DonutSvg = styled.svg`
 const DonutCenter = styled.div`
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  pointer-events: none;
 `;
 
 const CenterValue = styled.p`
   margin: 0;
   color: #f5f6ff;
-  font-size: 2.8rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  font-weight: 800;
   line-height: 1;
+  letter-spacing: -0.02em;
 `;
 
 const CenterLabel = styled.p`
-  margin: 0.25rem 0 0;
+  margin: 0.35rem 0 0;
   color: #8e94b4;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  font-size: 0.7rem;
   font-weight: 600;
+  line-height: 1;
 `;
 
 const Legend = styled.ul`

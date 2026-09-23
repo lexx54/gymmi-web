@@ -1,41 +1,84 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { useAuth } from '../../context/AuthContext';
+import { useMyAnalytics } from '../../hooks/useAnalytics';
 
-const BARS = [
-  { dayKey: 'dates.mon', height: 35 },
-  { dayKey: 'dates.tue', height: 52 },
-  { dayKey: 'dates.wed', height: 30 },
-  { dayKey: 'dates.thu', height: 64 },
-  { dayKey: 'dates.fri', height: 74, active: true },
-  { dayKey: 'dates.sat', height: 46 },
-  { dayKey: 'dates.sun', height: 22 },
+const WEEKDAYS = [
+  { index: 0, dayKey: 'dates.mon' },
+  { index: 1, dayKey: 'dates.tue' },
+  { index: 2, dayKey: 'dates.wed' },
+  { index: 3, dayKey: 'dates.thu' },
+  { index: 4, dayKey: 'dates.fri' },
+  { index: 5, dayKey: 'dates.sat' },
+  { index: 6, dayKey: 'dates.sun' },
 ];
 
 /**
- * Displays weekly progress with static bar metrics.
+ * Displays weekly workout volume progress with live Mon–Sun daily volume bars.
  */
 export function WeeklyProgressCard() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isClient = user?.role?.name === 'Client';
+  const { data: analytics, isLoading } = useMyAnalytics(isClient);
+
+  // Daily volume entries for current week (Mon=0..Sun=6)
+  const dailyVolume = analytics?.volumeTrends?.dailyVolume ?? [];
+  const maxVolume = Math.max(1, ...dailyVolume.map((d) => d.volumeKg));
+
+  // Goal completion % against assigned routine days
+  const completionPercent = analytics?.consistency?.completionPercent ?? 0;
+
+  // Current weekday (0=Mon, ..., 6=Sun)
+  const jsDay = new Date().getDay();
+  const currentWeekday = jsDay === 0 ? 6 : jsDay - 1;
 
   return (
-    <Card>
+    <Card data-testid="weekly-progress-card">
       <HeaderRow>
         <div>
           <Eyebrow>{t('dashboard.weeklyProgress')}</Eyebrow>
           <Title>{t('dashboard.volumeTraining')}</Title>
         </div>
         <PercentWrap>
-          <Percent>84%</Percent>
+          <Percent data-testid="goal-percent">
+            {isLoading && !analytics ? '...' : `${completionPercent}%`}
+          </Percent>
           <PercentCaption>{t('dashboard.goalReached')}</PercentCaption>
         </PercentWrap>
       </HeaderRow>
+
       <BarsWrap>
-        {BARS.map((bar) => (
-          <BarItem key={bar.dayKey}>
-            <Bar $height={bar.height} $active={Boolean(bar.active)} />
-            <DayLabel>{t(bar.dayKey)}</DayLabel>
-          </BarItem>
-        ))}
+        {WEEKDAYS.map((day) => {
+          const entry = dailyVolume.find((v) => v.weekday === day.index);
+          const volume = entry?.volumeKg ?? 0;
+          const hasVolume = volume > 0;
+          const height = hasVolume
+            ? Math.max(18, Math.round((volume / maxVolume) * 92))
+            : 12;
+          const isActive = day.index === currentWeekday;
+
+          return (
+            <BarItem key={day.dayKey}>
+              <BarTrack>
+                <Bar
+                  $height={height}
+                  $active={isActive}
+                  $hasVolume={hasVolume}
+                  title={`${t(day.dayKey)}: ${volume.toLocaleString()} kg`}
+                  data-testid={`bar-${day.index}`}
+                >
+                  {hasVolume && (
+                    <BarVolume>
+                      {volume >= 1000 ? `${(volume / 1000).toFixed(1)}k` : volume}
+                    </BarVolume>
+                  )}
+                </Bar>
+              </BarTrack>
+              <DayLabel $active={isActive}>{t(day.dayKey)}</DayLabel>
+            </BarItem>
+          );
+        })}
       </BarsWrap>
     </Card>
   );
@@ -96,13 +139,13 @@ const PercentCaption = styled.p`
 
 const BarsWrap = styled.div`
   margin-top: 1.2rem;
-  min-height: 18.75rem;
+  height: 18.75rem;
   border-radius: 1.35rem;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  align-items: end;
+  align-items: stretch;
   gap: 0.8rem;
-  padding: 1.15rem 0.6rem 0.35rem;
+  padding: 2.2rem 0.8rem 0.9rem;
   background: linear-gradient(180deg, rgba(18, 21, 41, 0.4) 0%, rgba(13, 17, 33, 0.75) 100%);
 `;
 
@@ -110,24 +153,57 @@ const BarItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
+  height: 100%;
   gap: 0.75rem;
 `;
 
-const Bar = styled.div<{ $height: number; $active: boolean }>`
+const BarTrack = styled.div`
+  flex: 1;
   width: 100%;
-  height: ${({ $height }) => `${$height}%`};
-  min-height: 2.4rem;
-  border-radius: 0.75rem 0.75rem 0.4rem 0.4rem;
-  background: ${({ $active }) =>
-    $active
-      ? 'linear-gradient(180deg, #ffc4c6 0%, #ef233c 95%)'
-      : 'linear-gradient(180deg, #4a506b 0%, #39405b 100%)'};
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 `;
 
-const DayLabel = styled.span`
-  color: #b9bfdc;
+const Bar = styled.div<{ $height: number; $active: boolean; $hasVolume: boolean }>`
+  width: 100%;
+  height: ${({ $height }) => `${$height}%`};
+  min-height: 1.5rem;
+  border-radius: 0.75rem 0.75rem 0.4rem 0.4rem;
+  background: ${({ $active, $hasVolume }) =>
+    $hasVolume
+      ? 'linear-gradient(180deg, #ff8a93 0%, #ef233c 95%)'
+      : $active
+        ? 'linear-gradient(180deg, rgba(239, 35, 60, 0.35) 0%, rgba(239, 35, 60, 0.15) 100%)'
+        : 'linear-gradient(180deg, #2b3046 0%, #1f2334 100%)'};
+  border: ${({ $active, $hasVolume }) =>
+    $active && !$hasVolume ? '1px dashed rgba(239, 35, 60, 0.6)' : 'none'};
+  box-shadow: ${({ $hasVolume, $active }) =>
+    $hasVolume
+      ? '0 0 16px rgba(239, 35, 60, 0.35)'
+      : $active
+        ? '0 0 8px rgba(239, 35, 60, 0.2)'
+        : 'none'};
+  transition: height 0.3s ease;
+  position: relative;
+`;
+
+const BarVolume = styled.span`
+  position: absolute;
+  top: -1.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #cfd3ec;
+  white-space: nowrap;
+`;
+
+const DayLabel = styled.span<{ $active?: boolean }>`
+  color: ${({ $active }) => ($active ? '#ffffff' : '#8e94b4')};
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: ${({ $active }) => ($active ? '700' : '600')};
 `;
