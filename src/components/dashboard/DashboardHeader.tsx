@@ -16,8 +16,8 @@ export function DashboardHeader({ username }: DashboardHeaderProps) {
       <SectionLabel>{t('dashboard.label')}</SectionLabel>
       <Greeting>{t('dashboard.greeting', { username: username.toUpperCase() })}</Greeting>
       <Headline>
-        {t('dashboard.headlinePrefix')}
-        <AccentLine>{t('dashboard.accent')}</AccentLine>
+        {t('dashboard.headlinePrefix')}{' '}
+        <AccentLine>{t('dashboard.accent')}</AccentLine>{' '}
         {t('dashboard.headlineSuffix')}
       </Headline>
     </Container>
@@ -27,20 +27,23 @@ export function DashboardHeader({ username }: DashboardHeaderProps) {
 const Container = styled.header`
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
+  width: 100%;
 `;
 
 const SectionLabel = styled.p`
+  margin: 0;
   color: #efc0c4;
-  font-size: 1.65rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 `;
 
 const Greeting = styled.p`
+  margin: 0;
   color: #efc0c4;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.42em;
   text-transform: uppercase;
@@ -49,14 +52,17 @@ const Greeting = styled.p`
 const Headline = styled.h1`
   color: #f4f5ff;
   margin: 0;
-  font-size: 5rem;
-  line-height: 0.95;
+  font-size: clamp(2.5rem, 4.2vw, 4.6rem);
+  line-height: 1.05;
   font-style: italic;
   font-weight: 800;
   letter-spacing: -0.02em;
+  text-transform: uppercase;
+  width: 100%;
 `;
 
 const AccentLine = styled.span`
-  display: block;
   color: #ef233c;
+  display: inline;
 `;
+

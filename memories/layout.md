@@ -45,3 +45,5 @@ Sidebar is desktop-only (`display` from `1024px` up).
 ## Current task changes
 
 - Fixed sidebar rows squeezing their icon to zero width and overflowing on long labels.
+- Restructured `DashboardLayout` to position `DashboardHeader` and `ActiveWorkoutCard` in a full-width header area above the 2-column content grid. Hero title uses fluid full-width typography, and `StatStack` (3 metric cards) now starts at the exact same level as `WeeklyProgressCard` without manual padding hacks.
+

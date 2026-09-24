@@ -21,10 +21,12 @@ export function DashboardLayout() {
       <Sidebar username={username} />
       <MainPanel>
         <TopBar />
+        <HeaderArea>
+          <DashboardHeader username={username} />
+          <ActiveWorkoutCard enabled={user?.role.name === 'Client'} />
+        </HeaderArea>
         <ContentGrid>
           <MainColumn>
-            <DashboardHeader username={username} />
-            <ActiveWorkoutCard enabled={user?.role.name === 'Client'} />
             <WeeklyProgressCard />
             <RecentActivity />
           </MainColumn>
@@ -57,11 +59,20 @@ const MainPanel = styled.main`
   }
 `;
 
+const HeaderArea = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.35rem;
+  width: 100%;
+`;
+
 const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: minmax(0, 1fr) 19rem;
   gap: 1.3rem;
-  margin-top: 0.75rem;
+  align-items: start;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
@@ -71,13 +82,13 @@ const ContentGrid = styled.div`
 const MainColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.3rem;
+  min-width: 0;
 `;
 
 const SideColumn = styled.aside`
-  padding-top: 13.7rem;
-
-  @media (max-width: 900px) {
-    padding-top: 0;
-  }
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 `;
+

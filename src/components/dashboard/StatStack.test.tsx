@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { StatStack } from './StatStack';
 import * as authContext from '../../context/AuthContext';
 import * as analyticsApi from '../../services/api/analytics';
+import * as dashboardApi from '../../services/api/dashboard';
 
 const mockAnalytics: analyticsApi.AnalyticsResponse = {
   volumeTrends: {
@@ -49,6 +50,19 @@ const mockAnalytics: analyticsApi.AnalyticsResponse = {
   personalRecords: [],
 };
 
+const mockTrainerData: dashboardApi.TrainerDashboardResponse = {
+  clientActivity: {
+    totalClients: 3,
+    activeClientsThisWeek: 2,
+    activeRatePercent: 67,
+    daily: [],
+  },
+  metrics: {
+    totalClients: 3,
+    availableWorkouts: 7,
+  },
+};
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -61,54 +75,102 @@ function createWrapper() {
 describe('StatStack', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(authContext, 'useAuth').mockReturnValue({
-      user: {
-        id: 'client-1',
-        email: 'client@example.com',
-        username: 'Alex',
-        role: { id: 'client-role', name: 'Client' },
-      },
-      isAuthenticated: true,
-      isLoading: false,
-      login: vi.fn(),
-      logout: vi.fn(),
-      signup: vi.fn(),
-    } as any);
   });
 
-  it('renders Weekly Volume, Active Time, and Daily Streak with live data', async () => {
-    vi.spyOn(analyticsApi, 'fetchMyAnalytics').mockResolvedValue(mockAnalytics);
-
-    render(<StatStack />, { wrapper: createWrapper() });
-
-    // Weekly Volume: sum of dailyVolume = 1000 + 1500 + 500 = 3,000
-    const volumeCard = screen.getByTestId('stat-volume');
-    await waitFor(() => {
-      expect(volumeCard).toHaveTextContent('3,000');
+  describe('as Client', () => {
+    beforeEach(() => {
+      vi.spyOn(authContext, 'useAuth').mockReturnValue({
+        user: {
+          id: 'client-1',
+          email: 'client@example.com',
+          username: 'Alex',
+          role: { id: 'client-role', name: 'Client' },
+        },
+        isAuthenticated: true,
+        isLoading: false,
+        login: vi.fn(),
+        logout: vi.fn(),
+        signup: vi.fn(),
+      } as any);
     });
-    expect(volumeCard).toHaveTextContent('KG');
 
-    // Active Time: 60 + 60 = 120 mins
-    const activeTimeCard = screen.getByTestId('stat-activeTime');
-    await waitFor(() => {
-      expect(activeTimeCard).toHaveTextContent('120');
+    it('renders Weekly Volume, Active Time, and Daily Streak with live data', async () => {
+      vi.spyOn(analyticsApi, 'fetchMyAnalytics').mockResolvedValue(mockAnalytics);
+
+      render(<StatStack />, { wrapper: createWrapper() });
+
+      // Weekly Volume: sum of dailyVolume = 1000 + 1500 + 500 = 3,000
+      const volumeCard = screen.getByTestId('stat-volume');
+      await waitFor(() => {
+        expect(volumeCard).toHaveTextContent('3,000');
+      });
+      expect(volumeCard).toHaveTextContent('KG');
+
+      // Active Time: 60 + 60 = 120 mins
+      const activeTimeCard = screen.getByTestId('stat-activeTime');
+      await waitFor(() => {
+        expect(activeTimeCard).toHaveTextContent('120');
+      });
+      expect(activeTimeCard).toHaveTextContent('MIN');
+
+      // Daily Streak: 5 days
+      const streakCard = screen.getByTestId('stat-streak');
+      await waitFor(() => {
+        expect(streakCard).toHaveTextContent('5');
+      });
     });
-    expect(activeTimeCard).toHaveTextContent('MIN');
 
-    // Daily Streak: 5 days
-    const streakCard = screen.getByTestId('stat-streak');
-    await waitFor(() => {
-      expect(streakCard).toHaveTextContent('5');
+    it('shows loading placeholder when analytics are fetching', () => {
+      vi.spyOn(analyticsApi, 'fetchMyAnalytics').mockReturnValue(new Promise(() => {}));
+
+      render(<StatStack />, { wrapper: createWrapper() });
+
+      expect(screen.getByTestId('stat-volume')).toHaveTextContent('...');
+      expect(screen.getByTestId('stat-activeTime')).toHaveTextContent('...');
+      expect(screen.getByTestId('stat-streak')).toHaveTextContent('...');
     });
   });
 
-  it('shows loading placeholder when analytics are fetching', () => {
-    vi.spyOn(analyticsApi, 'fetchMyAnalytics').mockReturnValue(new Promise(() => {}));
+  describe('as Trainer', () => {
+    beforeEach(() => {
+      vi.spyOn(authContext, 'useAuth').mockReturnValue({
+        user: {
+          id: 'trainer-1',
+          email: 'trainer@example.com',
+          username: 'Coach Loco',
+          role: { id: 'trainer-role', name: 'Trainer' },
+        },
+        isAuthenticated: true,
+        isLoading: false,
+        login: vi.fn(),
+        logout: vi.fn(),
+        signup: vi.fn(),
+      } as any);
+    });
 
-    render(<StatStack />, { wrapper: createWrapper() });
+    it('renders Total Clients, Available Workouts, and Coming Soon cards', async () => {
+      vi.spyOn(dashboardApi, 'fetchTrainerDashboard').mockResolvedValue(mockTrainerData);
 
-    expect(screen.getByTestId('stat-volume')).toHaveTextContent('...');
-    expect(screen.getByTestId('stat-activeTime')).toHaveTextContent('...');
-    expect(screen.getByTestId('stat-streak')).toHaveTextContent('...');
+      render(<StatStack />, { wrapper: createWrapper() });
+
+      // Total Clients
+      const clientsCard = screen.getByTestId('stat-clients');
+      await waitFor(() => {
+        expect(clientsCard).toHaveTextContent('3');
+      });
+      expect(clientsCard).toHaveTextContent(/total clients/i);
+
+      // Available Workouts
+      const workoutsCard = screen.getByTestId('stat-workouts');
+      await waitFor(() => {
+        expect(workoutsCard).toHaveTextContent('7');
+      });
+      expect(workoutsCard).toHaveTextContent(/available workouts/i);
+
+      // Placeholder / Coming soon
+      const placeholderCard = screen.getByTestId('stat-placeholder');
+      expect(placeholderCard).toHaveTextContent(/coming soon/i);
+      expect(placeholderCard).toHaveTextContent('—');
+    });
   });
 });

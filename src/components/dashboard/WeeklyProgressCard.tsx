@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import { useMyAnalytics } from '../../hooks/useAnalytics';
+import { useTrainerDashboard } from '../../hooks/useTrainerDashboard';
 
 const WEEKDAYS = [
   { index: 0, dayKey: 'dates.mon' },
@@ -14,48 +15,90 @@ const WEEKDAYS = [
 ];
 
 /**
- * Displays weekly workout volume progress with live Mon–Sun daily volume bars.
+ * Displays weekly workout progress:
+ * - For Clients: Mon–Sun daily volume bars with peak scaling and goal reached %.
+ * - For Trainers: Mon–Sun client activity bars (unique clients trained) scaled against total contracted clients, with active rate %.
  */
 export function WeeklyProgressCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const isTrainer = user?.role?.name === 'Trainer';
   const isClient = user?.role?.name === 'Client';
-  const { data: analytics, isLoading } = useMyAnalytics(isClient);
 
-  // Daily volume entries for current week (Mon=0..Sun=6)
-  const dailyVolume = analytics?.volumeTrends?.dailyVolume ?? [];
-  const maxVolume = Math.max(1, ...dailyVolume.map((d) => d.volumeKg));
-
-  // Goal completion % against assigned routine days
-  const completionPercent = analytics?.consistency?.completionPercent ?? 0;
+  const { data: analytics, isLoading: isClientLoading } = useMyAnalytics(isClient);
+  const { data: trainerData, isLoading: isTrainerLoading } = useTrainerDashboard(isTrainer);
 
   // Current weekday (0=Mon, ..., 6=Sun)
   const jsDay = new Date().getDay();
   const currentWeekday = jsDay === 0 ? 6 : jsDay - 1;
+
+  // Header stats & titles
+  const title = isTrainer ? t('dashboard.clientActivity') : t('dashboard.volumeTraining');
+  const percentCaption = isTrainer ? t('dashboard.activeRate') : t('dashboard.goalReached');
+
+  let percentValue = '0%';
+  if (isTrainer) {
+    percentValue =
+      isTrainerLoading && !trainerData
+        ? '...'
+        : `${trainerData?.clientActivity?.activeRatePercent ?? 0}%`;
+  } else {
+    const completionPercent = analytics?.consistency?.completionPercent ?? 0;
+    percentValue = isClientLoading && !analytics ? '...' : `${completionPercent}%`;
+  }
+
+  // Client daily volume calculations
+  const dailyVolume = analytics?.volumeTrends?.dailyVolume ?? [];
+  const maxVolume = Math.max(1, ...dailyVolume.map((d) => d.volumeKg));
+
+  // Trainer client activity calculations
+  const totalClients = trainerData?.clientActivity?.totalClients ?? 0;
+  const trainerDaily = trainerData?.clientActivity?.daily ?? [];
 
   return (
     <Card data-testid="weekly-progress-card">
       <HeaderRow>
         <div>
           <Eyebrow>{t('dashboard.weeklyProgress')}</Eyebrow>
-          <Title>{t('dashboard.volumeTraining')}</Title>
+          <Title>{title}</Title>
         </div>
         <PercentWrap>
-          <Percent data-testid="goal-percent">
-            {isLoading && !analytics ? '...' : `${completionPercent}%`}
-          </Percent>
-          <PercentCaption>{t('dashboard.goalReached')}</PercentCaption>
+          <Percent data-testid="goal-percent">{percentValue}</Percent>
+          <PercentCaption>{percentCaption}</PercentCaption>
         </PercentWrap>
       </HeaderRow>
 
       <BarsWrap>
         {WEEKDAYS.map((day) => {
-          const entry = dailyVolume.find((v) => v.weekday === day.index);
-          const volume = entry?.volumeKg ?? 0;
-          const hasVolume = volume > 0;
-          const height = hasVolume
-            ? Math.max(18, Math.round((volume / maxVolume) * 92))
-            : 12;
+          let height = 12;
+          let hasData = false;
+          let barTitle = '';
+          let barDisplayValue = '';
+
+          if (isTrainer) {
+            const entry = trainerDaily.find((v) => v.weekday === day.index);
+            const activeClients = entry?.activeClients ?? 0;
+            hasData = activeClients > 0;
+            height = hasData
+              ? Math.max(18, Math.round((activeClients / Math.max(1, totalClients)) * 92))
+              : 12;
+            barTitle = `${t(day.dayKey)}: ${activeClients} ${t('dashboard.clients')}`;
+            barDisplayValue = hasData ? String(activeClients) : '';
+          } else {
+            const entry = dailyVolume.find((v) => v.weekday === day.index);
+            const volume = entry?.volumeKg ?? 0;
+            hasData = volume > 0;
+            height = hasData
+              ? Math.max(18, Math.round((volume / maxVolume) * 92))
+              : 12;
+            barTitle = `${t(day.dayKey)}: ${volume.toLocaleString()} kg`;
+            barDisplayValue = hasData
+              ? volume >= 1000
+                ? `${(volume / 1000).toFixed(1)}k`
+                : String(volume)
+              : '';
+          }
+
           const isActive = day.index === currentWeekday;
 
           return (
@@ -64,15 +107,11 @@ export function WeeklyProgressCard() {
                 <Bar
                   $height={height}
                   $active={isActive}
-                  $hasVolume={hasVolume}
-                  title={`${t(day.dayKey)}: ${volume.toLocaleString()} kg`}
+                  $hasVolume={hasData}
+                  title={barTitle}
                   data-testid={`bar-${day.index}`}
                 >
-                  {hasVolume && (
-                    <BarVolume>
-                      {volume >= 1000 ? `${(volume / 1000).toFixed(1)}k` : volume}
-                    </BarVolume>
-                  )}
+                  {hasData && <BarVolume>{barDisplayValue}</BarVolume>}
                 </Bar>
               </BarTrack>
               <DayLabel $active={isActive}>{t(day.dayKey)}</DayLabel>

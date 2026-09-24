@@ -128,8 +128,14 @@
     "activityRecoveryMeta": "45 min - Baja intensidad",
     "activityPowerMeta": "65 min - 1,200kg Volumen",
     "lowIntensity": "Baja intensidad",
-    "volume": "Volumen",
-    "startWorkout": "Iniciar entrenamiento"
+    "startWorkout": "Iniciar entrenamiento",
+    "clientActivity": "Actividad de Clientes",
+    "activeRate": "Tasa Activa",
+    "totalClients": "Clientes Totales",
+    "availableWorkouts": "Entrenamientos Disponibles",
+    "comingSoon": "Próximamente",
+    "clients": "Clientes",
+    "workouts": "Entrenamientos"
   },
   "dates": {
     "mon": "Lun",
