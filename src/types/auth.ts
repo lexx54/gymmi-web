@@ -53,3 +53,37 @@ export type ResetPasswordParams = {
   code: string;
   newPassword: string;
 };
+
+export type FullUserProfile = {
+  id: string;
+  email: string;
+  username: string;
+  hasPaid: boolean;
+  plan?: PlanName;
+  role: { id: string; name: string };
+  profile?: {
+    id: string;
+    age: number;
+    gender: string;
+    height: number;
+    weight: number;
+    goal: string;
+    createdAt?: string;
+    updatedAt?: string;
+  } | null;
+  trainerProfile?: {
+    id: string;
+    description: string;
+    monthlyPrice: number;
+    specializations: string[];
+    gyms: string[];
+    createdAt?: string;
+    updatedAt?: string;
+  } | null;
+};
+
+export type UpdateProfilePayload = {
+  profile?: Partial<UserProfileParams>;
+  trainerProfile?: Partial<TrainerProfileParams>;
+};
+

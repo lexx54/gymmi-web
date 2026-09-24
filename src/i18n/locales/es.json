@@ -584,7 +584,17 @@
     "goalProgress": "PROGRESO DE META",
     "viewPublicProfile": "VER PERFIL PÚBLICO",
     "dataManagement": "Gestión de datos y servicios conectados",
-    "lastSync": "ÚLTIMA SINCR.: HACE 2M"
+    "lastSync": "ÚLTIMA SINCR.: HACE 2M",
+    "physicalProfile": "Perfil Físico",
+    "coachingProfile": "Perfil de Entrenador",
+    "editProfile": "Editar Perfil",
+    "editCredentials": "Editar Credenciales",
+    "profileUpdated": "¡Perfil actualizado con éxito!",
+    "athlete": "Atleta",
+    "personalTrainer": "Entrenador Personal",
+    "noGoal": "Aún no has definido una meta principal",
+    "noBio": "Aún no has añadido una descripción profesional",
+    "rateLabel": "TARIFA MENSUAL"
   },
   "admin": {
     "userUpdated": "Usuario actualizado",

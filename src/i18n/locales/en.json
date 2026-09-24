@@ -584,7 +584,17 @@
     "goalProgress": "GOAL PROGRESS",
     "viewPublicProfile": "VIEW PUBLIC PROFILE",
     "dataManagement": "Data Management & Connected Services",
-    "lastSync": "LAST SYNC: 2M AGO"
+    "lastSync": "LAST SYNC: 2M AGO",
+    "physicalProfile": "Physical Profile",
+    "coachingProfile": "Coaching Profile",
+    "editProfile": "Edit Profile",
+    "editCredentials": "Edit Credentials",
+    "profileUpdated": "Profile updated successfully!",
+    "athlete": "Athlete",
+    "personalTrainer": "Personal Trainer",
+    "noGoal": "No primary fitness goal set yet",
+    "noBio": "No professional description added yet",
+    "rateLabel": "MONTHLY RATE"
   },
   "admin": {
     "userUpdated": "User updated",

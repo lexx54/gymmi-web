@@ -1,54 +1,124 @@
-import { Heart, Pencil, TrendingUp } from 'lucide-react';
+import { Heart, Pencil, TrendingUp, Dumbbell, Tag as TagIconLucide } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CardSurface } from './SettingsShell';
+import type { FullUserProfile } from '../../types/auth';
+
+interface ProfileHeroCardProps {
+  userProfile?: FullUserProfile | null;
+}
 
 /**
  * Profile hero section displaying user identity, bio, tags,
- * workout frequency, and goal progress.
+ * workout frequency, and goal progress. Adapts dynamically for Athletes and Personal Trainers.
  */
-export function ProfileHeroCard() {
+export function ProfileHeroCard({ userProfile }: ProfileHeroCardProps) {
   const { t } = useTranslation();
 
+  const isTrainer = userProfile?.role?.name === 'Trainer';
+  const hasProfile = Boolean(userProfile);
+
+  // Dynamic names and bio
+  const displayName = hasProfile ? userProfile?.username : t('settings.displayName');
+  const statusLine = hasProfile
+    ? isTrainer
+      ? t('settings.personalTrainer')
+      : t('settings.athlete')
+    : t('settings.statusLine');
+
+  const bio = hasProfile
+    ? isTrainer
+      ? userProfile?.trainerProfile?.description || t('settings.noBio')
+      : userProfile?.profile?.goal
+        ? `${t('auth.fitnessGoal')}: ${userProfile.profile.goal}`
+        : t('settings.bio')
+    : t('settings.bio');
+
+  const trainerPrice = userProfile?.trainerProfile?.monthlyPrice ?? 0;
+  const trainerSpecs = userProfile?.trainerProfile?.specializations ?? [];
+  const clientAge = userProfile?.profile?.age;
+  const clientHeight = userProfile?.profile?.height;
+  const clientWeight = userProfile?.profile?.weight;
+
   return (
-    <HeroWrapper>
+    <HeroWrapper data-testid="profile-hero-card">
       <HeroLeft>
         <AvatarSection>
           <AvatarBox>
-            <AvatarPlaceholder />
+            <AvatarPlaceholder>
+              <AvatarInitials>
+                {(displayName || 'U').charAt(0).toUpperCase()}
+              </AvatarInitials>
+            </AvatarPlaceholder>
             <EditBadge aria-label={t('settings.editAvatar')}>
               <Pencil size={12} />
             </EditBadge>
           </AvatarBox>
         </AvatarSection>
         <ProfileInfo>
-          <DisplayName>{t('settings.displayName')}</DisplayName>
-          <StatusLine>{t('settings.statusLine')}</StatusLine>
-          <Bio>{t('settings.bio')}</Bio>
+          <DisplayName>{displayName}</DisplayName>
+          <StatusLine>{statusLine}</StatusLine>
+          <Bio>{bio}</Bio>
+
           <TagRow>
-            <Tag>
-              <TagIcon>&#9878;</TagIcon> {t('settings.endurancePro')}
-            </Tag>
-            <Tag>
-              <TagIcon>&#9201;</TagIcon> {t('settings.marathonPb')}
-            </Tag>
+            {hasProfile && isTrainer ? (
+              <>
+                <HighlightTag>
+                  <Dumbbell size={12} /> ${trainerPrice} USD/mo
+                </HighlightTag>
+                {trainerSpecs.slice(0, 3).map((spec) => (
+                  <Tag key={spec}>
+                    <TagIconLucide size={11} /> {spec}
+                  </Tag>
+                ))}
+              </>
+            ) : hasProfile ? (
+              <>
+                {clientAge && <Tag>{clientAge} yrs</Tag>}
+                {clientHeight && <Tag>{clientHeight} cm</Tag>}
+                {clientWeight && <Tag>{clientWeight} kg</Tag>}
+                {userProfile?.profile?.goal && (
+                  <HighlightTag>{userProfile.profile.goal}</HighlightTag>
+                )}
+              </>
+            ) : (
+              <>
+                <Tag>
+                  <TagIcon>&#9878;</TagIcon> {t('settings.endurancePro')}
+                </Tag>
+                <Tag>
+                  <TagIcon>&#9201;</TagIcon> {t('settings.marathonPb')}
+                </Tag>
+              </>
+            )}
           </TagRow>
+
           <HeartStat>
             <Heart size={14} fill="#ffb3b1" color="#ffb3b1" />
             <span>{t('settings.rhr')}</span>
           </HeartStat>
         </ProfileInfo>
       </HeroLeft>
+
       <HeroRight>
         <StatBlock>
           <StatHeader>
-            <StatLabel>{t('settings.workoutFrequency')}</StatLabel>
+            <StatLabel>
+              {isTrainer ? t('settings.rateLabel') : t('settings.workoutFrequency')}
+            </StatLabel>
             <TrendingUp size={16} color="#ffb3b1" />
           </StatHeader>
           <StatValue>
-            6.4<StatUnit>{t('settings.perWeek')}</StatUnit>
+            {isTrainer ? (
+              `$${trainerPrice}`
+            ) : (
+              <>
+                6.4<StatUnit>{t('settings.perWeek')}</StatUnit>
+              </>
+            )}
           </StatValue>
         </StatBlock>
+
         <ProgressBlock>
           <ProgressHeader>
             <StatLabel>{t('settings.goalProgress')}</StatLabel>
@@ -58,6 +128,7 @@ export function ProfileHeroCard() {
             <ProgressFill style={{ width: '84%' }} />
           </ProgressTrack>
         </ProgressBlock>
+
         <ViewProfileButton type="button">{t('settings.viewPublicProfile')}</ViewProfileButton>
       </HeroRight>
     </HeroWrapper>
@@ -99,6 +170,16 @@ const AvatarPlaceholder = styled.div`
   height: 100%;
   border-radius: 0.85rem;
   background: linear-gradient(180deg, #2c3357 0%, #1b203d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const AvatarInitials = styled.span`
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ff9da4;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 `;
 
 const EditBadge = styled.button`
@@ -165,6 +246,13 @@ const Tag = styled.span`
   color: #e0e0fc;
   font-size: 0.75rem;
   font-weight: 500;
+`;
+
+const HighlightTag = styled(Tag)`
+  background: rgba(239, 35, 60, 0.15);
+  border-color: rgba(239, 35, 60, 0.35);
+  color: #ff9da4;
+  font-weight: 600;
 `;
 
 const TagIcon = styled.span`

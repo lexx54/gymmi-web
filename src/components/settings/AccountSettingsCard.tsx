@@ -1,16 +1,24 @@
-import { Eye, Users } from 'lucide-react';
+import { Eye, Users, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CardSurface, SectionTitle } from './SettingsShell';
+import type { FullUserProfile } from '../../types/auth';
+
+interface AccountSettingsCardProps {
+  userProfile?: FullUserProfile | null;
+}
 
 /**
- * Account settings section with email, password, 2FA, and location sync controls.
+ * Account settings section with email, role, password, 2FA, and location sync controls.
  */
-export function AccountSettingsCard() {
+export function AccountSettingsCard({ userProfile }: AccountSettingsCardProps) {
   const { t } = useTranslation();
 
+  const email = userProfile?.email || 'alex.volt@kinetic.performance';
+  const roleName = userProfile?.role?.name;
+
   return (
-    <Wrapper>
+    <Wrapper data-testid="account-settings-card">
       <SectionTitle>
         <Users size={18} color="#ffb3b1" /> {t('settings.accountSettings')}
       </SectionTitle>
@@ -18,7 +26,13 @@ export function AccountSettingsCard() {
       <FieldGroup>
         <FieldLabel>{t('settings.emailAddress')}</FieldLabel>
         <FieldInput>
-          <span>alex.volt@kinetic.performance</span>
+          <span>{email}</span>
+          {roleName && (
+            <RoleBadge>
+              <Shield size={12} />
+              <span>{roleName}</span>
+            </RoleBadge>
+          )}
         </FieldInput>
       </FieldGroup>
 
@@ -81,6 +95,19 @@ const FieldInput = styled.div`
   background: #181a2e;
   color: #e0e0fc;
   font-size: 0.9rem;
+`;
+
+const RoleBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(239, 35, 60, 0.15);
+  border: 1px solid rgba(239, 35, 60, 0.35);
+  color: #ff9da4;
+  font-size: 0.72rem;
+  font-weight: 600;
 `;
 
 const PasswordDots = styled.span`

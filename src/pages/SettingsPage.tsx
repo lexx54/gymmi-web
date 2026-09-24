@@ -12,18 +12,34 @@ import {
   SettingsPageShell,
   SettingsPageTitle,
 } from '../components/settings/SettingsShell';
-import { TrainingMetricsCard } from '../components/settings/TrainingMetricsCard';
+import { PhysicalProfileCard } from '../components/settings/PhysicalProfileCard';
+import { CoachingProfileCard } from '../components/settings/CoachingProfileCard';
 import { useAuth } from '../context/AuthContext';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Settings & Profile page combining user profile, account settings,
- * training metrics, and data management sections.
+ * Settings & Profile page combining user profile, physical body metrics,
+ * coaching credentials (for trainers), and account configuration.
  */
 export default function SettingsPage() {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const username = user?.username ?? 'Alex';
+  const { data: userProfile, isLoading } = useUserProfile();
+
+  const effectiveProfile = userProfile ?? (user ? {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    role: user.role,
+    hasPaid: user.hasPaid,
+    plan: user.plan,
+    profile: null,
+    trainerProfile: null,
+  } : null);
+
+  const username = effectiveProfile?.username ?? 'Alex';
+  const isTrainer = (effectiveProfile?.role?.name) === 'Trainer';
 
   return (
     <SettingsPageShell>
@@ -34,11 +50,14 @@ export default function SettingsPage() {
           <TopBar />
         </HeaderRow>
         <SettingsContent>
-          <ProfileHeroCard />
+          <ProfileHeroCard userProfile={effectiveProfile} />
           <MiddleGrid>
-            <AccountSettingsCard />
-            <TrainingMetricsCard />
+            <AccountSettingsCard userProfile={effectiveProfile} />
+            <PhysicalProfileCard userProfile={effectiveProfile} isLoading={isLoading} />
           </MiddleGrid>
+          {isTrainer && (
+            <CoachingProfileCard userProfile={effectiveProfile} isLoading={isLoading} />
+          )}
           <LanguageSettingsCard />
           <DataManagementCard />
           <SettingsFooter />
