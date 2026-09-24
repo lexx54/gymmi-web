@@ -2,46 +2,211 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, Lock, Eye, EyeOff, User, Apple, Loader2 } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  User as UserIcon,
+  Dumbbell,
+  Check,
+  ChevronRight,
+  ChevronLeft,
+  Loader2,
+  Plus,
+  X,
+  Edit2,
+  Building,
+} from 'lucide-react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useSignup } from '../hooks/useAuthApi';
-import { createSignupSchema, SIGNUP_ROLES, type SignupFormValues } from '../schemas/auth';
+import {
+  createStep1Schema,
+  createStep2Schema,
+  createStep3TrainerSchema,
+  createSignupSchema,
+  type SignupFormValues,
+} from '../schemas/auth';
+import type { SignupParams } from '../types/auth';
 
 const LOCKOUT_DURATION = 180_000;
-
-const errorTextStyle = { color: '#d90429', fontSize: '0.75rem', marginTop: '0.375rem' } as const;
 
 function getMutationErrorMessage(err: unknown, fallback: string) {
   const ax = err as AxiosError<{ message: string }>;
   return ax.response?.data?.message || (err instanceof Error ? err.message : null) || fallback;
 }
 
+const PRESET_GOALS = [
+  { key: 'buildMuscle', labelKey: 'auth.goals.buildMuscle' },
+  { key: 'loseFat', labelKey: 'auth.goals.loseFat' },
+  { key: 'gainStrength', labelKey: 'auth.goals.gainStrength' },
+  { key: 'endurance', labelKey: 'auth.goals.endurance' },
+  { key: 'generalFitness', labelKey: 'auth.goals.generalFitness' },
+];
+
+const PRESET_SPECIALIZATIONS = [
+  'Hypertrophy',
+  'Weight Loss',
+  'Powerlifting',
+  'HIIT & Cardio',
+  'Calisthenics',
+  'Rehab & Mobility',
+  'CrossFit',
+  'Nutrition Coaching',
+];
+
 export default function SignupPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  // Unit toggles
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'ft'>('cm');
+  const [displayWeight, setDisplayWeight] = useState<string>('');
+  const [displayHeight, setDisplayHeight] = useState<string>('');
+
+  // Trainer custom tag and gym inputs
+  const [customTagInput, setCustomTagInput] = useState('');
+  const [gymInput, setGymInput] = useState('');
+
   const { mutate: signup, isPending: loading } = useSignup();
 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<SignupFormValues>({
     resolver: zodResolver(createSignupSchema(t)),
+    mode: 'onChange',
     defaultValues: {
       email: '',
       username: '',
       password: '',
       confirmPassword: '',
+      role: 'Client',
+      age: undefined,
+      gender: '',
+      height: undefined,
+      weight: undefined,
+      goal: '',
+      description: '',
+      monthlyPrice: undefined,
+      specializations: [],
+      gyms: [],
     },
   });
 
+  const selectedRole = watch('role');
+  const isTrainer = selectedRole === 'Trainer';
+  const totalSteps = isTrainer ? 4 : 3;
+
+  const currentSpecializations = watch('specializations') || [];
+  const currentGyms = watch('gyms') || [];
+  const selectedGoal = watch('goal') || '';
+  const selectedGender = watch('gender') || '';
+
+  // Synchronize height unit conversions
+  const handleHeightChange = (valStr: string) => {
+    setDisplayHeight(valStr);
+    const num = parseFloat(valStr);
+    if (isNaN(num)) {
+      setValue('height', undefined as any, { shouldValidate: true });
+      return;
+    }
+    const cm = heightUnit === 'ft' ? Math.round(num * 30.48 * 10) / 10 : num;
+    setValue('height', cm, { shouldValidate: true });
+  };
+
+  const toggleHeightUnit = (unit: 'cm' | 'ft') => {
+    if (unit === heightUnit) return;
+    setHeightUnit(unit);
+    const currentVal = parseFloat(displayHeight);
+    if (!isNaN(currentVal)) {
+      const converted = unit === 'ft'
+        ? (currentVal / 30.48).toFixed(1)
+        : (currentVal * 30.48).toFixed(0);
+      setDisplayHeight(converted);
+    }
+  };
+
+  // Synchronize weight unit conversions
+  const handleWeightChange = (valStr: string) => {
+    setDisplayWeight(valStr);
+    const num = parseFloat(valStr);
+    if (isNaN(num)) {
+      setValue('weight', undefined as any, { shouldValidate: true });
+      return;
+    }
+    const kg = weightUnit === 'lbs' ? Math.round((num / 2.20462) * 10) / 10 : num;
+    setValue('weight', kg, { shouldValidate: true });
+  };
+
+  const toggleWeightUnit = (unit: 'kg' | 'lbs') => {
+    if (unit === weightUnit) return;
+    setWeightUnit(unit);
+    const currentVal = parseFloat(displayWeight);
+    if (!isNaN(currentVal)) {
+      const converted = unit === 'lbs'
+        ? (currentVal * 2.20462).toFixed(1)
+        : (currentVal / 2.20462).toFixed(1);
+      setDisplayWeight(converted);
+    }
+  };
+
+  // Specialization tag handlers
+  const toggleSpecialization = (tag: string) => {
+    const exists = currentSpecializations.includes(tag);
+    const updated = exists
+      ? currentSpecializations.filter((t) => t !== tag)
+      : [...currentSpecializations, tag];
+    setValue('specializations', updated, { shouldValidate: true });
+  };
+
+  const addCustomTag = () => {
+    const trimmed = customTagInput.trim();
+    if (!trimmed) return;
+    if (!currentSpecializations.includes(trimmed)) {
+      setValue('specializations', [...currentSpecializations, trimmed], { shouldValidate: true });
+    }
+    setCustomTagInput('');
+  };
+
+  // Gym affiliation handlers
+  const addGym = () => {
+    const trimmed = gymInput.trim();
+    if (!trimmed) return;
+    if (currentGyms.length >= 3) {
+      toast.error(t('auth.maxGymsReached'));
+      return;
+    }
+    if (!currentGyms.includes(trimmed)) {
+      setValue('gyms', [...currentGyms, trimmed], { shouldValidate: true });
+    }
+    setGymInput('');
+  };
+
+  const removeGym = (gymToRemove: string) => {
+    setValue(
+      'gyms',
+      currentGyms.filter((g) => g !== gymToRemove),
+      { shouldValidate: true },
+    );
+  };
+
+  // Lockout timer
   useEffect(() => {
     if (!lockedUntil) return;
     const tick = () => {
@@ -64,27 +229,108 @@ export default function SignupPage() {
   const formatCountdown = (s: number) =>
     `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
+  // Step progression validations
+  const handleNextFromStep1 = async () => {
+    const currentValues = watch();
+    const result = createStep1Schema(t).safeParse(currentValues);
+    if (!result.success) {
+      const seen = new Set<string>();
+      for (const issue of result.error.issues) {
+        const fieldName = issue.path[0] as keyof SignupFormValues;
+        if (fieldName && !seen.has(fieldName)) {
+          seen.add(fieldName);
+          setError(fieldName, { type: 'manual', message: issue.message });
+        }
+      }
+      return;
+    }
+    clearErrors(['email', 'username', 'password', 'confirmPassword', 'role']);
+    setStep(2);
+  };
+
+  const handleNextFromStep2 = async () => {
+    const currentValues = watch();
+    const result = createStep2Schema(t).safeParse(currentValues);
+    if (!result.success) {
+      const seen = new Set<string>();
+      for (const issue of result.error.issues) {
+        const fieldName = issue.path[0] as keyof SignupFormValues;
+        if (fieldName && !seen.has(fieldName)) {
+          seen.add(fieldName);
+          setError(fieldName, { type: 'manual', message: issue.message });
+        }
+      }
+      return;
+    }
+    clearErrors(['age', 'gender', 'height', 'weight', 'goal']);
+    setStep(3);
+  };
+
+  const handleNextFromStep3 = async () => {
+    if (isTrainer) {
+      const currentValues = watch();
+      const result = createStep3TrainerSchema(t).safeParse(currentValues);
+      if (!result.success) {
+        const seen = new Set<string>();
+        for (const issue of result.error.issues) {
+          const fieldName = issue.path[0] as keyof SignupFormValues;
+          if (fieldName && !seen.has(fieldName)) {
+            seen.add(fieldName);
+            setError(fieldName, { type: 'manual', message: issue.message });
+          }
+        }
+        return;
+      }
+      clearErrors(['description', 'monthlyPrice', 'specializations', 'gyms']);
+      setStep(4);
+    } else {
+      setStep(3);
+    }
+  };
+
   const onSubmit = (data: SignupFormValues) => {
     if (disabled) return;
-    signup(
-      { email: data.email, username: data.username, password: data.password, role: data.role },
-      {
-        onSuccess: () => {
-          toast.success(t('auth.accountCreated'));
-          navigate('/login');
-        },
-        onError: (err) => {
-          if ((err as AxiosError).response?.status === 429) {
-            setLockedUntil(Date.now() + LOCKOUT_DURATION);
-            toast.error(
-              t('auth.lockout', { time: formatCountdown(Math.ceil(LOCKOUT_DURATION / 1000)) }),
-            );
-            return;
-          }
-          toast.error(getMutationErrorMessage(err, t('auth.signupFailed')));
-        },
+
+    const payload: SignupParams = {
+      email: data.email,
+      username: data.username,
+      password: data.password,
+      role: data.role,
+      profile: {
+        age: Number(data.age),
+        gender: data.gender,
+        height: Number(data.height),
+        weight: Number(data.weight),
+        goal: data.goal,
       },
-    );
+      ...(data.role === 'Trainer'
+        ? {
+            trainerProfile: {
+              description: data.description || '',
+              monthlyPrice: Number(data.monthlyPrice) || 0,
+              specializations: data.specializations || [],
+              gyms: data.gyms || [],
+            },
+          }
+        : {}),
+    };
+
+    signup(payload, {
+      onSuccess: () => {
+        toast.success(t('auth.accountCreated'));
+        navigate('/login');
+      },
+      onError: (err) => {
+        if ((err as AxiosError).response?.status === 429) {
+          setLockedUntil(Date.now() + LOCKOUT_DURATION);
+          toast.error(
+            t('auth.lockout', { time: formatCountdown(Math.ceil(LOCKOUT_DURATION / 1000)) }),
+          );
+          return;
+        }
+        toast.error(getMutationErrorMessage(err, t('auth.signupFailed')));
+      },
+    });
   };
 
   return (
@@ -110,360 +356,564 @@ export default function SignupPage() {
             <MobileBrandTitle>Gymmi</MobileBrandTitle>
           </MobileBrand>
 
-          <FormCard style={{ padding: '3rem' }}>
-            <FormTitle style={{ marginBottom: '0.25rem' }}>{t('auth.createAccount')}</FormTitle>
-            <FormSubtitle style={{ marginBottom: '2.5rem' }}>{t('auth.signUpWithEmail')}</FormSubtitle>
+          <FormCard>
+            {/* Step Progress Bar Header */}
+            <ProgressHeader>
+              <ProgressTrack>
+                <ProgressFill $percent={((step - 1) / (totalSteps - 1)) * 100} />
+              </ProgressTrack>
+              <StepIndicatorText>
+                {t('auth.stepIndicator', { current: step, total: totalSteps })}
+              </StepIndicatorText>
+            </ProgressHeader>
 
             <form noValidate onSubmit={handleSubmit(onSubmit)}>
-              <div style={{ marginBottom: '1.25rem' }}>
-                <div style={{ position: 'relative' }}>
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: '1.25rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#8d99ae',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Mail size={18} />
-                  </span>
-                  <input
-                    type="email"
-                    placeholder={t('auth.emailPlaceholder')}
-                    autoComplete="email"
-                    {...register('email')}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '3.25rem',
-                      paddingRight: '1.25rem',
-                      paddingTop: '0.875rem',
-                      paddingBottom: '0.875rem',
-                      borderRadius: '9999px',
-                      border: errors.email ? '1px solid #d90429' : '1px solid #d2d6df',
-                      backgroundColor: 'white',
-                      color: '#2b2d42',
-                      fontSize: '0.875rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-                {errors.email && <p style={errorTextStyle}>{errors.email.message}</p>}
-              </div>
+              {/* STEP 1: Account Credentials & Role */}
+              {step === 1 && (
+                <StepSection data-testid="signup-step-1">
+                  <FormTitle>{t('auth.createAccount')}</FormTitle>
+                  <FormSubtitle>{t('auth.signUpWithEmail')}</FormSubtitle>
 
-              <div style={{ marginBottom: '1.25rem' }}>
-                <div style={{ position: 'relative' }}>
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: '1.25rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#8d99ae',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <User size={18} />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder={t('auth.usernamePlaceholder')}
-                    autoComplete="username"
-                    {...register('username')}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '3.25rem',
-                      paddingRight: '1.25rem',
-                      paddingTop: '0.875rem',
-                      paddingBottom: '0.875rem',
-                      borderRadius: '9999px',
-                      border: errors.username ? '1px solid #d90429' : '1px solid #d2d6df',
-                      backgroundColor: 'white',
-                      color: '#2b2d42',
-                      fontSize: '0.875rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-                {errors.username && <p style={errorTextStyle}>{errors.username.message}</p>}
-              </div>
+                  {/* Role Selector Cards */}
+                  <FieldGroup>
+                    <Label>{t('auth.rolePrompt')}</Label>
+                    <RoleGrid>
+                      <RoleCard
+                        type="button"
+                        $selected={selectedRole === 'Client'}
+                        onClick={() => setValue('role', 'Client', { shouldValidate: true })}
+                        data-testid="role-client"
+                      >
+                        <RoleIconWrap $selected={selectedRole === 'Client'}>
+                          <UserIcon size={20} />
+                        </RoleIconWrap>
+                        <RoleTextWrap>
+                          <RoleName>{t('auth.roles.Client')}</RoleName>
+                          <RoleDesc>Track workouts, volume, and personal records</RoleDesc>
+                        </RoleTextWrap>
+                        {selectedRole === 'Client' && <CheckBadge><Check size={14} /></CheckBadge>}
+                      </RoleCard>
 
-              <div style={{ marginBottom: '1.25rem' }}>
-                <div style={{ position: 'relative' }}>
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: '1.25rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#8d99ae',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Lock size={18} />
-                  </span>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder={t('auth.passwordPlaceholder')}
-                    autoComplete="new-password"
-                    {...register('password')}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '3.25rem',
-                      paddingRight: '3.25rem',
-                      paddingTop: '0.875rem',
-                      paddingBottom: '0.875rem',
-                      borderRadius: '9999px',
-                      border: errors.password ? '1px solid #d90429' : '1px solid #d2d6df',
-                      backgroundColor: 'white',
-                      color: '#2b2d42',
-                      fontSize: '0.875rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                  <button
+                      <RoleCard
+                        type="button"
+                        $selected={selectedRole === 'Trainer'}
+                        onClick={() => setValue('role', 'Trainer', { shouldValidate: true })}
+                        data-testid="role-trainer"
+                      >
+                        <RoleIconWrap $selected={selectedRole === 'Trainer'}>
+                          <Dumbbell size={20} />
+                        </RoleIconWrap>
+                        <RoleTextWrap>
+                          <RoleName>{t('auth.roles.Trainer')}</RoleName>
+                          <RoleDesc>Coach clients, assign routines, manage roster</RoleDesc>
+                        </RoleTextWrap>
+                        {selectedRole === 'Trainer' && <CheckBadge><Check size={14} /></CheckBadge>}
+                      </RoleCard>
+                    </RoleGrid>
+                    {errors.role && <ErrorMsg>{errors.role.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Email */}
+                  <FieldGroup>
+                    <InputWrap>
+                      <InputIcon><Mail size={18} /></InputIcon>
+                      <StyledInput
+                        type="email"
+                        placeholder={t('auth.emailPlaceholder')}
+                        autoComplete="email"
+                        {...register('email')}
+                        $hasError={Boolean(errors.email)}
+                        data-testid="input-email"
+                      />
+                    </InputWrap>
+                    {errors.email && <ErrorMsg>{errors.email.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Username */}
+                  <FieldGroup>
+                    <InputWrap>
+                      <InputIcon><UserIcon size={18} /></InputIcon>
+                      <StyledInput
+                        type="text"
+                        placeholder={t('auth.usernamePlaceholder')}
+                        autoComplete="username"
+                        {...register('username')}
+                        $hasError={Boolean(errors.username)}
+                        data-testid="input-username"
+                      />
+                    </InputWrap>
+                    {errors.username && <ErrorMsg>{errors.username.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Password */}
+                  <FieldGroup>
+                    <InputWrap>
+                      <InputIcon><Lock size={18} /></InputIcon>
+                      <StyledInput
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder={t('auth.passwordPlaceholder')}
+                        autoComplete="new-password"
+                        {...register('password')}
+                        $hasError={Boolean(errors.password)}
+                        data-testid="input-password"
+                      />
+                      <TogglePasswordBtn
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </TogglePasswordBtn>
+                    </InputWrap>
+                    {errors.password && <ErrorMsg>{errors.password.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Confirm Password */}
+                  <FieldGroup>
+                    <InputWrap>
+                      <InputIcon><Lock size={18} /></InputIcon>
+                      <StyledInput
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder={t('auth.confirmPasswordPlaceholder')}
+                        autoComplete="new-password"
+                        {...register('confirmPassword')}
+                        $hasError={Boolean(errors.confirmPassword)}
+                        data-testid="input-confirmPassword"
+                      />
+                      <TogglePasswordBtn
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </TogglePasswordBtn>
+                    </InputWrap>
+                    {errors.confirmPassword && <ErrorMsg>{errors.confirmPassword.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  <PrimaryBtn
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '1.25rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#8d99ae',
-                      background: 'none',
-                      border: 'none',
-                      padding: 0,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
+                    onClick={handleNextFromStep1}
+                    data-testid="step1-next"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.password && <p style={errorTextStyle}>{errors.password.message}</p>}
-              </div>
+                    <span>{t('auth.continue')}</span>
+                    <ChevronRight size={18} />
+                  </PrimaryBtn>
+                </StepSection>
+              )}
 
-              <div style={{ marginBottom: '0.75rem' }}>
-                <div style={{ position: 'relative' }}>
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: '1.25rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#8d99ae',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Lock size={18} />
-                  </span>
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder={t('auth.confirmPasswordPlaceholder')}
-                    autoComplete="new-password"
-                    {...register('confirmPassword')}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '3.25rem',
-                      paddingRight: '3.25rem',
-                      paddingTop: '0.875rem',
-                      paddingBottom: '0.875rem',
-                      borderRadius: '9999px',
-                      border: errors.confirmPassword ? '1px solid #d90429' : '1px solid #d2d6df',
-                      backgroundColor: 'white',
-                      color: '#2b2d42',
-                      fontSize: '0.875rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '1.25rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#8d99ae',
-                      background: 'none',
-                      border: 'none',
-                      padding: 0,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p style={errorTextStyle}>{errors.confirmPassword.message}</p>
-                )}
-              </div>
+              {/* STEP 2: Physical Profile (Age, Gender, Height, Weight, Goal) */}
+              {step === 2 && (
+                <StepSection data-testid="signup-step-2">
+                  <FormTitle>{t('auth.stepBody')}</FormTitle>
+                  <FormSubtitle>Tell us about your physical background to tailor your experience</FormSubtitle>
 
-              <div style={{ marginBottom: '1.25rem' }}>
-                <p style={{ color: '#2b2d42', fontSize: '0.75rem', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {t('auth.rolePrompt')}
-                </p>
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  {SIGNUP_ROLES.map((r) => (
-                    <label
-                      key={r}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.4rem',
-                        padding: '0.75rem 0.5rem',
-                        borderRadius: '9999px',
-                        border: '1px solid #d2d6df',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        color: '#2b2d42',
-                      }}
+                  {/* Age & Gender in a row */}
+                  <TwoColRow>
+                    <FieldGroup>
+                      <Label>{t('auth.age')}</Label>
+                      <StyledInput
+                        type="number"
+                        placeholder={t('auth.agePlaceholder')}
+                        {...register('age', { valueAsNumber: true })}
+                        $hasError={Boolean(errors.age)}
+                        data-testid="input-age"
+                      />
+                      {errors.age && <ErrorMsg>{errors.age.message}</ErrorMsg>}
+                    </FieldGroup>
+
+                    <FieldGroup>
+                      <Label>{t('auth.gender')}</Label>
+                      <GenderGrid>
+                        {['male', 'female', 'other'].map((g) => (
+                          <GenderBtn
+                            key={g}
+                            type="button"
+                            $selected={selectedGender === g}
+                            onClick={() => setValue('gender', g, { shouldValidate: true })}
+                            data-testid={`gender-${g}`}
+                          >
+                            {t(`auth.gender${g.charAt(0).toUpperCase() + g.slice(1)}`)}
+                          </GenderBtn>
+                        ))}
+                      </GenderGrid>
+                      {errors.gender && <ErrorMsg>{errors.gender.message}</ErrorMsg>}
+                    </FieldGroup>
+                  </TwoColRow>
+
+                  {/* Height & Weight with Unit Toggles */}
+                  <TwoColRow>
+                    <FieldGroup>
+                      <UnitHeader>
+                        <Label>{t('auth.height')}</Label>
+                        <UnitToggleGroup>
+                          <UnitBtn
+                            type="button"
+                            $active={heightUnit === 'cm'}
+                            onClick={() => toggleHeightUnit('cm')}
+                          >
+                            CM
+                          </UnitBtn>
+                          <UnitBtn
+                            type="button"
+                            $active={heightUnit === 'ft'}
+                            onClick={() => toggleHeightUnit('ft')}
+                          >
+                            FT
+                          </UnitBtn>
+                        </UnitToggleGroup>
+                      </UnitHeader>
+                      <StyledInput
+                        type="number"
+                        step="0.1"
+                        placeholder={heightUnit === 'cm' ? '175' : '5.9'}
+                        value={displayHeight}
+                        onChange={(e) => handleHeightChange(e.target.value)}
+                        $hasError={Boolean(errors.height)}
+                        data-testid="input-height"
+                      />
+                      {errors.height && <ErrorMsg>{errors.height.message}</ErrorMsg>}
+                    </FieldGroup>
+
+                    <FieldGroup>
+                      <UnitHeader>
+                        <Label>{t('auth.weight')}</Label>
+                        <UnitToggleGroup>
+                          <UnitBtn
+                            type="button"
+                            $active={weightUnit === 'kg'}
+                            onClick={() => toggleWeightUnit('kg')}
+                          >
+                            KG
+                          </UnitBtn>
+                          <UnitBtn
+                            type="button"
+                            $active={weightUnit === 'lbs'}
+                            onClick={() => toggleWeightUnit('lbs')}
+                          >
+                            LBS
+                          </UnitBtn>
+                        </UnitToggleGroup>
+                      </UnitHeader>
+                      <StyledInput
+                        type="number"
+                        step="0.1"
+                        placeholder={weightUnit === 'kg' ? '70' : '154'}
+                        value={displayWeight}
+                        onChange={(e) => handleWeightChange(e.target.value)}
+                        $hasError={Boolean(errors.weight)}
+                        data-testid="input-weight"
+                      />
+                      {errors.weight && <ErrorMsg>{errors.weight.message}</ErrorMsg>}
+                    </FieldGroup>
+                  </TwoColRow>
+
+                  {/* Fitness Goal Chips */}
+                  <FieldGroup>
+                    <Label>{t('auth.fitnessGoal')}</Label>
+                    <ChipsWrap>
+                      {PRESET_GOALS.map((g) => {
+                        const label = t(g.labelKey);
+                        const isSelected = selectedGoal === label;
+                        return (
+                          <ChipBtn
+                            key={g.key}
+                            type="button"
+                            $selected={isSelected}
+                            onClick={() => setValue('goal', label, { shouldValidate: true })}
+                            data-testid={`goal-${g.key}`}
+                          >
+                            {label}
+                          </ChipBtn>
+                        );
+                      })}
+                    </ChipsWrap>
+
+                    {/* Custom goal input */}
+                    <StyledInput
+                      type="text"
+                      placeholder={t('auth.customGoalPlaceholder')}
+                      value={selectedGoal}
+                      onChange={(e) => setValue('goal', e.target.value, { shouldValidate: true })}
+                      style={{ marginTop: '0.65rem' }}
+                      data-testid="input-custom-goal"
+                    />
+                    {errors.goal && <ErrorMsg>{errors.goal.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Actions */}
+                  <NavActions>
+                    <SecondaryBtn type="button" onClick={() => setStep(1)}>
+                      <ChevronLeft size={18} />
+                      <span>{t('auth.back')}</span>
+                    </SecondaryBtn>
+                    <PrimaryBtn
+                      type="button"
+                      onClick={handleNextFromStep2}
+                      data-testid="step2-next"
                     >
-                      <input type="radio" value={r} {...register('role')} style={{ accentColor: '#ef233c' }} />
-                      {t(`auth.roles.${r}`)}
-                    </label>
-                  ))}
-                </div>
-                {errors.role && <p style={errorTextStyle}>{errors.role.message}</p>}
-              </div>
+                      <span>{t('auth.continue')}</span>
+                      <ChevronRight size={18} />
+                    </PrimaryBtn>
+                  </NavActions>
+                </StepSection>
+              )}
 
-              <button
-                type="submit"
-                disabled={disabled}
-                style={{
-                  width: '100%',
-                  padding: '0.875rem',
-                  borderRadius: '9999px',
-                  backgroundColor: disabled ? '#8d99ae' : '#ef233c',
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  letterSpacing: '0.05em',
-                  border: 'none',
-                  cursor: disabled ? 'not-allowed' : 'pointer',
-                  opacity: disabled ? 0.7 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  marginTop: '1rem',
-                }}
-                onMouseEnter={(e) => {
-                  if (!disabled) e.currentTarget.style.backgroundColor = '#d90429';
-                }}
-                onMouseLeave={(e) => {
-                  if (!disabled) e.currentTarget.style.backgroundColor = disabled ? '#8d99ae' : '#ef233c';
-                }}
-              >
-                {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
-                {isLocked
-                  ? t('auth.wait', { time: formatCountdown(remainingSeconds) })
-                  : loading
-                    ? t('auth.creatingAccount')
-                    : t('auth.signUpAction')}
-              </button>
+              {/* STEP 3: Coaching Profile (Trainers Only) */}
+              {step === 3 && isTrainer && (
+                <StepSection data-testid="signup-step-3-trainer">
+                  <FormTitle>{t('auth.stepCoaching')}</FormTitle>
+                  <FormSubtitle>Highlight your expertise, rate, and training locations</FormSubtitle>
+
+                  {/* Description */}
+                  <FieldGroup>
+                    <Label>{t('auth.servicesDescription')}</Label>
+                    <StyledTextarea
+                      rows={3}
+                      placeholder={t('auth.servicesPlaceholder')}
+                      {...register('description')}
+                      $hasError={Boolean(errors.description)}
+                      data-testid="input-description"
+                    />
+                    {errors.description && <ErrorMsg>{errors.description.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Monthly Rate ($ USD) */}
+                  <FieldGroup>
+                    <Label>{t('auth.monthlyPrice')}</Label>
+                    <StyledInput
+                      type="number"
+                      placeholder={t('auth.monthlyPricePlaceholder')}
+                      {...register('monthlyPrice', { valueAsNumber: true })}
+                      $hasError={Boolean(errors.monthlyPrice)}
+                      data-testid="input-monthlyPrice"
+                    />
+                    {errors.monthlyPrice && <ErrorMsg>{errors.monthlyPrice.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Specialization Tags */}
+                  <FieldGroup>
+                    <Label>{t('auth.specializations')}</Label>
+                    <ChipsWrap>
+                      {PRESET_SPECIALIZATIONS.map((tag) => {
+                        const isSelected = currentSpecializations.includes(tag);
+                        return (
+                          <ChipBtn
+                            key={tag}
+                            type="button"
+                            $selected={isSelected}
+                            onClick={() => toggleSpecialization(tag)}
+                            data-testid={`tag-${tag}`}
+                          >
+                            {tag}
+                          </ChipBtn>
+                        );
+                      })}
+                    </ChipsWrap>
+
+                    {/* Add Custom Tag */}
+                    <TagInputRow>
+                      <StyledInput
+                        type="text"
+                        placeholder={t('auth.customTagPlaceholder')}
+                        value={customTagInput}
+                        onChange={(e) => setCustomTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addCustomTag();
+                          }
+                        }}
+                        data-testid="input-custom-tag"
+                      />
+                      <AddSmallBtn type="button" onClick={addCustomTag}>
+                        <Plus size={16} />
+                      </AddSmallBtn>
+                    </TagInputRow>
+                    {errors.specializations && <ErrorMsg>{errors.specializations.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Gym Affiliations (max 3, optional) */}
+                  <FieldGroup>
+                    <Label>
+                      {t('auth.gymAffiliations')} ({currentGyms.length}/3)
+                    </Label>
+                    {currentGyms.length > 0 && (
+                      <SelectedTagsWrap>
+                        {currentGyms.map((gym) => (
+                          <GymBadge key={gym}>
+                            <Building size={14} />
+                            <span>{gym}</span>
+                            <RemoveBtn type="button" onClick={() => removeGym(gym)}>
+                              <X size={12} />
+                            </RemoveBtn>
+                          </GymBadge>
+                        ))}
+                      </SelectedTagsWrap>
+                    )}
+
+                    {currentGyms.length < 3 && (
+                      <TagInputRow>
+                        <StyledInput
+                          type="text"
+                          placeholder={t('auth.gymPlaceholder')}
+                          value={gymInput}
+                          onChange={(e) => setGymInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addGym();
+                            }
+                          }}
+                          data-testid="input-gym"
+                        />
+                        <AddSmallBtn type="button" onClick={addGym}>
+                          <Plus size={16} />
+                        </AddSmallBtn>
+                      </TagInputRow>
+                    )}
+                  </FieldGroup>
+
+                  {/* Nav Actions */}
+                  <NavActions>
+                    <SecondaryBtn type="button" onClick={() => setStep(2)}>
+                      <ChevronLeft size={18} />
+                      <span>{t('auth.back')}</span>
+                    </SecondaryBtn>
+                    <PrimaryBtn
+                      type="button"
+                      onClick={handleNextFromStep3}
+                      data-testid="step3-next"
+                    >
+                      <span>{t('auth.continue')}</span>
+                      <ChevronRight size={18} />
+                    </PrimaryBtn>
+                  </NavActions>
+                </StepSection>
+              )}
+
+              {/* CONFIRMATION STEP: (Step 3 for Client, Step 4 for Trainer) */}
+              {((!isTrainer && step === 3) || (isTrainer && step === 4)) && (
+                <StepSection data-testid="signup-step-confirmation">
+                  <FormTitle>{t('auth.reviewTitle')}</FormTitle>
+                  <FormSubtitle>{t('auth.reviewSubtitle')}</FormSubtitle>
+
+                  {/* Summary Card 1: Account Information */}
+                  <SummaryCard>
+                    <SummaryCardHeader>
+                      <SummaryCardTitle>{t('auth.accountSection')}</SummaryCardTitle>
+                      <EditLinkBtn type="button" onClick={() => setStep(1)} data-testid="edit-step-1">
+                        <Edit2 size={13} />
+                        <span>{t('auth.edit')}</span>
+                      </EditLinkBtn>
+                    </SummaryCardHeader>
+                    <SummaryRow>
+                      <SummaryLabel>Role:</SummaryLabel>
+                      <SummaryValHighlight>{watch('role')}</SummaryValHighlight>
+                    </SummaryRow>
+                    <SummaryRow>
+                      <SummaryLabel>Username:</SummaryLabel>
+                      <SummaryVal>{watch('username')}</SummaryVal>
+                    </SummaryRow>
+                    <SummaryRow>
+                      <SummaryLabel>Email:</SummaryLabel>
+                      <SummaryVal>{watch('email')}</SummaryVal>
+                    </SummaryRow>
+                  </SummaryCard>
+
+                  {/* Summary Card 2: Physical Profile */}
+                  <SummaryCard>
+                    <SummaryCardHeader>
+                      <SummaryCardTitle>{t('auth.profileSection')}</SummaryCardTitle>
+                      <EditLinkBtn type="button" onClick={() => setStep(2)} data-testid="edit-step-2">
+                        <Edit2 size={13} />
+                        <span>{t('auth.edit')}</span>
+                      </EditLinkBtn>
+                    </SummaryCardHeader>
+                    <SummaryRow>
+                      <SummaryLabel>{t('auth.age')}:</SummaryLabel>
+                      <SummaryVal>{watch('age')} yrs</SummaryVal>
+                    </SummaryRow>
+                    <SummaryRow>
+                      <SummaryLabel>{t('auth.gender')}:</SummaryLabel>
+                      <SummaryVal style={{ textTransform: 'capitalize' }}>{watch('gender')}</SummaryVal>
+                    </SummaryRow>
+                    <SummaryRow>
+                      <SummaryLabel>{t('auth.height')}:</SummaryLabel>
+                      <SummaryVal>{watch('height')} cm</SummaryVal>
+                    </SummaryRow>
+                    <SummaryRow>
+                      <SummaryLabel>{t('auth.weight')}:</SummaryLabel>
+                      <SummaryVal>{watch('weight')} kg</SummaryVal>
+                    </SummaryRow>
+                    <SummaryRow>
+                      <SummaryLabel>{t('auth.fitnessGoal')}:</SummaryLabel>
+                      <SummaryValHighlight>{watch('goal')}</SummaryValHighlight>
+                    </SummaryRow>
+                  </SummaryCard>
+
+                  {/* Summary Card 3: Coaching Profile (Trainer Only) */}
+                  {isTrainer && (
+                    <SummaryCard>
+                      <SummaryCardHeader>
+                        <SummaryCardTitle>{t('auth.coachingSection')}</SummaryCardTitle>
+                        <EditLinkBtn type="button" onClick={() => setStep(3)} data-testid="edit-step-3">
+                          <Edit2 size={13} />
+                          <span>{t('auth.edit')}</span>
+                        </EditLinkBtn>
+                      </SummaryCardHeader>
+                      <SummaryRow>
+                        <SummaryLabel>Monthly Rate:</SummaryLabel>
+                        <SummaryValHighlight>${watch('monthlyPrice')} USD / mo</SummaryValHighlight>
+                      </SummaryRow>
+                      <SummaryRow>
+                        <SummaryLabel>Specializations:</SummaryLabel>
+                        <SummaryVal>{currentSpecializations.join(', ')}</SummaryVal>
+                      </SummaryRow>
+                      {currentGyms.length > 0 && (
+                        <SummaryRow>
+                          <SummaryLabel>Gyms:</SummaryLabel>
+                          <SummaryVal>{currentGyms.join(', ')}</SummaryVal>
+                        </SummaryRow>
+                      )}
+                      <SummaryRow style={{ alignItems: 'flex-start' }}>
+                        <SummaryLabel>Services:</SummaryLabel>
+                        <SummaryVal style={{ whiteSpace: 'pre-wrap' }}>{watch('description')}</SummaryVal>
+                      </SummaryRow>
+                    </SummaryCard>
+                  )}
+
+                  {/* Final Actions */}
+                  <NavActions>
+                    <SecondaryBtn type="button" onClick={() => setStep(isTrainer ? 3 : 2)}>
+                      <ChevronLeft size={18} />
+                      <span>{t('auth.back')}</span>
+                    </SecondaryBtn>
+                    <SubmitPrimaryBtn
+                      type="submit"
+                      disabled={disabled}
+                      data-testid="confirm-signup-btn"
+                    >
+                      {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
+                      {isLocked
+                        ? t('auth.wait', { time: formatCountdown(remainingSeconds) })
+                        : loading
+                          ? t('auth.creatingAccount')
+                          : t('auth.confirmAndCreate')}
+                    </SubmitPrimaryBtn>
+                  </NavActions>
+                </StepSection>
+              )}
             </form>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.75rem 0' }}>
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
-              <span style={{ fontSize: '0.75rem', color: '#8d99ae', textTransform: 'uppercase' }}>{t('common.or')}</span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#d2d6df' }} />
-            </div>
+            <DividerRow>
+              <Line />
+              <OrText>{t('common.or')}</OrText>
+              <Line />
+            </DividerRow>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem' }}>
-              <button
-                type="button"
-                style={{
-                  width: '2.75rem',
-                  height: '2.75rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'white',
-                  border: '1px solid #d2d6df',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg viewBox="0 0 24 24" style={{ width: '1.25rem', height: '1.25rem' }}>
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-              </button>
-              <button
-                type="button"
-                style={{
-                  width: '2.75rem',
-                  height: '2.75rem',
-                  borderRadius: '9999px',
-                  backgroundColor: '#1877F2',
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg viewBox="0 0 24 24" style={{ width: '1.25rem', height: '1.25rem' }} fill="white">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                style={{
-                  width: '2.75rem',
-                  height: '2.75rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'black',
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Apple size={20} color="white" />
-              </button>
-            </div>
-
-            <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#8d99ae', marginTop: '2rem' }}>
+            <FooterText>
               {t('auth.alreadyHaveAccount')}{' '}
-              <Link
-                to="/login"
-                style={{ color: '#ef233c', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
-              >
-                {t('auth.login')}
-              </Link>
-            </p>
+              <LoginLink to="/login">{t('auth.login')}</LoginLink>
+            </FooterText>
           </FormCard>
         </FormInner>
       </FormPanel>
@@ -471,20 +921,22 @@ export default function SignupPage() {
   );
 }
 
+// Styled Components
 const PageContainer = styled.div`
   display: flex;
   min-height: 100vh;
+  background-color: #0d1121;
 `;
 
 const HeroPanel = styled.div`
   display: none;
   position: relative;
   overflow: hidden;
-  background-color: #2b2d42;
+  background-color: #161b33;
 
   @media (min-width: 1024px) {
     display: flex;
-    width: 40%;
+    width: 38%;
   }
 `;
 
@@ -494,7 +946,7 @@ const HeroImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.4;
+  opacity: 0.35;
 `;
 
 const HeroContent = styled.div`
@@ -503,26 +955,26 @@ const HeroContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 3rem;
+  padding: 3.5rem;
   width: 100%;
 `;
 
 const HeroTitle = styled.h1`
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.025em;
 `;
 
 const HeroFooter = styled.div`
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 `;
 
 const HeroQuote = styled.p`
-  font-size: 1.125rem;
-  line-height: 1.625;
-  color: rgba(237, 242, 244, 0.8);
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: rgba(237, 242, 244, 0.85);
   font-style: italic;
   max-width: 24rem;
 `;
@@ -532,18 +984,18 @@ const FormPanel = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #edf2f4;
-  padding: 3rem;
+  background: radial-gradient(circle at top right, #1d2342 0%, #0e1224 100%);
+  padding: 2.5rem 1.5rem;
 `;
 
 const FormInner = styled.div`
   width: 100%;
-  max-width: 32rem;
+  max-width: 36rem;
 `;
 
 const MobileBrand = styled.div`
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 
   @media (min-width: 1024px) {
     display: none;
@@ -551,28 +1003,546 @@ const MobileBrand = styled.div`
 `;
 
 const MobileBrandTitle = styled.h1`
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 700;
-  color: #2b2d42;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
 `;
 
 const FormCard = styled.div`
-  background-color: #ffffff;
-  border-radius: 1.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #181d38 0%, #12162f 100%);
+  border: 1px solid rgba(124, 132, 170, 0.16);
+  border-radius: 1.85rem;
+  padding: 2.25rem 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+`;
+
+const ProgressHeader = styled.div`
+  margin-bottom: 1.75rem;
+`;
+
+const ProgressTrack = styled.div`
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div<{ $percent: number }>`
+  width: ${({ $percent }) => `${$percent}%`};
+  height: 100%;
+  background: linear-gradient(90deg, #ff8a93 0%, #ef233c 100%);
+  border-radius: 9999px;
+  transition: width 0.35s ease;
+`;
+
+const StepIndicatorText = styled.p`
+  margin: 0.6rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #c5cbe9;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-align: right;
+`;
+
+const StepSection = styled.div`
+  animation: fadeIn 0.25s ease;
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
 const FormTitle = styled.h2`
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 700;
-  color: #2b2d42;
+  font-size: 1.85rem;
+  font-weight: 750;
+  color: #ffffff;
+  margin: 0 0 0.3rem;
   text-align: center;
+  letter-spacing: -0.01em;
 `;
 
 const FormSubtitle = styled.p`
-  color: #8d99ae;
-  font-size: 0.875rem;
+  color: #9da4c4;
+  font-size: 0.85rem;
+  margin: 0 0 1.85rem;
   text-align: center;
+`;
+
+const FieldGroup = styled.div`
+  margin-bottom: 1.15rem;
+`;
+
+const Label = styled.label`
+  display: block;
+  color: #d2d6ee;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.45rem;
+`;
+
+const InputWrap = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+const InputIcon = styled.span`
+  position: absolute;
+  left: 1.15rem;
+  color: #8b92b5;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+`;
+
+const StyledInput = styled.input<{ $hasError?: boolean }>`
+  width: 100%;
+  padding: 0.82rem 1.15rem 0.82rem 3.1rem;
+  border-radius: 9999px;
+  background-color: #0f1329;
+  border: 1px solid ${({ $hasError }) => ($hasError ? '#ef233c' : 'rgba(124, 132, 170, 0.22)')};
+  color: #ffffff;
+  font-size: 0.88rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #ef233c;
+  }
+
+  &::placeholder {
+    color: #697092;
+  }
+`;
+
+const StyledTextarea = styled.textarea<{ $hasError?: boolean }>`
+  width: 100%;
+  padding: 0.85rem 1.15rem;
+  border-radius: 1rem;
+  background-color: #0f1329;
+  border: 1px solid ${({ $hasError }) => ($hasError ? '#ef233c' : 'rgba(124, 132, 170, 0.22)')};
+  color: #ffffff;
+  font-size: 0.88rem;
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+
+  &:focus {
+    border-color: #ef233c;
+  }
+
+  &::placeholder {
+    color: #697092;
+  }
+`;
+
+const TogglePasswordBtn = styled.button`
+  position: absolute;
+  right: 1.15rem;
+  background: none;
+  border: none;
+  color: #8b92b5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+
+  &:hover {
+    color: #ffffff;
+  }
+`;
+
+const ErrorMsg = styled.p`
+  margin: 0.35rem 0 0 0.85rem;
+  color: #ff8a93;
+  font-size: 0.74rem;
+  font-weight: 500;
+`;
+
+const TwoColRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+`;
+
+const RoleGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-top: 0.4rem;
+`;
+
+const RoleCard = styled.button<{ $selected?: boolean }>`
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.95rem;
+  border-radius: 1.15rem;
+  background: ${({ $selected }) =>
+    $selected
+      ? 'linear-gradient(180deg, rgba(239, 35, 60, 0.18) 0%, rgba(239, 35, 60, 0.06) 100%)'
+      : '#0f1329'};
+  border: 1.5px solid ${({ $selected }) => ($selected ? '#ef233c' : 'rgba(124, 132, 170, 0.18)')};
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #ef233c;
+  }
+`;
+
+const RoleIconWrap = styled.div<{ $selected?: boolean }>`
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 0.75rem;
+  background-color: ${({ $selected }) => ($selected ? '#ef233c' : '#1d2342')};
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`;
+
+const RoleTextWrap = styled.div`
+  flex: 1;
+`;
+
+const RoleName = styled.p`
+  margin: 0 0 0.2rem;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 700;
+`;
+
+const RoleDesc = styled.p`
+  margin: 0;
+  color: #8b92b5;
+  font-size: 0.68rem;
+  line-height: 1.35;
+`;
+
+const CheckBadge = styled.span`
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: #ef233c;
+  color: white;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const GenderGrid = styled.div`
+  display: flex;
+  gap: 0.4rem;
+`;
+
+const GenderBtn = styled.button<{ $selected?: boolean }>`
+  flex: 1;
+  padding: 0.75rem 0.35rem;
+  border-radius: 9999px;
+  background-color: ${({ $selected }) => ($selected ? '#ef233c' : '#0f1329')};
+  border: 1px solid ${({ $selected }) => ($selected ? '#ef233c' : 'rgba(124, 132, 170, 0.22)')};
+  color: ${({ $selected }) => ($selected ? '#ffffff' : '#b2b8d8')};
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+`;
+
+const UnitHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+`;
+
+const UnitToggleGroup = styled.div`
+  display: flex;
+  background-color: #0f1329;
+  border-radius: 9999px;
+  padding: 2px;
+  border: 1px solid rgba(124, 132, 170, 0.2);
+`;
+
+const UnitBtn = styled.button<{ $active?: boolean }>`
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: ${({ $active }) => ($active ? '#ef233c' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#ffffff' : '#7d84a5')};
+  border: none;
+  cursor: pointer;
+`;
+
+const ChipsWrap = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`;
+
+const ChipBtn = styled.button<{ $selected?: boolean }>`
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  background: ${({ $selected }) =>
+    $selected
+      ? 'linear-gradient(180deg, #ff8a93 0%, #ef233c 100%)'
+      : '#0f1329'};
+  border: 1px solid ${({ $selected }) => ($selected ? '#ef233c' : 'rgba(124, 132, 170, 0.22)')};
+  color: ${({ $selected }) => ($selected ? '#ffffff' : '#b6bcdb')};
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+`;
+
+const TagInputRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+`;
+
+const AddSmallBtn = styled.button`
+  width: 2.85rem;
+  border-radius: 9999px;
+  background-color: #ef233c;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: #d90429;
+  }
+`;
+
+const SelectedTagsWrap = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+`;
+
+const GymBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: rgba(239, 35, 60, 0.15);
+  border: 1px solid rgba(239, 35, 60, 0.35);
+  color: #ff9da4;
+  padding: 0.35rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+`;
+
+const RemoveBtn = styled.button`
+  background: none;
+  border: none;
+  color: #ff9da4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+`;
+
+const NavActions = styled.div`
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+`;
+
+const PrimaryBtn = styled.button`
+  flex: 1;
+  padding: 0.85rem;
+  border-radius: 9999px;
+  background-color: #ef233c;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #d90429;
+  }
+`;
+
+const SecondaryBtn = styled.button`
+  padding: 0.85rem 1.25rem;
+  border-radius: 9999px;
+  background-color: #0f1329;
+  border: 1px solid rgba(124, 132, 170, 0.25);
+  color: #c5cbe9;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+
+  &:hover {
+    background-color: #171d38;
+  }
+`;
+
+const SubmitPrimaryBtn = styled.button`
+  flex: 1;
+  padding: 0.85rem;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #ff8a93 0%, #ef233c 100%);
+  color: white;
+  font-weight: 750;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 0 16px rgba(239, 35, 60, 0.4);
+
+  &:disabled {
+    background: #4a5068;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;
+
+// Summary cards for Confirmation step
+const SummaryCard = styled.div`
+  background-color: #0f1329;
+  border: 1px solid rgba(124, 132, 170, 0.16);
+  border-radius: 1.15rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.85rem;
+`;
+
+const SummaryCardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(124, 132, 170, 0.12);
+  padding-bottom: 0.45rem;
+`;
+
+const SummaryCardTitle = styled.h4`
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+`;
+
+const EditLinkBtn = styled.button`
+  background: none;
+  border: none;
+  color: #ef233c;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &:hover {
+    color: #ff8a93;
+    text-decoration: underline;
+  }
+`;
+
+const SummaryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const SummaryLabel = styled.span`
+  color: #8c93b3;
+`;
+
+const SummaryVal = styled.span`
+  color: #e4e7fa;
+  font-weight: 500;
+  text-align: right;
+`;
+
+const SummaryValHighlight = styled.span`
+  color: #ff9da4;
+  font-weight: 700;
+  text-align: right;
+`;
+
+const DividerRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+`;
+
+const Line = styled.div`
+  flex: 1;
+  height: 1px;
+  background-color: rgba(124, 132, 170, 0.18);
+`;
+
+const OrText = styled.span`
+  font-size: 0.75rem;
+  color: #8c93b3;
+  text-transform: uppercase;
+`;
+
+const FooterText = styled.p`
+  text-align: center;
+  font-size: 0.82rem;
+  color: #8c93b3;
+  margin: 0;
+`;
+
+const LoginLink = styled(Link)`
+  color: #ef233c;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;

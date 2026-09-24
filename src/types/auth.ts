@@ -20,11 +20,28 @@ export type LoginParams = {
   password: string;
 };
 
+export type UserProfileParams = {
+  age: number;
+  gender: string;
+  height: number; // in cm
+  weight: number; // in kg
+  goal: string;
+};
+
+export type TrainerProfileParams = {
+  description: string;
+  monthlyPrice: number;
+  specializations: string[];
+  gyms?: string[];
+};
+
 export type SignupParams = {
   email: string;
   username: string;
   password: string;
   role: string;
+  profile?: UserProfileParams;
+  trainerProfile?: TrainerProfileParams;
 };
 
 export type ForgotPasswordParams = {

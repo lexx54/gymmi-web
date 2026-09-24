@@ -53,84 +53,56 @@ beforeEach(() => {
   mockToastError.mockReset();
 });
 
-describe('SignupPage', () => {
-  it('renders all form fields and the submit button', () => {
+describe('SignupPage Multi-Step Flow', () => {
+  it('renders Step 1 with credentials and role selection cards', () => {
     render(<SignupPage />, { wrapper: createWrapper() });
 
-    expect(screen.getByPlaceholderText('email@mail.com')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('username')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('confirm password')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+    expect(screen.getByTestId('signup-step-1')).toBeInTheDocument();
+    expect(screen.getByTestId('role-client')).toBeInTheDocument();
+    expect(screen.getByTestId('role-trainer')).toBeInTheDocument();
+    expect(screen.getByTestId('input-email')).toBeInTheDocument();
+    expect(screen.getByTestId('input-username')).toBeInTheDocument();
+    expect(screen.getByTestId('input-password')).toBeInTheDocument();
+    expect(screen.getByTestId('input-confirmPassword')).toBeInTheDocument();
+    expect(screen.getByTestId('step1-next')).toBeInTheDocument();
   });
 
-  it('shows validation errors when submitting empty form', async () => {
+  it('shows validation errors when proceeding with invalid Step 1 credentials', async () => {
     const user = userEvent.setup();
     render(<SignupPage />, { wrapper: createWrapper() });
 
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
+    // Click continue with empty inputs
+    await user.click(screen.getByTestId('step1-next'));
 
     await waitFor(() => {
       expect(screen.getByText('Email is required')).toBeInTheDocument();
     });
     expect(screen.getByText('Username is required')).toBeInTheDocument();
     expect(screen.getByText('Password is required')).toBeInTheDocument();
-    expect(mockMutate).not.toHaveBeenCalled();
+
+    // Still on step 1
+    expect(screen.getByTestId('signup-step-1')).toBeInTheDocument();
+    expect(screen.queryByTestId('signup-step-2')).not.toBeInTheDocument();
   });
 
-  it('shows email format error', async () => {
+  it('shows password mismatch error on Step 1', async () => {
     const user = userEvent.setup();
     render(<SignupPage />, { wrapper: createWrapper() });
 
-    await user.type(screen.getByPlaceholderText('email@mail.com'), 'not-an-email');
-    await user.type(screen.getByPlaceholderText('username'), 'abc');
-    await user.type(screen.getByPlaceholderText('Password'), 'password12');
-    await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
+    await user.type(screen.getByTestId('input-email'), 'athlete@test.com');
+    await user.type(screen.getByTestId('input-username'), 'athlete1');
+    await user.type(screen.getByTestId('input-password'), 'password123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'different123');
 
-    await waitFor(() => {
-      expect(screen.getByText('Enter a valid email')).toBeInTheDocument();
-    });
-    expect(mockMutate).not.toHaveBeenCalled();
-  });
-
-  it('shows password mismatch error', async () => {
-    const user = userEvent.setup();
-    render(<SignupPage />, { wrapper: createWrapper() });
-
-    await user.type(screen.getByPlaceholderText('email@mail.com'), 'a@b.com');
-    await user.type(screen.getByPlaceholderText('username'), 'user');
-    await user.type(screen.getByPlaceholderText('Password'), 'password12');
-    await user.type(screen.getByPlaceholderText('confirm password'), 'password13');
-    await user.click(screen.getByLabelText('User'));
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
+    await user.click(screen.getByTestId('step1-next'));
 
     await waitFor(() => {
       expect(screen.getByText('Passwords do not match')).toBeInTheDocument();
     });
-    expect(mockMutate).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('signup-step-2')).not.toBeInTheDocument();
   });
 
-  it('calls useSignup mutate on valid submission', async () => {
-    const user = userEvent.setup();
-    render(<SignupPage />, { wrapper: createWrapper() });
-
-    await user.type(screen.getByPlaceholderText('email@mail.com'), 'new@user.com');
-    await user.type(screen.getByPlaceholderText('username'), 'newuser');
-    await user.type(screen.getByPlaceholderText('Password'), 'password12');
-    await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
-    await user.click(screen.getByLabelText('User'));
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
-
-    await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalledWith(
-        { email: 'new@user.com', username: 'newuser', password: 'password12', role: 'Client' },
-        expect.any(Object),
-      );
-    });
-  });
-
-  it('shows success toast and navigates to /login on success', async () => {
+  it('allows Client to advance Step 1 -> Step 2 -> Confirmation, and submit successfully', async () => {
     mockMutate.mockImplementation((_vars, opts) => {
       opts?.onSuccess?.();
     });
@@ -138,23 +110,189 @@ describe('SignupPage', () => {
     const user = userEvent.setup();
     render(<SignupPage />, { wrapper: createWrapper() });
 
-    await user.type(screen.getByPlaceholderText('email@mail.com'), 'new@user.com');
-    await user.type(screen.getByPlaceholderText('username'), 'newuser');
-    await user.type(screen.getByPlaceholderText('Password'), 'password12');
-    await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
-    await user.click(screen.getByLabelText('Trainer'));
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
+    // Step 1: Client credentials
+    await user.type(screen.getByTestId('input-email'), 'client@test.com');
+    await user.type(screen.getByTestId('input-username'), 'clientuser');
+    await user.type(screen.getByTestId('input-password'), 'securepassword');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'securepassword');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2: Physical Profile
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByTestId('input-age'), '26');
+    await user.click(screen.getByTestId('gender-male'));
+    await user.type(screen.getByTestId('input-height'), '182');
+    await user.type(screen.getByTestId('input-weight'), '78');
+    await user.click(screen.getByTestId('goal-buildMuscle'));
+
+    await user.click(screen.getByTestId('step2-next'));
+
+    // Confirmation Step for Client (total 3 steps, step 3 is confirmation)
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    // Check summary card information
+    expect(screen.getByText('clientuser')).toBeInTheDocument();
+    expect(screen.getByText('client@test.com')).toBeInTheDocument();
+    expect(screen.getByText('26 yrs')).toBeInTheDocument();
+    expect(screen.getByText('182 cm')).toBeInTheDocument();
+    expect(screen.getByText('78 kg')).toBeInTheDocument();
+
+    // Confirm & Create Account
+    await user.click(screen.getByTestId('confirm-signup-btn'));
 
     await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith(
+        {
+          email: 'client@test.com',
+          username: 'clientuser',
+          password: 'securepassword',
+          role: 'Client',
+          profile: {
+            age: 26,
+            gender: 'male',
+            height: 182,
+            weight: 78,
+            goal: 'Build Muscle',
+          },
+        },
+        expect.any(Object),
+      );
       expect(mockToastSuccess).toHaveBeenCalledWith('Account created successfully!');
       expect(mockNavigate).toHaveBeenCalledWith('/login');
     });
   });
 
-  it('shows error toast on mutation failure', async () => {
+  it('allows Trainer to advance Step 1 -> Step 2 -> Step 3 (Coaching) -> Step 4 (Confirmation)', async () => {
+    mockMutate.mockImplementation((_vars, opts) => {
+      opts?.onSuccess?.();
+    });
+
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    // Step 1: Select Trainer role and fill credentials
+    await user.click(screen.getByTestId('role-trainer'));
+    await user.type(screen.getByTestId('input-email'), 'trainer@test.com');
+    await user.type(screen.getByTestId('input-username'), 'protrainer');
+    await user.type(screen.getByTestId('input-password'), 'trainerpass12');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'trainerpass12');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2: Physical Profile
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-age'), '31');
+    await user.click(screen.getByTestId('gender-female'));
+    await user.type(screen.getByTestId('input-height'), '165');
+    await user.type(screen.getByTestId('input-weight'), '60');
+    await user.type(screen.getByTestId('input-custom-goal'), 'Athletic Performance');
+    await user.click(screen.getByTestId('step2-next'));
+
+    // Step 3: Coaching Profile
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-3-trainer')).toBeInTheDocument();
+    });
+    await user.type(
+      screen.getByTestId('input-description'),
+      'Certified strength and conditioning coach with 8 years of elite training experience.',
+    );
+    await user.type(screen.getByTestId('input-monthlyPrice'), '140');
+    await user.click(screen.getByTestId('tag-Hypertrophy'));
+    await user.type(screen.getByTestId('input-gym'), 'Metro Fitness{enter}');
+
+    await user.click(screen.getByTestId('step3-next'));
+
+    // Confirmation Step (Step 4 for Trainer)
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('protrainer')).toBeInTheDocument();
+    expect(screen.getByText('$140 USD / mo')).toBeInTheDocument();
+    expect(screen.getByText('Hypertrophy')).toBeInTheDocument();
+    expect(screen.getByText('Metro Fitness')).toBeInTheDocument();
+
+    // Submit
+    await user.click(screen.getByTestId('confirm-signup-btn'));
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith(
+        {
+          email: 'trainer@test.com',
+          username: 'protrainer',
+          password: 'trainerpass12',
+          role: 'Trainer',
+          profile: {
+            age: 31,
+            gender: 'female',
+            height: 165,
+            weight: 60,
+            goal: 'Athletic Performance',
+          },
+          trainerProfile: {
+            description: 'Certified strength and conditioning coach with 8 years of elite training experience.',
+            monthlyPrice: 140,
+            specializations: ['Hypertrophy'],
+            gyms: ['Metro Fitness'],
+          },
+        },
+        expect.any(Object),
+      );
+    });
+  });
+
+  it('allows user to navigate back and edit sections from the confirmation screen', async () => {
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    // Step 1
+    await user.type(screen.getByTestId('input-email'), 'edituser@test.com');
+    await user.type(screen.getByTestId('input-username'), 'edituser');
+    await user.type(screen.getByTestId('input-password'), 'password123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'password123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-age'), '25');
+    await user.click(screen.getByTestId('gender-male'));
+    await user.type(screen.getByTestId('input-height'), '175');
+    await user.type(screen.getByTestId('input-weight'), '70');
+    await user.click(screen.getByTestId('goal-buildMuscle'));
+    await user.click(screen.getByTestId('step2-next'));
+
+    // Confirmation
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    // Click edit on Account section (returns to step 1)
+    await user.click(screen.getByTestId('edit-step-1'));
+    expect(screen.getByTestId('signup-step-1')).toBeInTheDocument();
+
+    // Advance back to confirmation
+    await user.click(screen.getByTestId('step1-next'));
+    expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    await user.click(screen.getByTestId('step2-next'));
+    expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+
+    // Click edit on Physical Profile section (returns to step 2)
+    await user.click(screen.getByTestId('edit-step-2'));
+    expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+  });
+
+  it('shows error toast when signup mutation fails', async () => {
     mockMutate.mockImplementation((_vars, opts) => {
       opts?.onError?.({
-        response: { data: { message: 'Email already taken' } },
+        response: { data: { message: 'Email already registered' } },
         message: 'Request failed',
       });
     });
@@ -162,15 +300,33 @@ describe('SignupPage', () => {
     const user = userEvent.setup();
     render(<SignupPage />, { wrapper: createWrapper() });
 
-    await user.type(screen.getByPlaceholderText('email@mail.com'), 'taken@b.com');
-    await user.type(screen.getByPlaceholderText('username'), 'user');
-    await user.type(screen.getByPlaceholderText('Password'), 'password12');
-    await user.type(screen.getByPlaceholderText('confirm password'), 'password12');
-    await user.click(screen.getByLabelText('User'));
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
+    // Step 1
+    await user.type(screen.getByTestId('input-email'), 'taken@test.com');
+    await user.type(screen.getByTestId('input-username'), 'takenuser');
+    await user.type(screen.getByTestId('input-password'), 'password123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'password123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-age'), '25');
+    await user.click(screen.getByTestId('gender-other'));
+    await user.type(screen.getByTestId('input-height'), '170');
+    await user.type(screen.getByTestId('input-weight'), '65');
+    await user.click(screen.getByTestId('goal-buildMuscle'));
+    await user.click(screen.getByTestId('step2-next'));
+
+    // Confirmation
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTestId('confirm-signup-btn'));
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith('Email already taken');
+      expect(mockToastError).toHaveBeenCalledWith('Email already registered');
     });
   });
 });
