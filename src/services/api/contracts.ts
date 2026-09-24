@@ -3,10 +3,19 @@ import type { WorkoutAssignment, WorkoutPeriod } from './workouts';
 
 export type ContractStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'ENDED';
 
+export type TrainerProfileData = {
+  id?: string;
+  description: string;
+  monthlyPrice: number;
+  specializations: string[];
+  gyms: string[];
+};
+
 export type ContractParty = {
   id: string;
   email: string;
   username: string;
+  trainerProfile?: TrainerProfileData | null;
 };
 
 export type TrainerContract = {
