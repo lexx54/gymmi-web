@@ -26,6 +26,7 @@ Interactive multi-step registration slider with live validation, physical metric
 - **Step Pathing by Role**:
   - `Client`: Step 1 -> Step 2 -> Step 3 (Confirmation). Total steps = 3.
   - `Trainer`: Step 1 -> Step 2 -> Step 3 (Coaching) -> Step 4 (Confirmation). Total steps = 4.
+- **Role-Aware Physical Profile**: Primary fitness goals (preset chips and custom text input) are only shown to and required for Athletes (Clients). For Personal Trainers, the goal field is omitted on Step 2 and excluded from the Physical Profile review card and submitted payload.
 - **Unit Conversion**: Internal state stores height in cm and weight in kg to conform with backend API contracts, while presentation values dynamically convert between metric and imperial.
 - **Confirmation Review**: The final confirmation step provides a clean summary review with dedicated Edit buttons that navigate back to the appropriate step without losing state.
 - **Step-by-step Validation**: Each step transition validates only that step's fields using its dedicated Zod schema to avoid premature cross-step validation errors.

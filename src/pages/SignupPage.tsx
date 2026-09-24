@@ -250,7 +250,7 @@ export default function SignupPage() {
 
   const handleNextFromStep2 = async () => {
     const currentValues = watch();
-    const result = createStep2Schema(t).safeParse(currentValues);
+    const result = createStep2Schema(t, isTrainer).safeParse(currentValues);
     if (!result.success) {
       const seen = new Set<string>();
       for (const issue of result.error.issues) {
@@ -301,7 +301,7 @@ export default function SignupPage() {
         gender: data.gender,
         height: Number(data.height),
         weight: Number(data.weight),
-        goal: data.goal,
+        ...(data.role === 'Client' && data.goal ? { goal: data.goal } : {}),
       },
       ...(data.role === 'Trainer'
         ? {
@@ -606,38 +606,40 @@ export default function SignupPage() {
                     </FieldGroup>
                   </TwoColRow>
 
-                  {/* Fitness Goal Chips */}
-                  <FieldGroup>
-                    <Label>{t('auth.fitnessGoal')}</Label>
-                    <ChipsWrap>
-                      {PRESET_GOALS.map((g) => {
-                        const label = t(g.labelKey);
-                        const isSelected = selectedGoal === label;
-                        return (
-                          <ChipBtn
-                            key={g.key}
-                            type="button"
-                            $selected={isSelected}
-                            onClick={() => setValue('goal', label, { shouldValidate: true })}
-                            data-testid={`goal-${g.key}`}
-                          >
-                            {label}
-                          </ChipBtn>
-                        );
-                      })}
-                    </ChipsWrap>
+                  {/* Fitness Goal Chips (Athletes Only) */}
+                  {!isTrainer && (
+                    <FieldGroup>
+                      <Label>{t('auth.fitnessGoal')}</Label>
+                      <ChipsWrap>
+                        {PRESET_GOALS.map((g) => {
+                          const label = t(g.labelKey);
+                          const isSelected = selectedGoal === label;
+                          return (
+                            <ChipBtn
+                              key={g.key}
+                              type="button"
+                              $selected={isSelected}
+                              onClick={() => setValue('goal', label, { shouldValidate: true })}
+                              data-testid={`goal-${g.key}`}
+                            >
+                              {label}
+                            </ChipBtn>
+                          );
+                        })}
+                      </ChipsWrap>
 
-                    {/* Custom goal input */}
-                    <StyledInput
-                      type="text"
-                      placeholder={t('auth.customGoalPlaceholder')}
-                      value={selectedGoal}
-                      onChange={(e) => setValue('goal', e.target.value, { shouldValidate: true })}
-                      style={{ marginTop: '0.65rem' }}
-                      data-testid="input-custom-goal"
-                    />
-                    {errors.goal && <ErrorMsg>{errors.goal.message}</ErrorMsg>}
-                  </FieldGroup>
+                      {/* Custom goal input */}
+                      <StyledInput
+                        type="text"
+                        placeholder={t('auth.customGoalPlaceholder')}
+                        value={selectedGoal}
+                        onChange={(e) => setValue('goal', e.target.value, { shouldValidate: true })}
+                        style={{ marginTop: '0.65rem' }}
+                        data-testid="input-custom-goal"
+                      />
+                      {errors.goal && <ErrorMsg>{errors.goal.message}</ErrorMsg>}
+                    </FieldGroup>
+                  )}
 
                   {/* Actions */}
                   <NavActions>
@@ -844,10 +846,12 @@ export default function SignupPage() {
                       <SummaryLabel>{t('auth.weight')}:</SummaryLabel>
                       <SummaryVal>{watch('weight')} kg</SummaryVal>
                     </SummaryRow>
-                    <SummaryRow>
-                      <SummaryLabel>{t('auth.fitnessGoal')}:</SummaryLabel>
-                      <SummaryValHighlight>{watch('goal')}</SummaryValHighlight>
-                    </SummaryRow>
+                    {!isTrainer && watch('goal') && (
+                      <SummaryRow>
+                        <SummaryLabel>{t('auth.fitnessGoal')}:</SummaryLabel>
+                        <SummaryValHighlight>{watch('goal')}</SummaryValHighlight>
+                      </SummaryRow>
+                    )}
                   </SummaryCard>
 
                   {/* Summary Card 3: Coaching Profile (Trainer Only) */}

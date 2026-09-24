@@ -44,7 +44,7 @@ export const createStep1Schema = (t: TFunction) =>
       path: ['confirmPassword'],
     });
 
-export const createStep2Schema = (t: TFunction) =>
+export const createStep2Schema = (t: TFunction, isTrainer = false) =>
   z.object({
     age: z
       .number({ message: t('auth.validation.ageRequired') })
@@ -57,7 +57,9 @@ export const createStep2Schema = (t: TFunction) =>
     weight: z
       .number({ message: t('auth.validation.weightRequired') })
       .positive(t('auth.validation.weightPositive')),
-    goal: z.string().min(1, t('auth.validation.goalRequired')),
+    goal: isTrainer
+      ? z.string().optional()
+      : z.string().min(1, t('auth.validation.goalRequired')),
   });
 
 export const createStep3TrainerSchema = (t: TFunction) =>
@@ -105,7 +107,7 @@ export const createSignupSchema = (t: TFunction) =>
       weight: z
         .number({ message: t('auth.validation.weightRequired') })
         .positive(t('auth.validation.weightPositive')),
-      goal: z.string().min(1, t('auth.validation.goalRequired')),
+      goal: z.string().optional(),
       // Step 3 fields (Trainer only)
       description: z.string().optional(),
       monthlyPrice: z.number().optional(),
@@ -117,6 +119,15 @@ export const createSignupSchema = (t: TFunction) =>
       path: ['confirmPassword'],
     })
     .superRefine((data, ctx) => {
+      if (data.role === 'Client') {
+        if (!data.goal || !data.goal.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('auth.validation.goalRequired'),
+            path: ['goal'],
+          });
+        }
+      }
       if (data.role === 'Trainer') {
         if (!data.description || data.description.trim().length < 10) {
           ctx.addIssue({

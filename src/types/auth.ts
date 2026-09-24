@@ -25,7 +25,7 @@ export type UserProfileParams = {
   gender: string;
   height: number; // in cm
   weight: number; // in kg
-  goal: string;
+  goal?: string;
 };
 
 export type TrainerProfileParams = {

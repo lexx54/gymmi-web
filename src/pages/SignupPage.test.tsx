@@ -191,7 +191,7 @@ describe('SignupPage Multi-Step Flow', () => {
     await user.click(screen.getByTestId('gender-female'));
     await user.type(screen.getByTestId('input-height'), '165');
     await user.type(screen.getByTestId('input-weight'), '60');
-    await user.type(screen.getByTestId('input-custom-goal'), 'Athletic Performance');
+    expect(screen.queryByTestId('input-custom-goal')).not.toBeInTheDocument();
     await user.click(screen.getByTestId('step2-next'));
 
     // Step 3: Coaching Profile
@@ -233,7 +233,6 @@ describe('SignupPage Multi-Step Flow', () => {
             gender: 'female',
             height: 165,
             weight: 60,
-            goal: 'Athletic Performance',
           },
           trainerProfile: {
             description: 'Certified strength and conditioning coach with 8 years of elite training experience.',
