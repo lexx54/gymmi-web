@@ -5,27 +5,32 @@ Interactive multi-step registration slider with live validation, physical metric
 ## What it does
 
 - Guides users through a multi-step registration flow:
-  - **Step 1 (Account Credentials & Role)**: Email, username, password, confirm password, and interactive role selector cards (Athlete / Personal Trainer).
+  - **Step 1 (Account Credentials & Role)**: Email, username, password, confirm password, interactive role selector cards (Athlete / Personal Trainer), optional profile photo uploader (all users), and optional trainer logo uploader (Personal Trainers only).
   - **Step 2 (Physical Profile)**: Age, gender, height (with cm/ft live toggle, normalized to cm), weight (with kg/lbs live toggle, normalized to kg), fitness goals (preset chips + custom goal).
   - **Step 3 for Trainers (Coaching Profile)**: Services description, monthly rate ($ USD), specialization tags (preset chips + custom tag adder), and gym affiliations (up to 3 chips).
-  - **Confirmation Step (Step 3 for Clients, Step 4 for Trainers)**: Complete breakdown cards with quick "Edit" jump links to amend any step, followed by the final "Confirm & Create Account" submission.
+  - **Confirmation Step (Step 3 for Clients, Step 4 for Trainers)**: Complete breakdown cards including photo/logo thumbnail previews with quick "Edit" jump links to amend any step, followed by the final "Confirm & Create Account" submission.
+- Direct Cloudflare R2 image upload: Client compresses images using canvas (<1024x1024, ~0.82 quality), obtains presigned S3 PUT URL via `POST /auth/presigned-url`, and uploads binary directly with progress spinners and remove capabilities.
 - Real-time step validation ensuring fields are complete and valid before advancing to subsequent steps.
 - Handles rate-limit lockouts (429 status) with a 3-minute cooldown timer.
 
 ## Key files
 
-- `src/pages/SignupPage.tsx`: Main component managing slider state, unit conversions, multi-step navigation, review cards, and mutation submission.
+- `src/pages/SignupPage.tsx`: Main component managing slider state, unit conversions, image uploads, multi-step navigation, review cards, and mutation submission.
+- `src/utils/imageUpload.ts`: Utility for client-side image compression (`compressImage`) and direct PUT upload to Cloudflare R2 via presigned URLs (`uploadImageDirectly`).
 - `src/schemas/auth.ts`: Zod validation schemas for Step 1 (`createStep1Schema`), Step 2 (`createStep2Schema`), Trainer Step 3 (`createStep3TrainerSchema`), and full form (`createSignupSchema`).
-- `src/types/auth.ts`: TypeScript types for `UserProfileParams`, `TrainerProfileParams`, and `SignupParams`.
-- `src/services/api/auth.ts`: `signupApi` supporting the expanded payload.
-- `src/i18n/locales/en.json` & `es.json`: Full bilingual translations for step indicators, form labels, units, goal chips, specialization presets, summary cards, and validation errors.
-- `src/pages/SignupPage.test.tsx`: Comprehensive unit tests covering step transitions, role differences, edit navigation, validation errors, and mutation calls.
+- `src/types/auth.ts`: TypeScript types for `UserProfileParams`, `TrainerProfileParams`, `AuthUser`, and `SignupParams` supporting `avatarUrl` and `logoUrl`.
+- `src/services/api/auth.ts`: `signupApi` supporting the expanded payload, and `getPresignedUrlApi`.
+- `src/i18n/locales/en.json` & `es.json`: Full bilingual translations for step indicators, form labels, units, goal chips, specialization presets, summary cards, photo/logo uploaders, and validation errors.
+- `src/pages/SignupPage.test.tsx`: Comprehensive unit tests covering step transitions, role differences, image upload and preview, edit navigation, validation errors, and mutation calls.
 
 ## Constraints and decisions
 
 - **Step Pathing by Role**:
   - `Client`: Step 1 -> Step 2 -> Step 3 (Confirmation). Total steps = 3.
   - `Trainer`: Step 1 -> Step 2 -> Step 3 (Coaching) -> Step 4 (Confirmation). Total steps = 4.
+- **Client-Side Image Resizing**: Uploaded images are resized on a hidden canvas down to max 1024x1024 at ~0.82 quality to guarantee fast upload speeds and modest storage usage.
+- **Direct Presigned PUT URLs**: Images bypass the web server and the backend API server, streaming directly to Cloudflare R2 via presigned URLs obtained from `POST /auth/presigned-url`. Authorization headers are stripped during R2 upload to preserve S3 signature validity.
+- **Optional Media**: Both Profile Photo and Trainer Logo are strictly optional during registration.
 - **Role-Aware Physical Profile**: Primary fitness goals (preset chips and custom text input) are only shown to and required for Athletes (Clients). For Personal Trainers, the goal field is omitted on Step 2 and excluded from the Physical Profile review card and submitted payload.
 - **Unit Conversion**: Internal state stores height in cm and weight in kg to conform with backend API contracts, while presentation values dynamically convert between metric and imperial.
 - **Confirmation Review**: The final confirmation step provides a clean summary review with dedicated Edit buttons that navigate back to the appropriate step without losing state.
@@ -33,10 +38,11 @@ Interactive multi-step registration slider with live validation, physical metric
 
 ## Changes made by current task
 
-- Implemented multi-step slider layout in `SignupPage.tsx` with animated step transitions.
-- Added role selector cards with Athlete and Personal Trainer descriptions.
-- Added unit toggles for height and weight.
-- Added presets and custom input for goals, specialization tags, and gym affiliations.
-- Implemented summary confirmation cards with quick "Edit" navigation.
-- Added complete English and Spanish translations.
-- Updated `src/pages/SignupPage.test.tsx` with 7 passing test suites covering all workflows.
+- Implemented profile photo uploader on Step 1 for all users and trainer logo uploader for personal trainers.
+- Refactored Step 1 photo and logo uploaders into a side-by-side horizontal row (`PhotoUploadsContainer`, `PhotoUploadCol`) using icon-only triggers (72x72 circular avatar and 72x72 rounded logo) without redundant text action buttons.
+- Added top-right floating red badge buttons (`RemoveBadgeBtn`) with an `X` icon to allow removing selected profile photo or trainer logo without consuming vertical or horizontal layout space.
+- Created `src/utils/imageUpload.ts` for canvas compression and direct presigned S3 upload to Cloudflare R2.
+- Updated Zod validation schemas in `src/schemas/auth.ts` to validate `avatarUrl` and `logoUrl`.
+- Added thumbnail image previews to Confirmation summary cards (Account Information and Coaching Profile).
+- Added bilingual translations in `en.json` and `es.json` for photo and logo uploaders and error states.
+- Updated `src/pages/SignupPage.test.tsx` with test coverage for upload, preview, removal, role toggle, and submission payloads (all 38 suites, 154 tests pass).

@@ -40,3 +40,15 @@ export async function resetPasswordApi(
 export async function logoutApi(): Promise<void> {
   await apiClient.post('/auth/logout');
 }
+
+export async function getPresignedUrlApi(params: {
+  fileType: string;
+  purpose: 'avatar' | 'trainer-logo';
+}): Promise<{ presignedUrl: string; publicUrl: string; key: string }> {
+  const { data } = await apiClient.post<{
+    presignedUrl: string;
+    publicUrl: string;
+    key: string;
+  }>('/auth/presigned-url', params);
+  return data;
+}

@@ -38,6 +38,7 @@ export const createStep1Schema = (t: TFunction) =>
         .string()
         .min(1, t('auth.validation.confirmPasswordRequired')),
       role: z.enum(SIGNUP_ROLES, { message: t('auth.validation.roleRequired') }),
+      avatarUrl: z.string().optional(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('auth.validation.passwordMismatch'),
@@ -74,6 +75,7 @@ export const createStep3TrainerSchema = (t: TFunction) =>
       .array(z.string())
       .min(1, t('auth.validation.specializationsMin')),
     gyms: z.array(z.string()).max(3, t('auth.validation.gymsMax')).optional(),
+    logoUrl: z.string().optional(),
   });
 
 export const createSignupSchema = (t: TFunction) =>
@@ -95,6 +97,7 @@ export const createSignupSchema = (t: TFunction) =>
         .string()
         .min(1, t('auth.validation.confirmPasswordRequired')),
       role: z.enum(SIGNUP_ROLES, { message: t('auth.validation.roleRequired') }),
+      avatarUrl: z.string().optional(),
       // Step 2 fields
       age: z
         .number({ message: t('auth.validation.ageRequired') })
@@ -113,6 +116,7 @@ export const createSignupSchema = (t: TFunction) =>
       monthlyPrice: z.number().optional(),
       specializations: z.array(z.string()).optional(),
       gyms: z.array(z.string()).optional(),
+      logoUrl: z.string().optional(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('auth.validation.passwordMismatch'),

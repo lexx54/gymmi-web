@@ -159,7 +159,22 @@
     "coachingSection": "Perfil de Entrenador",
     "confirmAndCreate": "CONFIRMAR Y CREAR CUENTA",
     "back": "Atrás",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "profilePhoto": "Foto de perfil",
+    "uploadPhoto": "Subir foto",
+    "changePhoto": "Cambiar foto",
+    "removePhoto": "Eliminar foto",
+    "trainerLogo": "Logotipo de entrenador",
+    "uploadLogo": "Subir logotipo",
+    "changeLogo": "Cambiar logotipo",
+    "removeLogo": "Eliminar logotipo",
+    "photoUploadError": "No se pudo subir la imagen. Inténtalo de nuevo.",
+    "photoSizeError": "La imagen debe pesar menos de 3MB.",
+    "photoTypeError": "Por favor sube una imagen válida (JPEG, PNG o WebP).",
+    "uploading": "Subiendo...",
+    "optional": "Opcional",
+    "avatarPreviewAlt": "Vista previa de la foto de perfil",
+    "logoPreviewAlt": "Vista previa del logotipo de entrenador"
   },
   "dashboard": {
     "label": "Panel",

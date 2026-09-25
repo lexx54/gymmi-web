@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,6 +17,9 @@ import {
   X,
   Edit2,
   Building,
+  Camera,
+  Upload,
+  Trash2,
 } from 'lucide-react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
@@ -31,6 +34,7 @@ import {
   type SignupFormValues,
 } from '../schemas/auth';
 import type { SignupParams } from '../types/auth';
+import { uploadImageDirectly } from '../utils/imageUpload';
 
 const LOCKOUT_DURATION = 180_000;
 
@@ -97,6 +101,7 @@ export default function SignupPage() {
       password: '',
       confirmPassword: '',
       role: 'Client',
+      avatarUrl: '',
       age: undefined,
       gender: '',
       height: undefined,
@@ -106,17 +111,81 @@ export default function SignupPage() {
       monthlyPrice: undefined,
       specializations: [],
       gyms: [],
+      logoUrl: '',
     },
   });
+
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const selectedRole = watch('role');
   const isTrainer = selectedRole === 'Trainer';
   const totalSteps = isTrainer ? 4 : 3;
 
+  const currentAvatarUrl = watch('avatarUrl') || '';
+  const currentLogoUrl = watch('logoUrl') || '';
   const currentSpecializations = watch('specializations') || [];
   const currentGyms = watch('gyms') || [];
   const selectedGoal = watch('goal') || '';
   const selectedGender = watch('gender') || '';
+
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+
+    setUploadingAvatar(true);
+    try {
+      const publicUrl = await uploadImageDirectly(file, 'avatar');
+      setValue('avatarUrl', publicUrl, { shouldValidate: true });
+      clearErrors('avatarUrl');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (message === 'FILE_TOO_LARGE') {
+        toast.error(t('auth.photoSizeError'));
+      } else if (message === 'INVALID_FILE_TYPE') {
+        toast.error(t('auth.photoTypeError'));
+      } else {
+        toast.error(t('auth.photoUploadError'));
+      }
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setValue('avatarUrl', '', { shouldValidate: true });
+  };
+
+  const handleLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+
+    setUploadingLogo(true);
+    try {
+      const publicUrl = await uploadImageDirectly(file, 'trainer-logo');
+      setValue('logoUrl', publicUrl, { shouldValidate: true });
+      clearErrors('logoUrl');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (message === 'FILE_TOO_LARGE') {
+        toast.error(t('auth.photoSizeError'));
+      } else if (message === 'INVALID_FILE_TYPE') {
+        toast.error(t('auth.photoTypeError'));
+      } else {
+        toast.error(t('auth.photoUploadError'));
+      }
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setValue('logoUrl', '', { shouldValidate: true });
+  };
 
   // Synchronize height unit conversions
   const handleHeightChange = (valStr: string) => {
@@ -244,7 +313,7 @@ export default function SignupPage() {
       }
       return;
     }
-    clearErrors(['email', 'username', 'password', 'confirmPassword', 'role']);
+    clearErrors(['email', 'username', 'password', 'confirmPassword', 'role', 'avatarUrl']);
     setStep(2);
   };
 
@@ -281,7 +350,7 @@ export default function SignupPage() {
         }
         return;
       }
-      clearErrors(['description', 'monthlyPrice', 'specializations', 'gyms']);
+      clearErrors(['description', 'monthlyPrice', 'specializations', 'gyms', 'logoUrl']);
       setStep(4);
     } else {
       setStep(3);
@@ -296,6 +365,7 @@ export default function SignupPage() {
       username: data.username,
       password: data.password,
       role: data.role,
+      ...(data.avatarUrl ? { avatarUrl: data.avatarUrl } : {}),
       profile: {
         age: Number(data.age),
         gender: data.gender,
@@ -310,6 +380,7 @@ export default function SignupPage() {
               monthlyPrice: Number(data.monthlyPrice) || 0,
               specializations: data.specializations || [],
               gyms: data.gyms || [],
+              ...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
             },
           }
         : {}),
@@ -412,6 +483,113 @@ export default function SignupPage() {
                     </RoleGrid>
                     {errors.role && <ErrorMsg>{errors.role.message}</ErrorMsg>}
                   </FieldGroup>
+
+                  {/* Profile Photo & Trainer Logo Uploaders (Side by Side) */}
+                  <PhotoUploadsContainer>
+                    <PhotoUploadCol>
+                      <Label>
+                        {t('auth.profilePhoto')} <OptionalTag>({t('auth.optional')})</OptionalTag>
+                      </Label>
+                      <IconBoxWrapper>
+                        <AvatarUploadBox
+                          type="button"
+                          onClick={() => avatarInputRef.current?.click()}
+                          data-testid="avatar-picker-trigger"
+                          title={currentAvatarUrl ? t('auth.changePhoto') : t('auth.uploadPhoto')}
+                        >
+                          {uploadingAvatar ? (
+                            <SpinnerWrap data-testid="avatar-uploading">
+                              <Loader2 size={24} className="animate-spin" />
+                            </SpinnerWrap>
+                          ) : currentAvatarUrl ? (
+                            <AvatarPreviewImg
+                              src={currentAvatarUrl}
+                              alt={t('auth.avatarPreviewAlt')}
+                              data-testid="avatar-preview-img"
+                            />
+                          ) : (
+                            <UploadIconWrap>
+                              <Camera size={24} />
+                            </UploadIconWrap>
+                          )}
+                        </AvatarUploadBox>
+                        {currentAvatarUrl && (
+                          <RemoveBadgeBtn
+                            type="button"
+                            onClick={handleRemoveAvatar}
+                            data-testid="remove-avatar"
+                            title={t('auth.removePhoto')}
+                            aria-label={t('auth.removePhoto')}
+                          >
+                            <X size={12} />
+                          </RemoveBadgeBtn>
+                        )}
+                      </IconBoxWrapper>
+
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handleAvatarFile}
+                        style={{ display: 'none' }}
+                        data-testid="input-avatar"
+                      />
+                      {errors.avatarUrl && <ErrorMsg>{errors.avatarUrl.message}</ErrorMsg>}
+                    </PhotoUploadCol>
+
+                    {isTrainer && (
+                      <PhotoUploadCol data-testid="trainer-logo-field">
+                        <Label>
+                          {t('auth.trainerLogo')} <OptionalTag>({t('auth.optional')})</OptionalTag>
+                        </Label>
+                        <IconBoxWrapper>
+                          <LogoUploadBox
+                            type="button"
+                            onClick={() => logoInputRef.current?.click()}
+                            data-testid="logo-picker-trigger"
+                            title={currentLogoUrl ? t('auth.changeLogo') : t('auth.uploadLogo')}
+                          >
+                            {uploadingLogo ? (
+                              <SpinnerWrap data-testid="logo-uploading">
+                                <Loader2 size={24} className="animate-spin" />
+                              </SpinnerWrap>
+                            ) : currentLogoUrl ? (
+                              <LogoPreviewImg
+                                src={currentLogoUrl}
+                                alt={t('auth.logoPreviewAlt')}
+                                data-testid="logo-preview-img"
+                              />
+                            ) : (
+                              <UploadIconWrap>
+                                <Dumbbell size={24} />
+                              </UploadIconWrap>
+                            )}
+                          </LogoUploadBox>
+                          {currentLogoUrl && (
+                            <RemoveBadgeBtn
+                              type="button"
+                              onClick={handleRemoveLogo}
+                              data-testid="remove-logo"
+                              title={t('auth.removeLogo')}
+                              aria-label={t('auth.removeLogo')}
+                            >
+                              <X size={12} />
+                            </RemoveBadgeBtn>
+                          )}
+                        </IconBoxWrapper>
+
+                        <input
+                          ref={logoInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleLogoFile}
+                          style={{ display: 'none' }}
+                          data-testid="input-logo"
+                        />
+                        {errors.logoUrl && <ErrorMsg>{errors.logoUrl.message}</ErrorMsg>}
+                      </PhotoUploadCol>
+                    )}
+                  </PhotoUploadsContainer>
 
                   {/* Email */}
                   <FieldGroup>
@@ -819,6 +997,16 @@ export default function SignupPage() {
                       <SummaryLabel>Email:</SummaryLabel>
                       <SummaryVal>{watch('email')}</SummaryVal>
                     </SummaryRow>
+                    {watch('avatarUrl') && (
+                      <SummaryRow>
+                        <SummaryLabel>{t('auth.profilePhoto')}:</SummaryLabel>
+                        <SummaryThumbImg
+                          src={watch('avatarUrl')}
+                          alt={t('auth.avatarPreviewAlt')}
+                          data-testid="summary-avatar-img"
+                        />
+                      </SummaryRow>
+                    )}
                   </SummaryCard>
 
                   {/* Summary Card 2: Physical Profile */}
@@ -882,6 +1070,16 @@ export default function SignupPage() {
                         <SummaryLabel>Services:</SummaryLabel>
                         <SummaryVal style={{ whiteSpace: 'pre-wrap' }}>{watch('description')}</SummaryVal>
                       </SummaryRow>
+                      {watch('logoUrl') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.trainerLogo')}:</SummaryLabel>
+                          <SummaryThumbImg
+                            src={watch('logoUrl')}
+                            alt={t('auth.logoPreviewAlt')}
+                            data-testid="summary-logo-img"
+                          />
+                        </SummaryRow>
+                      )}
                     </SummaryCard>
                   )}
 
@@ -1549,4 +1747,145 @@ const LoginLink = styled(Link)`
   &:hover {
     text-decoration: underline;
   }
+`;
+
+const PhotoUploadsContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 1.25rem;
+  width: 100%;
+`;
+
+const PhotoUploadCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+`;
+
+const IconBoxWrapper = styled.div`
+  position: relative;
+  display: inline-flex;
+`;
+
+const AvatarUploadBox = styled.button`
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(124, 132, 170, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: #ef233c;
+    background: rgba(239, 35, 60, 0.08);
+  }
+`;
+
+const AvatarPreviewImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
+const LogoUploadBox = styled.button`
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(124, 132, 170, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: #ef233c;
+    background: rgba(239, 35, 60, 0.08);
+  }
+`;
+
+const LogoPreviewImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+`;
+
+const RemoveBadgeBtn = styled.button`
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ef233c;
+  border: 2px solid #1a1e36;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  transition: transform 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    background: #d90429;
+    transform: scale(1.1);
+  }
+`;
+
+const UploadIconWrap = styled.div`
+  color: #7c84aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SpinnerWrap = styled.div`
+  color: #ef233c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const OptionalTag = styled.span`
+  font-size: 0.75rem;
+  color: #7c84aa;
+  font-weight: 400;
+  margin-left: 0.35rem;
+`;
+
+const SummaryThumbImg = styled.img`
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 `;

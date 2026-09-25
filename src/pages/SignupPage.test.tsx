@@ -11,6 +11,11 @@ const mockMutate = vi.fn();
 const mockNavigate = vi.fn();
 const mockToastSuccess = vi.fn();
 const mockToastError = vi.fn();
+const mockUploadImageDirectly = vi.fn();
+
+vi.mock('../utils/imageUpload', () => ({
+  uploadImageDirectly: (...args: unknown[]) => mockUploadImageDirectly(...args),
+}));
 
 vi.mock('../hooks/useAuthApi', () => ({
   useSignup: () => ({
@@ -51,6 +56,7 @@ beforeEach(() => {
   mockNavigate.mockReset();
   mockToastSuccess.mockReset();
   mockToastError.mockReset();
+  mockUploadImageDirectly.mockReset();
 });
 
 describe('SignupPage Multi-Step Flow', () => {
@@ -327,5 +333,124 @@ describe('SignupPage Multi-Step Flow', () => {
     await waitFor(() => {
       expect(mockToastError).toHaveBeenCalledWith('Email already registered');
     });
+  });
+
+  it('renders profile photo uploader and displays trainer logo uploader only when role is Trainer', async () => {
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    expect(screen.getByTestId('avatar-picker-trigger')).toBeInTheDocument();
+    expect(screen.queryByTestId('trainer-logo-field')).not.toBeInTheDocument();
+
+    // Toggle to Trainer
+    await user.click(screen.getByTestId('role-trainer'));
+    expect(screen.getByTestId('trainer-logo-field')).toBeInTheDocument();
+
+    // Toggle back to Client
+    await user.click(screen.getByTestId('role-client'));
+    expect(screen.queryByTestId('trainer-logo-field')).not.toBeInTheDocument();
+  });
+
+  it('handles profile photo selection, direct upload, preview rendering, and removal', async () => {
+    mockUploadImageDirectly.mockResolvedValueOnce('https://cdn.example.com/avatars/user123.jpg');
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    const avatarInput = screen.getByTestId('input-avatar');
+    const file = new File(['dummy-avatar'], 'avatar.png', { type: 'image/png' });
+
+    await user.upload(avatarInput, file);
+
+    await waitFor(() => {
+      expect(mockUploadImageDirectly).toHaveBeenCalledWith(file, 'avatar');
+    });
+
+    await waitFor(() => {
+      const preview = screen.getByTestId('avatar-preview-img');
+      expect(preview).toHaveAttribute('src', 'https://cdn.example.com/avatars/user123.jpg');
+    });
+
+    // Remove photo
+    const removeBtn = screen.getByTestId('remove-avatar');
+    await user.click(removeBtn);
+
+    expect(screen.queryByTestId('avatar-preview-img')).not.toBeInTheDocument();
+  });
+
+  it('submits signup payload with avatarUrl and logoUrl and displays previews on confirmation card', async () => {
+    mockUploadImageDirectly
+      .mockResolvedValueOnce('https://cdn.example.com/avatars/my-avatar.jpg')
+      .mockResolvedValueOnce('https://cdn.example.com/logos/my-logo.png');
+
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    // Step 1: Switch to Trainer
+    await user.click(screen.getByTestId('role-trainer'));
+
+    // Upload avatar
+    const avatarInput = screen.getByTestId('input-avatar');
+    const avatarFile = new File(['avatar-content'], 'avatar.jpg', { type: 'image/jpeg' });
+    await user.upload(avatarInput, avatarFile);
+
+    // Upload logo
+    const logoInput = screen.getByTestId('input-logo');
+    const logoFile = new File(['logo-content'], 'logo.png', { type: 'image/png' });
+    await user.upload(logoInput, logoFile);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('avatar-preview-img')).toBeInTheDocument();
+      expect(screen.getByTestId('logo-preview-img')).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByTestId('input-email'), 'phototrainer@test.com');
+    await user.type(screen.getByTestId('input-username'), 'phototrainer');
+    await user.type(screen.getByTestId('input-password'), 'password123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'password123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-age'), '30');
+    await user.click(screen.getByTestId('gender-male'));
+    await user.type(screen.getByTestId('input-height'), '180');
+    await user.type(screen.getByTestId('input-weight'), '85');
+    await user.click(screen.getByTestId('step2-next'));
+
+    // Step 3 (Trainer Coaching)
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-3-trainer')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-description'), 'Top notch personal trainer with certified background.');
+    await user.type(screen.getByTestId('input-monthlyPrice'), '120');
+    await user.click(screen.getByTestId('tag-Hypertrophy'));
+    await user.click(screen.getByTestId('step3-next'));
+
+    // Confirmation Step
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    // Verify previews in confirmation cards
+    expect(screen.getByTestId('summary-avatar-img')).toHaveAttribute('src', 'https://cdn.example.com/avatars/my-avatar.jpg');
+    expect(screen.getByTestId('summary-logo-img')).toHaveAttribute('src', 'https://cdn.example.com/logos/my-logo.png');
+
+    // Submit
+    await user.click(screen.getByTestId('confirm-signup-btn'));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'phototrainer@test.com',
+        username: 'phototrainer',
+        role: 'Trainer',
+        avatarUrl: 'https://cdn.example.com/avatars/my-avatar.jpg',
+        trainerProfile: expect.objectContaining({
+          logoUrl: 'https://cdn.example.com/logos/my-logo.png',
+        }),
+      }),
+      expect.any(Object),
+    );
   });
 });

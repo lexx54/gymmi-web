@@ -4,6 +4,7 @@ export type AuthUser = {
   id: string;
   email: string;
   username: string;
+  avatarUrl?: string | null;
   hasPaid: boolean;
   plan?: PlanName;
   role: { id: string; name: string };
@@ -33,6 +34,7 @@ export type TrainerProfileParams = {
   monthlyPrice: number;
   specializations: string[];
   gyms?: string[];
+  logoUrl?: string;
 };
 
 export type SignupParams = {
@@ -40,6 +42,7 @@ export type SignupParams = {
   username: string;
   password: string;
   role: string;
+  avatarUrl?: string;
   profile?: UserProfileParams;
   trainerProfile?: TrainerProfileParams;
 };
@@ -58,6 +61,7 @@ export type FullUserProfile = {
   id: string;
   email: string;
   username: string;
+  avatarUrl?: string | null;
   hasPaid: boolean;
   plan?: PlanName;
   role: { id: string; name: string };
@@ -77,13 +81,14 @@ export type FullUserProfile = {
     monthlyPrice: number;
     specializations: string[];
     gyms: string[];
+    logoUrl?: string | null;
     createdAt?: string;
     updatedAt?: string;
   } | null;
 };
 
 export type UpdateProfilePayload = {
+  avatarUrl?: string;
   profile?: Partial<UserProfileParams>;
   trainerProfile?: Partial<TrainerProfileParams>;
 };
-

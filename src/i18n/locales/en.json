@@ -159,7 +159,22 @@
     "coachingSection": "Coaching Profile",
     "confirmAndCreate": "CONFIRM & CREATE ACCOUNT",
     "back": "Back",
-    "continue": "Continue"
+    "continue": "Continue",
+    "profilePhoto": "Profile Photo",
+    "uploadPhoto": "Upload Photo",
+    "changePhoto": "Change Photo",
+    "removePhoto": "Remove Photo",
+    "trainerLogo": "Trainer Logo",
+    "uploadLogo": "Upload Logo",
+    "changeLogo": "Change Logo",
+    "removeLogo": "Remove Logo",
+    "photoUploadError": "Failed to upload image. Please try again.",
+    "photoSizeError": "Image must be less than 3MB.",
+    "photoTypeError": "Please upload a valid image (JPEG, PNG, or WebP).",
+    "uploading": "Uploading...",
+    "optional": "Optional",
+    "avatarPreviewAlt": "Profile photo preview",
+    "logoPreviewAlt": "Trainer logo preview"
   },
   "dashboard": {
     "label": "Dashboard",
