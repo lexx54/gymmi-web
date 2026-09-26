@@ -9,12 +9,14 @@ export type TrainerProfileData = {
   monthlyPrice: number;
   specializations: string[];
   gyms: string[];
+  logoUrl?: string | null;
 };
 
 export type ContractParty = {
   id: string;
   email: string;
   username: string;
+  avatarUrl?: string | null;
   trainerProfile?: TrainerProfileData | null;
 };
 

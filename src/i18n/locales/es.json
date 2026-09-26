@@ -174,7 +174,9 @@
     "uploading": "Subiendo...",
     "optional": "Opcional",
     "avatarPreviewAlt": "Vista previa de la foto de perfil",
-    "logoPreviewAlt": "Vista previa del logotipo de entrenador"
+    "logoPreviewAlt": "Vista previa del logotipo de entrenador",
+    "dropzonePrompt": "Arrastra y suelta tu archivo aquí o",
+    "chooseFile": "Elige un archivo"
   },
   "dashboard": {
     "label": "Panel",
@@ -608,8 +610,15 @@
     "athlete": "Atleta",
     "personalTrainer": "Entrenador Personal",
     "noGoal": "Aún no has definido una meta principal",
-    "noBio": "Aún no has añadido una descripción profesional",
-    "rateLabel": "TARIFA MENSUAL"
+    "rateLabel": "TARIFA MENSUAL",
+    "profilePhoto": "Foto de perfil",
+    "trainerLogo": "Logo de entrenador",
+    "editTrainerLogo": "Editar logo de entrenador",
+    "avatarUpdated": "¡Foto de perfil actualizada con éxito!",
+    "logoUpdated": "¡Logo de entrenador actualizado con éxito!",
+    "publicProfilePreview": "Vista previa de perfil público",
+    "publicProfileNotice": "Así es como los atletas ven tu perfil de entrenador cuando buscan entrenadores para solicitar contratos.",
+    "simulationHint": "Los atletas seleccionan la duración del contrato (de 1 semana a 3 meses) para solicitar tu asesoría."
   },
   "admin": {
     "userUpdated": "Usuario actualizado",

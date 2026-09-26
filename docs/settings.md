@@ -31,9 +31,10 @@ Provides user profile inspection, physical body metric management, professional 
 
 ## Changes made by current task
 
-- Created `PhysicalProfileCard.tsx` and `CoachingProfileCard.tsx` with view/edit states and live unit toggles.
-- Created `useUserProfile` and `useUpdateUserProfile` hooks and `src/services/api/user.ts`.
-- Updated `ProfileHeroCard.tsx` and `AccountSettingsCard.tsx` to display real authenticated profile data.
-- Updated `SettingsPage.tsx` to replace mock training metrics card with `PhysicalProfileCard` and add `CoachingProfileCard` for trainers.
-- Added comprehensive unit tests in `PhysicalProfileCard.test.tsx`, `CoachingProfileCard.test.tsx`, and updated `SettingsPage.test.tsx`.
-- Synchronized English and Spanish translation keys.
+- Removed the 48 BPM RHR stat from `ProfileHeroCard.tsx` and updated unit tests.
+- Made "VIEW PUBLIC PROFILE" functional with `PublicProfileModal.tsx`, showing the public card with photo, logo, bio, specializations, gyms, and rate as prospective clients see it.
+- Added Profile Photo and Trainer Logo side-by-side rendering in `ProfileHeroCard.tsx` with instant R2 presigned file upload on pencil badge click.
+- Added Trainer Logo preview and upload in `CoachingProfileCard.tsx`.
+- Updated `TrainersPage.tsx` to render circular Profile Photo and rounded Trainer Logo side-by-side in trainer selection and pending contract cards.
+- Updated `contracts.ts` types with `avatarUrl` and `logoUrl`.
+- Synchronized English and Spanish i18n keys for avatar, logo, and public preview.

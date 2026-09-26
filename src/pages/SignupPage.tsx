@@ -117,6 +117,8 @@ export default function SignupPage() {
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [avatarDragOver, setAvatarDragOver] = useState(false);
+  const [logoDragOver, setLogoDragOver] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
@@ -131,11 +133,7 @@ export default function SignupPage() {
   const selectedGoal = watch('goal') || '';
   const selectedGender = watch('gender') || '';
 
-  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-
+  const processAvatarFile = async (file: File) => {
     setUploadingAvatar(true);
     try {
       const publicUrl = await uploadImageDirectly(file, 'avatar');
@@ -155,15 +153,27 @@ export default function SignupPage() {
     }
   };
 
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    await processAvatarFile(file);
+  };
+
+  const handleAvatarDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setAvatarDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processAvatarFile(file);
+    }
+  };
+
   const handleRemoveAvatar = () => {
     setValue('avatarUrl', '', { shouldValidate: true });
   };
 
-  const handleLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-
+  const processLogoFile = async (file: File) => {
     setUploadingLogo(true);
     try {
       const publicUrl = await uploadImageDirectly(file, 'trainer-logo');
@@ -180,6 +190,22 @@ export default function SignupPage() {
       }
     } finally {
       setUploadingLogo(false);
+    }
+  };
+
+  const handleLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    await processLogoFile(file);
+  };
+
+  const handleLogoDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setLogoDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processLogoFile(file);
     }
   };
 
@@ -484,39 +510,58 @@ export default function SignupPage() {
                     {errors.role && <ErrorMsg>{errors.role.message}</ErrorMsg>}
                   </FieldGroup>
 
-                  {/* Profile Photo & Trainer Logo Uploaders (Side by Side) */}
-                  <PhotoUploadsContainer>
+                  {/* Profile Photo & Trainer Logo Uploaders (Side by Side Dropzones) */}
+                  <PhotoUploadsContainer $twoCols={isTrainer}>
                     <PhotoUploadCol>
                       <Label>
                         {t('auth.profilePhoto')} <OptionalTag>({t('auth.optional')})</OptionalTag>
                       </Label>
-                      <IconBoxWrapper>
-                        <AvatarUploadBox
+                      <DropzoneCardWrapper>
+                        <DropzoneCard
                           type="button"
                           onClick={() => avatarInputRef.current?.click()}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setAvatarDragOver(true);
+                          }}
+                          onDragLeave={() => setAvatarDragOver(false)}
+                          onDrop={handleAvatarDrop}
+                          $dragOver={avatarDragOver}
+                          $hasImage={!!currentAvatarUrl}
                           data-testid="avatar-picker-trigger"
                           title={currentAvatarUrl ? t('auth.changePhoto') : t('auth.uploadPhoto')}
                         >
                           {uploadingAvatar ? (
                             <SpinnerWrap data-testid="avatar-uploading">
-                              <Loader2 size={24} className="animate-spin" />
+                              <Loader2 size={28} className="animate-spin" />
+                              <DropzoneText>{t('auth.uploading')}</DropzoneText>
                             </SpinnerWrap>
                           ) : currentAvatarUrl ? (
-                            <AvatarPreviewImg
+                            <DropzonePreviewImg
                               src={currentAvatarUrl}
                               alt={t('auth.avatarPreviewAlt')}
                               data-testid="avatar-preview-img"
                             />
                           ) : (
-                            <UploadIconWrap>
-                              <Camera size={24} />
-                            </UploadIconWrap>
+                            <>
+                              <DropzoneIconWrap>
+                                <Camera size={32} />
+                              </DropzoneIconWrap>
+                              <DropzonePromptText>
+                                {t('auth.dropzonePrompt')}{' '}
+                                <DropzoneHighlight>{t('auth.chooseFile')}</DropzoneHighlight>
+                              </DropzonePromptText>
+                            </>
                           )}
-                        </AvatarUploadBox>
+                        </DropzoneCard>
+
                         {currentAvatarUrl && (
                           <RemoveBadgeBtn
                             type="button"
-                            onClick={handleRemoveAvatar}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveAvatar();
+                            }}
                             data-testid="remove-avatar"
                             title={t('auth.removePhoto')}
                             aria-label={t('auth.removePhoto')}
@@ -524,7 +569,7 @@ export default function SignupPage() {
                             <X size={12} />
                           </RemoveBadgeBtn>
                         )}
-                      </IconBoxWrapper>
+                      </DropzoneCardWrapper>
 
                       <input
                         ref={avatarInputRef}
@@ -542,33 +587,52 @@ export default function SignupPage() {
                         <Label>
                           {t('auth.trainerLogo')} <OptionalTag>({t('auth.optional')})</OptionalTag>
                         </Label>
-                        <IconBoxWrapper>
-                          <LogoUploadBox
+                        <DropzoneCardWrapper>
+                          <DropzoneCard
                             type="button"
                             onClick={() => logoInputRef.current?.click()}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              setLogoDragOver(true);
+                            }}
+                            onDragLeave={() => setLogoDragOver(false)}
+                            onDrop={handleLogoDrop}
+                            $dragOver={logoDragOver}
+                            $hasImage={!!currentLogoUrl}
                             data-testid="logo-picker-trigger"
                             title={currentLogoUrl ? t('auth.changeLogo') : t('auth.uploadLogo')}
                           >
                             {uploadingLogo ? (
                               <SpinnerWrap data-testid="logo-uploading">
-                                <Loader2 size={24} className="animate-spin" />
+                                <Loader2 size={28} className="animate-spin" />
+                                <DropzoneText>{t('auth.uploading')}</DropzoneText>
                               </SpinnerWrap>
                             ) : currentLogoUrl ? (
-                              <LogoPreviewImg
+                              <DropzonePreviewImg
                                 src={currentLogoUrl}
                                 alt={t('auth.logoPreviewAlt')}
                                 data-testid="logo-preview-img"
                               />
                             ) : (
-                              <UploadIconWrap>
-                                <Dumbbell size={24} />
-                              </UploadIconWrap>
+                              <>
+                                <DropzoneIconWrap>
+                                  <Dumbbell size={32} />
+                                </DropzoneIconWrap>
+                                <DropzonePromptText>
+                                  {t('auth.dropzonePrompt')}{' '}
+                                  <DropzoneHighlight>{t('auth.chooseFile')}</DropzoneHighlight>
+                                </DropzonePromptText>
+                              </>
                             )}
-                          </LogoUploadBox>
+                          </DropzoneCard>
+
                           {currentLogoUrl && (
                             <RemoveBadgeBtn
                               type="button"
-                              onClick={handleRemoveLogo}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveLogo();
+                              }}
                               data-testid="remove-logo"
                               title={t('auth.removeLogo')}
                               aria-label={t('auth.removeLogo')}
@@ -576,7 +640,7 @@ export default function SignupPage() {
                               <X size={12} />
                             </RemoveBadgeBtn>
                           )}
-                        </IconBoxWrapper>
+                        </DropzoneCardWrapper>
 
                         <input
                           ref={logoInputRef}
@@ -1749,10 +1813,10 @@ const LoginLink = styled(Link)`
   }
 `;
 
-const PhotoUploadsContainer = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
+const PhotoUploadsContainer = styled.div<{ $twoCols?: boolean }>`
+  display: grid;
+  grid-template-columns: ${({ $twoCols }) => ($twoCols ? '1fr 1fr' : '1fr')};
+  gap: 1.25rem;
   margin-bottom: 1.25rem;
   width: 100%;
 `;
@@ -1762,75 +1826,86 @@ const PhotoUploadCol = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
 `;
 
-const IconBoxWrapper = styled.div`
+const DropzoneCardWrapper = styled.div`
   position: relative;
-  display: inline-flex;
+  width: 100%;
 `;
 
-const AvatarUploadBox = styled.button`
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px dashed rgba(124, 132, 170, 0.35);
+const DropzoneCard = styled.button<{ $dragOver?: boolean; $hasImage?: boolean }>`
+  width: 100%;
+  min-height: 140px;
+  height: 140px;
+  border-radius: 12px;
+  background: ${({ $dragOver }) =>
+    $dragOver ? 'rgba(239, 35, 60, 0.08)' : 'rgba(255, 255, 255, 0.03)'};
+  border: 2px dashed
+    ${({ $dragOver }) =>
+      $dragOver ? '#ef233c' : 'rgba(124, 132, 170, 0.35)'};
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   cursor: pointer;
-  padding: 0;
+  padding: ${({ $hasImage }) => ($hasImage ? '0' : '1.25rem 1rem')};
   transition: all 0.2s ease;
-  flex-shrink: 0;
+  text-align: center;
+  gap: 0.6rem;
 
   &:hover {
     border-color: #ef233c;
-    background: rgba(239, 35, 60, 0.08);
+    background: rgba(239, 35, 60, 0.06);
   }
 `;
 
-const AvatarPreviewImg = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-`;
-
-const LogoUploadBox = styled.button`
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px dashed rgba(124, 132, 170, 0.35);
+const DropzoneIconWrap = styled.div`
+  color: #7c84aa;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  transition: color 0.2s ease;
 
-  &:hover {
-    border-color: #ef233c;
-    background: rgba(239, 35, 60, 0.08);
+  ${DropzoneCard}:hover & {
+    color: #ef233c;
   }
 `;
 
-const LogoPreviewImg = styled.img`
+const DropzonePromptText = styled.span`
+  font-size: 0.82rem;
+  color: #a4aebf;
+  line-height: 1.4;
+`;
+
+const DropzoneHighlight = styled.span`
+  color: #edf2f4;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+`;
+
+const DropzonePreviewImg = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 10px;
+`;
+
+const DropzoneText = styled.span`
+  font-size: 0.8rem;
+  color: #a4aebf;
+  margin-top: 0.35rem;
 `;
 
 const RemoveBadgeBtn = styled.button`
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 22px;
-  height: 22px;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #ef233c;
   border: 2px solid #1a1e36;
@@ -1847,13 +1922,6 @@ const RemoveBadgeBtn = styled.button`
     background: #d90429;
     transform: scale(1.1);
   }
-`;
-
-const UploadIconWrap = styled.div`
-  color: #7c84aa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 const SpinnerWrap = styled.div`

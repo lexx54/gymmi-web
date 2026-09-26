@@ -39,10 +39,11 @@ Interactive multi-step registration slider with live validation, physical metric
 ## Changes made by current task
 
 - Implemented profile photo uploader on Step 1 for all users and trainer logo uploader for personal trainers.
-- Refactored Step 1 photo and logo uploaders into a side-by-side horizontal row (`PhotoUploadsContainer`, `PhotoUploadCol`) using icon-only triggers (72x72 circular avatar and 72x72 rounded logo) without redundant text action buttons.
-- Added top-right floating red badge buttons (`RemoveBadgeBtn`) with an `X` icon to allow removing selected profile photo or trainer logo without consuming vertical or horizontal layout space.
+- Redesigned Step 1 uploaders into dashed dropzone cards (`DropzoneCard`) matching the file dropzone layout with centered icons (`Camera`, `Dumbbell`), upload prompt text ("Drag and Drop file here or Choose file"), and drag-and-drop support:
+  - On Web: Displayed side-by-side in 2 equal columns when role is Trainer (`$twoCols`), single column when Client.
+  - When an image is uploaded: The preview image fills the card (`DropzonePreviewImg`), with a floating red circular `(X)` badge (`RemoveBadgeBtn`) in the top-right corner to clear/remove the selection.
 - Created `src/utils/imageUpload.ts` for canvas compression and direct presigned S3 upload to Cloudflare R2.
 - Updated Zod validation schemas in `src/schemas/auth.ts` to validate `avatarUrl` and `logoUrl`.
 - Added thumbnail image previews to Confirmation summary cards (Account Information and Coaching Profile).
-- Added bilingual translations in `en.json` and `es.json` for photo and logo uploaders and error states.
+- Added bilingual translations in `en.json` and `es.json` for dropzone prompts and photo/logo uploaders.
 - Updated `src/pages/SignupPage.test.tsx` with test coverage for upload, preview, removal, role toggle, and submission payloads (all 38 suites, 154 tests pass).

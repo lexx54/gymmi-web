@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Dumbbell, Pencil, Check, X, Loader2, Plus, Building } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Dumbbell, Pencil, Check, X, Loader2, Plus, Building, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { toast } from 'sonner';
 import { CardSurface, SectionTitle } from './SettingsShell';
 import { useUpdateUserProfile } from '../../hooks/useUserProfile';
+import { uploadImageDirectly } from '../../utils/imageUpload';
 import type { FullUserProfile } from '../../types/auth';
 
 interface CoachingProfileCardProps {
@@ -34,6 +35,9 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
   const [monthlyPrice, setMonthlyPrice] = useState<number | ''>('');
   const [specializations, setSpecializations] = useState<string[]>([]);
   const [gyms, setGyms] = useState<string[]>([]);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoFileRef = useRef<HTMLInputElement>(null);
 
   // Inputs for adding tags / gyms
   const [customTagInput, setCustomTagInput] = useState('');
@@ -47,8 +51,25 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       setMonthlyPrice(tp.monthlyPrice ?? '');
       setSpecializations(tp.specializations || []);
       setGyms(tp.gyms || []);
+      setLogoUrl(tp.logoUrl ?? null);
     }
   }, [userProfile]);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingLogo(true);
+      const publicUrl = await uploadImageDirectly(file, 'trainer-logo');
+      setLogoUrl(publicUrl);
+      toast.success(t('settings.logoUpdated') || 'Logo uploaded');
+    } catch (err: any) {
+      toast.error(err.message === 'FILE_TOO_LARGE' ? t('auth.fileTooLarge') : t('auth.uploadError'));
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoFileRef.current) logoFileRef.current.value = '';
+    }
+  };
 
   const toggleSpecialization = (tag: string) => {
     const exists = specializations.includes(tag);
@@ -90,6 +111,7 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       setMonthlyPrice(tp.monthlyPrice ?? '');
       setSpecializations(tp.specializations || []);
       setGyms(tp.gyms || []);
+      setLogoUrl(tp.logoUrl ?? null);
     }
     setCustomTagInput('');
     setGymInput('');
@@ -110,14 +132,19 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       return;
     }
 
+    const trainerPayload: any = {
+      description: description.trim(),
+      monthlyPrice: priceNum,
+      specializations,
+      gyms,
+    };
+    if (logoUrl) {
+      trainerPayload.logoUrl = logoUrl;
+    }
+
     updateProfile(
       {
-        trainerProfile: {
-          description: description.trim(),
-          monthlyPrice: priceNum,
-          specializations,
-          gyms,
-        },
+        trainerProfile: trainerPayload,
       },
       {
         onSuccess: () => {
@@ -209,6 +236,17 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
           </InfoBlock>
 
           <InfoBlock>
+            <InfoLabel>{t('settings.trainerLogo') || 'Trainer Logo'}</InfoLabel>
+            {tp?.logoUrl ? (
+              <LogoPreviewBox>
+                <img src={tp.logoUrl} alt="Trainer Logo" />
+              </LogoPreviewBox>
+            ) : (
+              <EmptyText>—</EmptyText>
+            )}
+          </InfoBlock>
+
+          <InfoBlock>
             <InfoLabel>{t('auth.servicesDescription')}</InfoLabel>
             <DescriptionText>{tp?.description || '—'}</DescriptionText>
           </InfoBlock>
@@ -216,6 +254,42 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       ) : (
         /* EDIT MODE */
         <EditForm>
+          <FieldGroup>
+            <FieldLabel>{t('settings.trainerLogo') || 'Trainer Logo'}</FieldLabel>
+            <LogoUploadRow>
+              {logoUrl ? (
+                <LogoPreviewBox>
+                  <img src={logoUrl} alt="Trainer Logo" />
+                </LogoPreviewBox>
+              ) : (
+                <LogoPlaceholderBox>
+                  <Dumbbell size={24} color="#ff9da4" />
+                </LogoPlaceholderBox>
+              )}
+              <UploadSmallBtn
+                type="button"
+                onClick={() => logoFileRef.current?.click()}
+                disabled={isUploadingLogo}
+                data-testid="coaching-upload-logo-btn"
+              >
+                {isUploadingLogo ? <Loader2 size={13} className="spin" /> : <Camera size={13} />}
+                <span>
+                  {logoUrl
+                    ? t('settings.editTrainerLogo') || 'Change Logo'
+                    : t('auth.uploadTrainerLogo') || 'Upload Logo'}
+                </span>
+              </UploadSmallBtn>
+              <input
+                ref={logoFileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                style={{ display: 'none' }}
+                onChange={handleLogoUpload}
+                data-testid="coaching-logo-file-input"
+              />
+            </LogoUploadRow>
+          </FieldGroup>
+
           <FieldGroup>
             <FieldLabel>{t('auth.monthlyPrice')}</FieldLabel>
             <StyledInput
@@ -609,5 +683,72 @@ const AddSmallBtn = styled.button`
 
   &:hover {
     background-color: #d90429;
+  }
+`;
+
+const LogoPreviewBox = styled.div`
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 179, 177, 0.4);
+  overflow: hidden;
+  background: #14172e;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const LogoPlaceholderBox = styled.div`
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.75rem;
+  border: 1px dashed rgba(255, 179, 177, 0.35);
+  background: rgba(255, 83, 90, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LogoUploadRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const UploadSmallBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(255, 83, 90, 0.12);
+  border: 1px solid rgba(255, 179, 177, 0.35);
+  color: #ffb3b1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 83, 90, 0.22);
+    color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;

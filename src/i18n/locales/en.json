@@ -174,7 +174,9 @@
     "uploading": "Uploading...",
     "optional": "Optional",
     "avatarPreviewAlt": "Profile photo preview",
-    "logoPreviewAlt": "Trainer logo preview"
+    "logoPreviewAlt": "Trainer logo preview",
+    "dropzonePrompt": "Drag and Drop file here or",
+    "chooseFile": "Choose file"
   },
   "dashboard": {
     "label": "Dashboard",
@@ -608,8 +610,15 @@
     "athlete": "Athlete",
     "personalTrainer": "Personal Trainer",
     "noGoal": "No primary fitness goal set yet",
-    "noBio": "No professional description added yet",
-    "rateLabel": "MONTHLY RATE"
+    "rateLabel": "MONTHLY RATE",
+    "profilePhoto": "Profile Photo",
+    "trainerLogo": "Trainer Logo",
+    "editTrainerLogo": "Edit trainer logo",
+    "avatarUpdated": "Profile photo updated successfully!",
+    "logoUpdated": "Trainer logo updated successfully!",
+    "publicProfilePreview": "Public Profile Preview",
+    "publicProfileNotice": "This is how athletes see your coaching profile when browsing trainers to request contracts.",
+    "simulationHint": "Athletes select a contract duration (1 week to 3 months) to request your coaching."
   },
   "admin": {
     "userUpdated": "User updated",

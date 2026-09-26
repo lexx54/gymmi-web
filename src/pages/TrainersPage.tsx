@@ -1,4 +1,4 @@
-import { Inbox, Send, UserRound, X } from 'lucide-react';
+import { Inbox, Send, UserRound, X, Dumbbell } from 'lucide-react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -85,12 +85,37 @@ export default function TrainersPage() {
                     type="button"
                     $selected={trainerId === trainer.id}
                     onClick={() => setTrainerId(trainer.id)}
+                    data-testid={`trainer-choice-${trainer.id}`}
                   >
-                    <Avatar aria-hidden>{trainer.username.slice(0, 1).toUpperCase()}</Avatar>
+                    <PhotosGroup>
+                      {trainer.avatarUrl ? (
+                        <AvatarImage src={trainer.avatarUrl} alt={trainer.username} />
+                      ) : (
+                        <Avatar aria-hidden>{trainer.username.slice(0, 1).toUpperCase()}</Avatar>
+                      )}
+                      {trainer.trainerProfile?.logoUrl ? (
+                        <LogoImage src={trainer.trainerProfile.logoUrl} alt={`${trainer.username} logo`} />
+                      ) : (
+                        <LogoPlaceholder aria-hidden title="Trainer logo">
+                          <Dumbbell size={15} color="#ff9da4" />
+                        </LogoPlaceholder>
+                      )}
+                    </PhotosGroup>
                     <Identity>
                       <Name>{trainer.username}</Name>
                       <Email>{trainer.email}</Email>
+                      {trainer.trainerProfile?.description ? (
+                        <TrainerBio>{trainer.trainerProfile.description}</TrainerBio>
+                      ) : null}
                     </Identity>
+                    {trainer.trainerProfile ? (
+                      <TrainerPills>
+                        <PriceTagBadge>${trainer.trainerProfile.monthlyPrice} USD/mo</PriceTagBadge>
+                        {trainer.trainerProfile.specializations?.slice(0, 2).map((s) => (
+                          <MiniTag key={s}>{s}</MiniTag>
+                        ))}
+                      </TrainerPills>
+                    ) : null}
                   </TrainerChoice>
                 ))}
               </PendingList>
@@ -150,7 +175,16 @@ export default function TrainersPage() {
 
                   return (
                     <PendingItem key={contract.id}>
-                      <Avatar aria-hidden>{name.slice(0, 1).toUpperCase()}</Avatar>
+                      <PhotosGroup>
+                        {contract.trainer?.avatarUrl ? (
+                          <AvatarImage src={contract.trainer.avatarUrl} alt={name} />
+                        ) : (
+                          <Avatar aria-hidden>{name.slice(0, 1).toUpperCase()}</Avatar>
+                        )}
+                        {contract.trainer?.trainerProfile?.logoUrl ? (
+                          <LogoImage src={contract.trainer.trainerProfile.logoUrl} alt={`${name} logo`} />
+                        ) : null}
+                      </PhotosGroup>
                       <Identity>
                         <Name>{name}</Name>
                         {contract.trainer?.email ? <Email>{contract.trainer.email}</Email> : null}
@@ -482,4 +516,77 @@ const EmptyState = styled.p`
 const ErrorText = styled.p`
   margin: 0;
   color: #ffb4ab;
+`;
+
+const PhotosGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const AvatarImage = styled.img`
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 1.5px solid #ef233c;
+  background: #2c3357;
+`;
+
+const LogoImage = styled.img`
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  border: 1.5px solid #ffb3b1;
+  background: #1b203d;
+`;
+
+const LogoPlaceholder = styled.div`
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.5rem;
+  border: 1px dashed rgba(255, 179, 177, 0.4);
+  background: rgba(255, 83, 90, 0.08);
+  display: grid;
+  place-items: center;
+`;
+
+const TrainerBio = styled.span`
+  color: #c0c5e4;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 24rem;
+`;
+
+const TrainerPills = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+`;
+
+const PriceTagBadge = styled.span`
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(239, 35, 60, 0.15);
+  border: 1px solid rgba(239, 35, 60, 0.35);
+  color: #ff9da4;
+  font-size: 0.75rem;
+  font-weight: 700;
+`;
+
+const MiniTag = styled.span`
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(126, 136, 175, 0.12);
+  border: 1px solid rgba(126, 136, 175, 0.2);
+  color: #e0e0fc;
+  font-size: 0.7rem;
+  font-weight: 500;
 `;
