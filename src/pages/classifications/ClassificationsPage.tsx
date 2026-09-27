@@ -133,48 +133,57 @@ export default function ClassificationsPage() {
           ) : null}
         </ControlsRow>
 
-        {/* Core Lifts Selector Pills & Other Exercises Dropdown */}
+        {/* Exercise Selector Dropdown */}
         <ExerciseBar data-testid="exercise-selector-bar">
-          <ExercisePillsGroup>
-            {coreExercises.map((ex) => (
-              <ExercisePill
-                key={ex.id}
-                type="button"
-                $active={ex.id === currentExerciseId}
-                onClick={() => setSelectedExerciseId(ex.id)}
-                data-testid={`exercise-pill-${ex.id}`}
-              >
-                <Dumbbell size={14} />
-                <span>{ex.name}</span>
-              </ExercisePill>
-            ))}
-          </ExercisePillsGroup>
-
-          {otherExercises.length > 0 ? (
-            <SelectWrapper>
-              <SelectInput
-                value={
-                  coreExercises.some((e) => e.id === currentExerciseId)
-                    ? ''
-                    : currentExerciseId
+          <SelectWrapper>
+            <Dumbbell
+              size={16}
+              color="#ef233c"
+              style={{ position: 'absolute', left: 14, pointerEvents: 'none', zIndex: 1 }}
+            />
+            <SelectInput
+              value={currentExerciseId || ''}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setSelectedExerciseId(e.target.value);
                 }
-                onChange={(e) => {
-                  if (e.target.value) {
-                    setSelectedExerciseId(e.target.value);
-                  }
-                }}
-                data-testid="other-exercises-select"
-              >
-                <option value="">{t('classifications.otherLifts')}...</option>
-                {otherExercises.map((ex) => (
-                  <option key={ex.id} value={ex.id}>
+              }}
+              data-testid="exercise-select"
+              aria-label={t('classifications.selectExercise')}
+            >
+              <option value="" disabled>
+                {t('classifications.selectExercise')}
+              </option>
+              {coreExercises.length > 0 && otherExercises.length > 0 ? (
+                <>
+                  <optgroup label={t('classifications.coreLifts')}>
+                    {coreExercises.map((ex) => (
+                      <option key={ex.id} value={ex.id} data-testid={`exercise-option-${ex.id}`}>
+                        {ex.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label={t('classifications.otherLifts')}>
+                    {otherExercises.map((ex) => (
+                      <option key={ex.id} value={ex.id} data-testid={`exercise-option-${ex.id}`}>
+                        {ex.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
+              ) : (
+                data?.availableExercises.map((ex) => (
+                  <option key={ex.id} value={ex.id} data-testid={`exercise-option-${ex.id}`}>
                     {ex.name}
                   </option>
-                ))}
-              </SelectInput>
-              <ChevronDown size={14} style={{ position: 'absolute', right: 12, pointerEvents: 'none', color: '#9ca3af' }} />
-            </SelectWrapper>
-          ) : null}
+                ))
+              )}
+            </SelectInput>
+            <ChevronDown
+              size={16}
+              style={{ position: 'absolute', right: 14, pointerEvents: 'none', color: '#9ca3af' }}
+            />
+          </SelectWrapper>
         </ExerciseBar>
 
         {isLoading ? (
@@ -430,59 +439,51 @@ const CohortBadge = styled.div`
 const ExerciseBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
   margin-bottom: 24px;
-  flex-wrap: wrap;
-`;
-
-const ExercisePillsGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-`;
-
-const ExercisePill = styled.button<{ $active: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 1px solid ${(p) => (p.$active ? '#ef233c' : '#23273e')};
-  background: ${(p) => (p.$active ? 'rgba(239, 35, 60, 0.15)' : '#181b2a')};
-  color: ${(p) => (p.$active ? '#ef233c' : '#cbd5e1')};
-  transition: all 0.15s ease;
-
-  &:hover {
-    border-color: #ef233c;
-    color: #fff;
-  }
 `;
 
 const SelectWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  max-width: 440px;
 `;
 
 const SelectInput = styled.select`
+  width: 100%;
   appearance: none;
   background: #181b2a;
-  color: #cbd5e1;
+  color: #fff;
   border: 1px solid #23273e;
   border-radius: 12px;
-  padding: 10px 36px 10px 16px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 12px 42px 12px 42px;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
   outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    border-color: #3b4263;
+  }
 
   &:focus {
     border-color: #ef233c;
+    box-shadow: 0 0 0 2px rgba(239, 35, 60, 0.25);
+  }
+
+  option,
+  optgroup {
+    background: #181b2a;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  optgroup {
+    color: #ef233c;
+    font-weight: 700;
   }
 `;
 

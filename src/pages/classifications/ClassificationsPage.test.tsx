@@ -188,15 +188,15 @@ describe('ClassificationsPage', () => {
     });
   });
 
-  it('allows switching exercise via core lift buttons', async () => {
+  it('allows switching exercise via exercise select dropdown', async () => {
     render(createElement(ClassificationsPage), { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(screen.getByText('Barbell Back Squat')).toBeDefined();
     });
 
-    const squatButton = screen.getByText('Barbell Back Squat');
-    fireEvent.click(squatButton);
+    const exerciseSelect = screen.getByTestId('exercise-select');
+    fireEvent.change(exerciseSelect, { target: { value: 'core-squat' } });
 
     await waitFor(() => {
       expect(classificationsApi.fetchClassifications).toHaveBeenCalledWith(
