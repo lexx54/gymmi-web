@@ -18,7 +18,7 @@ export const PricingSection: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [role, setRole] = useState<'trainer' | 'client'>('trainer');
+  const [role, setRole] = useState<'trainer' | 'client' | 'gym'>('trainer');
   const [cadence, setCadence] = useState<BillingCadence>('monthly');
 
   const plans = PRICING_DATA[role];
@@ -58,6 +58,15 @@ export const PricingSection: React.FC = () => {
             >
               {t('landing.pricing.tabClient')}
             </RoleTabButton>
+            <RoleTabButton
+              type="button"
+              role="tab"
+              aria-selected={role === 'gym'}
+              $active={role === 'gym'}
+              onClick={() => setRole('gym')}
+            >
+              {t('landing.pricing.tabGym')}
+            </RoleTabButton>
           </RoleSwitcher>
 
           {/* Billing Cadence Toggle */}
@@ -83,27 +92,34 @@ export const PricingSection: React.FC = () => {
         {/* Pricing Cards Grid */}
         <CardsGrid>
           {plans.map((plan) => {
-            const isPlus = plan.id === 'plus';
-            const isPro = plan.id === 'pro';
+            const isHighlighted = plan.badgeKey === 'landing.pricing.popularBadge';
+            const isPro = Boolean(plan.disabled);
             const price = cadence === 'annual' ? plan.annualPrice : plan.monthlyPrice;
+            const formattedPrice = Number.isInteger(price) ? price : price.toFixed(2);
 
             return (
               <PlanCard
                 key={plan.id}
-                $isPlus={isPlus}
+                $isPlus={isHighlighted}
                 $isPro={isPro}
               >
                 {/* Badges */}
-                {isPlus && (
+                {plan.badgeKey === 'landing.pricing.popularBadge' && (
                   <PopularBadge>
                     <Sparkles size={13} />
-                    <span>{t('landing.pricing.popularBadge')}</span>
+                    <span>{t(plan.badgeKey)}</span>
                   </PopularBadge>
                 )}
-                {isPro && (
+                {plan.badgeKey === 'landing.pricing.trialBadge' && (
+                  <TrialBadge>
+                    <Sparkles size={13} />
+                    <span>{t(plan.badgeKey)}</span>
+                  </TrialBadge>
+                )}
+                {plan.badgeKey === 'landing.pricing.comingSoonBadge' && (
                   <ComingSoonBadge>
                     <Lock size={13} />
-                    <span>{t('landing.pricing.comingSoonBadge')}</span>
+                    <span>{t(plan.badgeKey)}</span>
                   </ComingSoonBadge>
                 )}
 
@@ -117,7 +133,7 @@ export const PricingSection: React.FC = () => {
                 <PriceBlock>
                   <PriceRow>
                     <CurrencySymbol>$</CurrencySymbol>
-                    <PriceAmount>{price}</PriceAmount>
+                    <PriceAmount>{formattedPrice}</PriceAmount>
                     <PricePeriod>{t('landing.pricing.perMonth')}</PricePeriod>
                   </PriceRow>
                   {cadence === 'annual' && plan.monthlyPrice > 0 && (
@@ -130,7 +146,7 @@ export const PricingSection: React.FC = () => {
                   {plan.features.map((feat, idx) => (
                     <FeatureItem key={idx} $included={feat.included}>
                       {feat.included ? (
-                        <CheckIconWrapper $isPlus={isPlus}>
+                        <CheckIconWrapper $isPlus={isHighlighted}>
                           <Check size={16} />
                         </CheckIconWrapper>
                       ) : (
@@ -155,7 +171,7 @@ export const PricingSection: React.FC = () => {
                   ) : (
                     <ActiveCTAButton
                       type="button"
-                      $isPlus={isPlus}
+                      $isPlus={isHighlighted}
                       onClick={() => navigate('/signup')}
                     >
                       <span>{t(plan.ctaKey)}</span>
@@ -357,6 +373,26 @@ const PopularBadge = styled.div`
   text-transform: uppercase;
   letter-spacing: 0.04em;
   box-shadow: 0 4px 12px rgba(239, 35, 60, 0.4);
+`;
+
+const TrialBadge = styled.div`
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+  white-space: nowrap;
 `;
 
 const ComingSoonBadge = styled.div`

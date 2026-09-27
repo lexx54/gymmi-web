@@ -798,7 +798,8 @@
       "ctaSecondary": "Explorar Funciones",
       "statExercises": "Ejercicios Curados",
       "statLogging": "Registro en Vivo",
-      "statAi": "Motor de IA Multilingüe"
+      "statAi": "Motor de IA Multilingüe",
+      "statClassifications": "Clasificaciones de Fuerza"
     },
     "preview": {
       "badge": "Entrenamiento Activo",
@@ -821,6 +822,7 @@
       "tabBodyMap": "Mapa Muscular",
       "tabActive": "Entrenamiento Activo",
       "tabTrainer": "Sistema Coach-Atleta",
+      "tabClassifications": "Clasificaciones",
       "tabAi": "IA Gemini",
       "routineTitle": "Programación Visual de Rutinas",
       "routineDesc": "Construye rutinas de varios días con precisión quirúrgica. Configura series, rangos de repeticiones y RPE objetivo mediante un creador intuitivo y ágil.",
@@ -830,6 +832,14 @@
       "activeDesc": "Registra series, repeticiones y esfuerzo percibido en tiempo real. Temporizadores de descanso dinámicos e indicadores de serie mantienen al atleta concentrado en cada levantamiento.",
       "trainerTitle": "Arquitectura Entrenador-Cliente",
       "trainerDesc": "Establece contratos de asesoría estructurados, envía planes de entrenamiento directamente a los móviles de tus clientes y mantén el control con bifurcación automática de rutinas.",
+      "classificationsTitle": "Niveles de Fuerza y Clasificaciones Automatizadas",
+      "classificationsDesc": "Clasifica el rendimiento de tus clientes y miembros en niveles calibrados (Diamante, Platino, Oro, Plata, Bronce) según su 1RM estimado con la fórmula de Epley. Filtra por semana, mes o histórico.",
+      "classificationsF1": "Cálculo de 1RM máximo con la fórmula de Epley y desempate automático",
+      "classificationsF2": "5 niveles de fuerza calibrados desde Bronce hasta Diamante",
+      "classificationsF3": "Priorización de levantamientos principales (Sentadilla, Banca, Peso Muerto, Militar)",
+      "classificationsF4": "Filtros de grupo por ciclos semanales, mensuales e históricos",
+      "classificationsWidgetTitle": "Vista Previa de Clasificaciones",
+      "classificationsWidgetTag": "Grupo del Gimnasio y Entrenador",
       "aiTitle": "IA Multilingüe Impulsada por Gemini",
       "aiDesc": "Supera las barreras del idioma al instante. Los ejercicios personalizados y las indicaciones técnicas se traducen automáticamente entre inglés y español con Google Gemini AI."
     },
@@ -841,13 +851,15 @@
       "coachF2": "Crea programas de varias semanas y asígnalos con un solo clic",
       "coachF3": "Añade ejercicios personalizados con notas técnicas e instrucciones privadas",
       "coachF4": "Comparte plantillas probadas con otros entrenadores de tu red",
+      "coachF5": "Evalúa a tus clientes con clasificaciones semanales y mensuales en los levantamientos clave",
       "clientTag": "Para Atletas Dedicados",
       "clientTitle": "Entrena Con Propósito. Solo o Guiado.",
       "clientDesc": "Supera tus marcas personales, sigue los planes asignados por tu entrenador y mantén control total de tu evolución física.",
       "clientF1": "Ejecuta entrenamientos en vivo con temporizadores y registro de RPE",
       "clientF2": "Conéctate con entrenadores certificados que guían tu progreso de cerca",
       "clientF3": "Diseña rutinas individuales adaptadas a tus horarios y equipamiento",
-      "clientF4": "El mapa muscular anatómico te ayuda a mantener un desarrollo equilibrado"
+      "clientF4": "El mapa muscular anatómico te ayuda a mantener un desarrollo equilibrado",
+      "clientF5": "Compite en las clasificaciones del gimnasio para ganar insignias de nivel de fuerza"
     },
     "pricing": {
       "tag": "Precios Transparentes",
@@ -855,6 +867,7 @@
       "subtitle": "Comienza gratis hoy. Mejora tu plan cuando requieras más capacidad de clientes o plantillas.",
       "tabTrainer": "Para Entrenadores",
       "tabClient": "Para Atletas y Clientes",
+      "tabGym": "Para Gimnasios",
       "monthly": "Mensual",
       "annual": "Anual",
       "save20": "Ahorra 20%",
@@ -862,9 +875,12 @@
       "billedAnnually": "facturado anualmente",
       "popularBadge": "Más Popular",
       "comingSoonBadge": "Próximamente",
+      "trialBadge": "Prueba Gratuita de 30 Días",
       "startFree": "Comenzar Gratis",
       "upgradePlus": "Actualizar a Plus",
       "joinWaitlist": "Próximamente",
+      "startTrial": "Comenzar Prueba Gratuita de 30 Días",
+      "choosePlan": "Comenzar",
       "disclaimer": "La integración de pagos estará disponible muy pronto. Los planes Plus actualmente se activan mediante invitación o administración.",
       "trainer": {
         "free": {
@@ -926,6 +942,38 @@
           "f4": "Gráficas de progresión de 1RM y volumen",
           "f5": "Recomendaciones prioritarias con IA"
         }
+      },
+      "gym": {
+        "plus": {
+          "title": "Gimnasio Plus",
+          "desc": "Para estudios boutique y gimnasios locales en crecimiento.",
+          "f1": "Hasta 100 socios activos",
+          "f2": "Catálogo de rutinas seleccionadas del centro",
+          "f3": "Afiliación de entrenadores con permisos de publicación",
+          "f4": "Clasificaciones de fuerza en ejercicios del centro",
+          "f5": "Listado de socios y control de aforo",
+          "f6": "Prueba gratuita de 30 días incluida"
+        },
+        "pro": {
+          "title": "Gimnasio Pro",
+          "desc": "Para clubes deportivos consolidados que escalan su comunidad.",
+          "f1": "Hasta 300 socios activos",
+          "f2": "Afiliación ilimitada de entrenadores y publicaciones",
+          "f3": "Catálogo del gimnasio con aportes de entrenadores",
+          "f4": "Analíticas avanzadas de retención y volumen",
+          "f5": "Tablas de clasificación del centro y niveles de fuerza",
+          "f6": "Posicionamiento prioritario del centro"
+        },
+        "maximum": {
+          "title": "Gimnasio Maximum",
+          "desc": "Instalaciones insignia y complejos de entrenamiento multiespacio.",
+          "f1": "Socios activos ilimitados",
+          "f2": "Entrenadores y rutinas seleccionadas ilimitados",
+          "f3": "Marca personalizada y logotipo del centro",
+          "f4": "Analíticas completas de cohortes y mapas de calor",
+          "f5": "Clasificaciones automáticas en todo el centro",
+          "f6": "Soporte dedicado e integración guiada"
+        }
       }
     },
     "faq": {
@@ -940,7 +988,9 @@
       "q4": "¿Cómo funciona la traducción con IA Gemini?",
       "a4": "Gymmi integra Google Gemini AI para traducir al instante ejercicios personalizados e instrucciones entre inglés y español, facilitando el entrenamiento bilingüe.",
       "q5": "¿Cuándo estará disponible el plan Pro?",
-      "a5": "El plan Pro está actualmente en fase de desarrollo activo. Incorporará capacidad ilimitada de clientes, cuentas colaborativas para gimnasios y analíticas avanzadas."
+      "a5": "El plan Pro está actualmente en fase de desarrollo activo. Incorporará capacidad ilimitada de clientes, cuentas colaborativas para gimnasios y analíticas avanzadas.",
+      "q6": "¿Cómo funcionan los Niveles de Fuerza y las Clasificaciones?",
+      "a6": "Gymmi calcula automáticamente el 1RM estimado mediante la fórmula científica de Epley a partir de las series registradas. Los atletas alcanzan niveles calibrados (Diamante, Platino, Oro, Plata, Bronce) en los levantamientos principales. Entrenadores y gimnasios pueden ver clasificaciones semanales, mensuales e históricas."
     },
     "footer": {
       "tagline": "Potenciando a entrenadores y atletas con herramientas de precisión.",

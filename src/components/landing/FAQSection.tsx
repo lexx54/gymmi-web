@@ -13,6 +13,7 @@ export const FAQSection: React.FC = () => {
     { qKey: 'landing.faq.q3', aKey: 'landing.faq.a3' },
     { qKey: 'landing.faq.q4', aKey: 'landing.faq.a4' },
     { qKey: 'landing.faq.q5', aKey: 'landing.faq.a5' },
+    { qKey: 'landing.faq.q6', aKey: 'landing.faq.a6' },
   ];
 
   const toggle = (idx: number) => {

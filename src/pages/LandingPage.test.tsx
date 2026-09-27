@@ -98,6 +98,18 @@ describe('LandingPage', () => {
     const activeTab = screen.getByRole('tab', { name: /active workout/i });
     await user.click(activeTab);
     expect(screen.getByText(/Real-Time Workout Execution/i)).toBeInTheDocument();
+
+    // Switch to Strength Leaderboards
+    const leaderboardTab = screen.getByRole('tab', { name: /strength leaderboard/i });
+    await user.click(leaderboardTab);
+    expect(screen.getByText(/Automated Strength Tiers & Leaderboards/i)).toBeInTheDocument();
+    expect(screen.getByText('Cohort Leaderboard Live Preview')).toBeInTheDocument();
+    expect(screen.getByText('Alex Sterling')).toBeInTheDocument();
+
+    // Switch lift to Barbell Back Squat
+    const squatBtn = screen.getByRole('button', { name: 'Barbell Back Squat' });
+    await user.click(squatBtn);
+    expect(screen.getByText('David Kim')).toBeInTheDocument();
   });
 
   it('renders pricing plans with role toggle and disabled Pro plan', async () => {
@@ -107,10 +119,12 @@ describe('LandingPage', () => {
     // Section title
     expect(screen.getByText(/Plans That Scale With You/i)).toBeInTheDocument();
 
-    // Default trainer plans
+    // Default trainer plans and prices
     expect(screen.getByText('Free Coach')).toBeInTheDocument();
     expect(screen.getByText('Coach Plus')).toBeInTheDocument();
     expect(screen.getByText('Coach Pro')).toBeInTheDocument();
+    expect(screen.getByText('3.99')).toBeInTheDocument();
+    expect(screen.getByText('6.99')).toBeInTheDocument();
 
     // Check Pro plan is disabled
     const proButtons = screen.getAllByRole('button', { name: /coming soon/i });
@@ -123,17 +137,46 @@ describe('LandingPage', () => {
     expect(screen.getByText('Solo Athlete')).toBeInTheDocument();
     expect(screen.getByText('Athlete Plus')).toBeInTheDocument();
     expect(screen.getByText('Athlete Pro')).toBeInTheDocument();
+    expect(screen.getByText('1.99')).toBeInTheDocument();
+    expect(screen.getByText('2.99')).toBeInTheDocument();
+
+    // Switch to Gym Facilities tab
+    const gymTab = screen.getByRole('tab', { name: /for gym facilities/i });
+    await user.click(gymTab);
+
+    expect(screen.getByText('Gym Plus')).toBeInTheDocument();
+    expect(screen.getByText('Gym Pro')).toBeInTheDocument();
+    expect(screen.getByText('Gym Maximum')).toBeInTheDocument();
+    expect(screen.getByText('25')).toBeInTheDocument();
+    expect(screen.getByText('50')).toBeInTheDocument();
+    expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getByText('30-Day Free Trial')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start 30-day free trial/i })).toBeInTheDocument();
   });
 
   it('switches billing frequency from monthly to annual and shows savings', async () => {
     const user = userEvent.setup();
     render(<LandingPage />, { wrapper: createWrapper() });
 
+    // Check monthly Coach Plus price
+    expect(screen.getByText('3.99')).toBeInTheDocument();
+
     // Click Annual
     const annualBtn = screen.getByRole('button', { name: /annual/i });
     await user.click(annualBtn);
 
     expect(screen.getAllByText(/billed annually/i).length).toBeGreaterThan(0);
+    // Coach Plus annual discounted price ($3.19)
+    expect(screen.getByText('3.19')).toBeInTheDocument();
+
+    // Switch to Gym tab on Annual
+    const gymTab = screen.getByRole('tab', { name: /for gym facilities/i });
+    await user.click(gymTab);
+
+    // Gym annual prices ($20, $40, $80)
+    expect(screen.getByText('20')).toBeInTheDocument();
+    expect(screen.getByText('40')).toBeInTheDocument();
+    expect(screen.getByText('80')).toBeInTheDocument();
   });
 
   it('allows interacting with the hero workout preview checklist', async () => {

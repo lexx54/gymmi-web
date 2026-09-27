@@ -45,6 +45,10 @@ export const AudienceDeepDive: React.FC = () => {
                 <CheckCircle2 size={18} color="#ef233c" />
                 <span>{t('landing.audience.coachF4')}</span>
               </BenefitItem>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#ef233c" />
+                <span>{t('landing.audience.coachF5')}</span>
+              </BenefitItem>
             </BenefitList>
 
             <CTALink to="/signup">
@@ -119,6 +123,10 @@ export const AudienceDeepDive: React.FC = () => {
               <BenefitItem>
                 <CheckCircle2 size={18} color="#38bdf8" />
                 <span>{t('landing.audience.clientF4')}</span>
+              </BenefitItem>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#38bdf8" />
+                <span>{t('landing.audience.clientF5')}</span>
               </BenefitItem>
             </BenefitList>
 

@@ -11,6 +11,7 @@ import {
   Award,
   Sparkles,
   LayoutDashboard,
+  Trophy,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -115,6 +116,18 @@ export const HeroSection: React.FC = () => {
               <MetricDetails>
                 <MetricValue>Live</MetricValue>
                 <MetricLabel>{t('landing.hero.statLogging')}</MetricLabel>
+              </MetricDetails>
+            </MetricItem>
+
+            <MetricDivider />
+
+            <MetricItem>
+              <MetricIconWrapper $color="#fbbf24">
+                <Trophy size={18} />
+              </MetricIconWrapper>
+              <MetricDetails>
+                <MetricValue>5 Tiers</MetricValue>
+                <MetricLabel>{t('landing.hero.statClassifications')}</MetricLabel>
               </MetricDetails>
             </MetricItem>
           </MetricsStrip>

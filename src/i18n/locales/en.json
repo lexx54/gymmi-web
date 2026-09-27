@@ -798,7 +798,8 @@
       "ctaSecondary": "Explore Features",
       "statExercises": "Curated Exercises",
       "statLogging": "Active Session Logging",
-      "statAi": "AI Translation Engine"
+      "statAi": "AI Translation Engine",
+      "statClassifications": "Strength Leaderboards"
     },
     "preview": {
       "badge": "Live Workout",
@@ -821,6 +822,7 @@
       "tabBodyMap": "Muscle Body Map",
       "tabActive": "Active Workout",
       "tabTrainer": "Coaching Pipeline",
+      "tabClassifications": "Strength Leaderboard",
       "tabAi": "Gemini AI",
       "routineTitle": "Visual Workout Programming",
       "routineDesc": "Construct high-impact, multi-day routines with surgical precision. Configure supersets, rest intervals, target rep ranges, and target RPE with an intuitive, flexible builder.",
@@ -830,6 +832,14 @@
       "activeDesc": "Track sets, reps, and perceived exertion in real time. Dynamic rest timers and completion checkmarks keep athletes focused on every single set.",
       "trainerTitle": "Coach-to-Client Architecture",
       "trainerDesc": "Establish structured coaching contracts, deliver bespoke training blocks directly to client mobile devices, and maintain automated routine forking for customized progression.",
+      "classificationsTitle": "Automated Strength Tiers & Leaderboards",
+      "classificationsDesc": "Classify client and member performance into calibrated tiers (Diamond, Platinum, Gold, Silver, Bronze) based on peak estimated 1RM using Epley's formula. Filter by weekly, monthly, or all-time windows.",
+      "classificationsF1": "Scientific 1RM calculation calibrated with Epley's peak formula",
+      "classificationsF2": "5 standardized strength tiers from Bronze to Diamond",
+      "classificationsF3": "Core compound lift prioritization (Squat, Bench Press, Deadlift, Overhead Press)",
+      "classificationsF4": "Cohort filtering across Weekly, Monthly, and All-Time performance cycles",
+      "classificationsWidgetTitle": "Cohort Leaderboard Live Preview",
+      "classificationsWidgetTag": "Facility & Squad Cohort",
       "aiTitle": "Multilingual AI Powered by Gemini",
       "aiDesc": "Break language barriers instantly. Custom exercises, descriptions, and coaching notes are automatically translated between English and Spanish using Google Gemini AI."
     },
@@ -841,13 +851,15 @@
       "coachF2": "Build multi-week programs and deploy them with single-click routine assignments",
       "coachF3": "Create proprietary custom exercises with specialized cues and targets",
       "coachF4": "Share vetted training templates across fellow coaches in your network",
+      "coachF5": "Benchmark clients with weekly and monthly compound lift classifications",
       "clientTag": "For Dedicated Athletes",
       "clientTitle": "Train With Direction. Solo or Coached.",
       "clientDesc": "Log your personal PRs, follow coach-prescribed routines, and maintain full visibility over your strength journey.",
       "clientF1": "Execute workouts in real-time with automated timers and RPE logging",
       "clientF2": "Connect with certified personal trainers who program and supervise your progress",
       "clientF3": "Design solo routines tailored to your schedule and gym equipment",
-      "clientF4": "Interactive anatomical muscle map ensures balanced, injury-free training"
+      "clientF4": "Interactive anatomical muscle map ensures balanced, injury-free training",
+      "clientF5": "Compete on facility and squad leaderboards to earn verified tier badges"
     },
     "pricing": {
       "tag": "Transparent Pricing",
@@ -855,6 +867,7 @@
       "subtitle": "Start free today. Upgrade whenever you need expanded client seats or workout templates.",
       "tabTrainer": "For Coaches & Trainers",
       "tabClient": "For Athletes & Clients",
+      "tabGym": "For Gym Facilities",
       "monthly": "Monthly",
       "annual": "Annual",
       "save20": "Save 20%",
@@ -862,9 +875,12 @@
       "billedAnnually": "billed annually",
       "popularBadge": "Most Popular",
       "comingSoonBadge": "Coming Soon",
+      "trialBadge": "30-Day Free Trial",
       "startFree": "Get Started Free",
       "upgradePlus": "Upgrade to Plus",
       "joinWaitlist": "Coming Soon",
+      "startTrial": "Start 30-Day Free Trial",
+      "choosePlan": "Get Started",
       "disclaimer": "Self-serve billing integration is coming soon. Plus plans are currently activated through admin controls and platform invitations.",
       "trainer": {
         "free": {
@@ -926,6 +942,38 @@
           "f4": "1RM progression & volume charts",
           "f5": "Priority AI workout recommendations"
         }
+      },
+      "gym": {
+        "plus": {
+          "title": "Gym Plus",
+          "desc": "For boutique fitness studios and growing local gyms.",
+          "f1": "Up to 100 active gym members",
+          "f2": "Curated facility workout routine catalog",
+          "f3": "Coach affiliations with publishing permissions",
+          "f4": "Facility-wide exercise strength classifications",
+          "f5": "Member roster & capacity tracking",
+          "f6": "30-day free trial included"
+        },
+        "pro": {
+          "title": "Gym Pro",
+          "desc": "For established athletic clubs scaling their community.",
+          "f1": "Up to 300 active gym members",
+          "f2": "Unlimited coach affiliations & publishers",
+          "f3": "Facility routine catalog with coach submissions",
+          "f4": "Advanced member retention & volume analytics",
+          "f5": "Facility leaderboards & strength tiers",
+          "f6": "Priority facility listing"
+        },
+        "maximum": {
+          "title": "Gym Maximum",
+          "desc": "Flagship facilities and multi-coach fitness complexes.",
+          "f1": "Unlimited active gym members",
+          "f2": "Unlimited coaches & curated routines",
+          "f3": "Custom facility branding & cover logo",
+          "f4": "Full cohort analytics & volume heatmaps",
+          "f5": "Automated facility-wide classifications",
+          "f6": "Dedicated facility support & onboarding"
+        }
       }
     },
     "faq": {
@@ -941,7 +989,9 @@
       "q4": "How does Gemini AI translation work?",
       "a4": "Gymmi utilizes Google Gemini AI to translate custom exercises and routine instructions automatically between English and Spanish, enabling seamless bilingual coaching.",
       "q5": "When will the Pro tier be available?",
-      "a5": "The Pro tier is currently in active development. It will introduce unlimited client capacity, team collaboration for fitness studios, and advanced analytics."
+      "a5": "The Pro tier is currently in active development. It will introduce unlimited client capacity, team collaboration for fitness studios, and advanced analytics.",
+      "q6": "How do Strength Standards & Leaderboards work?",
+      "a6": "Gymmi automatically computes peak estimated 1RM using Epley's scientific formula across logged exercise sets. Athletes achieve calibrated strength tiers (Diamond, Platinum, Gold, Silver, Bronze) on core compound lifts. Facility coaches and gym owners can track cohort rankings across weekly, monthly, and all-time cycles."
     },
     "footer": {
       "tagline": "Empowering coaches and athletes with precision fitness tools.",

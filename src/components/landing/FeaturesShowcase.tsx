@@ -10,13 +10,18 @@ import {
   ChevronRight,
   Flame,
   Sparkles,
+  Trophy,
 } from 'lucide-react';
 
-type FeatureTab = 'routine' | 'bodymap' | 'active' | 'trainer';
+type FeatureTab = 'routine' | 'bodymap' | 'active' | 'trainer' | 'classifications';
 
 export const FeaturesShowcase: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<FeatureTab>('routine');
+
+  // Interactive Classifications sub-state
+  const [selectedLift, setSelectedLift] = useState<'bench' | 'squat' | 'deadlift' | 'ohp'>('bench');
+  const [selectedTf, setSelectedTf] = useState<'weekly' | 'monthly' | 'allTime'>('weekly');
 
   // Interactive Muscle Map sub-state
   const [selectedMuscle, setSelectedMuscle] = useState<string>('Chest');
@@ -47,6 +52,69 @@ export const FeaturesShowcase: React.FC = () => {
       { en: 'Cable Woodchopper', es: 'Leñador en Polea', equip: 'Cable' },
       { en: 'Plank with Reach', es: 'Plancha con Alcance', equip: 'Bodyweight' },
     ],
+  };
+
+  const classificationsData = {
+    bench: {
+      name: 'Bench Press',
+      distribution: [
+        { name: 'Diamond', count: 1, color: '#00f2fe' },
+        { name: 'Platinum', count: 2, color: '#c471ed' },
+        { name: 'Gold', count: 3, color: '#f59e0b' },
+        { name: 'Silver', count: 1, color: '#94a3b8' },
+      ],
+      total: 7,
+      podium: [
+        { rank: 1, medal: '🥇', name: 'Alex Sterling', tier: 'Diamond', tierColor: '#00f2fe', peak: 145, set: '140 kg × 2' },
+        { rank: 2, medal: '🥈', name: 'Sarah Miller', tier: 'Platinum', tierColor: '#c471ed', peak: 125, set: '120 kg × 2' },
+        { rank: 3, medal: '🥉', name: 'Mike Torres', tier: 'Gold', tierColor: '#f59e0b', peak: 105, set: '100 kg × 2' },
+      ],
+    },
+    squat: {
+      name: 'Barbell Back Squat',
+      distribution: [
+        { name: 'Diamond', count: 2, color: '#00f2fe' },
+        { name: 'Platinum', count: 1, color: '#c471ed' },
+        { name: 'Gold', count: 3, color: '#f59e0b' },
+        { name: 'Silver', count: 1, color: '#94a3b8' },
+      ],
+      total: 7,
+      podium: [
+        { rank: 1, medal: '🥇', name: 'David Kim', tier: 'Diamond', tierColor: '#00f2fe', peak: 210, set: '200 kg × 2' },
+        { rank: 2, medal: '🥈', name: 'Alex Sterling', tier: 'Platinum', tierColor: '#c471ed', peak: 185, set: '175 kg × 2' },
+        { rank: 3, medal: '🥉', name: 'Sarah Miller', tier: 'Gold', tierColor: '#f59e0b', peak: 145, set: '135 kg × 3' },
+      ],
+    },
+    deadlift: {
+      name: 'Deadlift',
+      distribution: [
+        { name: 'Diamond', count: 2, color: '#00f2fe' },
+        { name: 'Platinum', count: 2, color: '#c471ed' },
+        { name: 'Gold', count: 2, color: '#f59e0b' },
+        { name: 'Silver', count: 1, color: '#94a3b8' },
+      ],
+      total: 7,
+      podium: [
+        { rank: 1, medal: '🥇', name: 'David Kim', tier: 'Diamond', tierColor: '#00f2fe', peak: 250, set: '240 kg × 2' },
+        { rank: 2, medal: '🥈', name: 'Mike Torres', tier: 'Platinum', tierColor: '#c471ed', peak: 215, set: '200 kg × 3' },
+        { rank: 3, medal: '🥉', name: 'Alex Sterling', tier: 'Platinum', tierColor: '#c471ed', peak: 210, set: '200 kg × 2' },
+      ],
+    },
+    ohp: {
+      name: 'Overhead Press',
+      distribution: [
+        { name: 'Diamond', count: 1, color: '#00f2fe' },
+        { name: 'Platinum', count: 1, color: '#c471ed' },
+        { name: 'Gold', count: 3, color: '#f59e0b' },
+        { name: 'Silver', count: 2, color: '#94a3b8' },
+      ],
+      total: 7,
+      podium: [
+        { rank: 1, medal: '🥇', name: 'Alex Sterling', tier: 'Diamond', tierColor: '#00f2fe', peak: 102, set: '95 kg × 3' },
+        { rank: 2, medal: '🥈', name: 'Mike Torres', tier: 'Platinum', tierColor: '#c471ed', peak: 88, set: '80 kg × 4' },
+        { rank: 3, medal: '🥉', name: 'Sarah Miller', tier: 'Gold', tierColor: '#f59e0b', peak: 72, set: '65 kg × 4' },
+      ],
+    },
   };
 
   return (
@@ -102,6 +170,16 @@ export const FeaturesShowcase: React.FC = () => {
           >
             <UserCheck size={18} />
             <span>{t('landing.features.tabTrainer')}</span>
+          </TabButton>
+
+          <TabButton
+            role="tab"
+            aria-selected={activeTab === 'classifications'}
+            $active={activeTab === 'classifications'}
+            onClick={() => setActiveTab('classifications')}
+          >
+            <Trophy size={18} />
+            <span>{t('landing.features.tabClassifications')}</span>
           </TabButton>
         </TabNavigation>
 
@@ -192,6 +270,32 @@ export const FeaturesShowcase: React.FC = () => {
                   <BulletItem>
                     <Check size={16} color="#ef233c" />
                     <span>Automated assignment forks protect master routine templates</span>
+                  </BulletItem>
+                </BulletList>
+              </>
+            )}
+
+            {activeTab === 'classifications' && (
+              <>
+                <CardBadge>{t('landing.features.tabClassifications')}</CardBadge>
+                <CardHeading>{t('landing.features.classificationsTitle')}</CardHeading>
+                <CardDescription>{t('landing.features.classificationsDesc')}</CardDescription>
+                <BulletList>
+                  <BulletItem>
+                    <Check size={16} color="#ef233c" />
+                    <span>{t('landing.features.classificationsF1')}</span>
+                  </BulletItem>
+                  <BulletItem>
+                    <Check size={16} color="#ef233c" />
+                    <span>{t('landing.features.classificationsF2')}</span>
+                  </BulletItem>
+                  <BulletItem>
+                    <Check size={16} color="#ef233c" />
+                    <span>{t('landing.features.classificationsF3')}</span>
+                  </BulletItem>
+                  <BulletItem>
+                    <Check size={16} color="#ef233c" />
+                    <span>{t('landing.features.classificationsF4')}</span>
                   </BulletItem>
                 </BulletList>
               </>
@@ -334,6 +438,89 @@ export const FeaturesShowcase: React.FC = () => {
                     </TimelineContent>
                   </TimelineStep>
                 </PipelineTimeline>
+              </WidgetBox>
+            )}
+
+            {activeTab === 'classifications' && (
+              <WidgetBox>
+                <WidgetHeader>
+                  <WidgetTitle>{t('landing.features.classificationsWidgetTitle')}</WidgetTitle>
+                  <WidgetTag>{t('landing.features.classificationsWidgetTag')}</WidgetTag>
+                </WidgetHeader>
+
+                {/* Timeframe Selection Pills */}
+                <LeaderboardTimeframeRow>
+                  {(['weekly', 'monthly', 'allTime'] as const).map((tf) => (
+                    <TimeframePill
+                      key={tf}
+                      type="button"
+                      $active={selectedTf === tf}
+                      onClick={() => setSelectedTf(tf)}
+                    >
+                      {tf === 'weekly'
+                        ? t('classifications.timeframe.weekly')
+                        : tf === 'monthly'
+                        ? t('classifications.timeframe.monthly')
+                        : t('classifications.timeframe.allTime')}
+                    </TimeframePill>
+                  ))}
+                </LeaderboardTimeframeRow>
+
+                {/* Core Lift Pills */}
+                <LiftSelectorGrid>
+                  {(['bench', 'squat', 'deadlift', 'ohp'] as const).map((lift) => (
+                    <LiftButton
+                      key={lift}
+                      type="button"
+                      $selected={selectedLift === lift}
+                      onClick={() => setSelectedLift(lift)}
+                    >
+                      {classificationsData[lift].name}
+                    </LiftButton>
+                  ))}
+                </LiftSelectorGrid>
+
+                {/* Tier Distribution Bar */}
+                <TierBarContainer>
+                  <TierBarTrack>
+                    {classificationsData[selectedLift].distribution.map((tier) => (
+                      <TierBarSegment
+                        key={tier.name}
+                        $flex={tier.count / classificationsData[selectedLift].total}
+                        $color={tier.color}
+                      />
+                    ))}
+                  </TierBarTrack>
+                  <TierLegendRow>
+                    {classificationsData[selectedLift].distribution.map((tier) => (
+                      <TierLegendItem key={tier.name}>
+                        <TierLegendDot $color={tier.color} />
+                        <span>
+                          {tier.name} ({tier.count})
+                        </span>
+                      </TierLegendItem>
+                    ))}
+                  </TierLegendRow>
+                </TierBarContainer>
+
+                {/* Ranked Athletes List */}
+                <LeaderboardPodiumList>
+                  {classificationsData[selectedLift].podium.map((athlete) => (
+                    <PodiumRow key={athlete.rank}>
+                      <PodiumMedal>{athlete.medal}</PodiumMedal>
+                      <PodiumAthleteInfo>
+                        <AthleteNameText>{athlete.name}</AthleteNameText>
+                        <TierPillBadge $color={athlete.tierColor}>
+                          {athlete.tier}
+                        </TierPillBadge>
+                      </PodiumAthleteInfo>
+                      <PodiumMetrics>
+                        <Peak1RmText>{athlete.peak} kg</Peak1RmText>
+                        <BestSetDetail>{athlete.set}</BestSetDetail>
+                      </PodiumMetrics>
+                    </PodiumRow>
+                  ))}
+                </LeaderboardPodiumList>
               </WidgetBox>
             )}
           </CardPreviewSection>
@@ -728,5 +915,163 @@ const TimelineTitle = styled.span`
 const TimelineDesc = styled.span`
   color: #64748b;
   font-size: 0.75rem;
+`;
+
+const LeaderboardTimeframeRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+`;
+
+const TimeframePill = styled.button<{ $active?: boolean }>`
+  flex: 1;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid ${({ $active }) => ($active ? '#ef233c' : '#334155')};
+  background: ${({ $active }) => ($active ? 'rgba(239, 35, 60, 0.15)' : '#1e293b')};
+  color: ${({ $active }) => ($active ? '#fca5a5' : '#94a3b8')};
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #ffffff;
+    border-color: #ef233c;
+  }
+`;
+
+const LiftSelectorGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+`;
+
+const LiftButton = styled.button<{ $selected?: boolean }>`
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid ${({ $selected }) => ($selected ? '#ef233c' : '#334155')};
+  background: ${({ $selected }) => ($selected ? '#ef233c' : '#1e293b')};
+  color: ${({ $selected }) => ($selected ? '#ffffff' : '#94a3b8')};
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #ffffff;
+    border-color: #ef233c;
+  }
+`;
+
+const TierBarContainer = styled.div`
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const TierBarTrack = styled.div`
+  height: 6px;
+  border-radius: 999px;
+  display: flex;
+  overflow: hidden;
+  background: #1e293b;
+`;
+
+const TierBarSegment = styled.div<{ $flex: number; $color: string }>`
+  flex: ${({ $flex }) => $flex};
+  background: ${({ $color }) => $color};
+  height: 100%;
+`;
+
+const TierLegendRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+`;
+
+const TierLegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 600;
+`;
+
+const TierLegendDot = styled.span<{ $color: string }>`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+`;
+
+const LeaderboardPodiumList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const PodiumRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  gap: 0.75rem;
+`;
+
+const PodiumMedal = styled.span`
+  font-size: 1.15rem;
+  line-height: 1;
+`;
+
+const PodiumAthleteInfo = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const AthleteNameText = styled.span`
+  color: #f1f5f9;
+  font-size: 0.8rem;
+  font-weight: 700;
+`;
+
+const TierPillBadge = styled.span<{ $color: string }>`
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  color: ${({ $color }) => $color};
+  background: ${({ $color }) => `${$color}20`};
+  border: 1px solid ${({ $color }) => `${$color}50`};
+`;
+
+const PodiumMetrics = styled.div`
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
+
+const Peak1RmText = styled.span`
+  color: #f8fafc;
+  font-size: 0.85rem;
+  font-weight: 800;
+`;
+
+const BestSetDetail = styled.span`
+  color: #94a3b8;
+  font-size: 0.65rem;
 `;
 
