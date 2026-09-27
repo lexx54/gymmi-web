@@ -173,4 +173,58 @@ describe('StatStack', () => {
       expect(placeholderCard).toHaveTextContent('—');
     });
   });
+
+  describe('as Gym', () => {
+    beforeEach(() => {
+      vi.spyOn(authContext, 'useAuth').mockReturnValue({
+        user: {
+          id: 'gym-user-1',
+          email: 'gym@example.com',
+          username: 'IronParadise',
+          role: { id: 'gym-role', name: 'Gym' },
+        },
+        isAuthenticated: true,
+        isLoading: false,
+        login: vi.fn(),
+        logout: vi.fn(),
+        signup: vi.fn(),
+      } as any);
+    });
+
+    it('renders Active Members vs Capacity, Affiliated Coaches, and Curated Routines cards', async () => {
+      const mockGymData = {
+        gym: {
+          id: 'gym-1',
+          name: 'Iron Paradise',
+          tier: 'Plus',
+          capacity: 100,
+          trialDaysRemaining: 25,
+          activeMembersCount: 42,
+          coachesCount: 5,
+          routinesCount: 12,
+        },
+        activeMembersCount: 42,
+        capacity: 100,
+        coachesCount: 5,
+        routinesCount: 12,
+      };
+
+      const gymApi = await import('../../services/api/gyms');
+      vi.spyOn(gymApi, 'fetchMyGym').mockResolvedValue(mockGymData as any);
+
+      render(<StatStack />, { wrapper: createWrapper() });
+
+      const membersCard = screen.getByTestId('stat-members');
+      await waitFor(() => {
+        expect(membersCard).toHaveTextContent('42');
+        expect(membersCard).toHaveTextContent('/ 100');
+      });
+
+      const coachesCard = screen.getByTestId('stat-coaches');
+      expect(coachesCard).toHaveTextContent('5');
+
+      const routinesCard = screen.getByTestId('stat-routines');
+      expect(routinesCard).toHaveTextContent('12');
+    });
+  });
 });

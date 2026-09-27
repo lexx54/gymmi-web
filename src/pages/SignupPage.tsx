@@ -29,6 +29,7 @@ import { useSignup } from '../hooks/useAuthApi';
 import {
   createStep1Schema,
   createStep2Schema,
+  createStep2GymSchema,
   createStep3TrainerSchema,
   createSignupSchema,
   type SignupFormValues,
@@ -60,6 +61,17 @@ const PRESET_SPECIALIZATIONS = [
   'Rehab & Mobility',
   'CrossFit',
   'Nutrition Coaching',
+];
+
+const PRESET_AMENITIES = [
+  { key: 'freeWeights', labelKey: 'auth.amenityPresets.freeWeights' },
+  { key: 'squatRacks', labelKey: 'auth.amenityPresets.squatRacks' },
+  { key: 'machines', labelKey: 'auth.amenityPresets.machines' },
+  { key: 'lockers', labelKey: 'auth.amenityPresets.lockers' },
+  { key: 'sauna', labelKey: 'auth.amenityPresets.sauna' },
+  { key: 'parking', labelKey: 'auth.amenityPresets.parking' },
+  { key: 'access247', labelKey: 'auth.amenityPresets.access247' },
+  { key: 'personalTraining', labelKey: 'auth.amenityPresets.personalTraining' },
 ];
 
 export default function SignupPage() {
@@ -112,26 +124,88 @@ export default function SignupPage() {
       specializations: [],
       gyms: [],
       logoUrl: '',
+      gymName: '',
+      gymDescription: '',
+      gymAddress: '',
+      gymCity: '',
+      gymWebsiteUrl: '',
+      gymPhoneNumber: '',
+      gymAmenities: [],
+      gymCoverUrl: '',
     },
   });
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [avatarDragOver, setAvatarDragOver] = useState(false);
   const [logoDragOver, setLogoDragOver] = useState(false);
+  const [coverDragOver, setCoverDragOver] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const selectedRole = watch('role');
   const isTrainer = selectedRole === 'Trainer';
+  const isGym = selectedRole === 'Gym';
   const totalSteps = isTrainer ? 4 : 3;
 
   const currentAvatarUrl = watch('avatarUrl') || '';
   const currentLogoUrl = watch('logoUrl') || '';
+  const currentCoverUrl = watch('gymCoverUrl') || '';
   const currentSpecializations = watch('specializations') || [];
   const currentGyms = watch('gyms') || [];
+  const currentAmenities = watch('gymAmenities') || [];
   const selectedGoal = watch('goal') || '';
   const selectedGender = watch('gender') || '';
+
+  const processCoverFile = async (file: File) => {
+    setUploadingCover(true);
+    try {
+      const publicUrl = await uploadImageDirectly(file, 'gym-cover');
+      setValue('gymCoverUrl', publicUrl, { shouldValidate: true });
+      clearErrors('gymCoverUrl');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (message === 'FILE_TOO_LARGE') {
+        toast.error(t('auth.photoSizeError'));
+      } else if (message === 'INVALID_FILE_TYPE') {
+        toast.error(t('auth.photoTypeError'));
+      } else {
+        toast.error(t('auth.photoUploadError'));
+      }
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
+  const handleCoverFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    await processCoverFile(file);
+  };
+
+  const handleCoverDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setCoverDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processCoverFile(file);
+    }
+  };
+
+  const handleRemoveCover = () => {
+    setValue('gymCoverUrl', '', { shouldValidate: true });
+  };
+
+  const toggleAmenity = (amenityKey: string) => {
+    const exists = currentAmenities.includes(amenityKey);
+    const updated = exists
+      ? currentAmenities.filter((a) => a !== amenityKey)
+      : [...currentAmenities, amenityKey];
+    setValue('gymAmenities', updated, { shouldValidate: true });
+  };
 
   const processAvatarFile = async (file: File) => {
     setUploadingAvatar(true);
@@ -345,6 +419,33 @@ export default function SignupPage() {
 
   const handleNextFromStep2 = async () => {
     const currentValues = watch();
+    if (isGym) {
+      const result = createStep2GymSchema(t).safeParse(currentValues);
+      if (!result.success) {
+        const seen = new Set<string>();
+        for (const issue of result.error.issues) {
+          const fieldName = issue.path[0] as keyof SignupFormValues;
+          if (fieldName && !seen.has(fieldName)) {
+            seen.add(fieldName);
+            setError(fieldName, { type: 'manual', message: issue.message });
+          }
+        }
+        return;
+      }
+      clearErrors([
+        'gymName',
+        'gymDescription',
+        'gymAddress',
+        'gymCity',
+        'gymWebsiteUrl',
+        'gymPhoneNumber',
+        'gymAmenities',
+        'gymCoverUrl',
+      ]);
+      setStep(3);
+      return;
+    }
+
     const result = createStep2Schema(t, isTrainer).safeParse(currentValues);
     if (!result.success) {
       const seen = new Set<string>();
@@ -392,24 +493,40 @@ export default function SignupPage() {
       password: data.password,
       role: data.role,
       ...(data.avatarUrl ? { avatarUrl: data.avatarUrl } : {}),
-      profile: {
-        age: Number(data.age),
-        gender: data.gender,
-        height: Number(data.height),
-        weight: Number(data.weight),
-        ...(data.role === 'Client' && data.goal ? { goal: data.goal } : {}),
-      },
-      ...(data.role === 'Trainer'
+      ...(data.role === 'Gym'
         ? {
-            trainerProfile: {
-              description: data.description || '',
-              monthlyPrice: Number(data.monthlyPrice) || 0,
-              specializations: data.specializations || [],
-              gyms: data.gyms || [],
-              ...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
+            gymProfile: {
+              name: data.gymName || data.username,
+              description: data.gymDescription || undefined,
+              address: data.gymAddress || undefined,
+              city: data.gymCity || undefined,
+              websiteUrl: data.gymWebsiteUrl || undefined,
+              phoneNumber: data.gymPhoneNumber || undefined,
+              amenities: data.gymAmenities || [],
+              logoUrl: data.avatarUrl || undefined,
+              coverUrl: data.gymCoverUrl || undefined,
             },
           }
-        : {}),
+        : {
+            profile: {
+              age: Number(data.age),
+              gender: data.gender || '',
+              height: Number(data.height),
+              weight: Number(data.weight),
+              ...(data.role === 'Client' && data.goal ? { goal: data.goal } : {}),
+            },
+            ...(data.role === 'Trainer'
+              ? {
+                  trainerProfile: {
+                    description: data.description || '',
+                    monthlyPrice: Number(data.monthlyPrice) || 0,
+                    specializations: data.specializations || [],
+                    gyms: data.gyms || [],
+                    ...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
+                  },
+                }
+              : {}),
+          }),
     };
 
     signup(payload, {
@@ -506,6 +623,22 @@ export default function SignupPage() {
                         </RoleTextWrap>
                         {selectedRole === 'Trainer' && <CheckBadge><Check size={14} /></CheckBadge>}
                       </RoleCard>
+
+                      <RoleCard
+                        type="button"
+                        $selected={selectedRole === 'Gym'}
+                        onClick={() => setValue('role', 'Gym', { shouldValidate: true })}
+                        data-testid="role-gym"
+                      >
+                        <RoleIconWrap $selected={selectedRole === 'Gym'}>
+                          <Building size={20} />
+                        </RoleIconWrap>
+                        <RoleTextWrap>
+                          <RoleName>{t('auth.roles.Gym')}</RoleName>
+                          <RoleDesc>Manage facility, routine library, coaches, members</RoleDesc>
+                        </RoleTextWrap>
+                        {selectedRole === 'Gym' && <CheckBadge><Check size={14} /></CheckBadge>}
+                      </RoleCard>
                     </RoleGrid>
                     {errors.role && <ErrorMsg>{errors.role.message}</ErrorMsg>}
                   </FieldGroup>
@@ -514,7 +647,8 @@ export default function SignupPage() {
                   <PhotoUploadsContainer $twoCols={isTrainer}>
                     <PhotoUploadCol>
                       <Label>
-                        {t('auth.profilePhoto')} <OptionalTag>({t('auth.optional')})</OptionalTag>
+                        {isGym ? t('auth.gymLogo') : t('auth.profilePhoto')}{' '}
+                        <OptionalTag>({t('auth.optional')})</OptionalTag>
                       </Label>
                       <DropzoneCardWrapper>
                         <DropzoneCard
@@ -743,7 +877,7 @@ export default function SignupPage() {
               )}
 
               {/* STEP 2: Physical Profile (Age, Gender, Height, Weight, Goal) */}
-              {step === 2 && (
+              {step === 2 && !isGym && (
                 <StepSection data-testid="signup-step-2">
                   <FormTitle>{t('auth.stepBody')}</FormTitle>
                   <FormSubtitle>Tell us about your physical background to tailor your experience</FormSubtitle>
@@ -893,6 +1027,217 @@ export default function SignupPage() {
                       type="button"
                       onClick={handleNextFromStep2}
                       data-testid="step2-next"
+                    >
+                      <span>{t('auth.continue')}</span>
+                      <ChevronRight size={18} />
+                    </PrimaryBtn>
+                  </NavActions>
+                </StepSection>
+              )}
+
+              {/* STEP 2 for Gym: Facility Details */}
+              {step === 2 && isGym && (
+                <StepSection data-testid="signup-step-2-gym">
+                  <FormTitle>{t('auth.stepFacility')}</FormTitle>
+                  <FormSubtitle>Set up your gym profile, facility info, and amenities</FormSubtitle>
+
+                  {/* Free Trial Banner */}
+                  <TrialBanner data-testid="gym-trial-banner">
+                    <TrialBannerIcon>
+                      <Building size={22} />
+                    </TrialBannerIcon>
+                    <div>
+                      <TrialBannerTitle>{t('auth.trialBannerTitle')}</TrialBannerTitle>
+                      <TrialBannerText>{t('auth.trialBannerText')}</TrialBannerText>
+                    </div>
+                  </TrialBanner>
+
+                  {/* Facility Name */}
+                  <FieldGroup>
+                    <Label>{t('auth.facilityName')}</Label>
+                    <InputWrap>
+                      <InputIcon><Building size={18} /></InputIcon>
+                      <StyledInput
+                        type="text"
+                        placeholder={t('auth.facilityNamePlaceholder')}
+                        {...register('gymName')}
+                        $hasError={Boolean(errors.gymName)}
+                        data-testid="input-gym-name"
+                      />
+                    </InputWrap>
+                    {errors.gymName && <ErrorMsg>{errors.gymName.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Facility Description */}
+                  <FieldGroup>
+                    <Label>{t('auth.facilityDescription')}</Label>
+                    <StyledTextarea
+                      rows={3}
+                      placeholder={t('auth.facilityDescriptionPlaceholder')}
+                      {...register('gymDescription')}
+                      $hasError={Boolean(errors.gymDescription)}
+                      data-testid="input-gym-description"
+                    />
+                    {errors.gymDescription && <ErrorMsg>{errors.gymDescription.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* City and Address */}
+                  <TwoColRow>
+                    <FieldGroup>
+                      <Label>{t('auth.facilityCity')}</Label>
+                      <StyledInput
+                        type="text"
+                        placeholder={t('auth.facilityCityPlaceholder')}
+                        {...register('gymCity')}
+                        $hasError={Boolean(errors.gymCity)}
+                        data-testid="input-gym-city"
+                      />
+                      {errors.gymCity && <ErrorMsg>{errors.gymCity.message}</ErrorMsg>}
+                    </FieldGroup>
+
+                    <FieldGroup>
+                      <Label>{t('auth.facilityAddress')}</Label>
+                      <StyledInput
+                        type="text"
+                        placeholder={t('auth.facilityAddressPlaceholder')}
+                        {...register('gymAddress')}
+                        $hasError={Boolean(errors.gymAddress)}
+                        data-testid="input-gym-address"
+                      />
+                      {errors.gymAddress && <ErrorMsg>{errors.gymAddress.message}</ErrorMsg>}
+                    </FieldGroup>
+                  </TwoColRow>
+
+                  {/* Website & Phone */}
+                  <TwoColRow>
+                    <FieldGroup>
+                      <Label>{t('auth.facilityWebsite')}</Label>
+                      <StyledInput
+                        type="url"
+                        placeholder={t('auth.facilityWebsitePlaceholder')}
+                        {...register('gymWebsiteUrl')}
+                        $hasError={Boolean(errors.gymWebsiteUrl)}
+                        data-testid="input-gym-website"
+                      />
+                      {errors.gymWebsiteUrl && <ErrorMsg>{errors.gymWebsiteUrl.message}</ErrorMsg>}
+                    </FieldGroup>
+
+                    <FieldGroup>
+                      <Label>{t('auth.facilityPhone')}</Label>
+                      <StyledInput
+                        type="tel"
+                        placeholder={t('auth.facilityPhonePlaceholder')}
+                        {...register('gymPhoneNumber')}
+                        $hasError={Boolean(errors.gymPhoneNumber)}
+                        data-testid="input-gym-phone"
+                      />
+                      {errors.gymPhoneNumber && <ErrorMsg>{errors.gymPhoneNumber.message}</ErrorMsg>}
+                    </FieldGroup>
+                  </TwoColRow>
+
+                  {/* Amenities Checklist */}
+                  <FieldGroup>
+                    <Label>{t('auth.facilityAmenities')}</Label>
+                    <ChipsWrap>
+                      {PRESET_AMENITIES.map((amenity) => {
+                        const isSelected = currentAmenities.includes(amenity.key);
+                        return (
+                          <ChipBtn
+                            key={amenity.key}
+                            type="button"
+                            $selected={isSelected}
+                            onClick={() => toggleAmenity(amenity.key)}
+                            data-testid={`amenity-chip-${amenity.key}`}
+                          >
+                            {isSelected && <Check size={13} />}
+                            {t(amenity.labelKey)}
+                          </ChipBtn>
+                        );
+                      })}
+                    </ChipsWrap>
+                  </FieldGroup>
+
+                  {/* Facility Cover Image Dropzone */}
+                  <FieldGroup>
+                    <Label>
+                      {t('auth.gymCoverPhoto')} <OptionalTag>({t('auth.optional')})</OptionalTag>
+                    </Label>
+                    <DropzoneCardWrapper>
+                      <DropzoneCard
+                        type="button"
+                        onClick={() => coverInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setCoverDragOver(true);
+                        }}
+                        onDragLeave={() => setCoverDragOver(false)}
+                        onDrop={handleCoverDrop}
+                        $dragOver={coverDragOver}
+                        $hasImage={!!currentCoverUrl}
+                        data-testid="cover-picker-trigger"
+                        title={currentCoverUrl ? t('auth.changeCover') : t('auth.uploadCover')}
+                      >
+                        {uploadingCover ? (
+                          <SpinnerWrap data-testid="cover-uploading">
+                            <Loader2 size={28} className="animate-spin" />
+                            <DropzoneText>{t('auth.uploading')}</DropzoneText>
+                          </SpinnerWrap>
+                        ) : currentCoverUrl ? (
+                          <DropzonePreviewImg
+                            src={currentCoverUrl}
+                            alt={t('auth.coverPreviewAlt')}
+                            data-testid="cover-preview-img"
+                          />
+                        ) : (
+                          <>
+                            <DropzoneIconWrap>
+                              <Upload size={32} />
+                            </DropzoneIconWrap>
+                            <DropzonePromptText>
+                              {t('auth.dropzonePrompt')}{' '}
+                              <DropzoneHighlight>{t('auth.chooseFile')}</DropzoneHighlight>
+                            </DropzonePromptText>
+                          </>
+                        )}
+                      </DropzoneCard>
+
+                      {currentCoverUrl && (
+                        <RemoveBadgeBtn
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveCover();
+                          }}
+                          data-testid="remove-cover"
+                          title={t('auth.removeCover')}
+                          aria-label={t('auth.removeCover')}
+                        >
+                          <X size={12} />
+                        </RemoveBadgeBtn>
+                      )}
+                    </DropzoneCardWrapper>
+
+                    <input
+                      ref={coverInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleCoverFile}
+                      style={{ display: 'none' }}
+                      data-testid="input-cover"
+                    />
+                    {errors.gymCoverUrl && <ErrorMsg>{errors.gymCoverUrl.message}</ErrorMsg>}
+                  </FieldGroup>
+
+                  {/* Actions */}
+                  <NavActions>
+                    <SecondaryBtn type="button" onClick={() => setStep(1)}>
+                      <ChevronLeft size={18} />
+                      <span>{t('auth.back')}</span>
+                    </SecondaryBtn>
+                    <PrimaryBtn
+                      type="button"
+                      onClick={handleNextFromStep2}
+                      data-testid="step2-gym-next"
                     >
                       <span>{t('auth.continue')}</span>
                       <ChevronRight size={18} />
@@ -1074,37 +1419,116 @@ export default function SignupPage() {
                   </SummaryCard>
 
                   {/* Summary Card 2: Physical Profile */}
-                  <SummaryCard>
-                    <SummaryCardHeader>
-                      <SummaryCardTitle>{t('auth.profileSection')}</SummaryCardTitle>
-                      <EditLinkBtn type="button" onClick={() => setStep(2)} data-testid="edit-step-2">
-                        <Edit2 size={13} />
-                        <span>{t('auth.edit')}</span>
-                      </EditLinkBtn>
-                    </SummaryCardHeader>
-                    <SummaryRow>
-                      <SummaryLabel>{t('auth.age')}:</SummaryLabel>
-                      <SummaryVal>{watch('age')} yrs</SummaryVal>
-                    </SummaryRow>
-                    <SummaryRow>
-                      <SummaryLabel>{t('auth.gender')}:</SummaryLabel>
-                      <SummaryVal style={{ textTransform: 'capitalize' }}>{watch('gender')}</SummaryVal>
-                    </SummaryRow>
-                    <SummaryRow>
-                      <SummaryLabel>{t('auth.height')}:</SummaryLabel>
-                      <SummaryVal>{watch('height')} cm</SummaryVal>
-                    </SummaryRow>
-                    <SummaryRow>
-                      <SummaryLabel>{t('auth.weight')}:</SummaryLabel>
-                      <SummaryVal>{watch('weight')} kg</SummaryVal>
-                    </SummaryRow>
-                    {!isTrainer && watch('goal') && (
+                  {!isGym && (
+                    <SummaryCard>
+                      <SummaryCardHeader>
+                        <SummaryCardTitle>{t('auth.profileSection')}</SummaryCardTitle>
+                        <EditLinkBtn type="button" onClick={() => setStep(2)} data-testid="edit-step-2">
+                          <Edit2 size={13} />
+                          <span>{t('auth.edit')}</span>
+                        </EditLinkBtn>
+                      </SummaryCardHeader>
                       <SummaryRow>
-                        <SummaryLabel>{t('auth.fitnessGoal')}:</SummaryLabel>
-                        <SummaryValHighlight>{watch('goal')}</SummaryValHighlight>
+                        <SummaryLabel>{t('auth.age')}:</SummaryLabel>
+                        <SummaryVal>{watch('age')} yrs</SummaryVal>
                       </SummaryRow>
-                    )}
-                  </SummaryCard>
+                      <SummaryRow>
+                        <SummaryLabel>{t('auth.gender')}:</SummaryLabel>
+                        <SummaryVal style={{ textTransform: 'capitalize' }}>{watch('gender')}</SummaryVal>
+                      </SummaryRow>
+                      <SummaryRow>
+                        <SummaryLabel>{t('auth.height')}:</SummaryLabel>
+                        <SummaryVal>{watch('height')} cm</SummaryVal>
+                      </SummaryRow>
+                      <SummaryRow>
+                        <SummaryLabel>{t('auth.weight')}:</SummaryLabel>
+                        <SummaryVal>{watch('weight')} kg</SummaryVal>
+                      </SummaryRow>
+                      {!isTrainer && watch('goal') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.fitnessGoal')}:</SummaryLabel>
+                          <SummaryValHighlight>{watch('goal')}</SummaryValHighlight>
+                        </SummaryRow>
+                      )}
+                    </SummaryCard>
+                  )}
+
+                  {/* Summary Card 2: Facility Profile (Gym Only) */}
+                  {isGym && (
+                    <SummaryCard data-testid="summary-gym-card">
+                      <SummaryCardHeader>
+                        <SummaryCardTitle>{t('auth.facilitySection')}</SummaryCardTitle>
+                        <EditLinkBtn type="button" onClick={() => setStep(2)} data-testid="edit-step-2-gym">
+                          <Edit2 size={13} />
+                          <span>{t('auth.edit')}</span>
+                        </EditLinkBtn>
+                      </SummaryCardHeader>
+                      <SummaryRow>
+                        <SummaryLabel>{t('auth.facilityName')}:</SummaryLabel>
+                        <SummaryValHighlight>{watch('gymName')}</SummaryValHighlight>
+                      </SummaryRow>
+                      {watch('gymDescription') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.facilityDescription')}:</SummaryLabel>
+                          <SummaryVal>{watch('gymDescription')}</SummaryVal>
+                        </SummaryRow>
+                      )}
+                      {watch('gymCity') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.facilityCity')}:</SummaryLabel>
+                          <SummaryVal>{watch('gymCity')}</SummaryVal>
+                        </SummaryRow>
+                      )}
+                      {watch('gymAddress') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.facilityAddress')}:</SummaryLabel>
+                          <SummaryVal>{watch('gymAddress')}</SummaryVal>
+                        </SummaryRow>
+                      )}
+                      {watch('gymWebsiteUrl') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.facilityWebsite')}:</SummaryLabel>
+                          <SummaryVal>{watch('gymWebsiteUrl')}</SummaryVal>
+                        </SummaryRow>
+                      )}
+                      {watch('gymPhoneNumber') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.facilityPhone')}:</SummaryLabel>
+                          <SummaryVal>{watch('gymPhoneNumber')}</SummaryVal>
+                        </SummaryRow>
+                      )}
+                      {currentAmenities.length > 0 && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.facilityAmenities')}:</SummaryLabel>
+                          <SelectedTagsWrap>
+                            {currentAmenities.map((key) => {
+                              const preset = PRESET_AMENITIES.find((a) => a.key === key);
+                              return (
+                                <GymBadge key={key}>
+                                  <Check size={12} />
+                                  <span>{preset ? t(preset.labelKey) : key}</span>
+                                </GymBadge>
+                              );
+                            })}
+                          </SelectedTagsWrap>
+                        </SummaryRow>
+                      )}
+                      {watch('gymCoverUrl') && (
+                        <SummaryRow>
+                          <SummaryLabel>{t('auth.gymCoverPhoto')}:</SummaryLabel>
+                          <SummaryThumbImg
+                            src={watch('gymCoverUrl')}
+                            alt={t('auth.coverPreviewAlt')}
+                            data-testid="summary-cover-img"
+                          />
+                        </SummaryRow>
+                      )}
+                      <SummaryRow>
+                        <SummaryLabel>Tier & Trial:</SummaryLabel>
+                        <SummaryValHighlight>30-Day Free Trial (100 Members)</SummaryValHighlight>
+                      </SummaryRow>
+                    </SummaryCard>
+                  )}
 
                   {/* Summary Card 3: Coaching Profile (Trainer Only) */}
                   {isTrainer && (
@@ -1444,9 +1868,13 @@ const TwoColRow = styled.div`
 
 const RoleGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.85rem;
   margin-top: 0.4rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const RoleCard = styled.button<{ $selected?: boolean }>`
@@ -1957,3 +2385,36 @@ const SummaryThumbImg = styled.img`
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.15);
 `;
+
+const TrialBanner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: rgba(239, 35, 60, 0.08);
+  border: 1px solid rgba(239, 35, 60, 0.3);
+  border-radius: 0.9rem;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+`;
+
+const TrialBannerIcon = styled.div`
+  color: #ef233c;
+  display: flex;
+  align-items: center;
+  margin-top: 0.15rem;
+`;
+
+const TrialBannerTitle = styled.h4`
+  margin: 0 0 0.25rem 0;
+  color: #f7f7ff;
+  font-size: 0.95rem;
+  font-weight: 700;
+`;
+
+const TrialBannerText = styled.p`
+  margin: 0;
+  color: #a3a9cb;
+  font-size: 0.82rem;
+  line-height: 1.4;
+`;
+

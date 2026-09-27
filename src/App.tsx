@@ -17,6 +17,10 @@ import ClientsPage from './pages/ClientsPage'
 import TrainersPage from './pages/TrainersPage'
 import AdminPermissionsPage from './pages/admin/AdminPermissionsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
+import GymCatalogPage from './pages/gym/GymCatalogPage'
+import GymCoachesPage from './pages/gym/GymCoachesPage'
+import GymMembersPage from './pages/gym/GymMembersPage'
+import ClassificationsPage from './pages/classifications/ClassificationsPage'
 import LandingPage from './pages/LandingPage'
 
 function App() {
@@ -39,7 +43,12 @@ function App() {
           <Route path="/workout/:id/edit" element={<WorkoutsPage />} />
           <Route path="/clients" element={<RoleRoute role="Trainer"><ClientsPage /></RoleRoute>} />
           <Route path="/clients/:clientId" element={<RoleRoute role="Trainer"><ClientsPage /></RoleRoute>} />
+          <Route path="/classifications" element={<RoleRoute role="Trainer"><ClassificationsPage /></RoleRoute>} />
           <Route path="/trainers" element={<RoleRoute role="Client"><TrainersPage /></RoleRoute>} />
+          <Route path="/gym/catalog" element={<RoleRoute role="Gym"><GymCatalogPage /></RoleRoute>} />
+          <Route path="/gym/coaches" element={<RoleRoute role="Gym"><GymCoachesPage /></RoleRoute>} />
+          <Route path="/gym/members" element={<RoleRoute role="Gym"><GymMembersPage /></RoleRoute>} />
+          <Route path="/gym/classifications" element={<RoleRoute role="Gym"><ClassificationsPage /></RoleRoute>} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/settings" element={<SettingsPage />} />

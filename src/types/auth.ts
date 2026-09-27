@@ -1,4 +1,5 @@
 import type { PlanName } from './rbac';
+import type { GymProfile } from './gym';
 
 export type AuthUser = {
   id: string;
@@ -8,6 +9,7 @@ export type AuthUser = {
   hasPaid: boolean;
   plan?: PlanName;
   role: { id: string; name: string };
+  gymProfile?: GymProfile | null;
 };
 
 export type AuthResponse = {
@@ -37,6 +39,18 @@ export type TrainerProfileParams = {
   logoUrl?: string;
 };
 
+export type GymProfileParams = {
+  name: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  logoUrl?: string;
+  coverUrl?: string;
+  websiteUrl?: string;
+  phoneNumber?: string;
+  amenities?: string[];
+};
+
 export type SignupParams = {
   email: string;
   username: string;
@@ -45,6 +59,7 @@ export type SignupParams = {
   avatarUrl?: string;
   profile?: UserProfileParams;
   trainerProfile?: TrainerProfileParams;
+  gymProfile?: GymProfileParams;
 };
 
 export type ForgotPasswordParams = {
@@ -65,6 +80,7 @@ export type FullUserProfile = {
   hasPaid: boolean;
   plan?: PlanName;
   role: { id: string; name: string };
+  gymProfile?: GymProfile | null;
   profile?: {
     id: string;
     age: number;
@@ -91,4 +107,6 @@ export type UpdateProfilePayload = {
   avatarUrl?: string;
   profile?: Partial<UserProfileParams>;
   trainerProfile?: Partial<TrainerProfileParams>;
+  gymProfile?: Partial<GymProfileParams>;
 };
+

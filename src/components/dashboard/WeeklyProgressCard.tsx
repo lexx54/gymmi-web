@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import { useMyAnalytics } from '../../hooks/useAnalytics';
 import { useTrainerDashboard } from '../../hooks/useTrainerDashboard';
+import { useMyGym } from '../../hooks/useGyms';
 
 const WEEKDAYS = [
   { index: 0, dayKey: 'dates.mon' },
@@ -18,26 +19,41 @@ const WEEKDAYS = [
  * Displays weekly workout progress:
  * - For Clients: Mon–Sun daily volume bars with peak scaling and goal reached %.
  * - For Trainers: Mon–Sun client activity bars (unique clients trained) scaled against total contracted clients, with active rate %.
+ * - For Gyms: Capacity utilization % and member baseline across weekdays.
  */
 export function WeeklyProgressCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isTrainer = user?.role?.name === 'Trainer';
   const isClient = user?.role?.name === 'Client';
+  const isGym = user?.role?.name === 'Gym';
 
   const { data: analytics, isLoading: isClientLoading } = useMyAnalytics(isClient);
   const { data: trainerData, isLoading: isTrainerLoading } = useTrainerDashboard(isTrainer);
+  const { data: gymData, isLoading: isGymLoading } = useMyGym(isGym);
 
   // Current weekday (0=Mon, ..., 6=Sun)
   const jsDay = new Date().getDay();
   const currentWeekday = jsDay === 0 ? 6 : jsDay - 1;
 
   // Header stats & titles
-  const title = isTrainer ? t('dashboard.clientActivity') : t('dashboard.volumeTraining');
-  const percentCaption = isTrainer ? t('dashboard.activeRate') : t('dashboard.goalReached');
+  const title = isGym
+    ? t('gym.capacity')
+    : isTrainer
+      ? t('dashboard.clientActivity')
+      : t('dashboard.volumeTraining');
+  const percentCaption = isGym
+    ? t('gym.capacity')
+    : isTrainer
+      ? t('dashboard.activeRate')
+      : t('dashboard.goalReached');
 
   let percentValue = '0%';
-  if (isTrainer) {
+  if (isGym) {
+    const cap = Math.max(1, gymData?.capacity ?? 100);
+    const used = gymData?.activeMembersCount ?? 0;
+    percentValue = isGymLoading && !gymData ? '...' : `${Math.round((used / cap) * 100)}%`;
+  } else if (isTrainer) {
     percentValue =
       isTrainerLoading && !trainerData
         ? '...'
@@ -75,7 +91,14 @@ export function WeeklyProgressCard() {
           let barTitle = '';
           let barDisplayValue = '';
 
-          if (isTrainer) {
+          if (isGym) {
+            const cap = Math.max(1, gymData?.capacity ?? 100);
+            const activeMembers = gymData?.activeMembersCount ?? 0;
+            hasData = activeMembers > 0;
+            height = hasData ? Math.max(18, Math.round((activeMembers / cap) * 92)) : 12;
+            barTitle = `${t(day.dayKey)}: ${activeMembers} ${t('gym.members')}`;
+            barDisplayValue = hasData ? String(activeMembers) : '';
+          } else if (isTrainer) {
             const entry = trainerDaily.find((v) => v.weekday === day.index);
             const activeClients = entry?.activeClients ?? 0;
             hasData = activeClients > 0;

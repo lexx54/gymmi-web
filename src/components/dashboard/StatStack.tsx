@@ -1,23 +1,27 @@
-import { Dumbbell, Flame, Sparkles, Timer, Users } from 'lucide-react';
+import { Dumbbell, Flame, Shield, Sparkles, Timer, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import { useMyAnalytics } from '../../hooks/useAnalytics';
 import { useTrainerDashboard } from '../../hooks/useTrainerDashboard';
+import { useMyGym } from '../../hooks/useGyms';
 
 /**
  * Renders the right-column stat cards:
  * - For Clients: Weekly Volume, Active Time, Daily Streak.
  * - For Trainers: Total Clients, Available Workouts, and Coming Soon.
+ * - For Gyms: Active Members vs Capacity, Affiliated Coaches, and Curated Routines.
  */
 export function StatStack() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isTrainer = user?.role?.name === 'Trainer';
   const isClient = user?.role?.name === 'Client';
+  const isGym = user?.role?.name === 'Gym';
 
   const { data: analytics, isLoading: isClientLoading } = useMyAnalytics(isClient);
   const { data: trainerData, isLoading: isTrainerLoading } = useTrainerDashboard(isTrainer);
+  const { data: gymData, isLoading: isGymLoading } = useMyGym(isGym);
 
   // Client calculations
   const weeklyVolume = analytics?.volumeTrends?.dailyVolume?.length
@@ -30,65 +34,95 @@ export function StatStack() {
 
   const streak = analytics?.consistency?.streak ?? 0;
 
-  const stats = isTrainer
-    ? [
-        {
-          id: 'clients',
-          label: t('dashboard.totalClients'),
-          value:
-            isTrainerLoading && !trainerData
-              ? '...'
-              : String(trainerData?.metrics?.totalClients ?? 0),
-          unit: t('dashboard.clients'),
-          icon: Users,
-          iconColor: '#ff8a93',
-        },
-        {
-          id: 'workouts',
-          label: t('dashboard.availableWorkouts'),
-          value:
-            isTrainerLoading && !trainerData
-              ? '...'
-              : String(trainerData?.metrics?.availableWorkouts ?? 0),
-          unit: t('dashboard.workouts'),
-          icon: Dumbbell,
-          iconColor: '#f7c873',
-        },
-        {
-          id: 'placeholder',
-          label: t('dashboard.comingSoon'),
-          value: '—',
-          unit: '',
-          icon: Sparkles,
-          iconColor: '#7c84aa',
-        },
-      ]
-    : [
-        {
-          id: 'volume',
-          label: t('dashboard.weeklyVolume'),
-          value: isClientLoading && !analytics ? '...' : weeklyVolume.toLocaleString(),
-          unit: t('dashboard.kg'),
-          icon: Dumbbell,
-          iconColor: '#ff8a93',
-        },
-        {
-          id: 'activeTime',
-          label: t('dashboard.activeTime'),
-          value: isClientLoading && !analytics ? '...' : String(currentWeekActiveMinutes),
-          unit: t('dashboard.mins'),
-          icon: Timer,
-          iconColor: '#f7c873',
-        },
-        {
-          id: 'streak',
-          label: t('dashboard.dailyStreak'),
-          value: isClientLoading && !analytics ? '...' : String(streak),
-          unit: t('dashboard.days'),
-          icon: Flame,
-          iconColor: '#ef233c',
-        },
-      ];
+  let stats;
+  if (isGym) {
+    stats = [
+      {
+        id: 'members',
+        label: t('gym.activeMembers'),
+        value: isGymLoading && !gymData ? '...' : String(gymData?.activeMembersCount ?? 0),
+        unit: `/ ${gymData?.capacity ?? 100}`,
+        icon: Users,
+        iconColor: '#ff8a93',
+      },
+      {
+        id: 'coaches',
+        label: t('gym.affiliatedCoaches'),
+        value: isGymLoading && !gymData ? '...' : String(gymData?.coachesCount ?? 0),
+        unit: t('gym.coaches'),
+        icon: Shield,
+        iconColor: '#f7c873',
+      },
+      {
+        id: 'routines',
+        label: t('gym.curatedRoutines'),
+        value: isGymLoading && !gymData ? '...' : String(gymData?.routinesCount ?? 0),
+        unit: t('dashboard.workouts'),
+        icon: Dumbbell,
+        iconColor: '#ef233c',
+      },
+    ];
+  } else if (isTrainer) {
+    stats = [
+      {
+        id: 'clients',
+        label: t('dashboard.totalClients'),
+        value:
+          isTrainerLoading && !trainerData
+            ? '...'
+            : String(trainerData?.metrics?.totalClients ?? 0),
+        unit: t('dashboard.clients'),
+        icon: Users,
+        iconColor: '#ff8a93',
+      },
+      {
+        id: 'workouts',
+        label: t('dashboard.availableWorkouts'),
+        value:
+          isTrainerLoading && !trainerData
+            ? '...'
+            : String(trainerData?.metrics?.availableWorkouts ?? 0),
+        unit: t('dashboard.workouts'),
+        icon: Dumbbell,
+        iconColor: '#f7c873',
+      },
+      {
+        id: 'placeholder',
+        label: t('dashboard.comingSoon'),
+        value: '—',
+        unit: '',
+        icon: Sparkles,
+        iconColor: '#7c84aa',
+      },
+    ];
+  } else {
+    stats = [
+      {
+        id: 'volume',
+        label: t('dashboard.weeklyVolume'),
+        value: isClientLoading && !analytics ? '...' : weeklyVolume.toLocaleString(),
+        unit: t('dashboard.kg'),
+        icon: Dumbbell,
+        iconColor: '#ff8a93',
+      },
+      {
+        id: 'activeTime',
+        label: t('dashboard.activeTime'),
+        value: isClientLoading && !analytics ? '...' : String(currentWeekActiveMinutes),
+        unit: t('dashboard.mins'),
+        icon: Timer,
+        iconColor: '#f7c873',
+      },
+      {
+        id: 'streak',
+        label: t('dashboard.dailyStreak'),
+        value: isClientLoading && !analytics ? '...' : String(streak),
+        unit: t('dashboard.days'),
+        icon: Flame,
+        iconColor: '#ef233c',
+      },
+    ];
+  }
 
   return (
     <Stack>

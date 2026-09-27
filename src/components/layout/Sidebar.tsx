@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -22,6 +22,16 @@ const sidebarItems: SidebarItem[] = [
   { labelKey: 'nav.settings', to: '/settings', icon: Settings },
 ];
 
+const gymItems: SidebarItem[] = [
+  { labelKey: 'nav.dashboard', to: '/dashboard', icon: LayoutDashboard },
+  { labelKey: 'nav.catalog', to: '/gym/catalog', icon: Dumbbell },
+  { labelKey: 'nav.coaches', to: '/gym/coaches', icon: Shield },
+  { labelKey: 'nav.members', to: '/gym/members', icon: Users },
+  { labelKey: 'nav.classifications', to: '/gym/classifications', icon: Trophy },
+  { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
+  { labelKey: 'nav.settings', to: '/settings', icon: Settings },
+];
+
 /**
  * Displays the main dashboard navigation sidebar.
  */
@@ -37,8 +47,14 @@ export function Sidebar({ username }: SidebarProps) {
   const isAdmin = user?.role?.name === 'Admin';
   const isTrainer = user?.role?.name === 'Trainer';
   const isClient = user?.role?.name === 'Client';
+  const isGym = user?.role?.name === 'Gym';
+
+  const displayedItems = isGym ? gymItems : sidebarItems;
   const roleItems: SidebarItem[] = isTrainer
-    ? [{ labelKey: 'nav.clients', to: '/clients', icon: Users }]
+    ? [
+        { labelKey: 'nav.clients', to: '/clients', icon: Users },
+        { labelKey: 'nav.classifications', to: '/classifications', icon: Trophy },
+      ]
     : isClient
       ? [{ labelKey: 'nav.trainers', to: '/trainers', icon: Handshake }]
       : [];
@@ -52,7 +68,7 @@ export function Sidebar({ username }: SidebarProps) {
     <SidebarAside>
       <SidebarBrand>KINETIC</SidebarBrand>
       <ProfileCard>
-        <Avatar />
+        <Avatar $img={user?.avatarUrl} />
         <ProfileText>
           <Username>{username.toUpperCase().slice(0, 6)}</Username>
           <EliteStatus>{user?.role?.name?.toUpperCase() ?? t('common.member')}</EliteStatus>
@@ -61,7 +77,7 @@ export function Sidebar({ username }: SidebarProps) {
       </ProfileCard>
       <SidebarNav aria-label={t('nav.dashboardNavigation')}>
         <NavList>
-          {sidebarItems.map((item) => {
+          {displayedItems.map((item) => {
             const Icon = item.icon;
 
             return (
@@ -143,11 +159,14 @@ const ProfileCard = styled.div`
   margin-top: 1.4rem;
 `;
 
-const Avatar = styled.div`
+const Avatar = styled.div<{ $img?: string | null }>`
   width: 2.65rem;
   height: 2.65rem;
   border-radius: 0.7rem;
-  background: linear-gradient(180deg, #2c3357 0%, #1b203d 100%);
+  background: ${({ $img }) =>
+    $img
+      ? `url(${$img}) center/cover no-repeat`
+      : 'linear-gradient(180deg, #2c3357 0%, #1b203d 100%)'};
   border: 1px solid #303a63;
 `;
 

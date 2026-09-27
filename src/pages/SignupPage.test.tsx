@@ -252,6 +252,72 @@ describe('SignupPage Multi-Step Flow', () => {
     });
   });
 
+  it('allows Gym to advance Step 1 -> Step 2 (Facility) -> Step 3 (Confirmation), and submit successfully', async () => {
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    // Step 1: Select Gym role and enter credentials
+    await user.click(screen.getByTestId('role-gym'));
+    await user.type(screen.getByTestId('input-email'), 'gymowner@ironforge.com');
+    await user.type(screen.getByTestId('input-username'), 'ironforge');
+    await user.type(screen.getByTestId('input-password'), 'gympass123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'gympass123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2: Facility Details
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2-gym')).toBeInTheDocument();
+      expect(screen.getByTestId('gym-trial-banner')).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByTestId('input-gym-name'), 'Iron Forge Gym');
+    await user.type(
+      screen.getByTestId('input-gym-description'),
+      'Premier strength facility and powerlifting hub.',
+    );
+    await user.type(screen.getByTestId('input-gym-city'), 'Miami');
+    await user.type(screen.getByTestId('input-gym-address'), '123 Muscle Way');
+    await user.type(screen.getByTestId('input-gym-website'), 'https://ironforgegym.com');
+    await user.type(screen.getByTestId('input-gym-phone'), '+1 305-555-0199');
+    await user.click(screen.getByTestId('amenity-chip-freeWeights'));
+    await user.click(screen.getByTestId('amenity-chip-sauna'));
+
+    await user.click(screen.getByTestId('step2-gym-next'));
+
+    // Confirmation Step (Step 3 for Gym)
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+      expect(screen.getByTestId('summary-gym-card')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Iron Forge Gym')).toBeInTheDocument();
+    expect(screen.getByText('30-Day Free Trial (100 Members)')).toBeInTheDocument();
+
+    // Submit
+    await user.click(screen.getByTestId('confirm-signup-btn'));
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith(
+        {
+          email: 'gymowner@ironforge.com',
+          username: 'ironforge',
+          password: 'gympass123',
+          role: 'Gym',
+          gymProfile: {
+            name: 'Iron Forge Gym',
+            description: 'Premier strength facility and powerlifting hub.',
+            city: 'Miami',
+            address: '123 Muscle Way',
+            websiteUrl: 'https://ironforgegym.com',
+            phoneNumber: '+1 305-555-0199',
+            amenities: ['freeWeights', 'sauna'],
+          },
+        },
+        expect.any(Object),
+      );
+    });
+  });
+
   it('allows user to navigate back and edit sections from the confirmation screen', async () => {
     const user = userEvent.setup();
     render(<SignupPage />, { wrapper: createWrapper() });
