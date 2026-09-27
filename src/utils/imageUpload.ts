@@ -110,9 +110,11 @@ export async function compressImage(
   });
 }
 
+export type UploadImagePurpose = 'avatar' | 'trainer-logo' | 'gym-cover';
+
 export async function uploadImageDirectly(
   file: File,
-  purpose: 'avatar' | 'trainer-logo',
+  purpose: UploadImagePurpose,
 ): Promise<string> {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     throw new Error('INVALID_FILE_TYPE');
@@ -129,9 +131,12 @@ export async function uploadImageDirectly(
     | 'image/png'
     | 'image/webp';
 
+  const apiPurpose: 'avatar' | 'trainer-logo' =
+    purpose === 'gym-cover' ? 'trainer-logo' : purpose;
+
   const { presignedUrl, publicUrl } = await getPresignedUrlApi({
     fileType,
-    purpose,
+    purpose: apiPurpose,
   });
 
   await axios.put(presignedUrl, compressedBlob, {

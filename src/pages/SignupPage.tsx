@@ -19,7 +19,6 @@ import {
   Building,
   Camera,
   Upload,
-  Trash2,
 } from 'lucide-react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';

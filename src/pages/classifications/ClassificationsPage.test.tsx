@@ -134,11 +134,19 @@ describe('ClassificationsPage', () => {
         description: 'Elite training facility',
         address: '123 Iron St',
         userId: 'gym-user-1',
+        tier: 'plus',
+        memberCapacity: 100,
+        trialEndsAt: '2026-12-31',
+        isActive: true,
         createdAt: '2026-01-01',
         updatedAt: '2026-01-01',
       },
-      coaches: [],
-      members: [],
+      activeMembersCount: 10,
+      capacity: 100,
+      coachesCount: 2,
+      routinesCount: 5,
+      trialDaysRemaining: null,
+      isTrialActive: false,
     });
 
     vi.spyOn(classificationsApi, 'fetchClassifications').mockResolvedValue(mockClassificationsData);

@@ -7,7 +7,7 @@ Web dashboard delivering role-tailored training overviews, weekly charts, and ke
 - Renders the primary dashboard based on user role:
   1. `DashboardHeader`: Personalized greeting ("Good Morning, <User>") and motivational hero banner ("YOU'RE IN THE PEAK ZONE TODAY").
   2. `ActiveWorkoutCard`: Direct overview and link to active assigned routine (for Clients).
-  3. `GymTrialBanner` (in `DashboardLayout` for Gyms): Displays remaining trial days badge (30-day countdown), current member capacity vs limit, and action buttons ("Create Facility Routine", "Upgrade Tier").
+  3. `GymTrialBanner` (in `DashboardLayout` for Gyms): Displays remaining trial days badge (e.g. "Trial ending in 30 days" or "Trial expired" if ended, or plan name if on paid tier), current member capacity vs limit ("1 / 100 Members"), and action buttons ("Create Routine", "Upgrade Tier").
   4. `WeeklyProgressCard`:
      - **Clients**: Dynamic 7-day "Volume Training" chart (Mon–Sun of current week) with live volume bars, active day indicator, and goal completion percentage.
      - **Trainers**: Dynamic 7-day "Client Activity" chart (Mon–Sun of current week) showing unique active contracted clients who trained each day, scaled against total contracted clients, with top-right weekly active client rate percentage.
@@ -22,6 +22,7 @@ Web dashboard delivering role-tailored training overviews, weekly charts, and ke
 ## Key files
 
 - `src/components/layout/DashboardLayout.tsx`
+- `src/components/layout/DashboardLayout.test.tsx`
 - `src/components/dashboard/StatStack.tsx`
 - `src/components/dashboard/WeeklyProgressCard.tsx`
 - `src/components/dashboard/DashboardHeader.tsx`
@@ -45,10 +46,11 @@ Web dashboard delivering role-tailored training overviews, weekly charts, and ke
 - Daily bar heights for Trainers scale proportionally against the trainer's total contracted clients (`(activeClients / Math.max(1, totalClients)) * 92%`).
 - For Gyms, StartWorkout floating action button is omitted since facilities curate routines rather than log personal sessions directly.
 - Card titles and icons in `StatStack` share a compact single row using space-between flex alignment.
+- `GymTrialBanner` safely parses `isTrialActive`, `trialDaysRemaining`, and `capacity` with fallbacks to avoid displaying "Trial expired" or "1 / MEMBERS" when a gym is newly registered.
 
 ## Changes made by current task
 
-- Integrated Gym role into `DashboardLayout`, displaying `GymTrialBanner` with countdown days and capacity pills.
-- Added Gym metrics to `StatStack`: Active Members vs Capacity, Affiliated Coaches, and Curated Routines.
-- Added Gym capacity utilization calculation to `WeeklyProgressCard`.
-- Added unit tests in `StatStack.test.tsx` for Gym role.
+- Fixed "Trial expired" and "1 / MEMBERS" bug for newly created gyms:
+  - Backend `getMyGym` now computes and returns `isTrialActive: boolean`, `trialDaysRemaining: number`, `capacity: number`, `coachesCount`, `routinesCount`, and `gym` nested object.
+  - `DashboardLayout` derives `gymTier`, `isTrial`, `isTrialActive`, `trialDaysRemaining`, and `capacity` defensively with robust fallbacks.
+  - Added unit test suite in `src/components/layout/DashboardLayout.test.tsx`.

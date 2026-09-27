@@ -25,6 +25,7 @@ export interface ClassificationExerciseOption {
   id: string;
   name: string;
   isCore: boolean;
+  category?: string;
 }
 
 export interface TierDistribution {
@@ -45,6 +46,8 @@ export interface ClassificationsData {
   exercise: {
     id: string;
     name: string;
+    category?: string;
+    isCore?: boolean;
     targetMuscle?: { en?: string; es?: string } | null;
   };
   availableExercises: ClassificationExerciseOption[];

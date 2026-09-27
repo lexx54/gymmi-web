@@ -1,9 +1,6 @@
 import {
-  Award,
   ChevronDown,
   Dumbbell,
-  Flame,
-  Medal,
   Sparkles,
   Trophy,
   Users,

@@ -39,11 +39,9 @@ Web console interface for Gym facilities to manage their curated workout catalog
 - **Capacity Monitoring**: Member roster computes percentage against `gymData.capacity` (fallback to 100).
 - **Coach Permissions**: Coaches affiliated with a gym cannot publish workouts to the gym's public catalog unless `canPublishRoutines` is explicitly enabled by the facility admin.
 - **Routines & Exercises Scoping**: Workout routines created while logged in as a Gym account are automatically attached to `gymProfile.id` on the backend.
+- **Trial & Tier Status**: Backend `GET /gyms/me` returns `isTrialActive`, `trialDaysRemaining`, and `capacity`. Frontend gracefully handles trial vs paid tiers without showing expired banners to active accounts.
 
 ## Changes made by current task
 
-- Implemented `GymCatalogPage`, `GymCoachesPage`, and `GymMembersPage`.
-- Added gym API service (`src/services/api/gyms.ts`) and React Query hooks (`src/hooks/useGyms.ts`).
-- Created TypeScript interfaces in `src/types/gym.ts`.
-- Configured routes in `src/App.tsx` and sidebar navigation in `Sidebar.tsx`.
-- Added unit tests in `GymPages.test.tsx` verifying catalog searching, coach approvals, and member roster.
+- Fixed discrepancy between backend `/gyms/me` payload and frontend `GymDashboardData` properties (`isTrialActive`, `trialDaysRemaining`, `capacity`).
+- Added test coverage in `DashboardLayout.test.tsx` and updated test fixtures in `GymPages.test.tsx`.

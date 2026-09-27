@@ -69,12 +69,19 @@ export interface GymCoach {
 }
 
 export interface GymDashboardData {
-  gym: GymProfile;
+  id?: string;
+  name?: string;
+  tier?: GymTier;
+  gym?: GymProfile;
   activeMembersCount: number;
   capacity: number;
+  memberCapacity?: number;
   coachesCount: number;
+  activeCoachesCount?: number;
   routinesCount: number;
+  catalogRoutinesCount?: number;
   trialDaysRemaining: number | null;
+  daysRemainingInTrial?: number | null;
   isTrialActive: boolean;
 }
 

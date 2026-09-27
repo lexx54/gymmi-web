@@ -25,6 +25,16 @@ export function DashboardLayout() {
   const isClient = user?.role?.name === 'Client';
   const { data: gymData } = useMyGym(isGym);
 
+  const gymTier = (gymData?.tier ?? gymData?.gym?.tier ?? 'trial').toLowerCase();
+  const isTrial = gymTier === 'trial';
+  const trialDaysRemaining =
+    gymData?.trialDaysRemaining ?? gymData?.daysRemainingInTrial ?? 30;
+  const isTrialActive =
+    gymData?.isTrialActive ?? (isTrial ? trialDaysRemaining > 0 : false);
+  const activeMembers = gymData?.activeMembersCount ?? 0;
+  const capacity =
+    gymData?.capacity ?? gymData?.memberCapacity ?? (gymData?.gym?.memberCapacity ?? 100);
+
   return (
     <LayoutShell>
       <Sidebar username={username} />
@@ -38,14 +48,16 @@ export function DashboardLayout() {
               <BannerLeft>
                 <Clock size={18} />
                 <span>
-                  {gymData.isTrialActive
-                    ? t('gym.trialEnding', { days: gymData.trialDaysRemaining ?? 30 })
-                    : t('gym.trialExpired')}
+                  {isTrial
+                    ? isTrialActive
+                      ? t('gym.trialEnding', { days: trialDaysRemaining })
+                      : t('gym.trialExpired')
+                    : `${gymTier.toUpperCase()} Plan`}
                 </span>
                 <CapacityBadge>
                   {t('gym.capacityProgress', {
-                    current: gymData.activeMembersCount,
-                    max: gymData.capacity,
+                    current: activeMembers,
+                    max: capacity,
                   })}
                 </CapacityBadge>
               </BannerLeft>
@@ -58,14 +70,16 @@ export function DashboardLayout() {
                   <Dumbbell size={15} />
                   <span>{t('gym.createRoutine')}</span>
                 </CreateRoutineBtn>
-                <UpgradeBtn
-                  type="button"
-                  onClick={() => navigate('/settings')}
-                  data-testid="gym-upgrade-btn"
-                >
-                  <Sparkles size={15} />
-                  <span>{t('gym.upgradeTier')}</span>
-                </UpgradeBtn>
+                {isTrial && (
+                  <UpgradeBtn
+                    type="button"
+                    onClick={() => navigate('/settings')}
+                    data-testid="gym-upgrade-btn"
+                  >
+                    <Sparkles size={15} />
+                    <span>{t('gym.upgradeTier')}</span>
+                  </UpgradeBtn>
+                )}
               </BannerRight>
             </GymTrialBanner>
           )}

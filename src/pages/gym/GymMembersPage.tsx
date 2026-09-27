@@ -1,4 +1,4 @@
-import { Calendar, Search, Trash2, User, Users } from 'lucide-react';
+import { Calendar, Search, Trash2, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';

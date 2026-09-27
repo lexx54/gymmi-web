@@ -10,6 +10,7 @@ import GymMembersPage from './GymMembersPage';
 import * as authContext from '../../context/AuthContext';
 import * as gymsApi from '../../services/api/gyms';
 import * as workoutsApi from '../../services/api/workouts';
+import type { GymCoach, GymMember } from '../../types/gym';
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -52,6 +53,10 @@ describe('Gym Pages', () => {
           difficulty: 'ADVANCED',
           daysOfWeek: [1, 4],
           routineExercises: [],
+          createdById: 'u-1',
+          days: [],
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
         },
         {
           id: 'routine-2',
@@ -60,14 +65,28 @@ describe('Gym Pages', () => {
           difficulty: 'BEGINNER',
           daysOfWeek: [3],
           routineExercises: [],
+          createdById: 'u-1',
+          days: [],
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
         },
       ]);
       vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
-        gym: { id: 'g-1', name: 'IronHQ', tier: 'Plus', capacity: 100, trialDaysRemaining: 20 },
+        gym: {
+          id: 'g-1',
+          userId: 'u-gym',
+          name: 'IronHQ',
+          tier: 'plus',
+          memberCapacity: 100,
+          trialEndsAt: '2026-12-31',
+          isActive: true,
+        },
         activeMembersCount: 15,
         capacity: 100,
         coachesCount: 2,
         routinesCount: 2,
+        trialDaysRemaining: 20,
+        isTrialActive: false,
       });
 
       render(<GymCatalogPage />, { wrapper: createWrapper() });
@@ -86,14 +105,14 @@ describe('Gym Pages', () => {
 
   describe('GymCoachesPage', () => {
     it('renders pending coach approvals and approved coaches with toggle permissions', async () => {
-      const mockCoaches: gymsApi.GymCoach[] = [
+      const mockCoaches: GymCoach[] = [
         {
           id: 'coach-rel-1',
           gymId: 'g-1',
           trainerId: 'trainer-1',
           status: 'PENDING',
           canPublishRoutines: false,
-          createdAt: new Date().toISOString(),
+          affiliatedAt: new Date().toISOString(),
           trainer: {
             id: 'trainer-1',
             username: 'CoachMike',
@@ -106,7 +125,7 @@ describe('Gym Pages', () => {
           trainerId: 'trainer-2',
           status: 'APPROVED',
           canPublishRoutines: true,
-          createdAt: new Date().toISOString(),
+          affiliatedAt: new Date().toISOString(),
           trainer: {
             id: 'trainer-2',
             username: 'CoachSarah',
@@ -135,7 +154,7 @@ describe('Gym Pages', () => {
 
   describe('GymMembersPage', () => {
     it('renders capacity usage and members list with search filtering', async () => {
-      const mockMembers: gymsApi.GymMember[] = [
+      const mockMembers: GymMember[] = [
         {
           id: 'member-1',
           gymId: 'g-1',
@@ -164,11 +183,21 @@ describe('Gym Pages', () => {
 
       vi.spyOn(gymsApi, 'fetchMyGymMembers').mockResolvedValue(mockMembers);
       vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
-        gym: { id: 'g-1', name: 'IronHQ', tier: 'Plus', capacity: 100, trialDaysRemaining: 15 },
+        gym: {
+          id: 'g-1',
+          userId: 'u-gym',
+          name: 'IronHQ',
+          tier: 'plus',
+          memberCapacity: 100,
+          trialEndsAt: '2026-12-31',
+          isActive: true,
+        },
         activeMembersCount: 2,
         capacity: 100,
         coachesCount: 1,
         routinesCount: 5,
+        trialDaysRemaining: 15,
+        isTrialActive: false,
       });
 
       render(<GymMembersPage />, { wrapper: createWrapper() });

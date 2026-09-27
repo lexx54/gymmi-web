@@ -63,6 +63,10 @@ export type WorkoutRoutine = {
   days: WorkoutDay[];
   createdAt: string;
   updatedAt: string;
+  period?: WorkoutPeriod | null;
+  difficulty?: string | null;
+  daysOfWeek?: number[];
+  routineExercises?: any[];
   assignment?: WorkoutAssignmentWindow | null;
 };
 
