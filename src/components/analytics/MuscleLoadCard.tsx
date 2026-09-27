@@ -9,148 +9,179 @@ interface MuscleLoadCardProps {
 }
 
 const DEFAULT_SEGMENTS: MuscleSegment[] = [
-  { id: 'lower', labelKey: 'analytics.lowerBody', sets: 0, percent: 0, color: '#ef233c' },
-  { id: 'upper', labelKey: 'analytics.upperBody', sets: 0, percent: 0, color: '#f5a7ad' },
-  { id: 'arms', labelKey: 'analytics.arms', sets: 0, percent: 0, color: '#5e6787' },
-  { id: 'core', labelKey: 'analytics.core', sets: 0, percent: 0, color: '#3d4463' },
+  { id: 'chest', labelKey: 'analytics.chest', sets: 0, exercisesCount: 0, percent: 0, color: '#ef233c' },
+  { id: 'back', labelKey: 'analytics.back', sets: 0, exercisesCount: 0, percent: 0, color: '#3b82f6' },
+  { id: 'legs', labelKey: 'analytics.legs', sets: 0, exercisesCount: 0, percent: 0, color: '#10b981' },
+  { id: 'shoulders', labelKey: 'analytics.shoulders', sets: 0, exercisesCount: 0, percent: 0, color: '#f59e0b' },
+  { id: 'arms', labelKey: 'analytics.arms', sets: 0, exercisesCount: 0, percent: 0, color: '#8b5cf6' },
+  { id: 'core', labelKey: 'analytics.core', sets: 0, exercisesCount: 0, percent: 0, color: '#06b6d4' },
 ];
-
-const RADIUS = 72;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
-type SegmentSlice = MuscleSegment & { dash: number; offset: number };
-
-function computeSlices(segments: MuscleSegment[]): SegmentSlice[] {
-  let cursor = 0;
-  return segments.map((segment) => {
-    const dash = (segment.percent / 100) * CIRCUMFERENCE;
-    const slice: SegmentSlice = { ...segment, dash, offset: cursor };
-    cursor += dash;
-    return slice;
-  });
-}
 
 export function MuscleLoadCard({ data, isLoading }: MuscleLoadCardProps) {
   const { t } = useTranslation();
   const segments = data?.distribution && data.distribution.length > 0 ? data.distribution : DEFAULT_SEGMENTS;
   const totalSets = data?.totalSets ?? 0;
-  const slices = computeSlices(segments);
 
   return (
     <AnalyticsCard>
-      <Eyebrow>{t('analytics.bodyComposition')}</Eyebrow>
-      <CardTitle>{t('analytics.muscleLoad')}</CardTitle>
+      <HeaderRow>
+        <div>
+          <Eyebrow>{t('analytics.bodyComposition')}</Eyebrow>
+          <CardTitle>{t('analytics.muscleLoad')}</CardTitle>
+        </div>
+        <TotalsWrap>
+          <TotalValue>
+            {isLoading ? '...' : totalSets} <TotalUnit>{t('analytics.sets')}</TotalUnit>
+          </TotalValue>
+        </TotalsWrap>
+      </HeaderRow>
 
-      <DonutWrap>
-        <DonutSvg viewBox="0 0 200 200" role="img" aria-label={t('analytics.muscleLoadDistribution')}>
-          <circle cx="100" cy="100" r={RADIUS} stroke="#23284a" strokeWidth="20" fill="none" />
-          {totalSets > 0 &&
-            slices.map((slice) => (
-              <circle
-                key={slice.id}
-                cx="100"
-                cy="100"
-                r={RADIUS}
-                stroke={slice.color}
-                strokeWidth="20"
-                fill="none"
-                strokeDasharray={`${slice.dash} ${CIRCUMFERENCE - slice.dash}`}
-                strokeDashoffset={-slice.offset}
-                transform="rotate(-90 100 100)"
-                strokeLinecap="butt"
-              />
-            ))}
-        </DonutSvg>
-        <DonutCenter>
-          <CenterValue>{isLoading ? '...' : totalSets}</CenterValue>
-          <CenterLabel>{t('analytics.sets')}</CenterLabel>
-        </DonutCenter>
-      </DonutWrap>
-
-      <Legend>
-        {segments.map((segment) => (
-          <LegendItem key={segment.id}>
-            <LegendDot style={{ background: segment.color }} />
-            <LegendLabel>{t(segment.labelKey, segment.id)}</LegendLabel>
-            <LegendValue>{segment.percent}%</LegendValue>
-          </LegendItem>
-        ))}
-      </Legend>
+      <BarsGrid role="region" aria-label={t('analytics.muscleLoadDistribution')}>
+        {segments.map((segment) => {
+          const count = segment.exercisesCount ?? 0;
+          return (
+            <BarItem key={segment.id}>
+              <BarHeader>
+                <MuscleLabelGroup>
+                  <ColorDot $color={segment.color} />
+                  <MuscleName>{t(segment.labelKey, segment.id)}</MuscleName>
+                  <ExerciseBadge>
+                    {t('analytics.exerciseCount', {
+                      count,
+                      defaultValue: `${count} ${count === 1 ? 'exercise' : 'exercises'}`,
+                    })}
+                  </ExerciseBadge>
+                </MuscleLabelGroup>
+                <StatsGroup>
+                  <SetsCount>
+                    {segment.sets} {t('analytics.sets').toLowerCase()}
+                  </SetsCount>
+                  <PercentValue>{segment.percent}%</PercentValue>
+                </StatsGroup>
+              </BarHeader>
+              <Track>
+                <Fill $color={segment.color} $percent={segment.percent} />
+              </Track>
+            </BarItem>
+          );
+        })}
+      </BarsGrid>
     </AnalyticsCard>
   );
 }
 
-const DonutWrap = styled.div`
-  margin-top: 1.25rem;
-  position: relative;
-  display: grid;
-  place-items: center;
-`;
-
-const DonutSvg = styled.svg`
-  width: 12.5rem;
-  height: 12.5rem;
-`;
-
-const DonutCenter = styled.div`
-  position: absolute;
-  inset: 0;
+const HeaderRow = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  pointer-events: none;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 `;
 
-const CenterValue = styled.p`
+const TotalsWrap = styled.div`
+  text-align: right;
+`;
+
+const TotalValue = styled.p`
   margin: 0;
-  color: #f5f6ff;
-  font-size: 2.5rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  color: #f6f7ff;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 `;
 
-const CenterLabel = styled.p`
-  margin: 0.35rem 0 0;
-  color: #8e94b4;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-size: 0.7rem;
+const TotalUnit = styled.span`
+  color: #bdc2e1;
+  font-size: 0.95rem;
+  margin-left: 0.25rem;
   font-weight: 600;
-  line-height: 1;
 `;
 
-const Legend = styled.ul`
-  list-style: none;
-  margin: 1.5rem 0 0;
-  padding: 0;
+const BarsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 2.5rem;
+  margin-top: 1.5rem;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+`;
+
+const BarItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 `;
 
-const LegendItem = styled.li`
-  display: grid;
-  grid-template-columns: 0.5rem 1fr auto;
+const BarHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
+const MuscleLabelGroup = styled.div`
+  display: flex;
   align-items: center;
   gap: 0.65rem;
 `;
 
-const LegendDot = styled.span`
-  width: 0.5rem;
-  height: 0.5rem;
+const ColorDot = styled.span<{ $color: string }>`
+  width: 0.625rem;
+  height: 0.625rem;
   border-radius: 9999px;
+  background-color: ${({ $color }) => $color};
+  flex-shrink: 0;
 `;
 
-const LegendLabel = styled.span`
-  color: #cfd3ec;
-  font-size: 0.82rem;
-`;
-
-const LegendValue = styled.span`
+const MuscleName = styled.span`
   color: #f5f6ff;
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   font-weight: 700;
+`;
+
+const ExerciseBadge = styled.span`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #a4a9c6;
+  border-radius: 9999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+`;
+
+const StatsGroup = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+`;
+
+const SetsCount = styled.span`
+  color: #8e94b4;
+  font-size: 0.84rem;
+  font-weight: 600;
+`;
+
+const PercentValue = styled.span`
+  color: #f5f6ff;
+  font-size: 0.84rem;
+  font-weight: 700;
+`;
+
+const Track = styled.div`
+  width: 100%;
+  height: 0.55rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.55rem;
+`;
+
+const Fill = styled.div<{ $color: string; $percent: number }>`
+  height: 100%;
+  border-radius: 9999px;
+  background-color: ${({ $color }) => $color};
+  width: ${({ $percent }) => ($percent > 0 ? `${Math.max(2, $percent)}%` : '0%')};
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 `;

@@ -67,11 +67,11 @@ export default function AnalyticsPage() {
             </HeaderControlRow>
           )}
 
-          <VolumeTrendsCard data={analytics?.volumeTrends} isLoading={isLoading} />
-          <MiddleGrid>
-            <MuscleLoadCard data={analytics?.muscleLoad} isLoading={isLoading} />
+          <MuscleLoadCard data={analytics?.muscleLoad} isLoading={isLoading} />
+          <SplitGrid>
+            <VolumeTrendsCard data={analytics?.volumeTrends} isLoading={isLoading} />
             <ConsistencyHeatmapCard data={analytics?.consistency} isLoading={isLoading} />
-          </MiddleGrid>
+          </SplitGrid>
           <PersonalRecordsCard records={analytics?.personalRecords} isLoading={isLoading} />
         </AnalyticsContent>
       </AnalyticsMain>
@@ -114,12 +114,12 @@ const ClientSelect = styled.select`
   }
 `;
 
-const MiddleGrid = styled.div`
+const SplitGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
 `;

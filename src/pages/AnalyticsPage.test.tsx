@@ -168,4 +168,34 @@ describe('AnalyticsPage', () => {
       expect(analyticsApi.fetchClientAnalytics).toHaveBeenCalledWith('client-99');
     });
   });
+
+  it('renders muscle load bar chart with specific breakdown and exercise counts', async () => {
+    const customAnalytics: analyticsApi.AnalyticsResponse = {
+      ...mockAnalytics,
+      muscleLoad: {
+        totalSets: 30,
+        distribution: [
+          { id: 'chest', labelKey: 'analytics.chest', sets: 12, exercisesCount: 3, percent: 40, color: '#ef233c' },
+          { id: 'back', labelKey: 'analytics.back', sets: 9, exercisesCount: 2, percent: 30, color: '#3b82f6' },
+          { id: 'legs', labelKey: 'analytics.legs', sets: 6, exercisesCount: 2, percent: 20, color: '#10b981' },
+          { id: 'shoulders', labelKey: 'analytics.shoulders', sets: 3, exercisesCount: 1, percent: 10, color: '#f59e0b' },
+          { id: 'arms', labelKey: 'analytics.arms', sets: 0, exercisesCount: 0, percent: 0, color: '#8b5cf6' },
+          { id: 'core', labelKey: 'analytics.core', sets: 0, exercisesCount: 0, percent: 0, color: '#06b6d4' },
+        ],
+      },
+    };
+    vi.spyOn(analyticsApi, 'fetchMyAnalytics').mockResolvedValue(customAnalytics);
+
+    render(<AnalyticsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText('3 exercises')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Chest')).toBeInTheDocument();
+    expect(screen.getByText('Back')).toBeInTheDocument();
+    expect(screen.getByText('Legs')).toBeInTheDocument();
+    expect(screen.getByText('Shoulders')).toBeInTheDocument();
+    expect(screen.getByText('1 exercise')).toBeInTheDocument();
+    expect(screen.getByText('40%')).toBeInTheDocument();
+  });
 });

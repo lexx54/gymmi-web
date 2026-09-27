@@ -29,6 +29,7 @@ export interface MuscleSegment {
   id: string;
   labelKey: string;
   sets: number;
+  exercisesCount?: number;
   percent: number;
   color: string;
 }
