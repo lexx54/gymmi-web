@@ -41,9 +41,16 @@ export async function logoutApi(): Promise<void> {
   await apiClient.post('/auth/logout');
 }
 
+export type AllowedUploadPurpose =
+  | 'avatar'
+  | 'trainer-logo'
+  | 'gym-cover'
+  | 'gym-logo'
+  | 'article-cover';
+
 export async function getPresignedUrlApi(params: {
   fileType: string;
-  purpose: 'avatar' | 'trainer-logo';
+  purpose: AllowedUploadPurpose;
 }): Promise<{ presignedUrl: string; publicUrl: string; key: string }> {
   const { data } = await apiClient.post<{
     presignedUrl: string;

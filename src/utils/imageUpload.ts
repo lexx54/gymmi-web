@@ -110,7 +110,14 @@ export async function compressImage(
   });
 }
 
-export type UploadImagePurpose = 'avatar' | 'trainer-logo' | 'gym-cover';
+export type UploadImagePurpose =
+  | 'avatar'
+  | 'trainer-logo'
+  | 'gym-cover'
+  | 'gym-logo'
+  | 'article-cover';
+
+export const R2_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 
 export async function uploadImageDirectly(
   file: File,
@@ -131,17 +138,15 @@ export async function uploadImageDirectly(
     | 'image/png'
     | 'image/webp';
 
-  const apiPurpose: 'avatar' | 'trainer-logo' =
-    purpose === 'gym-cover' ? 'trainer-logo' : purpose;
-
   const { presignedUrl, publicUrl } = await getPresignedUrlApi({
     fileType,
-    purpose: apiPurpose,
+    purpose,
   });
 
   await axios.put(presignedUrl, compressedBlob, {
     headers: {
       'Content-Type': fileType,
+      'Cache-Control': R2_CACHE_CONTROL,
     },
   });
 

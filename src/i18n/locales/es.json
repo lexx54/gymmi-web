@@ -42,6 +42,7 @@
     "coaches": "Entrenadores",
     "members": "Miembros",
     "classifications": "Clasificaciones",
+    "articles": "Artículos",
     "streak": "Racha de 7 días",
     "signOut": "Cerrar sesión",
     "dashboardNavigation": "Navegación del panel"
@@ -1032,6 +1033,64 @@
     "date": "Fecha",
     "noData": "No hay levantamientos registrados para este ejercicio en el período seleccionado.",
     "unrankedNotice": "Los clientes sin series registradas en este levantamiento aparecen como Sin clasificar."
+  },
+  "articles": {
+    "title": "Centro de Artículos y Conocimiento",
+    "desc": "Consejos de entrenamiento, guías de nutrición y anuncios de tus entrenadores y gimnasios.",
+    "gymTitle": "Artículos y Anuncios del Gimnasio",
+    "gymDesc": "Publica artículos, consejos de entrenamiento y avisos exclusivamente para tus miembros activos.",
+    "newArticle": "Nuevo artículo",
+    "editArticle": "Editar artículo",
+    "deleteArticle": "Eliminar artículo",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer.",
+    "publish": "Publicar",
+    "saveDraft": "Guardar como borrador",
+    "draft": "Borrador",
+    "published": "Publicado",
+    "searchPlaceholder": "Buscar artículos por título o palabra clave...",
+    "readTime": "{{minutes}} min de lectura",
+    "by": "Por",
+    "fromTrainer": "Entrenador",
+    "fromGym": "Gimnasio",
+    "sources": {
+      "all": "Todos los artículos",
+      "trainer": "De entrenadores",
+      "gym": "Del gimnasio",
+      "saved": "Guardados (Marcadores)"
+    },
+    "categories": {
+      "all": "Todas las categorías",
+      "NUTRITION": "Nutrición",
+      "TECHNIQUE": "Técnica",
+      "RECOVERY": "Recuperación",
+      "ANNOUNCEMENT": "Anuncios",
+      "MINDSET": "Mentalidad",
+      "GENERAL": "General"
+    },
+    "form": {
+      "titleLabel": "Título del artículo",
+      "titlePlaceholder": "ej. Domina la sentadilla trasera con barra",
+      "categoryLabel": "Categoría",
+      "coverUrlLabel": "URL de imagen de portada (Opcional)",
+      "coverUrlPlaceholder": "https://ejemplo.com/portada.jpg",
+      "excerptLabel": "Resumen breve / Extracto (Opcional)",
+      "excerptPlaceholder": "Breve introducción para la tarjeta...",
+      "contentLabel": "Contenido (Markdown soportado)",
+      "contentPlaceholder": "Escribe tu artículo utilizando Markdown (encabezados, listas, negritas, enlaces)...",
+      "readTimeLabel": "Tiempo estimado de lectura (minutos)"
+    },
+    "comments": {
+      "title": "Comentarios ({{count}})",
+      "writePlaceholder": "Escribe una opinión o pregunta...",
+      "post": "Comentar",
+      "delete": "Eliminar",
+      "noComments": "Aún no hay comentarios. ¡Sé el primero en iniciar la conversación!"
+    },
+    "empty": {
+      "feed": "Aún no hay artículos disponibles. ¡Cuando tus entrenadores o gimnasio publiquen, aparecerán aquí!",
+      "saved": "No has guardado ningún artículo aún. Haz clic en el icono de marcador para guardarlo.",
+      "myArticles": "Aún no has publicado ningún artículo. Haz clic en 'Nuevo artículo' para comenzar."
+    }
   }
 }
 

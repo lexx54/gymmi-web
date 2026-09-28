@@ -42,6 +42,7 @@
     "coaches": "Coaches",
     "members": "Members",
     "classifications": "Leaderboard",
+    "articles": "Articles",
     "streak": "7 day streak",
     "signOut": "Sign out",
     "dashboardNavigation": "Dashboard navigation"
@@ -1033,6 +1034,64 @@
     "date": "Achieved",
     "noData": "No lifts logged for this exercise in the selected timeframe.",
     "unrankedNotice": "Clients with no logged sets for this lift appear as Unranked."
+  },
+  "articles": {
+    "title": "Articles & Knowledge Hub",
+    "desc": "Training insights, nutritional guides, and facility announcements from your coaches and gyms.",
+    "gymTitle": "Gym Articles & Announcements",
+    "gymDesc": "Publish articles, training tips, and facility updates exclusively for your active members.",
+    "newArticle": "New Article",
+    "editArticle": "Edit Article",
+    "deleteArticle": "Delete Article",
+    "deleteConfirm": "Are you sure you want to delete this article? This action cannot be undone.",
+    "publish": "Publish",
+    "saveDraft": "Save as Draft",
+    "draft": "Draft",
+    "published": "Published",
+    "searchPlaceholder": "Search articles by title or keyword...",
+    "readTime": "{{minutes}} min read",
+    "by": "By",
+    "fromTrainer": "Coach",
+    "fromGym": "Facility",
+    "sources": {
+      "all": "All Articles",
+      "trainer": "From Coaches",
+      "gym": "From Gym",
+      "saved": "Saved (Bookmarks)"
+    },
+    "categories": {
+      "all": "All Categories",
+      "NUTRITION": "Nutrition",
+      "TECHNIQUE": "Technique",
+      "RECOVERY": "Recovery",
+      "ANNOUNCEMENT": "Announcements",
+      "MINDSET": "Mindset",
+      "GENERAL": "General"
+    },
+    "form": {
+      "titleLabel": "Article Title",
+      "titlePlaceholder": "e.g. Master the Barbell Back Squat",
+      "categoryLabel": "Category",
+      "coverUrlLabel": "Cover Image URL (Optional)",
+      "coverUrlPlaceholder": "https://example.com/cover.jpg",
+      "excerptLabel": "Short Summary / Excerpt (Optional)",
+      "excerptPlaceholder": "Brief overview shown on cards...",
+      "contentLabel": "Content (Markdown supported)",
+      "contentPlaceholder": "Write your article using Markdown (headers, lists, bold text, links)...",
+      "readTimeLabel": "Estimated Read Time (minutes)"
+    },
+    "comments": {
+      "title": "Discussion ({{count}})",
+      "writePlaceholder": "Add a thought or ask a question...",
+      "post": "Comment",
+      "delete": "Delete",
+      "noComments": "No comments yet. Be the first to start the conversation!"
+    },
+    "empty": {
+      "feed": "No articles available yet. When your coaches or gym post articles, they will appear here!",
+      "saved": "You haven't bookmarked any articles yet. Click the bookmark icon on any article to save it for later.",
+      "myArticles": "You haven't authored any articles yet. Click 'New Article' to create your first post."
+    }
   }
 }
 

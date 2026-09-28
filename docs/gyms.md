@@ -45,3 +45,6 @@ Web console interface for Gym facilities to manage their curated workout catalog
 
 - Fixed discrepancy between backend `/gyms/me` payload and frontend `GymDashboardData` properties (`isTrialActive`, `trialDaysRemaining`, `capacity`).
 - Added test coverage in `DashboardLayout.test.tsx` and updated test fixtures in `GymPages.test.tsx`.
+- Removed workaround in `imageUpload.ts` that mapped `gym-cover` to `trainer-logo`; gym covers and gym logos now use native `gym-cover` and `gym-logo` upload purposes directly.
+- Added `Cache-Control: public, max-age=31536000, immutable` headers to all image uploads.
+

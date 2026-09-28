@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy, BookOpen } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -19,6 +19,7 @@ const sidebarItems: SidebarItem[] = [
   { labelKey: 'nav.workouts', to: '/workout', icon: Dumbbell },
   { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
   { labelKey: 'nav.analytics', to: '/analytics', icon: BarChart3 },
+  { labelKey: 'nav.articles', to: '/articles', icon: BookOpen },
   { labelKey: 'nav.settings', to: '/settings', icon: Settings },
 ];
 
@@ -28,6 +29,7 @@ const gymItems: SidebarItem[] = [
   { labelKey: 'nav.coaches', to: '/gym/coaches', icon: Shield },
   { labelKey: 'nav.members', to: '/gym/members', icon: Users },
   { labelKey: 'nav.classifications', to: '/gym/classifications', icon: Trophy },
+  { labelKey: 'nav.articles', to: '/gym/articles', icon: BookOpen },
   { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
   { labelKey: 'nav.settings', to: '/settings', icon: Settings },
 ];

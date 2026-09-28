@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { loginApi, signupApi, forgotPasswordApi, resetPasswordApi, logoutApi } from './auth';
+import {
+  loginApi,
+  signupApi,
+  forgotPasswordApi,
+  resetPasswordApi,
+  logoutApi,
+  getPresignedUrlApi,
+} from './auth';
 import apiClient from './client';
 
 vi.mock('./client', () => ({
@@ -124,5 +131,27 @@ describe('logoutApi', () => {
     mockPost.mockRejectedValue(new Error('Network Error'));
 
     await expect(logoutApi()).rejects.toThrow('Network Error');
+  });
+});
+
+describe('getPresignedUrlApi', () => {
+  it('should POST to /auth/presigned-url with purpose and fileType', async () => {
+    const response = {
+      presignedUrl: 'https://r2.cloudflarestorage.com/upload',
+      publicUrl: 'https://cdn.gymmi.com/article-covers/xyz.jpg',
+      key: 'article-covers/xyz.jpg',
+    };
+    mockPost.mockResolvedValue({ data: response });
+
+    const result = await getPresignedUrlApi({
+      fileType: 'image/jpeg',
+      purpose: 'article-cover',
+    });
+
+    expect(mockPost).toHaveBeenCalledWith('/auth/presigned-url', {
+      fileType: 'image/jpeg',
+      purpose: 'article-cover',
+    });
+    expect(result).toEqual(response);
   });
 });

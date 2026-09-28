@@ -21,6 +21,8 @@ import GymCatalogPage from './pages/gym/GymCatalogPage'
 import GymCoachesPage from './pages/gym/GymCoachesPage'
 import GymMembersPage from './pages/gym/GymMembersPage'
 import ClassificationsPage from './pages/classifications/ClassificationsPage'
+import ArticlesPage from './pages/ArticlesPage'
+import GymArticlesPage from './pages/gym/GymArticlesPage'
 import LandingPage from './pages/LandingPage'
 
 function App() {
@@ -49,6 +51,8 @@ function App() {
           <Route path="/gym/coaches" element={<RoleRoute role="Gym"><GymCoachesPage /></RoleRoute>} />
           <Route path="/gym/members" element={<RoleRoute role="Gym"><GymMembersPage /></RoleRoute>} />
           <Route path="/gym/classifications" element={<RoleRoute role="Gym"><ClassificationsPage /></RoleRoute>} />
+          <Route path="/gym/articles" element={<RoleRoute role="Gym"><GymArticlesPage /></RoleRoute>} />
+          <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/settings" element={<SettingsPage />} />
