@@ -11,9 +11,10 @@ import {
   Flame,
   Sparkles,
   Trophy,
+  Building2,
 } from 'lucide-react';
 
-type FeatureTab = 'routine' | 'bodymap' | 'active' | 'trainer' | 'classifications';
+type FeatureTab = 'routine' | 'bodymap' | 'active' | 'trainer' | 'classifications' | 'facility';
 
 export const FeaturesShowcase: React.FC = () => {
   const { t } = useTranslation();
@@ -181,6 +182,16 @@ export const FeaturesShowcase: React.FC = () => {
             <Trophy size={18} />
             <span>{t('landing.features.tabClassifications')}</span>
           </TabButton>
+
+          <TabButton
+            role="tab"
+            aria-selected={activeTab === 'facility'}
+            $active={activeTab === 'facility'}
+            onClick={() => setActiveTab('facility')}
+          >
+            <Building2 size={18} />
+            <span>{t('landing.features.tabFacility')}</span>
+          </TabButton>
         </TabNavigation>
 
         {/* Tab Showcase Card */}
@@ -296,6 +307,32 @@ export const FeaturesShowcase: React.FC = () => {
                   <BulletItem>
                     <Check size={16} color="#ef233c" />
                     <span>{t('landing.features.classificationsF4')}</span>
+                  </BulletItem>
+                </BulletList>
+              </>
+            )}
+
+            {activeTab === 'facility' && (
+              <>
+                <CardBadge>{t('landing.features.tabFacility')}</CardBadge>
+                <CardHeading>{t('landing.features.facilityTitle')}</CardHeading>
+                <CardDescription>{t('landing.features.facilityDesc')}</CardDescription>
+                <BulletList>
+                  <BulletItem>
+                    <Check size={16} color="#a855f7" />
+                    <span>{t('landing.features.facilityF1')}</span>
+                  </BulletItem>
+                  <BulletItem>
+                    <Check size={16} color="#a855f7" />
+                    <span>{t('landing.features.facilityF2')}</span>
+                  </BulletItem>
+                  <BulletItem>
+                    <Check size={16} color="#a855f7" />
+                    <span>{t('landing.features.facilityF3')}</span>
+                  </BulletItem>
+                  <BulletItem>
+                    <Check size={16} color="#a855f7" />
+                    <span>{t('landing.features.facilityF4')}</span>
                   </BulletItem>
                 </BulletList>
               </>
@@ -521,6 +558,50 @@ export const FeaturesShowcase: React.FC = () => {
                     </PodiumRow>
                   ))}
                 </LeaderboardPodiumList>
+              </WidgetBox>
+            )}
+
+            {activeTab === 'facility' && (
+              <WidgetBox>
+                <WidgetHeader>
+                  <WidgetTitle>Facility Command Center</WidgetTitle>
+                  <WidgetTag>30-Day Trial Active</WidgetTag>
+                </WidgetHeader>
+
+                <FacilityCapacityBox>
+                  <FacilityMetaRow>
+                    <FacilityMetaLabel>MEMBER CAPACITY</FacilityMetaLabel>
+                    <FacilityCapacityValue>74 / 100 (74%)</FacilityCapacityValue>
+                  </FacilityMetaRow>
+                  <FacilityProgressBar>
+                    <FacilityProgressFill $percent={74} />
+                  </FacilityProgressBar>
+                </FacilityCapacityBox>
+
+                <FacilityCoachList>
+                  <FacilityCoachItem>
+                    <FacilityAvatar>AS</FacilityAvatar>
+                    <FacilityCoachInfo>
+                      <FacilityCoachName>Alex Sterling</FacilityCoachName>
+                      <FacilityCoachRole>Head Trainer • 6 Clients</FacilityCoachRole>
+                    </FacilityCoachInfo>
+                    <FacilityBadge $published>CAN PUBLISH</FacilityBadge>
+                  </FacilityCoachItem>
+
+                  <FacilityCoachItem>
+                    <FacilityAvatar $secondary>SM</FacilityAvatar>
+                    <FacilityCoachInfo>
+                      <FacilityCoachName>Sarah Miller</FacilityCoachName>
+                      <FacilityCoachRole>Strength Coach • 4 Clients</FacilityCoachRole>
+                    </FacilityCoachInfo>
+                    <FacilityBadge>AFFILIATED</FacilityBadge>
+                  </FacilityCoachItem>
+                </FacilityCoachList>
+
+                <FacilityCatalogBadge>
+                  <Layers size={14} color="#c084fc" />
+                  <span>12 Curated Routine Templates Active</span>
+                </FacilityCatalogBadge>
               </WidgetBox>
             )}
           </CardPreviewSection>
@@ -1073,5 +1154,119 @@ const Peak1RmText = styled.span`
 const BestSetDetail = styled.span`
   color: #94a3b8;
   font-size: 0.65rem;
+`;
+
+const FacilityCapacityBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.05);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+`;
+
+const FacilityMetaRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const FacilityMetaLabel = styled.span`
+  color: #c084fc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+`;
+
+const FacilityCapacityValue = styled.span`
+  color: #f1f5f9;
+  font-size: 0.8125rem;
+  font-weight: 700;
+`;
+
+const FacilityProgressBar = styled.div`
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+`;
+
+const FacilityProgressFill = styled.div<{ $percent: number }>`
+  width: ${({ $percent }) => $percent}%;
+  height: 100%;
+  background: linear-gradient(90deg, #9333ea, #c084fc);
+  border-radius: 999px;
+`;
+
+const FacilityCoachList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const FacilityCoachItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.625rem;
+`;
+
+const FacilityAvatar = styled.div<{ $secondary?: boolean }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${({ $secondary }) => ($secondary ? '#3b0764' : '#581c87')};
+  color: ${({ $secondary }) => ($secondary ? '#d8b4fe' : '#e9d5ff')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+`;
+
+const FacilityCoachInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const FacilityCoachName = styled.span`
+  color: #f1f5f9;
+  font-size: 0.8125rem;
+  font-weight: 700;
+`;
+
+const FacilityCoachRole = styled.span`
+  color: #94a3b8;
+  font-size: 0.6875rem;
+`;
+
+const FacilityBadge = styled.span<{ $published?: boolean }>`
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  color: ${({ $published }) => ($published ? '#34d399' : '#a855f7')};
+  background: ${({ $published }) => ($published ? 'rgba(52, 211, 153, 0.12)' : 'rgba(168, 85, 247, 0.12)')};
+  border: 1px solid ${({ $published }) => ($published ? 'rgba(52, 211, 153, 0.3)' : 'rgba(168, 85, 247, 0.3)')};
+`;
+
+const FacilityCatalogBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px dashed rgba(168, 85, 247, 0.35);
+  border-radius: 0.625rem;
+  color: #d8b4fe;
+  font-size: 0.75rem;
+  font-weight: 600;
 `;
 

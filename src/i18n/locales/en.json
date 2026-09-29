@@ -801,7 +801,7 @@
       "tag": "The Modern Fitness Platform",
       "titleLine1": "Coaching Meets Execution.",
       "titleHighlight": "Elevate Every Rep.",
-      "subtitle": "The all-in-one platform connecting fitness coaches and dedicated athletes. Build precision workouts on the web, execute with real-time tracking on mobile, and achieve measurable gains.",
+      "subtitle": "The unified fitness ecosystem connecting fitness coaches, dedicated athletes, and gym facilities. Build precision workouts on the web, execute with real-time tracking on mobile, and manage facility catalogs with ease.",
       "ctaPrimary": "Start Free Today",
       "ctaSecondary": "Explore Features",
       "statExercises": "Curated Exercises",
@@ -825,12 +825,13 @@
     "features": {
       "tag": "Core Capabilities",
       "title": "Engineered for Serious Training",
-      "subtitle": "From programming 8-client rosters to tracking personal PRs solo, Gymmi provides professional tools built for performance.",
+      "subtitle": "From programming 8-client rosters and managing gym facility catalogs to tracking personal PRs solo, Gymmi provides professional tools built for performance.",
       "tabRoutine": "Routine Builder",
       "tabBodyMap": "Muscle Body Map",
       "tabActive": "Active Workout",
       "tabTrainer": "Coaching Pipeline",
       "tabClassifications": "Strength Leaderboard",
+      "tabFacility": "Facility Console",
       "tabAi": "Gemini AI",
       "routineTitle": "Visual Workout Programming",
       "routineDesc": "Construct high-impact, multi-day routines with surgical precision. Configure supersets, rest intervals, target rep ranges, and target RPE with an intuitive, flexible builder.",
@@ -848,6 +849,12 @@
       "classificationsF4": "Cohort filtering across Weekly, Monthly, and All-Time performance cycles",
       "classificationsWidgetTitle": "Cohort Leaderboard Live Preview",
       "classificationsWidgetTag": "Facility & Squad Cohort",
+      "facilityTitle": "Gym Facility & Studio Management",
+      "facilityDesc": "Supervise your fitness facility with centralized routine catalogs, member capacity tracking, and coach affiliation permissions. Built to help local gyms and athletic clubs scale.",
+      "facilityF1": "Curated facility workout routine catalog accessible to all active gym members",
+      "facilityF2": "Coach affiliation requests with granular routine publishing toggles",
+      "facilityF3": "Real-time member roster tracking with tier capacity visual indicators",
+      "facilityF4": "Facility-wide strength leaderboards and collective cohort tracking",
       "aiTitle": "Multilingual AI Powered by Gemini",
       "aiDesc": "Break language barriers instantly. Custom exercises, descriptions, and coaching notes are automatically translated between English and Spanish using Google Gemini AI."
     },
@@ -867,7 +874,16 @@
       "clientF2": "Connect with certified personal trainers who program and supervise your progress",
       "clientF3": "Design solo routines tailored to your schedule and gym equipment",
       "clientF4": "Interactive anatomical muscle map ensures balanced, injury-free training",
-      "clientF5": "Compete on facility and squad leaderboards to earn verified tier badges"
+      "clientF5": "Compete on facility and squad leaderboards to earn verified tier badges",
+      "gymTag": "For Gym Facilities",
+      "gymTitle": "Empower Your Facility. Unify Coaches & Members.",
+      "gymDesc": "Transform your athletic club or boutique studio into a digital powerhouse. Curate proprietary routine catalogs, approve coaching staff with publishing permissions, and monitor active member capacity from a single command center.",
+      "gymF1": "Publish branded, curated routine templates for all active facility members",
+      "gymF2": "Review and approve coach affiliation requests with publishing toggles",
+      "gymF3": "Monitor real-time member roster capacity across Plus, Pro, and Maximum tiers",
+      "gymF4": "Broadcast facility articles, nutrition guidelines, and member updates",
+      "gymF5": "Track facility-wide strength classifications and member retention metrics",
+      "gymCta": "Register Your Facility"
     },
     "pricing": {
       "tag": "Transparent Pricing",
@@ -999,7 +1015,9 @@
       "q5": "When will the Pro tier be available?",
       "a5": "The Pro tier is currently in active development. It will introduce unlimited client capacity, team collaboration for fitness studios, and advanced analytics.",
       "q6": "How do Strength Standards & Leaderboards work?",
-      "a6": "Gymmi automatically computes peak estimated 1RM using Epley's scientific formula across logged exercise sets. Athletes achieve calibrated strength tiers (Diamond, Platinum, Gold, Silver, Bronze) on core compound lifts. Facility coaches and gym owners can track cohort rankings across weekly, monthly, and all-time cycles."
+      "a6": "Gymmi automatically computes peak estimated 1RM using Epley's scientific formula across logged exercise sets. Athletes achieve calibrated strength tiers (Diamond, Platinum, Gold, Silver, Bronze) on core compound lifts. Facility coaches and gym owners can track cohort rankings across weekly, monthly, and all-time cycles.",
+      "q7": "How does Gymmi work for gym facilities and studios?",
+      "a7": "Gym facilities receive a dedicated management web console. You can curate facility-wide workout catalogs, approve personal trainers to represent your gym with optional routine publishing rights, track active member capacity against your tier (starting at 100 members with a 30-day free trial on Plus), and publish exclusive member announcements."
     },
     "footer": {
       "tagline": "Empowering coaches and athletes with precision fitness tools.",

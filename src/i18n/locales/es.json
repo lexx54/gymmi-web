@@ -801,7 +801,7 @@
       "tag": "La Plataforma de Entrenamiento del Futuro",
       "titleLine1": "El Entrenamiento se Une a la Ejecución.",
       "titleHighlight": "Eleva Cada Repetición.",
-      "subtitle": "El ecosistema integral que conecta entrenadores con atletas dedicados. Diseña rutinas de precisión en la web, ejecútalas con seguimiento en tiempo real en el móvil y alcanza tus metas.",
+      "subtitle": "El ecosistema integral que conecta entrenadores, atletas dedicados e instalaciones de fitness. Diseña rutinas de precisión en la web, ejecútalas con seguimiento en tiempo real en el móvil y gestiona catálogos de gimnasio con total facilidad.",
       "ctaPrimary": "Comienza Gratis",
       "ctaSecondary": "Explorar Funciones",
       "statExercises": "Ejercicios Curados",
@@ -825,12 +825,13 @@
     "features": {
       "tag": "Capacidades de la Plataforma",
       "title": "Diseñado para Entrenamiento Riguroso",
-      "subtitle": "Desde gestionar un grupo de 8 clientes hasta registrar tus mejores marcas en solitario, Gymmi ofrece herramientas profesionales para el alto rendimiento.",
+      "subtitle": "Desde gestionar un grupo de 8 clientes y catálogos para gimnasios hasta registrar tus mejores marcas en solitario, Gymmi ofrece herramientas profesionales para el alto rendimiento.",
       "tabRoutine": "Creador de Rutinas",
       "tabBodyMap": "Mapa Muscular",
       "tabActive": "Entrenamiento Activo",
       "tabTrainer": "Sistema Coach-Atleta",
       "tabClassifications": "Clasificaciones",
+      "tabFacility": "Consola de Gimnasio",
       "tabAi": "IA Gemini",
       "routineTitle": "Programación Visual de Rutinas",
       "routineDesc": "Construye rutinas de varios días con precisión quirúrgica. Configura series, rangos de repeticiones y RPE objetivo mediante un creador intuitivo y ágil.",
@@ -848,6 +849,12 @@
       "classificationsF4": "Filtros de grupo por ciclos semanales, mensuales e históricos",
       "classificationsWidgetTitle": "Vista Previa de Clasificaciones",
       "classificationsWidgetTag": "Grupo del Gimnasio y Entrenador",
+      "facilityTitle": "Gestión Integral para Gimnasios y Estudios",
+      "facilityDesc": "Supervisa tu instalación de fitness con catálogos centralizados de rutinas, control visual de capacidad de miembros y permisos de publicación para entrenadores afiliados.",
+      "facilityF1": "Catálogo de rutinas curadas del gimnasio accesible para todos los miembros activos",
+      "facilityF2": "Solicitudes de afiliación de entrenadores con permisos selectivos de publicación",
+      "facilityF3": "Control de miembros activos con indicadores visuales de capacidad por nivel",
+      "facilityF4": "Clasificaciones de fuerza a nivel de gimnasio y tablas de líderes comunitarias",
       "aiTitle": "IA Multilingüe Impulsada por Gemini",
       "aiDesc": "Supera las barreras del idioma al instante. Los ejercicios personalizados y las indicaciones técnicas se traducen automáticamente entre inglés y español con Google Gemini AI."
     },
@@ -867,7 +874,16 @@
       "clientF2": "Conéctate con entrenadores certificados que guían tu progreso de cerca",
       "clientF3": "Diseña rutinas individuales adaptadas a tus horarios y equipamiento",
       "clientF4": "El mapa muscular anatómico te ayuda a mantener un desarrollo equilibrado",
-      "clientF5": "Compite en las clasificaciones del gimnasio para ganar insignias de nivel de fuerza"
+      "clientF5": "Compite en las clasificaciones del gimnasio para ganar insignias de nivel de fuerza",
+      "gymTag": "Para Gimnasios e Instalaciones",
+      "gymTitle": "Centraliza Tu Gimnasio. Unifica Entrenadores y Miembros.",
+      "gymDesc": "Transforma tu club deportivo o estudio boutique en una potencia digital. Diseña catálogos de rutinas exclusivos, aprueba entrenadores con permisos de publicación y supervisa la capacidad de miembros desde una consola ejecutiva.",
+      "gymF1": "Publica plantillas de entrenamiento curadas para todos los miembros del gimnasio",
+      "gymF2": "Aprueba y gestiona entrenadores afiliados con control de permisos de publicación",
+      "gymF3": "Supervisa la capacidad en tiempo real según los planes Plus, Pro y Maximum",
+      "gymF4": "Difunde artículos exclusivos, guías de nutrición y anuncios del centro",
+      "gymF5": "Monitorea la retención de atletas y clasificaciones de fuerza comunitarias",
+      "gymCta": "Registra Tu Gimnasio"
     },
     "pricing": {
       "tag": "Precios Transparentes",
@@ -998,7 +1014,9 @@
       "q5": "¿Cuándo estará disponible el plan Pro?",
       "a5": "El plan Pro está actualmente en fase de desarrollo activo. Incorporará capacidad ilimitada de clientes, cuentas colaborativas para gimnasios y analíticas avanzadas.",
       "q6": "¿Cómo funcionan los Niveles de Fuerza y las Clasificaciones?",
-      "a6": "Gymmi calcula automáticamente el 1RM estimado mediante la fórmula científica de Epley a partir de las series registradas. Los atletas alcanzan niveles calibrados (Diamante, Platino, Oro, Plata, Bronce) en los levantamientos principales. Entrenadores y gimnasios pueden ver clasificaciones semanales, mensuales e históricas."
+      "a6": "Gymmi calcula automáticamente el 1RM estimado mediante la fórmula científica de Epley a partir de las series registradas. Los atletas alcanzan niveles calibrados (Diamante, Platino, Oro, Plata, Bronce) en los levantamientos principales. Entrenadores y gimnasios pueden ver clasificaciones semanales, mensuales e históricas.",
+      "q7": "¿Cómo funciona Gymmi para gimnasios e instalaciones?",
+      "a7": "Los gimnasios cuentan con una consola web de gestión dedicada. Puedes crear catálogos de rutinas para toda la instalación, aprobar entrenadores personales con derechos opcionales de publicación, controlar la capacidad de miembros activos según tu plan (a partir de 100 miembros con prueba gratis de 30 días en Plus) y publicar anuncios exclusivos."
     },
     "footer": {
       "tagline": "Potenciando a entrenadores y atletas con herramientas de precisión.",

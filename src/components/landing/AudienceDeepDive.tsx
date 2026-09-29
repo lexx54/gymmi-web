@@ -9,6 +9,8 @@ import {
   ArrowRight,
   ShieldCheck,
   Zap,
+  Building2,
+  Layers,
 } from 'lucide-react';
 
 export const AudienceDeepDive: React.FC = () => {
@@ -164,6 +166,97 @@ export const AudienceDeepDive: React.FC = () => {
             </VisualCard>
           </AudienceVisualColumn>
         </AudienceRow>
+
+        {/* Row 3: For Gyms & Fitness Facilities */}
+        <AudienceRow>
+          <AudienceTextColumn>
+            <RoleBadge $role="gym">
+              <Building2 size={15} />
+              <span>{t('landing.audience.gymTag')}</span>
+            </RoleBadge>
+
+            <AudienceTitle>{t('landing.audience.gymTitle')}</AudienceTitle>
+            <AudienceDescription>{t('landing.audience.gymDesc')}</AudienceDescription>
+
+            <BenefitList>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#a855f7" />
+                <span>{t('landing.audience.gymF1')}</span>
+              </BenefitItem>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#a855f7" />
+                <span>{t('landing.audience.gymF2')}</span>
+              </BenefitItem>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#a855f7" />
+                <span>{t('landing.audience.gymF3')}</span>
+              </BenefitItem>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#a855f7" />
+                <span>{t('landing.audience.gymF4')}</span>
+              </BenefitItem>
+              <BenefitItem>
+                <CheckCircle2 size={18} color="#a855f7" />
+                <span>{t('landing.audience.gymF5')}</span>
+              </BenefitItem>
+            </BenefitList>
+
+            <CTALink to="/signup" $gym>
+              <span>{t('landing.audience.gymCta')}</span>
+              <ArrowRight size={16} />
+            </CTALink>
+          </AudienceTextColumn>
+
+          <AudienceVisualColumn>
+            <VisualCard $accent="#a855f7">
+              <VisualHeader>
+                <Building2 size={18} color="#a855f7" />
+                <VisualHeaderText>Facility Management Console</VisualHeaderText>
+              </VisualHeader>
+
+              {/* Member Capacity Progress */}
+              <CapacityContainer>
+                <CapacityMetaRow>
+                  <CapacityTitle>Active Member Capacity</CapacityTitle>
+                  <CapacityPercentText>74 / 100 (74%)</CapacityPercentText>
+                </CapacityMetaRow>
+                <CapacityTrack>
+                  <CapacityFill $percent={74} />
+                </CapacityTrack>
+              </CapacityContainer>
+
+              {/* Coach Staff Approvals */}
+              <ClientRosterList>
+                <ClientRow>
+                  <ClientAvatar style={{ background: '#581c87', color: '#e9d5ff' }}>AS</ClientAvatar>
+                  <ClientMeta>
+                    <ClientName>Alex Sterling</ClientName>
+                    <ClientPlan>Head Trainer • 6 Active Clients</ClientPlan>
+                  </ClientMeta>
+                  <CoachPermBadge $published>CAN PUBLISH</CoachPermBadge>
+                </ClientRow>
+                <ClientRow>
+                  <ClientAvatar style={{ background: '#3b0764', color: '#d8b4fe' }}>SM</ClientAvatar>
+                  <ClientMeta>
+                    <ClientName>Sarah Miller</ClientName>
+                    <ClientPlan>Strength Coach • 4 Active Clients</ClientPlan>
+                  </ClientMeta>
+                  <CoachPermBadge>AFFILIATED</CoachPermBadge>
+                </ClientRow>
+              </ClientRosterList>
+
+              {/* Curated Catalog Strip */}
+              <CatalogSummaryBadge>
+                <Layers size={15} color="#c084fc" />
+                <span>12 Curated Routines Published to Members</span>
+              </CatalogSummaryBadge>
+
+              <VisualCardNote>
+                Gym Plus includes a 30-day free trial with up to 100 members and full catalog controls.
+              </VisualCardNote>
+            </VisualCard>
+          </AudienceVisualColumn>
+        </AudienceRow>
       </DeepDiveInner>
     </DeepDiveWrapper>
   );
@@ -211,18 +304,27 @@ const AudienceTextColumn = styled.div`
   gap: 1.5rem;
 `;
 
-const RoleBadge = styled.div<{ $role: 'coach' | 'client' }>`
+const RoleBadge = styled.div<{ $role: 'coach' | 'client' | 'gym' }>`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0.85rem;
   background: ${({ $role }) =>
-    $role === 'coach' ? 'rgba(239, 35, 60, 0.12)' : 'rgba(56, 189, 248, 0.12)'};
+    $role === 'coach'
+      ? 'rgba(239, 35, 60, 0.12)'
+      : $role === 'client'
+      ? 'rgba(56, 189, 248, 0.12)'
+      : 'rgba(168, 85, 247, 0.12)'};
   border: 1px solid
     ${({ $role }) =>
-      $role === 'coach' ? 'rgba(239, 35, 60, 0.3)' : 'rgba(56, 189, 248, 0.3)'};
+      $role === 'coach'
+        ? 'rgba(239, 35, 60, 0.3)'
+        : $role === 'client'
+        ? 'rgba(56, 189, 248, 0.3)'
+        : 'rgba(168, 85, 247, 0.3)'};
   border-radius: 9999px;
-  color: ${({ $role }) => ($role === 'coach' ? '#fca5a5' : '#7dd3fc')};
+  color: ${({ $role }) =>
+    $role === 'coach' ? '#fca5a5' : $role === 'client' ? '#7dd3fc' : '#d8b4fe'};
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -257,13 +359,15 @@ const BenefitItem = styled.div`
   line-height: 1.5;
 `;
 
-const CTALink = styled(Link)<{ $client?: boolean }>`
+const CTALink = styled(Link)<{ $client?: boolean; $gym?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: ${({ $client }) =>
+  background: ${({ $client, $gym }) =>
     $client
       ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)'
+      : $gym
+      ? 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)'
       : 'linear-gradient(135deg, #ef233c 0%, #d90429 100%)'};
   color: #ffffff;
   text-decoration: none;
@@ -273,12 +377,86 @@ const CTALink = styled(Link)<{ $client?: boolean }>`
   border-radius: 0.625rem;
   width: fit-content;
   box-shadow: 0 4px 14px
-    ${({ $client }) => ($client ? 'rgba(2, 132, 199, 0.35)' : 'rgba(239, 35, 60, 0.35)')};
+    ${({ $client, $gym }) =>
+      $client
+        ? 'rgba(2, 132, 199, 0.35)'
+        : $gym
+        ? 'rgba(147, 51, 234, 0.35)'
+        : 'rgba(239, 35, 60, 0.35)'};
   transition: all 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
   }
+`;
+
+const CapacityContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  background: rgba(168, 85, 247, 0.06);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  border-radius: 0.75rem;
+`;
+
+const CapacityMetaRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const CapacityTitle = styled.span`
+  color: #e9d5ff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+`;
+
+const CapacityPercentText = styled.span`
+  color: #c084fc;
+  font-size: 0.8125rem;
+  font-weight: 800;
+`;
+
+const CapacityTrack = styled.div`
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+`;
+
+const CapacityFill = styled.div<{ $percent: number }>`
+  width: ${({ $percent }) => $percent}%;
+  height: 100%;
+  background: linear-gradient(90deg, #9333ea, #c084fc);
+  border-radius: 9999px;
+`;
+
+const CoachPermBadge = styled.span<{ $published?: boolean }>`
+  font-size: 0.6875rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  background: ${({ $published }) =>
+    $published ? 'rgba(168, 85, 247, 0.2)' : 'rgba(148, 163, 184, 0.15)'};
+  color: ${({ $published }) => ($published ? '#d8b4fe' : '#94a3b8')};
+  border: 1px solid
+    ${({ $published }) =>
+      $published ? 'rgba(168, 85, 247, 0.35)' : 'rgba(148, 163, 184, 0.25)'};
+`;
+
+const CatalogSummaryBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.875rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.625rem;
+  color: #cbd5e1;
+  font-size: 0.8125rem;
+  font-weight: 600;
 `;
 
 const AudienceVisualColumn = styled.div`

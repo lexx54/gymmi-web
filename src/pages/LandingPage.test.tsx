@@ -104,12 +104,21 @@ describe('LandingPage', () => {
     await user.click(leaderboardTab);
     expect(screen.getByText(/Automated Strength Tiers & Leaderboards/i)).toBeInTheDocument();
     expect(screen.getByText('Cohort Leaderboard Live Preview')).toBeInTheDocument();
-    expect(screen.getByText('Alex Sterling')).toBeInTheDocument();
+    expect(screen.getAllByText('Alex Sterling')[0]).toBeInTheDocument();
 
     // Switch lift to Barbell Back Squat
     const squatBtn = screen.getByRole('button', { name: 'Barbell Back Squat' });
     await user.click(squatBtn);
     expect(screen.getByText('David Kim')).toBeInTheDocument();
+
+    // Switch to Facility Console
+    const facilityTab = screen.getByRole('tab', { name: /facility console/i });
+    await user.click(facilityTab);
+    expect(screen.getByText(/Gym Facility & Studio Management/i)).toBeInTheDocument();
+    expect(screen.getByText('Facility Command Center')).toBeInTheDocument();
+    expect(screen.getByText('MEMBER CAPACITY')).toBeInTheDocument();
+    expect(screen.getAllByText('74 / 100 (74%)')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('CAN PUBLISH')[0]).toBeInTheDocument();
   });
 
   it('renders pricing plans with role toggle and disabled Pro plan', async () => {
@@ -188,5 +197,22 @@ describe('LandingPage', () => {
 
     // Clicking toggles completion state
     expect(benchPressRow).toBeInTheDocument();
+  });
+
+  it('renders gym facility section in audience deep dive and faq', async () => {
+    const user = userEvent.setup();
+    render(<LandingPage />, { wrapper: createWrapper() });
+
+    // Audience deep dive for gym
+    expect(screen.getAllByText(/For Gym Facilities/i)[0]).toBeInTheDocument();
+    expect(screen.getByText(/Empower Your Facility. Unify Coaches & Members./i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /register your facility/i })).toHaveAttribute('href', '/signup');
+    expect(screen.getByText('Active Member Capacity')).toBeInTheDocument();
+
+    // FAQ accordion for gym
+    const gymFaq = screen.getByText(/How does Gymmi work for gym facilities and studios\?/i);
+    expect(gymFaq).toBeInTheDocument();
+    await user.click(gymFaq);
+    expect(screen.getByText(/Gym facilities receive a dedicated management web console/i)).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 import { uploadImageDirectly, R2_CACHE_CONTROL } from './imageUpload';
 import * as authApi from '../services/api/auth';
