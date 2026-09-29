@@ -157,7 +157,7 @@ export function ArticleEditorModal({
           </FormGroup>
 
           <Row>
-            <FormGroup style={{ flex: 1 }}>
+            <FormGroup>
               <Label>{t('articles.form.categoryLabel')}</Label>
               <Select
                 value={category}
@@ -172,7 +172,7 @@ export function ArticleEditorModal({
               </Select>
             </FormGroup>
 
-            <FormGroup style={{ width: '130px' }}>
+            <FormGroup>
               <Label>{t('articles.form.readTimeLabel')}</Label>
               <Input
                 type="number"
@@ -329,24 +329,36 @@ const FormBody = styled.div`
   gap: 1.25rem;
 `;
 
+const Row = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-`;
-
-const Row = styled.div`
-  display: flex;
-  gap: 1rem;
+  min-width: 0;
+  justify-content: flex-end;
 `;
 
 const Label = styled.label`
   font-size: 0.8rem;
   font-weight: 600;
   color: #949ab8;
+  line-height: 1.35;
 `;
 
 const Input = styled.input`
+  width: 100%;
+  min-width: 0;
+  height: 2.65rem;
+  box-sizing: border-box;
   background: #141830;
   border: 1px solid rgba(126, 136, 175, 0.2);
   border-radius: 0.65rem;
@@ -366,6 +378,10 @@ const Input = styled.input`
 `;
 
 const Select = styled.select`
+  width: 100%;
+  min-width: 0;
+  height: 2.65rem;
+  box-sizing: border-box;
   background: #141830;
   border: 1px solid rgba(126, 136, 175, 0.2);
   border-radius: 0.65rem;
@@ -377,6 +393,11 @@ const Select = styled.select`
 
   &:focus {
     border-color: #ef233c;
+  }
+
+  option {
+    background: #141830;
+    color: #f7f7ff;
   }
 `;
 

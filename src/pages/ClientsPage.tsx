@@ -24,7 +24,6 @@ import {
   SettingsContent,
   SettingsMain,
   SettingsPageShell,
-  SettingsPageTitle,
 } from '../components/settings/SettingsShell';
 import { useAuth } from '../context/AuthContext';
 import { useContractClients, useMyContracts, useRespondContract } from '../hooks/useContracts';
@@ -75,12 +74,7 @@ export default function ClientsPage() {
     <SettingsPageShell>
       <Sidebar username={username} />
       <SettingsMain>
-        <HeaderRow>
-          <SettingsPageTitle>
-            {selected ? selected.client.username : t('nav.clients')}
-          </SettingsPageTitle>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={selected ? selected.client.username : t('nav.clients')} />
         <SettingsContent>
           <EntitlementGraceWarning />
           {typeof entitlements?.limits?.trainerSeats === 'number' ? (
@@ -334,12 +328,6 @@ function ClientDetail({ item }: { item: ContractClientRoster }) {
   );
 }
 
-const HeaderRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-`;
 
 const UsageText = styled.p`
   margin: 0;

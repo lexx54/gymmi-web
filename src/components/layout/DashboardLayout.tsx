@@ -85,13 +85,11 @@ export function DashboardLayout() {
           )}
         </HeaderArea>
         <ContentGrid>
-          <MainColumn>
+          <OverviewGrid>
             <WeeklyProgressCard />
-            <RecentActivity />
-          </MainColumn>
-          <SideColumn>
             <StatStack />
-          </SideColumn>
+          </OverviewGrid>
+          <RecentActivity />
         </ContentGrid>
         {isClient && <StartWorkoutButton />}
       </MainPanel>
@@ -128,27 +126,21 @@ const HeaderArea = styled.section`
 `;
 
 const ContentGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+`;
+
+const OverviewGrid = styled.section`
   display: grid;
   grid-template-columns: minmax(0, 1fr) 19rem;
   gap: 1.3rem;
-  align-items: start;
+  align-items: stretch;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
-`;
-
-const MainColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.3rem;
-  min-width: 0;
-`;
-
-const SideColumn = styled.aside`
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
 `;
 
 const GymTrialBanner = styled.div`

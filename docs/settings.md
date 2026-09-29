@@ -9,7 +9,7 @@ Provides user profile inspection, physical body metric management, professional 
   2. **Account Settings Card**: Displays real email, username, and role badge alongside security settings.
   3. **Physical Profile Card**: Replaces mock training metrics card. Displays Age, Gender, Height, Weight, and Fitness Goal with live `cm`/`ft` and `kg`/`lbs` toggles. Offers inline "Edit Profile" mode with live validation and mutation saving.
   4. **Coaching Profile Card (Trainers Only)**: Displayed exclusively for users with the `Trainer` role. Shows Monthly Rate ($ USD), Specializations, Gym Affiliations, and Services Bio. Offers inline "Edit Credentials" mode with preset chips, custom tag adder, gym chip manager, and services textarea.
-  5. **Language & Data Cards**: Preferences and data management options.
+  5. **Data Card**: Device preferences and data management options (language is managed globally via the standardized TopBar).
 
 ## Key files
 
@@ -38,3 +38,5 @@ Provides user profile inspection, physical body metric management, professional 
 - Updated `TrainersPage.tsx` to render circular Profile Photo and rounded Trainer Logo side-by-side in trainer selection and pending contract cards.
 - Updated `contracts.ts` types with `avatarUrl` and `logoUrl`.
 - Synchronized English and Spanish i18n keys for avatar, logo, and public preview.
+- Standardized top navigation bar with unified `<TopBar title={...} />` component featuring left-aligned title and right-aligned segmented `[EN | ES]` language toggle pill.
+- Removed redundant `LanguageSettingsCard` from `SettingsPage` in favor of the global TopBar language toggle.

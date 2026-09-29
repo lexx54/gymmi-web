@@ -115,7 +115,8 @@ export type UploadImagePurpose =
   | 'trainer-logo'
   | 'gym-cover'
   | 'gym-logo'
-  | 'article-cover';
+  | 'article-cover'
+  | 'payment-receipt';
 
 export const R2_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 

@@ -45,7 +45,7 @@ export default function AnalyticsPage() {
     <AnalyticsPageShell>
       <Sidebar username={username} />
       <AnalyticsMain>
-        <TopBar />
+        <TopBar title={t('nav.analytics')} />
         <AnalyticsContent>
           {isTrainer && clientsRoster.length > 0 && (
             <HeaderControlRow>

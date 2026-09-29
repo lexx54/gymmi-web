@@ -23,5 +23,8 @@ The web frontend implementation for the Articles knowledge hub and community fee
   - Full translations for all buttons, labels, categories, and empty states in both English (`en.json`) and Spanish (`es.json`).
 
 ## Recent Changes
+- Standardized form row layout in `ArticleEditorModal.tsx` using a balanced 2-column grid (`grid-template-columns: 1fr 1fr; gap: 1rem;` with mobile fallback to `1fr`).
+- Fixed vertical and horizontal misalignment between **Category** and **Estimated Read Time** by removing restrictive inline width constraints (`width: 130px`), standardizing input and select heights (`2.65rem`), and aligning fields to prevent label wrapping discrepancies from skewing the inputs.
 - Added direct file upload capability for article cover images in `ArticleEditorModal.tsx` using `uploadImageDirectly(file, 'article-cover')`.
 - Uploads now send `Cache-Control: public, max-age=31536000, immutable` headers.
+- Added comprehensive unit tests in `src/components/articles/ArticleEditorModal.test.tsx` verifying field rendering, interactions, and submission.

@@ -12,7 +12,6 @@ import {
   SettingsContent,
   SettingsMain,
   SettingsPageShell,
-  SettingsPageTitle,
 } from '../components/settings/SettingsShell';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -66,10 +65,7 @@ export default function TrainersPage() {
     <SettingsPageShell>
       <Sidebar username={username} />
       <SettingsMain>
-        <HeaderRow>
-          <SettingsPageTitle>{t('nav.trainers')}</SettingsPageTitle>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={t('nav.trainers')} />
         <SettingsContent>
           <EntitlementGraceWarning />
           <StyledCard>
@@ -250,12 +246,6 @@ function formatRequestDate(value: string, locale: string) {
   return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(date);
 }
 
-const HeaderRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-`;
 
 const StyledCard = styled(CardSurface)`
   display: flex;

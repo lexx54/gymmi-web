@@ -12,7 +12,7 @@ import {
   ExercisesMain,
   ExercisesPageShell,
 } from '../../components/exercises/ExercisesShell';
-import { ExercisesHeader } from '../../components/exercises/ExercisesHeader';
+import { TopBar } from '../../components/layout/TopBar';
 import { useState } from 'react';
 
 export default function AdminUsersPage() {
@@ -53,7 +53,7 @@ export default function AdminUsersPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title={t('admin.userManagement')} />
+        <TopBar title={t('admin.userManagement')} />
         <ExercisesContent>
           <Card>
             {isLoading ? (

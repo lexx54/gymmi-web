@@ -1,57 +1,141 @@
-import { Bell } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { setAppLanguage, type AppLanguage } from '../../i18n';
+
+export type TopBarProps = {
+  title?: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+};
 
 /**
- * Displays the dashboard utility actions on the top-right.
+ * Standardized top bar providing the page title on the left
+ * and utility actions (actions slot and language toggle pill) on the right.
  */
-export function TopBar() {
-  const { t } = useTranslation();
+export function TopBar({ title, actions, className }: TopBarProps) {
+  const { i18n } = useTranslation();
+  const activeLanguage: AppLanguage = i18n.language?.startsWith('es') ? 'es' : 'en';
+
+  const handleLanguageChange = (language: AppLanguage) => {
+    if (language !== activeLanguage) {
+      void setAppLanguage(language);
+    }
+  };
 
   return (
-    <Container>
-      <IconButton type="button" aria-label={t('common.notifications')}>
-        <Bell size={16} />
-      </IconButton>
-      <AvatarFrame aria-hidden>
-        <AvatarDot />
-      </AvatarFrame>
-    </Container>
+    <TopBarContainer className={className} $hasTitle={Boolean(title)}>
+      {title ? (
+        typeof title === 'string' ? (
+          <TitleHeading>{title}</TitleHeading>
+        ) : (
+          title
+        )
+      ) : (
+        <Spacer />
+      )}
+      <RightControls>
+        {actions && <ActionsSlot>{actions}</ActionsSlot>}
+        <LanguagePill role="group" aria-label="Language selection">
+          <LangButton
+            type="button"
+            $active={activeLanguage === 'en'}
+            aria-pressed={activeLanguage === 'en'}
+            onClick={() => handleLanguageChange('en')}
+            data-testid="lang-btn-en"
+          >
+            EN
+          </LangButton>
+          <LangButton
+            type="button"
+            $active={activeLanguage === 'es'}
+            aria-pressed={activeLanguage === 'es'}
+            onClick={() => handleLanguageChange('es')}
+            data-testid="lang-btn-es"
+          >
+            ES
+          </LangButton>
+        </LanguagePill>
+      </RightControls>
+    </TopBarContainer>
   );
 }
 
-const Container = styled.div`
+const TopBarContainer = styled.header<{ $hasTitle: boolean }>`
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  width: 100%;
+  margin-bottom: ${({ $hasTitle }) => ($hasTitle ? '0.5rem' : '0')};
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 `;
 
-const IconButton = styled.button`
-  width: 2rem;
-  height: 2rem;
+const TitleHeading = styled.h1`
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f5f6ff;
+  letter-spacing: -0.01em;
+
+  @media (max-width: 640px) {
+    font-size: 1.3rem;
+  }
+`;
+
+const Spacer = styled.div`
+  flex: 1;
+`;
+
+const RightControls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+  margin-left: auto;
+`;
+
+const ActionsSlot = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+`;
+
+const LanguagePill = styled.div`
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 9999px;
+  background: #181a2e;
+  border: 1px solid rgba(126, 136, 175, 0.22);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+`;
+
+const LangButton = styled.button<{ $active: boolean }>`
   border: none;
+  background: ${({ $active }) => ($active ? '#313349' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#f5f6ff' : '#9096b6')};
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.7rem;
   border-radius: 9999px;
-  background: transparent;
-  color: #f5bdc1;
-  display: grid;
-  place-items: center;
   cursor: pointer;
-`;
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
 
-const AvatarFrame = styled.div`
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 0.7rem;
-  border: 1px solid #f5bdc1;
-  background: rgba(245, 189, 193, 0.08);
-  display: grid;
-  place-items: center;
-`;
+  &:hover {
+    color: #f5f6ff;
+  }
 
-const AvatarDot = styled.div`
-  width: 0.95rem;
-  height: 0.95rem;
-  border-radius: 9999px;
-  background: #f5bdc1;
+  ${({ $active }) =>
+    $active &&
+    `
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  `}
 `;

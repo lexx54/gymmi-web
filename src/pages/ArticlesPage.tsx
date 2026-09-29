@@ -90,13 +90,7 @@ export default function ArticlesPage() {
     <PageShell>
       <Sidebar username={user?.username ?? 'User'} />
       <Main>
-        <HeaderRow>
-          <div>
-            <Title>{t('articles.title')}</Title>
-            <Subtitle>{t('articles.desc')}</Subtitle>
-          </div>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={t('nav.articles')} />
 
         <ControlsBar>
           <TabsRow>
@@ -282,38 +276,23 @@ export default function ArticlesPage() {
 const PageShell = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #0b0d1b;
+  background: #0b1020;
   color: #f7f7ff;
 `;
 
 const Main = styled.main`
   flex: 1;
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+  padding: 1.4rem 2rem 2.5rem;
+  position: relative;
+  overflow-y: auto;
+  min-width: 0;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
 `;
 
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  gap: 1rem;
-`;
 
-const Title = styled.h1`
-  margin: 0 0 0.4rem;
-  font-size: 1.85rem;
-  font-weight: 800;
-  color: #f7f7ff;
-`;
-
-const Subtitle = styled.p`
-  margin: 0;
-  color: #949ab8;
-  font-size: 0.95rem;
-`;
 
 const ControlsBar = styled.div`
   display: flex;

@@ -2,7 +2,6 @@ import {
   ChevronDown,
   Dumbbell,
   Sparkles,
-  Trophy,
   Users,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -82,16 +81,7 @@ export default function ClassificationsPage() {
     <PageShell>
       <Sidebar username={user?.username ?? 'Coach'} />
       <Main>
-        <HeaderRow>
-          <div>
-            <TitleWrapper>
-              <Trophy size={28} color="#ef233c" />
-              <Title>{t('classifications.title')}</Title>
-            </TitleWrapper>
-            <Subtitle>{t('classifications.desc')}</Subtitle>
-          </div>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={t('classifications.title')} />
 
         {/* Timeframe selector & Cohort indicator */}
         <ControlsRow>
@@ -346,45 +336,23 @@ export default function ClassificationsPage() {
 const PageShell = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #0f111a;
-  color: #f3f4f6;
-  font-family: inherit;
+  background: #0b1020;
+  color: #f7f7ff;
 `;
 
 const Main = styled.main`
   flex: 1;
-  padding: 32px 40px;
+  padding: 1.4rem 2rem 2.5rem;
+  position: relative;
   overflow-y: auto;
-  max-width: 1400px;
-  margin: 0 auto;
+  min-width: 0;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
 `;
 
-const HeaderRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 24px;
-`;
 
-const TitleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const Title = styled.h1`
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  margin: 0;
-  color: #fff;
-`;
-
-const Subtitle = styled.p`
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: #9ca3af;
-`;
 
 const ControlsRow = styled.div`
   display: flex;

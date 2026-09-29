@@ -71,13 +71,7 @@ export default function GymCoachesPage() {
     <PageShell>
       <Sidebar username={user?.username ?? 'Alex'} />
       <Main>
-        <HeaderRow>
-          <div>
-            <Title>{t('gym.coachesTitle')}</Title>
-            <Subtitle>{t('gym.coachesDesc')}</Subtitle>
-          </div>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={t('gym.coachesTitle')} />
 
         <StatsRow>
           <StatPill>
@@ -245,26 +239,7 @@ const Main = styled.main`
   overflow-y: auto;
 `;
 
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-`;
 
-const Title = styled.h1`
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #f5f6ff;
-`;
-
-const Subtitle = styled.p`
-  margin: 0.25rem 0 0;
-  color: #949ab8;
-  font-size: 0.88rem;
-`;
 
 const StatsRow = styled.div`
   display: flex;

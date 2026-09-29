@@ -10,7 +10,7 @@ import { ExerciseBulkCsvModal } from '../components/exercises/ExerciseBulkCsvMod
 import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
 import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { NoExercises } from '../components/exercises/NoExercises';
-import { ExercisesHeader } from '../components/exercises/ExercisesHeader';
+import { TopBar } from '../components/layout/TopBar';
 import {
   ExercisesContent,
   ExercisesMain,
@@ -161,15 +161,9 @@ export default function ExercisesPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title={t('nav.exercises')} />
-        <ExercisesContent>
-          <EntitlementGraceWarning />
-          <HeaderRow>
-            <Copy>
-              <Eyebrow>{t('exercises.catalog')}</Eyebrow>
-              <Title>{t('exercises.catalogTitle')}</Title>
-              <Subtitle>{t('exercises.catalogSubtitle')}</Subtitle>
-            </Copy>
+        <TopBar
+          title={t('nav.exercises')}
+          actions={
             <Can resource="exercises" action="CREATE">
               <ActionGroup>
                 <SecondaryButton type="button" onClick={() => requestCustomExercise('bulk')}>
@@ -182,7 +176,10 @@ export default function ExercisesPage() {
                 </CreateButton>
               </ActionGroup>
             </Can>
-          </HeaderRow>
+          }
+        />
+        <ExercisesContent>
+          <EntitlementGraceWarning />
           {typeof entitlements?.limits?.customExercises === 'number' ? (
             <UsageText>{t('entitlements.exerciseUsage', {
               usage: entitlements.usage?.customExercises ?? 0,
@@ -343,58 +340,10 @@ export default function ExercisesPage() {
     </ExercisesPageShell>
   );
 }
-
-const HeaderRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  justify-content: space-between;
-  align-items: flex-start;
-
-  @media (min-width: 900px) {
-    flex-direction: row;
-    align-items: flex-end;
-  }
-`;
-
 const UsageText = styled.p`
   margin: 0;
   color: #e7bdbb;
   font-size: 0.85rem;
-`;
-
-const Copy = styled.div`
-  max-width: 34rem;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-`;
-
-const Eyebrow = styled.p`
-  margin: 0;
-  color: #ffb3b1;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  font-size: 0.7rem;
-  font-weight: 700;
-`;
-
-const Title = styled.h2`
-  margin: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  color: #e0e0fc;
-  font-size: clamp(1.75rem, 7vw, 2.4rem);
-  font-weight: 800;
-  line-height: 1.1;
-  overflow-wrap: break-word;
-`;
-
-const Subtitle = styled.p`
-  margin: 0;
-  color: #e7bdbb;
-  font-size: 0.95rem;
-  line-height: 1.5;
 `;
 
 const ActionGroup = styled.div`

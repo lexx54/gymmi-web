@@ -1,43 +1,38 @@
 import styled from 'styled-components';
 
 /**
- * Outer page shell for the exercises routes. Holds the sidebar + main column.
+ * Outer page shell matching the standardized layout shell.
  */
 export const ExercisesPageShell = styled.div`
   display: flex;
   min-height: 100vh;
-  background-color: #101225;
-  color: #e0e0fc;
+  background: #0b1020;
+  color: #f7f7ff;
 `;
 
 /**
- * Vertical main column for exercises pages (sits right of the sidebar).
+ * Vertical main column with standardized 1.4rem 2rem 2.5rem padding.
  */
 export const ExercisesMain = styled.main`
   flex: 1;
-  /* Without this a flex item refuses to shrink below its content width,
-     which pushes the page wider than a phone viewport. */
   min-width: 0;
-  display: flex;
-  flex-direction: column;
+  padding: 1.4rem 2rem 2.5rem;
   position: relative;
+  overflow-y: auto;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
 `;
 
 /**
- * Centered content area below the sticky header.
+ * Standardized content area below the TopBar.
  */
 export const ExercisesContent = styled.div`
-  padding: 2.25rem 2.5rem 3rem;
-  max-width: 80rem;
-  width: 100%;
-  min-width: 0;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
-
-  @media (max-width: 640px) {
-    padding: 1.5rem 1.15rem 2.5rem;
-    gap: 1.5rem;
-  }
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  width: 100%;
+  min-width: 0;
 `;

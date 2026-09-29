@@ -7,6 +7,7 @@ export type AuthUser = {
   username: string;
   avatarUrl?: string | null;
   hasPaid: boolean;
+  paidUntil?: string | null;
   plan?: PlanName;
   role: { id: string; name: string };
   gymProfile?: GymProfile | null;
@@ -78,6 +79,7 @@ export type FullUserProfile = {
   username: string;
   avatarUrl?: string | null;
   hasPaid: boolean;
+  paidUntil?: string | null;
   plan?: PlanName;
   role: { id: string; name: string };
   gymProfile?: GymProfile | null;

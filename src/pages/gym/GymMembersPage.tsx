@@ -46,13 +46,7 @@ export default function GymMembersPage() {
     <PageShell>
       <Sidebar username={user?.username ?? 'Alex'} />
       <Main>
-        <HeaderRow>
-          <div>
-            <Title>{t('gym.membersTitle')}</Title>
-            <Subtitle>{t('gym.membersDesc')}</Subtitle>
-          </div>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={t('gym.membersTitle')} />
 
         {/* Capacity Progress Bar Card */}
         <CapacityCard data-testid="gym-capacity-card">
@@ -147,26 +141,7 @@ const Main = styled.main`
   overflow-y: auto;
 `;
 
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-`;
 
-const Title = styled.h1`
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #f5f6ff;
-`;
-
-const Subtitle = styled.p`
-  margin: 0.25rem 0 0;
-  color: #949ab8;
-  font-size: 0.88rem;
-`;
 
 const CapacityCard = styled.div`
   background: linear-gradient(180deg, #171b34 0%, #121630 100%);

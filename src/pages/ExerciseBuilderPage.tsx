@@ -9,7 +9,7 @@ import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { BasicInfoCard } from '../components/exercises/BasicInfoCard';
 import { BuilderPageHeader } from '../components/exercises/BuilderPageHeader';
 import { DifficultyMovementCard } from '../components/exercises/DifficultyMovementCard';
-import { ExercisesHeader } from '../components/exercises/ExercisesHeader';
+import { TopBar } from '../components/layout/TopBar';
 import {
   ExercisesContent,
   ExercisesMain,
@@ -250,7 +250,7 @@ export default function ExerciseBuilderPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title={t('workouts.builderTitle')} />
+        <TopBar title={t('workouts.builderTitle')} />
         <ExercisesContent>
           <EntitlementGraceWarning />
           <BuilderPageHeader

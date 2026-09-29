@@ -151,6 +151,11 @@ const Card = styled.section`
   background: linear-gradient(180deg, #171b34 0%, #121630 100%);
   border: 1px solid rgba(124, 132, 170, 0.14);
   padding: 1.55rem 1.6rem 1.45rem;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const HeaderRow = styled.div`

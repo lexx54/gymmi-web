@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { Sidebar } from '../components/layout/Sidebar';
+import { TopBar } from '../components/layout/TopBar';
 import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
 import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { NoRoutines } from '../components/workouts/NoRoutines';
@@ -94,13 +95,15 @@ export default function WorkoutLibraryPage() {
     <PageShell>
       <Sidebar username={user?.username ?? 'Alex'} />
       <Main>
-        <Hero>
-          <div>
-            <Title>{t('workouts.libraryTitle')}</Title>
-            <Subtitle>{t('workouts.librarySubtitle')}</Subtitle>
-          </div>
-          <CreateButton type="button" onClick={requestCreate}><Plus size={16} />{t('workouts.createRoutine')}</CreateButton>
-        </Hero>
+        <TopBar
+          title={t('nav.workouts')}
+          actions={
+            <CreateButton type="button" onClick={requestCreate}>
+              <Plus size={16} />
+              {t('workouts.createRoutine')}
+            </CreateButton>
+          }
+        />
         <EntitlementGraceWarning />
         <Controls>
           <FilterGroup aria-label={t('workouts.routineFilters')}>
@@ -321,13 +324,21 @@ function WorkoutAccessDialog({
 const PageShell = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #101225;
+  background: #0b1020;
   color: #f7f7ff;
 `;
-const Main = styled.main`flex: 1; min-width: 0; padding: 2.5rem; @media (max-width: 640px) { padding: 1.1rem; }`;
-const Hero = styled.header`display: flex; justify-content: space-between; gap: 1rem; align-items: start; @media (max-width: 640px) { flex-direction: column; }`;
-const Title = styled.h1`margin: 0; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; letter-spacing: -0.06em;`;
-const Subtitle = styled.p`color: #e7bdbb;`;
+
+const Main = styled.main`
+  flex: 1;
+  min-width: 0;
+  padding: 1.4rem 2rem 2.5rem;
+  position: relative;
+  overflow-y: auto;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
+`;
 const CreateButton = styled.button`display: inline-flex; align-items: center; gap: .5rem; border: 0; padding: .9rem 1.2rem; border-radius: .8rem; background: linear-gradient(135deg,#ffb3b1,#ff535a); color: #46000b; font-weight: 900; cursor: pointer;`;
 const Controls = styled.div`display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; margin: 2rem 0;`;
 const FilterGroup = styled.div`display: flex; flex-wrap: wrap; gap: .55rem;`;

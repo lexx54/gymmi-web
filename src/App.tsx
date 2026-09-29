@@ -24,6 +24,8 @@ import ClassificationsPage from './pages/classifications/ClassificationsPage'
 import ArticlesPage from './pages/ArticlesPage'
 import GymArticlesPage from './pages/gym/GymArticlesPage'
 import LandingPage from './pages/LandingPage'
+import BillingPage from './pages/BillingPage'
+import AdminPaymentsPage from './pages/admin/AdminPaymentsPage'
 
 function App() {
   return (
@@ -55,9 +57,11 @@ function App() {
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
+          <Route path="/billing" element={<BillingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />
           <Route path="/admin/users" element={<RoleRoute role="Admin"><AdminUsersPage /></RoleRoute>} />
+          <Route path="/admin/payments" element={<RoleRoute role="Admin"><AdminPaymentsPage /></RoleRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

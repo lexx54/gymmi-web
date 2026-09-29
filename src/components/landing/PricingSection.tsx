@@ -13,10 +13,12 @@ import {
   PRICING_DATA,
   type BillingCadence,
 } from '../../constants/pricing.constants';
+import { useAuth } from '../../context/AuthContext';
 
 export const PricingSection: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [role, setRole] = useState<'trainer' | 'client' | 'gym'>('trainer');
   const [cadence, setCadence] = useState<BillingCadence>('monthly');
@@ -172,7 +174,7 @@ export const PricingSection: React.FC = () => {
                     <ActiveCTAButton
                       type="button"
                       $isPlus={isHighlighted}
-                      onClick={() => navigate('/signup')}
+                      onClick={() => navigate(user ? '/billing' : '/signup')}
                     >
                       <span>{t(plan.ctaKey)}</span>
                     </ActiveCTAButton>

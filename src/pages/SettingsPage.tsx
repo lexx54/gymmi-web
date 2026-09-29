@@ -3,17 +3,16 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
 import { AccountSettingsCard } from '../components/settings/AccountSettingsCard';
 import { DataManagementCard } from '../components/settings/DataManagementCard';
-import { LanguageSettingsCard } from '../components/settings/LanguageSettingsCard';
 import { ProfileHeroCard } from '../components/settings/ProfileHeroCard';
 import { SettingsFooter } from '../components/settings/SettingsFooter';
 import {
   SettingsContent,
   SettingsMain,
   SettingsPageShell,
-  SettingsPageTitle,
 } from '../components/settings/SettingsShell';
 import { PhysicalProfileCard } from '../components/settings/PhysicalProfileCard';
 import { CoachingProfileCard } from '../components/settings/CoachingProfileCard';
+import { SubscriptionSettingsCard } from '../components/settings/SubscriptionSettingsCard';
 import { useAuth } from '../context/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useTranslation } from 'react-i18next';
@@ -45,12 +44,10 @@ export default function SettingsPage() {
     <SettingsPageShell>
       <Sidebar username={username} />
       <SettingsMain>
-        <HeaderRow>
-          <SettingsPageTitle>{t('settings.title')}</SettingsPageTitle>
-          <TopBar />
-        </HeaderRow>
+        <TopBar title={t('settings.title')} />
         <SettingsContent>
           <ProfileHeroCard userProfile={effectiveProfile} />
+          <SubscriptionSettingsCard userProfile={effectiveProfile} />
           <MiddleGrid>
             <AccountSettingsCard userProfile={effectiveProfile} />
             <PhysicalProfileCard userProfile={effectiveProfile} isLoading={isLoading} />
@@ -58,7 +55,6 @@ export default function SettingsPage() {
           {isTrainer && (
             <CoachingProfileCard userProfile={effectiveProfile} isLoading={isLoading} />
           )}
-          <LanguageSettingsCard />
           <DataManagementCard />
           <SettingsFooter />
         </SettingsContent>
@@ -66,13 +62,6 @@ export default function SettingsPage() {
     </SettingsPageShell>
   );
 }
-
-const HeaderRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-`;
 
 const MiddleGrid = styled.div`
   display: grid;

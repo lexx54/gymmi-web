@@ -151,14 +151,21 @@ const Stack = styled.section`
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+  height: 100%;
+
+  @media (max-width: 900px) {
+    height: auto;
+  }
 `;
 
 const Card = styled.article`
+  flex: 1;
   border-radius: 1.35rem;
   border: 1px solid rgba(126, 136, 175, 0.18);
   background: linear-gradient(180deg, #181d36 0%, #12152d 100%);
   padding: 0.95rem 1.15rem 1rem;
   min-height: 5.6rem;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

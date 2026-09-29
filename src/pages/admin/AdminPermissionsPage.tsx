@@ -12,7 +12,7 @@ import {
   ExercisesMain,
   ExercisesPageShell,
 } from '../../components/exercises/ExercisesShell';
-import { ExercisesHeader } from '../../components/exercises/ExercisesHeader';
+import { TopBar } from '../../components/layout/TopBar';
 
 const ACTIONS = ['READ', 'CREATE', 'EDIT', 'DELETE'];
 
@@ -75,10 +75,10 @@ export default function AdminPermissionsPage() {
     <ExercisesPageShell>
       <Sidebar username={username} />
       <ExercisesMain>
-        <ExercisesHeader title={t('admin.rolePermissions')} />
+        <TopBar title={t('admin.rolePermissions')} />
         <ExercisesContent>
           <Card>
-            <TopBar>
+            <RoleControlRow>
               <RoleSelect
                 value={selectedRoleId ?? ''}
                 onChange={(e) => setSelectedRoleId(e.target.value)}
@@ -97,7 +97,7 @@ export default function AdminPermissionsPage() {
               >
                 {saveMutation.isPending ? t('admin.saving') : t('admin.save')}
               </SaveButton>
-            </TopBar>
+            </RoleControlRow>
             {permsLoading ? (
               <p style={{ color: '#e0e0fc', textAlign: 'center', padding: '2rem' }}>{t('common.loading')}</p>
             ) : (
@@ -147,7 +147,7 @@ const Card = styled.section`
   padding: 2rem;
 `;
 
-const TopBar = styled.div`
+const RoleControlRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;

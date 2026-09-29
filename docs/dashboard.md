@@ -50,6 +50,10 @@ Web dashboard delivering role-tailored training overviews, weekly charts, and ke
 
 ## Changes made by current task
 
+- Aligned the 3 right-side stat cards (`StatStack`) to match the main card (`WeeklyProgressCard`) height:
+  - In `DashboardLayout.tsx`, grouped `WeeklyProgressCard` and `StatStack` into an `OverviewGrid` (`grid-template-columns: minmax(0, 1fr) 19rem; align-items: stretch; gap: 1.3rem;`), placing `RecentActivity` below as a clean full-width section.
+  - In `WeeklyProgressCard.tsx`, set `Card` to `height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;`.
+  - In `StatStack.tsx`, set `Stack` to `height: 100%` and `Card` to `flex: 1; min-height: 5.6rem; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;` so the 3 cards expand equally to perfectly match the main card's top and bottom edges.
 - Fixed "Trial expired" and "1 / MEMBERS" bug for newly created gyms:
   - Backend `getMyGym` now computes and returns `isTrialActive: boolean`, `trialDaysRemaining: number`, `capacity: number`, `coachesCount`, `routinesCount`, and `gym` nested object.
   - `DashboardLayout` derives `gymTier`, `isTrial`, `isTrialActive`, `trialDaysRemaining`, and `capacity` defensively with robust fallbacks.

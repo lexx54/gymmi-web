@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy, BookOpen, CreditCard } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -20,6 +20,7 @@ const sidebarItems: SidebarItem[] = [
   { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
   { labelKey: 'nav.analytics', to: '/analytics', icon: BarChart3 },
   { labelKey: 'nav.articles', to: '/articles', icon: BookOpen },
+  { labelKey: 'nav.billing', to: '/billing', icon: CreditCard },
   { labelKey: 'nav.settings', to: '/settings', icon: Settings },
 ];
 
@@ -31,6 +32,7 @@ const gymItems: SidebarItem[] = [
   { labelKey: 'nav.classifications', to: '/gym/classifications', icon: Trophy },
   { labelKey: 'nav.articles', to: '/gym/articles', icon: BookOpen },
   { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
+  { labelKey: 'nav.billing', to: '/billing', icon: CreditCard },
   { labelKey: 'nav.settings', to: '/settings', icon: Settings },
 ];
 
@@ -40,6 +42,7 @@ const gymItems: SidebarItem[] = [
 const adminItems: SidebarItem[] = [
   { labelKey: 'nav.permissions', to: '/admin/permissions', icon: Shield },
   { labelKey: 'nav.users', to: '/admin/users', icon: Users },
+  { labelKey: 'nav.payments', to: '/admin/payments', icon: CreditCard },
 ];
 
 export function Sidebar({ username }: SidebarProps) {
