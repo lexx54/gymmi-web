@@ -23,7 +23,7 @@ Provides the persistent application shell, sidebar navigation, and standardized 
 - `SettingsPage.tsx`: `<TopBar title={t('settings.title')} />`
 - `BillingPage.tsx`: `<TopBar title={t('billing.pageTitle', 'Subscription & Billing')} />`
 - `AnalyticsPage.tsx`: `<TopBar title={t('nav.analytics')} />`
-- `TrainersPage.tsx`: `<TopBar title={t('nav.trainers')} />`
+- `TrainersPage.tsx`: `<TopBar title={t('nav.trainersAndGyms')} actions={<SegmentedTabs ... />} />`
 - `ClientsPage.tsx`: `<TopBar title={selected ? selected.client.username : t('nav.clients')} />`
 - `ClassificationsPage.tsx`: `<TopBar title={t('classifications.title')} />`
 - `ArticlesPage.tsx`: `<TopBar title={t('nav.articles')} />`

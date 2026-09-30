@@ -8,7 +8,7 @@ Provides user profile inspection, physical body metric management, professional 
   1. **Profile Hero Card**: Displays user avatar initials, dynamic role status line ("Athlete" vs "Personal Trainer"), real bio (primary goal for athletes, services bio for trainers), and relevant tags (age/height/weight for athletes, rate & specializations for trainers).
   2. **Account Settings Card**: Displays real email, username, and role badge alongside security settings.
   3. **Physical Profile Card**: Replaces mock training metrics card. Displays Age, Gender, Height, Weight, and Fitness Goal with live `cm`/`ft` and `kg`/`lbs` toggles. Offers inline "Edit Profile" mode with live validation and mutation saving.
-  4. **Coaching Profile Card (Trainers Only)**: Displayed exclusively for users with the `Trainer` role. Shows Monthly Rate ($ USD), Specializations, Gym Affiliations, and Services Bio. Offers inline "Edit Credentials" mode with preset chips, custom tag adder, gym chip manager, and services textarea.
+  4. **Coaching Profile Card (Trainers Only)**: Displayed exclusively for users with the `Trainer` role. Shows Monthly Rate ($ USD), Specializations, verified Gym Affiliations, and Services Bio. Offers inline "Edit Credentials" mode with preset chips, custom tag adder, and services textarea. Gym affiliations are displayed from formal facility approvals (`gym_coaches`) and cannot be arbitrarily edited here.
   5. **Data Card**: Device preferences and data management options (language is managed globally via the standardized TopBar).
 
 ## Key files
@@ -39,4 +39,14 @@ Provides user profile inspection, physical body metric management, professional 
 - Updated `contracts.ts` types with `avatarUrl` and `logoUrl`.
 - Synchronized English and Spanish i18n keys for avatar, logo, and public preview.
 - Standardized top navigation bar with unified `<TopBar title={...} />` component featuring left-aligned title and right-aligned segmented `[EN | ES]` language toggle pill.
-- Removed redundant `LanguageSettingsCard` from `SettingsPage` in favor of the global TopBar language toggle.
+- Transitioned gym affiliations to the formal facility affiliation model:
+  - Removed informal manual gym input and dropdown from `CoachingProfileCard.tsx` edit mode.
+  - Profile update mutation no longer overwrites gym affiliations with arbitrary strings.
+  - View mode in `CoachingProfileCard.tsx` and `PublicProfileModal.tsx` displays verified gym affiliations populated from approved `gym_coaches` records.
+  - Updated unit tests in `CoachingProfileCard.test.tsx` to assert that informal gym editing inputs are not rendered and save mutations preserve verified affiliations.
+- Localized trainer specializations across settings and public profile views:
+  - Replaced hardcoded English strings in `CoachingProfileCard.tsx` with `PRESET_SPECIALIZATIONS` and `getSpecializationLabel` helper (`src/utils/specializations.ts`).
+  - Active preset chips in edit mode render localized text via `t(preset.labelKey)` while maintaining test attributes `data-testid="edit-tag-${preset.defaultEn}"`.
+  - View mode tags in `CoachingProfileCard.tsx`, `ProfileHeroCard.tsx`, and `PublicProfileModal.tsx` automatically translate stored database values (English, Spanish, or key) to the current language via `getSpecializationLabel(spec, t)`.
+  - Custom unlisted specializations are preserved and displayed as entered.
+

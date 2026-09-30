@@ -11,6 +11,18 @@ const mockMutate = vi.fn();
 const mockToastSuccess = vi.fn();
 const mockToastError = vi.fn();
 
+const mockDbGyms = [
+  { id: 'gym-1', name: 'Iron Paradise', city: 'Miami' },
+  { id: 'gym-2', name: 'Gold Gym', city: 'Venice' },
+];
+
+vi.mock('../../hooks/useGyms', () => ({
+  usePublicGyms: () => ({
+    data: mockDbGyms,
+    isLoading: false,
+  }),
+}));
+
 vi.mock('../../hooks/useUserProfile', () => ({
   useUpdateUserProfile: () => ({
     mutate: mockMutate,
@@ -112,7 +124,6 @@ describe('CoachingProfileCard', () => {
             description:
               'Updated coaching description with elite conditioning and nutrition focus.',
             specializations: ['Hypertrophy', 'HIIT & Cardio'],
-            gyms: ['Metro Fitness'],
           },
         },
         expect.any(Object),
@@ -135,4 +146,22 @@ describe('CoachingProfileCard', () => {
     expect(screen.getByTestId('edit-coaching-profile-btn')).toBeInTheDocument();
     expect(mockMutate).not.toHaveBeenCalled();
   });
+
+  it('displays formally affiliated gyms in view mode and does not allow informal gym editing in edit mode', async () => {
+    const user = userEvent.setup();
+    render(<CoachingProfileCard userProfile={mockTrainerProfileData} />, {
+      wrapper: createWrapper(),
+    });
+
+    // View mode displays affiliated gyms
+    expect(screen.getByText('Metro Fitness')).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('edit-coaching-profile-btn'));
+
+    // Edit mode should NOT have manual or select gym inputs because affiliations are formal
+    expect(screen.queryByTestId('select-db-gym')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('edit-input-gym')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('add-gym-btn')).not.toBeInTheDocument();
+  });
 });
+

@@ -16,6 +16,7 @@ export interface GymProfile {
   trialEndsAt: string;
   memberCapacity: number;
   isActive: boolean;
+  joinCode?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -24,7 +25,7 @@ export interface GymMember {
   id: string;
   gymId: string;
   clientId: string;
-  status: 'ACTIVE' | 'CANCELLED';
+  status: 'ACTIVE' | 'PENDING' | 'REJECTED' | 'CANCELLED';
   joinedAt: string;
   client?: {
     id: string;
@@ -46,6 +47,13 @@ export interface GymCoach {
   id: string;
   gymId: string;
   trainerId: string;
+  username?: string;
+  email?: string;
+  avatarUrl?: string | null;
+  logoUrl?: string | null;
+  monthlyPrice?: number;
+  description?: string;
+  specializations?: string[];
   canPublishRoutines: boolean;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   affiliatedAt: string;
@@ -78,15 +86,34 @@ export interface GymDashboardData {
   memberCapacity?: number;
   coachesCount: number;
   activeCoachesCount?: number;
+  pendingMembersCount?: number;
   routinesCount: number;
   catalogRoutinesCount?: number;
   trialDaysRemaining: number | null;
   daysRemainingInTrial?: number | null;
   isTrialActive: boolean;
+  joinCode?: string | null;
+  logoUrl?: string | null;
+}
+
+export interface GymMembershipItem {
+  id: string;
+  gymId: string;
+  status: 'ACTIVE' | 'PENDING' | 'REJECTED' | 'CANCELLED';
+  name?: string;
+  description?: string | null;
+  address?: string | null;
+  city?: string | null;
+  logoUrl?: string | null;
+  coverUrl?: string | null;
+  amenities?: string[];
+  joinedAt: string;
 }
 
 export interface PublicGymItem extends GymProfile {
   activeMembersCount?: number;
+  memberCount?: number;
+  coachCount?: number;
   coachesCount?: number;
   routinesCount?: number;
 }

@@ -1,8 +1,10 @@
-import { Inbox, Send, UserRound, X, Dumbbell } from 'lucide-react';
+import { Building2, Inbox, Send, UserRound, X, Dumbbell } from 'lucide-react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { ClientGymsSection } from '../components/gyms/ClientGymsSection';
 import { EntitlementGraceWarning } from '../components/entitlements/EntitlementGraceWarning';
 import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
@@ -24,11 +26,18 @@ import { useEntitlements } from '../hooks/usePermissions';
 import { getApiErrorMessage } from '../services/api/errors';
 import { WORKOUT_PERIODS, type WorkoutPeriod } from '../services/api/workouts';
 import type { ContractStatus } from '../services/api/contracts';
+import { getSpecializationLabel } from '../utils/specializations';
 
 /** Client directory of trainers plus contract request / cancel actions. */
 export default function TrainersPage() {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab =
+    searchParams.get('tab') === 'gyms' || Boolean(searchParams.get('code') || searchParams.get('joinCode'))
+      ? 'gyms'
+      : 'trainers';
+
   const trainers = useContractTrainers(user?.role?.name === 'Client');
   const contracts = useMyContracts(user?.role?.name === 'Client');
   const create = useCreateContract();
@@ -42,6 +51,12 @@ export default function TrainersPage() {
   const canRequest =
     !entitlements?.isCoveredClient &&
     Boolean(trainerId) && (period !== 'CUSTOM' || Boolean(customEndDate)) && !create.isPending;
+
+  const handleTabChange = (tab: 'trainers' | 'gyms') => {
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next);
+  };
 
   const request = () => {
     if (!canRequest) {
@@ -65,14 +80,42 @@ export default function TrainersPage() {
     <SettingsPageShell>
       <Sidebar username={username} />
       <SettingsMain>
-        <TopBar title={t('nav.trainers')} />
+        <TopBar
+          title={t('nav.trainersAndGyms')}
+          actions={
+            <SegmentedTabs>
+              <TabBtn
+                type="button"
+                $active={activeTab === 'trainers'}
+                onClick={() => handleTabChange('trainers')}
+                data-testid="trainers-tab"
+              >
+                <UserRound size={15} />
+                <span>{t('nav.trainers')}</span>
+              </TabBtn>
+              <TabBtn
+                type="button"
+                $active={activeTab === 'gyms'}
+                onClick={() => handleTabChange('gyms')}
+                data-testid="gyms-tab"
+              >
+                <Building2 size={15} />
+                <span>{t('nav.gyms')}</span>
+              </TabBtn>
+            </SegmentedTabs>
+          }
+        />
         <SettingsContent>
-          <EntitlementGraceWarning />
-          <StyledCard>
-            <SectionTitle>
-              <Send size={18} color="#ffb3b1" />
-              {t('contracts.requestTitle')}
-            </SectionTitle>
+          {activeTab === 'gyms' ? (
+            <ClientGymsSection />
+          ) : (
+            <>
+              <EntitlementGraceWarning />
+              <StyledCard>
+                <SectionTitle>
+                  <Send size={18} color="#ffb3b1" />
+                  {t('contracts.requestTitle')}
+                </SectionTitle>
             {trainers.data?.length ? (
               <PendingList>
                 {trainers.data.map((trainer) => (
@@ -108,7 +151,7 @@ export default function TrainersPage() {
                       <TrainerPills>
                         <PriceTagBadge>${trainer.trainerProfile.monthlyPrice} USD/mo</PriceTagBadge>
                         {trainer.trainerProfile.specializations?.slice(0, 2).map((s) => (
-                          <MiniTag key={s}>{s}</MiniTag>
+                          <MiniTag key={s}>{getSpecializationLabel(s, t)}</MiniTag>
                         ))}
                       </TrainerPills>
                     ) : null}
@@ -233,11 +276,43 @@ export default function TrainersPage() {
               </EmptyState>
             )}
           </StyledCard>
+          </>
+          )}
         </SettingsContent>
       </SettingsMain>
     </SettingsPageShell>
   );
 }
+
+const SegmentedTabs = styled.div`
+  display: inline-flex;
+  align-items: center;
+  background: #141830;
+  border: 1px solid rgba(126, 136, 175, 0.2);
+  border-radius: 0.65rem;
+  padding: 0.25rem;
+  gap: 0.25rem;
+`;
+
+const TabBtn = styled.button<{ $active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: ${({ $active }) => ($active ? '#ef233c' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#ffffff' : '#7c84aa')};
+
+  &:hover {
+    color: #ffffff;
+    ${({ $active }) => !$active && 'background: rgba(126, 136, 175, 0.1);'}
+  }
+`;
 
 /** Formats a contract createdAt timestamp for the requested-on label. */
 function formatRequestDate(value: string, locale: string) {

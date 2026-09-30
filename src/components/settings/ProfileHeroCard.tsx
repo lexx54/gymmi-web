@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { CardSurface } from './SettingsShell';
 import { PublicProfileModal } from './PublicProfileModal';
 import { uploadImageDirectly } from '../../utils/imageUpload';
+import { getSpecializationLabel } from '../../utils/specializations';
 import { useUpdateUserProfile } from '../../hooks/useUserProfile';
 import type { FullUserProfile } from '../../types/auth';
 
@@ -210,7 +211,7 @@ export function ProfileHeroCard({ userProfile }: ProfileHeroCardProps) {
                   </HighlightTag>
                   {trainerSpecs.slice(0, 3).map((spec) => (
                     <Tag key={spec}>
-                      <TagIconLucide size={11} /> {spec}
+                      <TagIconLucide size={11} /> {getSpecializationLabel(spec, t)}
                     </Tag>
                   ))}
                 </>

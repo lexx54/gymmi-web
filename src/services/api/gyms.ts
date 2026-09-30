@@ -5,6 +5,7 @@ import type {
   GymCoach,
   GymDashboardData,
   PublicGymItem,
+  GymMembershipItem,
 } from '../../types/gym';
 import type { GymProfileParams } from '../../types/auth';
 
@@ -81,13 +82,58 @@ export async function joinGym(gymId: string): Promise<GymMember> {
   return data;
 }
 
+export async function requestGymMembership(gymId: string): Promise<GymMember> {
+  const { data } = await apiClient.post<GymMember>(`/gyms/${gymId}/request`);
+  return data;
+}
+
+export async function cancelGymMembershipRequest(gymId: string): Promise<{ success: boolean }> {
+  const { data } = await apiClient.delete<{ success: boolean }>(
+    `/gyms/me/memberships/requests/${gymId}`,
+  );
+  return data;
+}
+
+export async function joinGymByCode(code: string): Promise<{
+  success: boolean;
+  gymId: string;
+  status: string;
+  gym: { id: string; name: string; logoUrl?: string | null; city?: string | null };
+}> {
+  const { data } = await apiClient.post('/gyms/join-by-code', { code });
+  return data;
+}
+
 export async function leaveGym(gymId: string): Promise<{ message: string }> {
   const { data } = await apiClient.post<{ message: string }>(`/gyms/${gymId}/leave`);
   return data;
 }
 
-export async function fetchMyMemberships(): Promise<GymMember[]> {
-  const { data } = await apiClient.get<GymMember[]>('/gyms/me/memberships');
+export async function fetchMyMemberships(): Promise<GymMembershipItem[]> {
+  const { data } = await apiClient.get<GymMembershipItem[]>('/gyms/me/memberships');
+  return data;
+}
+
+export async function fetchMyPendingMembers(): Promise<GymMember[]> {
+  const { data } = await apiClient.get<GymMember[]>('/gyms/me/members/pending');
+  return data;
+}
+
+export async function approveGymMember(
+  memberId: string,
+): Promise<{ success: boolean; status: string }> {
+  const { data } = await apiClient.post<{ success: boolean; status: string }>(
+    `/gyms/me/members/${memberId}/approve`,
+  );
+  return data;
+}
+
+export async function rejectGymMember(
+  memberId: string,
+): Promise<{ success: boolean; status: string }> {
+  const { data } = await apiClient.post<{ success: boolean; status: string }>(
+    `/gyms/me/members/${memberId}/reject`,
+  );
   return data;
 }
 

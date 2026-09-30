@@ -150,6 +150,33 @@ describe('Gym Pages', () => {
         expect(approveSpy).toHaveBeenCalledWith('coach-rel-1');
       });
     });
+
+    it('renders coaches with top-level flat properties, bio, monthly rate, and fallbacks', async () => {
+      const mockCoaches: GymCoach[] = [
+        {
+          id: 'coach-flat-1',
+          gymId: 'g-1',
+          trainerId: 'trainer-flat',
+          status: 'PENDING',
+          canPublishRoutines: false,
+          affiliatedAt: new Date().toISOString(),
+          username: 'FlatCoachDave',
+          email: 'dave@example.com',
+          description: 'Specialist in functional hypertrophy',
+          monthlyPrice: 75,
+          specializations: ['HYPERTROPHY', 'STRENGTH'],
+        },
+      ];
+
+      vi.spyOn(gymsApi, 'fetchMyGymCoaches').mockResolvedValue(mockCoaches);
+
+      render(<GymCoachesPage />, { wrapper: createWrapper() });
+
+      expect(await screen.findByText('FlatCoachDave')).toBeInTheDocument();
+      expect(screen.getByText('dave@example.com')).toBeInTheDocument();
+      expect(screen.getByText('Specialist in functional hypertrophy')).toBeInTheDocument();
+      expect(screen.getByText('$75 / mo')).toBeInTheDocument();
+    });
   });
 
   describe('GymMembersPage', () => {
@@ -213,5 +240,121 @@ describe('Gym Pages', () => {
       expect(screen.getByText('AthleteJohn')).toBeInTheDocument();
       expect(screen.queryByText('AthleteLisa')).not.toBeInTheDocument();
     });
+
+    it('renders pending member requests and allows approving or rejecting them', async () => {
+      const mockMembers: GymMember[] = [];
+      const mockPending: GymMember[] = [
+        {
+          id: 'pending-1',
+          gymId: 'g-1',
+          clientId: 'client-pending-1',
+          status: 'PENDING',
+          joinedAt: new Date().toISOString(),
+          client: {
+            id: 'client-pending-1',
+            username: 'PendingPaul',
+            email: 'paul@example.com',
+          },
+        },
+      ];
+
+      vi.spyOn(gymsApi, 'fetchMyGymMembers').mockResolvedValue(mockMembers);
+      vi.spyOn(gymsApi, 'fetchMyPendingMembers').mockResolvedValue(mockPending);
+      vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+        gym: {
+          id: 'g-1',
+          userId: 'u-gym',
+          name: 'IronHQ',
+          tier: 'plus',
+          memberCapacity: 100,
+          trialEndsAt: '2026-12-31',
+          isActive: true,
+          joinCode: 'IRON1234',
+        },
+        activeMembersCount: 0,
+        capacity: 100,
+        coachesCount: 1,
+        routinesCount: 5,
+        trialDaysRemaining: 15,
+        isTrialActive: false,
+      });
+
+      const approveSpy = vi.spyOn(gymsApi, 'approveGymMember').mockResolvedValue({
+        success: true,
+        status: 'ACTIVE',
+      });
+      const rejectSpy = vi.spyOn(gymsApi, 'rejectGymMember').mockResolvedValue({
+        success: true,
+        status: 'REJECTED',
+      });
+
+      render(<GymMembersPage />, { wrapper: createWrapper() });
+
+      expect(await screen.findByTestId('pending-members-section')).toBeInTheDocument();
+      expect(screen.getByText('PendingPaul')).toBeInTheDocument();
+      expect(screen.getByText('paul@example.com')).toBeInTheDocument();
+
+      // Click Approve
+      const approveBtn = screen.getByTestId('approve-member-pending-1');
+      fireEvent.click(approveBtn);
+
+      await waitFor(() => {
+        expect(approveSpy).toHaveBeenCalledWith('pending-1');
+      });
+
+      // Click Reject
+      const rejectBtn = screen.getByTestId('reject-member-pending-1');
+      fireEvent.click(rejectBtn);
+
+      await waitFor(() => {
+        expect(rejectSpy).toHaveBeenCalledWith('pending-1');
+      });
+    });
+
+    it('opens facility QR and join code modal and copies join code', async () => {
+      vi.spyOn(gymsApi, 'fetchMyGymMembers').mockResolvedValue([]);
+      vi.spyOn(gymsApi, 'fetchMyPendingMembers').mockResolvedValue([]);
+      vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+        gym: {
+          id: 'g-1',
+          userId: 'u-gym',
+          name: 'IronHQ',
+          tier: 'plus',
+          memberCapacity: 100,
+          trialEndsAt: '2026-12-31',
+          isActive: true,
+          joinCode: 'IRON-JOIN-99',
+        },
+        activeMembersCount: 0,
+        capacity: 100,
+        coachesCount: 1,
+        routinesCount: 5,
+        trialDaysRemaining: 15,
+        isTrialActive: false,
+      });
+
+      const writeTextMock = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: writeTextMock,
+        },
+      });
+
+      render(<GymMembersPage />, { wrapper: createWrapper() });
+
+      const qrBtn = await screen.findByTestId('facility-qr-btn');
+      fireEvent.click(qrBtn);
+
+      expect(await screen.findByTestId('facility-qr-modal')).toBeInTheDocument();
+      expect(screen.getByText('IRON-JOIN-99')).toBeInTheDocument();
+
+      const copyBtn = screen.getByTestId('copy-join-code-btn');
+      fireEvent.click(copyBtn);
+
+      await waitFor(() => {
+        expect(writeTextMock).toHaveBeenCalledWith('IRON-JOIN-99');
+      });
+    });
   });
 });
+

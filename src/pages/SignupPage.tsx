@@ -35,6 +35,12 @@ import {
 } from '../schemas/auth';
 import type { SignupParams } from '../types/auth';
 import { uploadImageDirectly } from '../utils/imageUpload';
+import {
+  PRESET_SPECIALIZATIONS,
+  getSpecializationLabel,
+  isSameSpecialization,
+  type PresetSpecialization,
+} from '../utils/specializations';
 
 const LOCKOUT_DURATION = 180_000;
 
@@ -49,17 +55,6 @@ const PRESET_GOALS = [
   { key: 'gainStrength', labelKey: 'auth.goals.gainStrength' },
   { key: 'endurance', labelKey: 'auth.goals.endurance' },
   { key: 'generalFitness', labelKey: 'auth.goals.generalFitness' },
-];
-
-const PRESET_SPECIALIZATIONS = [
-  'Hypertrophy',
-  'Weight Loss',
-  'Powerlifting',
-  'HIIT & Cardio',
-  'Calisthenics',
-  'Rehab & Mobility',
-  'CrossFit',
-  'Nutrition Coaching',
 ];
 
 const PRESET_AMENITIES = [
@@ -89,9 +84,8 @@ export default function SignupPage() {
   const [displayWeight, setDisplayWeight] = useState<string>('');
   const [displayHeight, setDisplayHeight] = useState<string>('');
 
-  // Trainer custom tag and gym inputs
+  // Trainer custom tag input
   const [customTagInput, setCustomTagInput] = useState('');
-  const [gymInput, setGymInput] = useState('');
 
   const { mutate: signup, isPending: loading } = useSignup();
 
@@ -153,7 +147,6 @@ export default function SignupPage() {
   const currentLogoUrl = watch('logoUrl') || '';
   const currentCoverUrl = watch('gymCoverUrl') || '';
   const currentSpecializations = watch('specializations') || [];
-  const currentGyms = watch('gyms') || [];
   const currentAmenities = watch('gymAmenities') || [];
   const selectedGoal = watch('goal') || '';
   const selectedGender = watch('gender') || '';
@@ -335,43 +328,21 @@ export default function SignupPage() {
   };
 
   // Specialization tag handlers
-  const toggleSpecialization = (tag: string) => {
-    const exists = currentSpecializations.includes(tag);
+  const toggleSpecialization = (preset: PresetSpecialization) => {
+    const exists = currentSpecializations.some((s) => isSameSpecialization(s, preset));
     const updated = exists
-      ? currentSpecializations.filter((t) => t !== tag)
-      : [...currentSpecializations, tag];
+      ? currentSpecializations.filter((s) => !isSameSpecialization(s, preset))
+      : [...currentSpecializations, preset.defaultEn];
     setValue('specializations', updated, { shouldValidate: true });
   };
 
   const addCustomTag = () => {
     const trimmed = customTagInput.trim();
     if (!trimmed) return;
-    if (!currentSpecializations.includes(trimmed)) {
+    if (!currentSpecializations.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
       setValue('specializations', [...currentSpecializations, trimmed], { shouldValidate: true });
     }
     setCustomTagInput('');
-  };
-
-  // Gym affiliation handlers
-  const addGym = () => {
-    const trimmed = gymInput.trim();
-    if (!trimmed) return;
-    if (currentGyms.length >= 3) {
-      toast.error(t('auth.maxGymsReached'));
-      return;
-    }
-    if (!currentGyms.includes(trimmed)) {
-      setValue('gyms', [...currentGyms, trimmed], { shouldValidate: true });
-    }
-    setGymInput('');
-  };
-
-  const removeGym = (gymToRemove: string) => {
-    setValue(
-      'gyms',
-      currentGyms.filter((g) => g !== gymToRemove),
-      { shouldValidate: true },
-    );
   };
 
   // Lockout timer
@@ -476,7 +447,7 @@ export default function SignupPage() {
         }
         return;
       }
-      clearErrors(['description', 'monthlyPrice', 'specializations', 'gyms', 'logoUrl']);
+      clearErrors(['description', 'monthlyPrice', 'specializations', 'logoUrl']);
       setStep(4);
     } else {
       setStep(3);
@@ -520,7 +491,6 @@ export default function SignupPage() {
                     description: data.description || '',
                     monthlyPrice: Number(data.monthlyPrice) || 0,
                     specializations: data.specializations || [],
-                    gyms: data.gyms || [],
                     ...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
                   },
                 }
@@ -1281,21 +1251,48 @@ export default function SignupPage() {
                   <FieldGroup>
                     <Label>{t('auth.specializations')}</Label>
                     <ChipsWrap>
-                      {PRESET_SPECIALIZATIONS.map((tag) => {
-                        const isSelected = currentSpecializations.includes(tag);
+                      {PRESET_SPECIALIZATIONS.map((preset) => {
+                        const isSelected = currentSpecializations.some((s) =>
+                          isSameSpecialization(s, preset),
+                        );
                         return (
                           <ChipBtn
-                            key={tag}
+                            key={preset.key}
                             type="button"
                             $selected={isSelected}
-                            onClick={() => toggleSpecialization(tag)}
-                            data-testid={`tag-${tag}`}
+                            onClick={() => toggleSpecialization(preset)}
+                            data-testid={`tag-${preset.defaultEn}`}
                           >
-                            {tag}
+                            {t(preset.labelKey)}
                           </ChipBtn>
                         );
                       })}
                     </ChipsWrap>
+                    {currentSpecializations.some(
+                      (s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p)),
+                    ) && (
+                      <SelectedTagsWrap style={{ marginTop: '0.45rem' }}>
+                        {currentSpecializations
+                          .filter((s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p)))
+                          .map((customTag) => (
+                            <GymBadge key={customTag}>
+                              <span>{customTag}</span>
+                              <RemoveBtn
+                                type="button"
+                                onClick={() =>
+                                  setValue(
+                                    'specializations',
+                                    currentSpecializations.filter((s) => s !== customTag),
+                                    { shouldValidate: true },
+                                  )
+                                }
+                              >
+                                <X size={12} />
+                              </RemoveBtn>
+                            </GymBadge>
+                          ))}
+                      </SelectedTagsWrap>
+                    )}
 
                     {/* Add Custom Tag */}
                     <TagInputRow>
@@ -1317,47 +1314,6 @@ export default function SignupPage() {
                       </AddSmallBtn>
                     </TagInputRow>
                     {errors.specializations && <ErrorMsg>{errors.specializations.message}</ErrorMsg>}
-                  </FieldGroup>
-
-                  {/* Gym Affiliations (max 3, optional) */}
-                  <FieldGroup>
-                    <Label>
-                      {t('auth.gymAffiliations')} ({currentGyms.length}/3)
-                    </Label>
-                    {currentGyms.length > 0 && (
-                      <SelectedTagsWrap>
-                        {currentGyms.map((gym) => (
-                          <GymBadge key={gym}>
-                            <Building size={14} />
-                            <span>{gym}</span>
-                            <RemoveBtn type="button" onClick={() => removeGym(gym)}>
-                              <X size={12} />
-                            </RemoveBtn>
-                          </GymBadge>
-                        ))}
-                      </SelectedTagsWrap>
-                    )}
-
-                    {currentGyms.length < 3 && (
-                      <TagInputRow>
-                        <StyledInput
-                          type="text"
-                          placeholder={t('auth.gymPlaceholder')}
-                          value={gymInput}
-                          onChange={(e) => setGymInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              addGym();
-                            }
-                          }}
-                          data-testid="input-gym"
-                        />
-                        <AddSmallBtn type="button" onClick={addGym}>
-                          <Plus size={16} />
-                        </AddSmallBtn>
-                      </TagInputRow>
-                    )}
                   </FieldGroup>
 
                   {/* Nav Actions */}
@@ -1544,15 +1500,13 @@ export default function SignupPage() {
                         <SummaryValHighlight>${watch('monthlyPrice')} USD / mo</SummaryValHighlight>
                       </SummaryRow>
                       <SummaryRow>
-                        <SummaryLabel>Specializations:</SummaryLabel>
-                        <SummaryVal>{currentSpecializations.join(', ')}</SummaryVal>
+                        <SummaryLabel>{t('auth.specializations')}:</SummaryLabel>
+                        <SummaryVal>
+                          {currentSpecializations
+                            .map((s) => getSpecializationLabel(s, t))
+                            .join(', ')}
+                        </SummaryVal>
                       </SummaryRow>
-                      {currentGyms.length > 0 && (
-                        <SummaryRow>
-                          <SummaryLabel>Gyms:</SummaryLabel>
-                          <SummaryVal>{currentGyms.join(', ')}</SummaryVal>
-                        </SummaryRow>
-                      )}
                       <SummaryRow style={{ alignItems: 'flex-start' }}>
                         <SummaryLabel>Services:</SummaryLabel>
                         <SummaryVal style={{ whiteSpace: 'pre-wrap' }}>{watch('description')}</SummaryVal>

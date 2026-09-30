@@ -1,6 +1,7 @@
 import { X, Eye, Dumbbell, Building, Tag, ShieldCheck } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { getSpecializationLabel } from '../../utils/specializations';
 import type { FullUserProfile } from '../../types/auth';
 
 interface PublicProfileModalProps {
@@ -104,7 +105,7 @@ export function PublicProfileModal({ isOpen, onClose, userProfile }: PublicProfi
                 {specializations.map((spec) => (
                   <SpecChip key={spec}>
                     <Tag size={12} />
-                    <span>{spec}</span>
+                    <span>{getSpecializationLabel(spec, t)}</span>
                   </SpecChip>
                 ))}
               </ChipsList>

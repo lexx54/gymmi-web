@@ -49,6 +49,7 @@ function App() {
           <Route path="/clients/:clientId" element={<RoleRoute role="Trainer"><ClientsPage /></RoleRoute>} />
           <Route path="/classifications" element={<RoleRoute role="Trainer"><ClassificationsPage /></RoleRoute>} />
           <Route path="/trainers" element={<RoleRoute role="Client"><TrainersPage /></RoleRoute>} />
+          <Route path="/affiliations" element={<RoleRoute role="Client"><TrainersPage /></RoleRoute>} />
           <Route path="/gym/catalog" element={<RoleRoute role="Gym"><GymCatalogPage /></RoleRoute>} />
           <Route path="/gym/coaches" element={<RoleRoute role="Gym"><GymCoachesPage /></RoleRoute>} />
           <Route path="/gym/members" element={<RoleRoute role="Gym"><GymMembersPage /></RoleRoute>} />

@@ -61,7 +61,7 @@ export function Sidebar({ username }: SidebarProps) {
         { labelKey: 'nav.classifications', to: '/classifications', icon: Trophy },
       ]
     : isClient
-      ? [{ labelKey: 'nav.trainers', to: '/trainers', icon: Handshake }]
+      ? [{ labelKey: 'nav.trainersAndGyms', to: '/trainers', icon: Handshake }]
       : [];
 
   const handleSignOut = async () => {

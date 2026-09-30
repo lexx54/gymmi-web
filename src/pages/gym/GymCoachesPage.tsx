@@ -1,4 +1,4 @@
-import { Check, Dumbbell, Shield, Trash2, UserCheck, Users, X } from 'lucide-react';
+import { Check, Dumbbell, Shield, Trash2, UserCheck, UserRound, Users, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import styled from 'styled-components';
@@ -12,6 +12,7 @@ import {
   useUpdateCoachPermissions,
   useRemoveGymCoach,
 } from '../../hooks/useGyms';
+import { getSpecializationLabel } from '../../utils/specializations';
 import type { GymCoach } from '../../types/gym';
 
 export default function GymCoachesPage() {
@@ -103,48 +104,69 @@ export default function GymCoachesPage() {
             </SectionHeader>
 
             <Grid>
-              {pendingCoaches.map((coach) => (
-                <CoachCard key={coach.id} data-testid={`pending-coach-${coach.id}`}>
-                  <CardHeader>
-                    <Avatar $img={coach.trainer?.avatarUrl || coach.trainer?.trainerProfile?.logoUrl} />
-                    <div>
-                      <CoachName>{coach.trainer?.username}</CoachName>
-                      <CoachEmail>{coach.trainer?.email}</CoachEmail>
-                    </div>
-                  </CardHeader>
+              {pendingCoaches.map((coach) => {
+                const username = coach.trainer?.username || coach.username || 'Trainer';
+                const email = coach.trainer?.email || coach.email || '';
+                const avatarImg =
+                  coach.trainer?.avatarUrl ||
+                  coach.trainer?.trainerProfile?.logoUrl ||
+                  coach.avatarUrl ||
+                  coach.logoUrl;
+                const description = coach.trainer?.trainerProfile?.description || coach.description;
+                const specializations =
+                  coach.trainer?.trainerProfile?.specializations || coach.specializations || [];
+                const monthlyPrice = coach.trainer?.trainerProfile?.monthlyPrice ?? coach.monthlyPrice;
 
-                  {coach.trainer?.trainerProfile?.description && (
-                    <Bio>{coach.trainer.trainerProfile.description}</Bio>
-                  )}
+                return (
+                  <CoachCard key={coach.id} data-testid={`pending-coach-${coach.id}`}>
+                    <CardHeader>
+                      <Avatar $img={avatarImg}>
+                        {!avatarImg && <UserRound size={18} color="#7c84aa" />}
+                      </Avatar>
+                      <div>
+                        <CoachName>{username}</CoachName>
+                        {email && <CoachEmail>{email}</CoachEmail>}
+                      </div>
+                    </CardHeader>
 
-                  {coach.trainer?.trainerProfile?.specializations?.length ? (
-                    <ChipsRow>
-                      {coach.trainer.trainerProfile.specializations.map((spec) => (
-                        <SpecBadge key={spec}>{spec}</SpecBadge>
-                      ))}
-                    </ChipsRow>
-                  ) : null}
+                    {monthlyPrice !== undefined && monthlyPrice > 0 && (
+                      <RateRow>
+                        <span>Rate:</span>
+                        <strong>${monthlyPrice} / mo</strong>
+                      </RateRow>
+                    )}
 
-                  <ActionsRow>
-                    <ApproveBtn
-                      type="button"
-                      onClick={() => handleApprove(coach)}
-                      data-testid={`approve-coach-${coach.id}`}
-                    >
-                      <Check size={15} />
-                      <span>{t('gym.approve')}</span>
-                    </ApproveBtn>
-                    <RejectBtn
-                      type="button"
-                      onClick={() => handleReject(coach)}
-                      data-testid={`reject-coach-${coach.id}`}
-                    >
-                      <X size={15} />
-                      <span>{t('gym.reject')}</span>
-                    </RejectBtn>
-                  </ActionsRow>
-                </CoachCard>
-              ))}
+                    {description && <Bio>{description}</Bio>}
+
+                    {specializations.length > 0 ? (
+                      <ChipsRow>
+                        {specializations.map((spec) => (
+                          <SpecBadge key={spec}>{getSpecializationLabel(spec, t)}</SpecBadge>
+                        ))}
+                      </ChipsRow>
+                    ) : null}
+
+                    <ActionsRow>
+                      <ApproveBtn
+                        type="button"
+                        onClick={() => handleApprove(coach)}
+                        data-testid={`approve-coach-${coach.id}`}
+                      >
+                        <Check size={15} />
+                        <span>{t('gym.approve')}</span>
+                      </ApproveBtn>
+                      <RejectBtn
+                        type="button"
+                        onClick={() => handleReject(coach)}
+                        data-testid={`reject-coach-${coach.id}`}
+                      >
+                        <X size={15} />
+                        <span>{t('gym.reject')}</span>
+                      </RejectBtn>
+                    </ActionsRow>
+                  </CoachCard>
+                );
+              })}
             </Grid>
           </Section>
         )}
@@ -165,59 +187,77 @@ export default function GymCoachesPage() {
             </EmptyState>
           ) : (
             <Grid>
-              {approvedCoaches.map((coach) => (
-                <CoachCard key={coach.id} data-testid={`approved-coach-${coach.id}`}>
-                  <CardHeader>
-                    <Avatar $img={coach.trainer?.avatarUrl || coach.trainer?.trainerProfile?.logoUrl} />
-                    <div>
-                      <CoachName>{coach.trainer?.username}</CoachName>
-                      <CoachEmail>{coach.trainer?.email}</CoachEmail>
-                    </div>
-                  </CardHeader>
+              {approvedCoaches.map((coach) => {
+                const username = coach.trainer?.username || coach.username || 'Trainer';
+                const email = coach.trainer?.email || coach.email || '';
+                const avatarImg =
+                  coach.trainer?.avatarUrl ||
+                  coach.trainer?.trainerProfile?.logoUrl ||
+                  coach.avatarUrl ||
+                  coach.logoUrl;
+                const description = coach.trainer?.trainerProfile?.description || coach.description;
+                const specializations =
+                  coach.trainer?.trainerProfile?.specializations || coach.specializations || [];
+                const monthlyPrice = coach.trainer?.trainerProfile?.monthlyPrice ?? coach.monthlyPrice;
 
-                  {coach.trainer?.trainerProfile?.monthlyPrice !== undefined && (
-                    <RateRow>
-                      <span>Rate:</span>
-                      <strong>${coach.trainer.trainerProfile.monthlyPrice} / mo</strong>
-                    </RateRow>
-                  )}
+                return (
+                  <CoachCard key={coach.id} data-testid={`approved-coach-${coach.id}`}>
+                    <CardHeader>
+                      <Avatar $img={avatarImg}>
+                        {!avatarImg && <UserRound size={18} color="#7c84aa" />}
+                      </Avatar>
+                      <div>
+                        <CoachName>{username}</CoachName>
+                        {email && <CoachEmail>{email}</CoachEmail>}
+                      </div>
+                    </CardHeader>
 
-                  {coach.trainer?.trainerProfile?.specializations?.length ? (
-                    <ChipsRow>
-                      {coach.trainer.trainerProfile.specializations.map((spec) => (
-                        <SpecBadge key={spec}>{spec}</SpecBadge>
-                      ))}
-                    </ChipsRow>
-                  ) : null}
+                    {monthlyPrice !== undefined && monthlyPrice > 0 && (
+                      <RateRow>
+                        <span>Rate:</span>
+                        <strong>${monthlyPrice} / mo</strong>
+                      </RateRow>
+                    )}
 
-                  <PermissionsRow>
-                    <PermLabel>
-                      <Dumbbell size={14} />
-                      <span>{t('gym.canPublishRoutines')}</span>
-                    </PermLabel>
-                    <ToggleBtn
-                      type="button"
-                      $active={coach.canPublishRoutines}
-                      onClick={() => handleTogglePublish(coach)}
-                      data-testid={`toggle-publish-${coach.id}`}
-                      aria-pressed={coach.canPublishRoutines}
-                    >
-                      <ToggleThumb $active={coach.canPublishRoutines} />
-                    </ToggleBtn>
-                  </PermissionsRow>
+                    {description && <Bio>{description}</Bio>}
 
-                  <CardFooter>
-                    <RemoveBtn
-                      type="button"
-                      onClick={() => handleRemove(coach)}
-                      data-testid={`remove-coach-${coach.id}`}
-                    >
-                      <Trash2 size={14} />
-                      <span>{t('gym.removeCoach')}</span>
-                    </RemoveBtn>
-                  </CardFooter>
-                </CoachCard>
-              ))}
+                    {specializations.length > 0 ? (
+                      <ChipsRow>
+                        {specializations.map((spec) => (
+                          <SpecBadge key={spec}>{getSpecializationLabel(spec, t)}</SpecBadge>
+                        ))}
+                      </ChipsRow>
+                    ) : null}
+
+                    <PermissionsRow>
+                      <PermLabel>
+                        <Dumbbell size={14} />
+                        <span>{t('gym.canPublishRoutines')}</span>
+                      </PermLabel>
+                      <ToggleBtn
+                        type="button"
+                        $active={coach.canPublishRoutines}
+                        onClick={() => handleTogglePublish(coach)}
+                        data-testid={`toggle-publish-${coach.id}`}
+                        aria-pressed={coach.canPublishRoutines}
+                      >
+                        <ToggleThumb $active={coach.canPublishRoutines} />
+                      </ToggleBtn>
+                    </PermissionsRow>
+
+                    <CardFooter>
+                      <RemoveBtn
+                        type="button"
+                        onClick={() => handleRemove(coach)}
+                        data-testid={`remove-coach-${coach.id}`}
+                      >
+                        <Trash2 size={14} />
+                        <span>{t('gym.removeCoach')}</span>
+                      </RemoveBtn>
+                    </CardFooter>
+                  </CoachCard>
+                );
+              })}
             </Grid>
           )}
         </Section>
@@ -328,6 +368,9 @@ const Avatar = styled.div<{ $img?: string | null }>`
       : 'linear-gradient(180deg, #2c3357 0%, #1b203d 100%)'};
   border: 1px solid #303a63;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const CoachName = styled.h3`

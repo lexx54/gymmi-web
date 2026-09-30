@@ -6,23 +6,18 @@ import { toast } from 'sonner';
 import { CardSurface, SectionTitle } from './SettingsShell';
 import { useUpdateUserProfile } from '../../hooks/useUserProfile';
 import { uploadImageDirectly } from '../../utils/imageUpload';
+import {
+  PRESET_SPECIALIZATIONS,
+  getSpecializationLabel,
+  isSameSpecialization,
+  type PresetSpecialization,
+} from '../../utils/specializations';
 import type { FullUserProfile } from '../../types/auth';
 
 interface CoachingProfileCardProps {
   userProfile?: FullUserProfile | null;
   isLoading?: boolean;
 }
-
-const PRESET_SPECIALIZATIONS = [
-  'Hypertrophy',
-  'Weight Loss',
-  'Powerlifting',
-  'HIIT & Cardio',
-  'Calisthenics',
-  'Rehab & Mobility',
-  'CrossFit',
-  'Nutrition Coaching',
-];
 
 export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileCardProps) {
   const { t } = useTranslation();
@@ -34,14 +29,12 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
   const [description, setDescription] = useState('');
   const [monthlyPrice, setMonthlyPrice] = useState<number | ''>('');
   const [specializations, setSpecializations] = useState<string[]>([]);
-  const [gyms, setGyms] = useState<string[]>([]);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const logoFileRef = useRef<HTMLInputElement>(null);
 
-  // Inputs for adding tags / gyms
+  // Inputs for adding custom tags
   const [customTagInput, setCustomTagInput] = useState('');
-  const [gymInput, setGymInput] = useState('');
 
   // Sync state when profile loads
   useEffect(() => {
@@ -50,7 +43,6 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       setDescription(tp.description || '');
       setMonthlyPrice(tp.monthlyPrice ?? '');
       setSpecializations(tp.specializations || []);
-      setGyms(tp.gyms || []);
       setLogoUrl(tp.logoUrl ?? null);
     }
   }, [userProfile]);
@@ -71,36 +63,21 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
     }
   };
 
-  const toggleSpecialization = (tag: string) => {
-    const exists = specializations.includes(tag);
-    const updated = exists ? specializations.filter((t) => t !== tag) : [...specializations, tag];
+  const toggleSpecialization = (preset: PresetSpecialization) => {
+    const exists = specializations.some((s) => isSameSpecialization(s, preset));
+    const updated = exists
+      ? specializations.filter((s) => !isSameSpecialization(s, preset))
+      : [...specializations, preset.defaultEn];
     setSpecializations(updated);
   };
 
   const addCustomTag = () => {
     const trimmed = customTagInput.trim();
     if (!trimmed) return;
-    if (!specializations.includes(trimmed)) {
+    if (!specializations.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
       setSpecializations([...specializations, trimmed]);
     }
     setCustomTagInput('');
-  };
-
-  const addGym = () => {
-    const trimmed = gymInput.trim();
-    if (!trimmed) return;
-    if (gyms.length >= 3) {
-      toast.error(t('auth.maxGymsReached'));
-      return;
-    }
-    if (!gyms.includes(trimmed)) {
-      setGyms([...gyms, trimmed]);
-    }
-    setGymInput('');
-  };
-
-  const removeGym = (gymToRemove: string) => {
-    setGyms(gyms.filter((g) => g !== gymToRemove));
   };
 
   const handleCancel = () => {
@@ -110,11 +87,9 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       setDescription(tp.description || '');
       setMonthlyPrice(tp.monthlyPrice ?? '');
       setSpecializations(tp.specializations || []);
-      setGyms(tp.gyms || []);
       setLogoUrl(tp.logoUrl ?? null);
     }
     setCustomTagInput('');
-    setGymInput('');
   };
 
   const handleSave = () => {
@@ -136,7 +111,6 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
       description: description.trim(),
       monthlyPrice: priceNum,
       specializations,
-      gyms,
     };
     if (logoUrl) {
       trainerPayload.logoUrl = logoUrl;
@@ -211,7 +185,7 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
             {tp?.specializations && tp.specializations.length > 0 ? (
               <ChipsList>
                 {tp.specializations.map((tag) => (
-                  <TagChip key={tag}>{tag}</TagChip>
+                  <TagChip key={tag}>{getSpecializationLabel(tag, t)}</TagChip>
                 ))}
               </ChipsList>
             ) : (
@@ -305,21 +279,40 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
           <FieldGroup>
             <FieldLabel>{t('auth.specializations')}</FieldLabel>
             <ChipsWrap>
-              {PRESET_SPECIALIZATIONS.map((tag) => {
-                const isSelected = specializations.includes(tag);
+              {PRESET_SPECIALIZATIONS.map((preset) => {
+                const isSelected = specializations.some((s) => isSameSpecialization(s, preset));
                 return (
                   <ChipBtn
-                    key={tag}
+                    key={preset.key}
                     type="button"
                     $selected={isSelected}
-                    onClick={() => toggleSpecialization(tag)}
-                    data-testid={`edit-tag-${tag}`}
+                    onClick={() => toggleSpecialization(preset)}
+                    data-testid={`edit-tag-${preset.defaultEn}`}
                   >
-                    {tag}
+                    {t(preset.labelKey)}
                   </ChipBtn>
                 );
               })}
             </ChipsWrap>
+            {specializations.some((s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p))) && (
+              <ChipsList style={{ marginTop: '0.45rem' }}>
+                {specializations
+                  .filter((s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p)))
+                  .map((customTag) => (
+                    <GymChipEditable key={customTag}>
+                      <span>{customTag}</span>
+                      <RemoveBtn
+                        type="button"
+                        onClick={() =>
+                          setSpecializations(specializations.filter((s) => s !== customTag))
+                        }
+                      >
+                        <X size={12} />
+                      </RemoveBtn>
+                    </GymChipEditable>
+                  ))}
+              </ChipsList>
+            )}
             <TagInputRow>
               <StyledInput
                 type="text"
@@ -338,45 +331,6 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
                 <Plus size={16} />
               </AddSmallBtn>
             </TagInputRow>
-          </FieldGroup>
-
-          <FieldGroup>
-            <FieldLabel>
-              {t('auth.gymAffiliations')} ({gyms.length}/3)
-            </FieldLabel>
-            {gyms.length > 0 && (
-              <ChipsList>
-                {gyms.map((gym) => (
-                  <GymChipEditable key={gym}>
-                    <Building size={13} />
-                    <span>{gym}</span>
-                    <RemoveBtn type="button" onClick={() => removeGym(gym)}>
-                      <X size={12} />
-                    </RemoveBtn>
-                  </GymChipEditable>
-                ))}
-              </ChipsList>
-            )}
-            {gyms.length < 3 && (
-              <TagInputRow>
-                <StyledInput
-                  type="text"
-                  placeholder={t('auth.gymPlaceholder')}
-                  value={gymInput}
-                  onChange={(e) => setGymInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addGym();
-                    }
-                  }}
-                  data-testid="edit-input-gym"
-                />
-                <AddSmallBtn type="button" onClick={addGym}>
-                  <Plus size={16} />
-                </AddSmallBtn>
-              </TagInputRow>
-            )}
           </FieldGroup>
 
           <FieldGroup>
@@ -617,6 +571,7 @@ const FieldLabel = styled.span`
 `;
 
 const StyledInput = styled.input`
+  flex: 1;
   padding: 0.7rem 0.95rem;
   border-radius: 0.75rem;
   background: #0f1329;
@@ -752,3 +707,4 @@ const UploadSmallBtn = styled.button`
     }
   }
 `;
+

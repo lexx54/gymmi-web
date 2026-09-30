@@ -13,8 +13,14 @@ import {
   fetchPublicGyms,
   fetchPublicGym,
   joinGym,
+  requestGymMembership,
+  cancelGymMembershipRequest,
+  joinGymByCode,
   leaveGym,
   fetchMyMemberships,
+  fetchMyPendingMembers,
+  approveGymMember,
+  rejectGymMember,
   requestAffiliation,
   fetchMyAffiliations,
 } from '../services/api/gyms';
@@ -22,6 +28,7 @@ import type { GymProfileParams } from '../types/auth';
 
 export const myGymQueryKey = ['gyms', 'me'] as const;
 export const myGymMembersQueryKey = ['gyms', 'me', 'members'] as const;
+export const myPendingMembersQueryKey = ['gyms', 'me', 'members', 'pending'] as const;
 export const myGymCoachesQueryKey = ['gyms', 'me', 'coaches'] as const;
 export const publicGymsQueryKey = (params?: { search?: string; city?: string }) =>
   ['gyms', 'public', params] as const;
@@ -171,6 +178,68 @@ export function useMyMemberships(enabled = true) {
     queryKey: myMembershipsQueryKey,
     queryFn: fetchMyMemberships,
     enabled,
+  });
+}
+
+export function useRequestGymMembership() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (gymId: string) => requestGymMembership(gymId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: myMembershipsQueryKey });
+    },
+  });
+}
+
+export function useCancelGymMembershipRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (gymId: string) => cancelGymMembershipRequest(gymId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: myMembershipsQueryKey });
+    },
+  });
+}
+
+export function useJoinGymByCode() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (code: string) => joinGymByCode(code),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: myMembershipsQueryKey });
+    },
+  });
+}
+
+export function useMyPendingMembers(enabled = true) {
+  return useQuery({
+    queryKey: myPendingMembersQueryKey,
+    queryFn: fetchMyPendingMembers,
+    enabled,
+  });
+}
+
+export function useApproveGymMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (memberId: string) => approveGymMember(memberId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: myPendingMembersQueryKey });
+      void queryClient.invalidateQueries({ queryKey: myGymMembersQueryKey });
+      void queryClient.invalidateQueries({ queryKey: myGymQueryKey });
+    },
+  });
+}
+
+export function useRejectGymMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (memberId: string) => rejectGymMember(memberId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: myPendingMembersQueryKey });
+      void queryClient.invalidateQueries({ queryKey: myGymMembersQueryKey });
+      void queryClient.invalidateQueries({ queryKey: myGymQueryKey });
+    },
   });
 }
 

@@ -24,6 +24,18 @@ vi.mock('../hooks/useAuthApi', () => ({
   }),
 }));
 
+const mockDbGyms = [
+  { id: 'gym-1', name: 'Iron Paradise', city: 'Miami' },
+  { id: 'gym-2', name: 'Gold Gym', city: 'Venice' },
+];
+
+vi.mock('../hooks/useGyms', () => ({
+  usePublicGyms: () => ({
+    data: mockDbGyms,
+    isLoading: false,
+  }),
+}));
+
 vi.mock('sonner', () => ({
   toast: {
     success: (...args: unknown[]) => mockToastSuccess(...args),
@@ -210,7 +222,6 @@ describe('SignupPage Multi-Step Flow', () => {
     );
     await user.type(screen.getByTestId('input-monthlyPrice'), '140');
     await user.click(screen.getByTestId('tag-Hypertrophy'));
-    await user.type(screen.getByTestId('input-gym'), 'Metro Fitness{enter}');
 
     await user.click(screen.getByTestId('step3-next'));
 
@@ -222,7 +233,6 @@ describe('SignupPage Multi-Step Flow', () => {
     expect(screen.getByText('protrainer')).toBeInTheDocument();
     expect(screen.getByText('$140 USD / mo')).toBeInTheDocument();
     expect(screen.getByText('Hypertrophy')).toBeInTheDocument();
-    expect(screen.getByText('Metro Fitness')).toBeInTheDocument();
 
     // Submit
     await user.click(screen.getByTestId('confirm-signup-btn'));
@@ -244,7 +254,6 @@ describe('SignupPage Multi-Step Flow', () => {
             description: 'Certified strength and conditioning coach with 8 years of elite training experience.',
             monthlyPrice: 140,
             specializations: ['Hypertrophy'],
-            gyms: ['Metro Fitness'],
           },
         },
         expect.any(Object),
@@ -515,6 +524,74 @@ describe('SignupPage Multi-Step Flow', () => {
         trainerProfile: expect.objectContaining({
           logoUrl: 'https://cdn.example.com/logos/my-logo.png',
         }),
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it('does not render informal gym input fields during trainer signup (Step 3)', async () => {
+    mockMutate.mockImplementation((_vars, opts) => {
+      opts?.onSuccess?.();
+    });
+
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    // Step 1: Trainer role & valid credentials
+    await user.click(screen.getByTestId('role-trainer'));
+    await user.type(screen.getByTestId('input-email'), 'formalgymtrainer@test.com');
+    await user.type(screen.getByTestId('input-username'), 'formalgymtrainer');
+    await user.type(screen.getByTestId('input-password'), 'password123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'password123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    // Step 2: Physical Profile
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-age'), '29');
+    await user.click(screen.getByTestId('gender-female'));
+    await user.type(screen.getByTestId('input-height'), '170');
+    await user.type(screen.getByTestId('input-weight'), '65');
+    await user.click(screen.getByTestId('step2-next'));
+
+    // Step 3: Coaching Profile
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-3-trainer')).toBeInTheDocument();
+    });
+
+    // Verify informal gym inputs are NOT rendered
+    expect(screen.queryByTestId('select-db-gym')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('input-gym')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('add-gym-btn')).not.toBeInTheDocument();
+
+    // Complete Step 3
+    await user.type(
+      screen.getByTestId('input-description'),
+      'Dedicated certified strength coach offering gym and online programs.',
+    );
+    await user.type(screen.getByTestId('input-monthlyPrice'), '150');
+    await user.click(screen.getByTestId('tag-Weight Loss'));
+    await user.click(screen.getByTestId('step3-next'));
+
+    // Confirmation Step
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    // Submit
+    await user.click(screen.getByTestId('confirm-signup-btn'));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'formalgymtrainer@test.com',
+        username: 'formalgymtrainer',
+        role: 'Trainer',
+        trainerProfile: {
+          description: 'Dedicated certified strength coach offering gym and online programs.',
+          monthlyPrice: 150,
+          specializations: ['Weight Loss'],
+        },
       }),
       expect.any(Object),
     );
