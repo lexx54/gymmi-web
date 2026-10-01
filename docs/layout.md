@@ -56,3 +56,4 @@ Provides the persistent application shell, sidebar navigation, and standardized 
 - Removed redundant `LanguageSettingsCard` from `SettingsPage.tsx`.
 - Added unit test suite in `TopBar.test.tsx` (7 passing tests).
 - Verified full test suite (194 tests passing across 46 test files) and production bundle build.
+- Implemented route-based code-splitting in `App.tsx` using `React.lazy()` and `<Suspense>`, reducing initial monolithic bundle size from 1.12 MB down to 560 kB (307 kB -> 184 kB gzipped) and splitting all 21 pages into on-demand asynchronous chunks.

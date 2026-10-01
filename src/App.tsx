@@ -1,37 +1,55 @@
 import './App.css'
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { PrivateRoute } from './components/PrivateRoute'
 import { PublicRoute } from './components/PublicRoute'
 import { RoleRoute } from './components/RoleRoute'
 import { DashboardLayout } from './components/layout/DashboardLayout'
-import AnalyticsPage from './pages/AnalyticsPage'
-import ExerciseBuilderPage from './pages/ExerciseBuilderPage'
-import ExercisesPage from './pages/ExercisesPage'
-import LoginPage from './pages/LoginPage'
-import SettingsPage from './pages/SettingsPage'
-import SignupPage from './pages/SignupPage'
-import WorkoutLibraryPage from './pages/WorkoutLibraryPage'
-import WorkoutsPage from './pages/WorkoutsPage'
-import ClientsPage from './pages/ClientsPage'
-import TrainersPage from './pages/TrainersPage'
-import AdminPermissionsPage from './pages/admin/AdminPermissionsPage'
-import AdminUsersPage from './pages/admin/AdminUsersPage'
-import GymCatalogPage from './pages/gym/GymCatalogPage'
-import GymCoachesPage from './pages/gym/GymCoachesPage'
-import GymMembersPage from './pages/gym/GymMembersPage'
-import ClassificationsPage from './pages/classifications/ClassificationsPage'
-import ArticlesPage from './pages/ArticlesPage'
-import GymArticlesPage from './pages/gym/GymArticlesPage'
-import LandingPage from './pages/LandingPage'
-import BillingPage from './pages/BillingPage'
-import AdminPaymentsPage from './pages/admin/AdminPaymentsPage'
+
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const SignupPage = lazy(() => import('./pages/SignupPage'))
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
+const ExerciseBuilderPage = lazy(() => import('./pages/ExerciseBuilderPage'))
+const ExercisesPage = lazy(() => import('./pages/ExercisesPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const WorkoutLibraryPage = lazy(() => import('./pages/WorkoutLibraryPage'))
+const WorkoutsPage = lazy(() => import('./pages/WorkoutsPage'))
+const ClientsPage = lazy(() => import('./pages/ClientsPage'))
+const TrainersPage = lazy(() => import('./pages/TrainersPage'))
+const AdminPermissionsPage = lazy(() => import('./pages/admin/AdminPermissionsPage'))
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'))
+const AdminPaymentsPage = lazy(() => import('./pages/admin/AdminPaymentsPage'))
+const GymCatalogPage = lazy(() => import('./pages/gym/GymCatalogPage'))
+const GymCoachesPage = lazy(() => import('./pages/gym/GymCoachesPage'))
+const GymMembersPage = lazy(() => import('./pages/gym/GymMembersPage'))
+const GymArticlesPage = lazy(() => import('./pages/gym/GymArticlesPage'))
+const ClassificationsPage = lazy(() => import('./pages/classifications/ClassificationsPage'))
+const ArticlesPage = lazy(() => import('./pages/ArticlesPage'))
+const BillingPage = lazy(() => import('./pages/BillingPage'))
+
+const PageFallback = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+    <div
+      style={{
+        width: 32,
+        height: 32,
+        border: '3px solid rgba(255, 255, 255, 0.15)',
+        borderTopColor: '#f97316',
+        borderRadius: '50%',
+        animation: 'spin 0.8s linear infinite',
+      }}
+    />
+  </div>
+)
 
 function App() {
   return (
     <>
       <Toaster position="top-right" richColors />
-      <Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
@@ -66,6 +84,7 @@ function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </>
   )
 }
