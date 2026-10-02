@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createElement, type ReactNode } from 'react';
 import { ArticleEditorModal } from './ArticleEditorModal';
 import * as articlesApi from '../../services/api/articles';
+import * as imageUpload from '../../utils/imageUpload';
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -135,5 +136,85 @@ describe('ArticleEditorModal', () => {
       );
       expect(onClose).toHaveBeenCalled();
     });
+  });
+
+  it('renders drag and drop zone by default and shows image preview when image is uploaded', async () => {
+    const uploadSpy = vi
+      .spyOn(imageUpload, 'uploadImageDirectly')
+      .mockResolvedValue('https://cdn.example.com/portada.jpg');
+
+    render(
+      createElement(ArticleEditorModal, {
+        isOpen: true,
+        onClose: vi.fn(),
+      }),
+      { wrapper: createWrapper() },
+    );
+
+    // Dropzone should be visible by default, not a raw URL text input
+    expect(screen.getByTestId('article-cover-dropzone')).toBeInTheDocument();
+    expect(screen.queryByTestId('article-cover-preview')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('article-cover-url-fallback-input')).not.toBeInTheDocument();
+
+    // Trigger file drop
+    const dropzone = screen.getByTestId('article-cover-dropzone');
+    const file = new File(['dummy-image-bits'], 'portada.png', { type: 'image/png' });
+
+    fireEvent.drop(dropzone, {
+      dataTransfer: { files: [file] },
+    });
+
+    await waitFor(() => {
+      expect(uploadSpy).toHaveBeenCalledWith(file, 'article-cover');
+    });
+
+    // Preview should now appear
+    expect(await screen.findByTestId('article-cover-preview')).toBeInTheDocument();
+    const previewImg = screen.getByTestId('article-cover-img');
+    expect(previewImg).toHaveAttribute('src', 'https://cdn.example.com/portada.jpg');
+
+    // Removing the image clears the preview and returns to dropzone
+    const removeBtn = screen.getByTestId('remove-cover-image-btn');
+    fireEvent.click(removeBtn);
+
+    expect(screen.queryByTestId('article-cover-preview')).not.toBeInTheDocument();
+    expect(screen.getByTestId('article-cover-dropzone')).toBeInTheDocument();
+  });
+
+  it('renders image preview directly when editing an article with an existing cover image', () => {
+    render(
+      createElement(ArticleEditorModal, {
+        isOpen: true,
+        onClose: vi.fn(),
+        articleToEdit: {
+          id: 'art-edit',
+          title: 'Existing Article',
+          content: 'Some long content for testing...',
+          excerpt: 'Short excerpt',
+          coverImageUrl: 'https://cdn.example.com/existing-cover.jpg',
+          category: 'TECHNIQUE',
+          readTimeMinutes: 4,
+          status: 'PUBLISHED',
+          publishedAt: '2026-03-01T00:00:00Z',
+          createdAt: '2026-03-01T00:00:00Z',
+          updatedAt: '2026-03-01T00:00:00Z',
+          authorRole: 'TRAINER',
+          authorId: 'trainer-1',
+          author: { id: 'trainer-1', username: 'coach_mike', avatarUrl: null },
+          gym: null,
+          trainer: null,
+          likesCount: 2,
+          commentsCount: 1,
+          isLikedByMe: false,
+          isBookmarkedByMe: false,
+        },
+      }),
+      { wrapper: createWrapper() },
+    );
+
+    expect(screen.getByTestId('article-cover-preview')).toBeInTheDocument();
+    const previewImg = screen.getByTestId('article-cover-img');
+    expect(previewImg).toHaveAttribute('src', 'https://cdn.example.com/existing-cover.jpg');
+    expect(screen.queryByTestId('article-cover-dropzone')).not.toBeInTheDocument();
   });
 });

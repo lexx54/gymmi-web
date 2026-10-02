@@ -71,6 +71,11 @@ Web console interface for Gym facilities to manage their curated workout catalog
   - Added robust property resolution in `GymCoachesPage.tsx` supporting nested and flat fields.
   - Added fallback `UserRound` icon inside `<Avatar>` when no trainer avatar/logo image is present.
   - Rendered rate (`${monthlyPrice} / mo`), bio, and specialization chips for both pending and approved coaches.
-  - Added test coverage for flat and nested coach payloads in `GymPages.test.tsx`.
+- Fixed empty client cards in `GymMembersPage.tsx`:
+  - Enriched `GymMember` type with top-level fallback properties (`username`, `email`, `avatarUrl`, `goal`) and nested `client.profile` / `client.userProfile`.
+  - Added robust property resolution in `GymMembersPage.tsx` supporting nested and flat client fields for both pending request cards and active roster cards.
+  - Added fallback `UserRound` icon inside `<Avatar>` when no client avatar image is present, with centered flexbox layout.
+  - Updated search filtering and member removal action to check both nested and top-level fields seamlessly.
+  - Added test coverage for flat and nested member payloads in `GymPages.test.tsx` (all 7 tests passing).
 
 

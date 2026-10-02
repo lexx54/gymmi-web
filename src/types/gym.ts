@@ -25,6 +25,10 @@ export interface GymMember {
   id: string;
   gymId: string;
   clientId: string;
+  username?: string;
+  email?: string;
+  avatarUrl?: string | null;
+  goal?: string | null;
   status: 'ACTIVE' | 'PENDING' | 'REJECTED' | 'CANCELLED';
   joinedAt: string;
   client?: {
@@ -32,6 +36,14 @@ export interface GymMember {
     username: string;
     email: string;
     avatarUrl?: string | null;
+    profile?: {
+      id?: string;
+      age?: number;
+      gender?: string;
+      height?: number;
+      weight?: number;
+      goal?: string;
+    } | null;
     userProfile?: {
       id?: string;
       age?: number;

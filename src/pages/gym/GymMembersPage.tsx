@@ -49,8 +49,8 @@ export default function GymMembersPage() {
     const needle = search.trim().toLowerCase();
     if (!needle) return activeMembers;
     return activeMembers.filter((m) => {
-      const username = m.client?.username?.toLowerCase() ?? '';
-      const email = m.client?.email?.toLowerCase() ?? '';
+      const username = (m.client?.username || m.username || '').toLowerCase();
+      const email = (m.client?.email || m.email || '').toLowerCase();
       return username.includes(needle) || email.includes(needle);
     });
   }, [activeMembers, search]);
@@ -90,7 +90,7 @@ export default function GymMembersPage() {
   };
 
   const handleRemove = async (member: GymMember) => {
-    const memberName = member.client?.username ?? 'Member';
+    const memberName = member.client?.username || member.username || 'Member';
     if (!window.confirm(`Are you sure you want to remove ${memberName} from this gym?`)) return;
     try {
       await removeMemberMutation.mutateAsync(member.id);
@@ -144,44 +144,56 @@ export default function GymMembersPage() {
             </SectionHeader>
 
             <Grid>
-              {pendingMembers.map((member) => (
-                <PendingCard key={member.id} data-testid={`pending-member-${member.id}`}>
-                  <MemberHeader>
-                    <Avatar $img={member.client?.avatarUrl}>
-                      {!member.client?.avatarUrl && <UserRound size={18} color="#7c84aa" />}
-                    </Avatar>
-                    <MemberInfo>
-                      <MemberName>{member.client?.username || 'Client'}</MemberName>
-                      <MemberEmail>{member.client?.email}</MemberEmail>
-                    </MemberInfo>
-                  </MemberHeader>
+              {pendingMembers.map((member) => {
+                const username = member.client?.username || member.username || 'Client';
+                const email = member.client?.email || member.email || '';
+                const avatarImg = member.client?.avatarUrl || member.avatarUrl;
+                const goal =
+                  member.client?.userProfile?.goal ||
+                  member.client?.profile?.goal ||
+                  member.goal;
 
-                  <CardBottom>
-                    <JoinedDate>
-                      <Calendar size={13} />
-                      <span>{new Date(member.joinedAt).toLocaleDateString()}</span>
-                    </JoinedDate>
-                    <ActionsRow>
-                      <ApproveBtn
-                        type="button"
-                        onClick={() => handleApprove(member)}
-                        data-testid={`approve-member-${member.id}`}
-                      >
-                        <Check size={14} />
-                        <span>{t('gym.approve')}</span>
-                      </ApproveBtn>
-                      <RejectBtn
-                        type="button"
-                        onClick={() => handleReject(member)}
-                        data-testid={`reject-member-${member.id}`}
-                      >
-                        <X size={14} />
-                        <span>{t('gym.reject')}</span>
-                      </RejectBtn>
-                    </ActionsRow>
-                  </CardBottom>
-                </PendingCard>
-              ))}
+                return (
+                  <PendingCard key={member.id} data-testid={`pending-member-${member.id}`}>
+                    <MemberHeader>
+                      <Avatar $img={avatarImg}>
+                        {!avatarImg && <UserRound size={18} color="#7c84aa" />}
+                      </Avatar>
+                      <MemberInfo>
+                        <MemberName>{username}</MemberName>
+                        {email && <MemberEmail>{email}</MemberEmail>}
+                      </MemberInfo>
+                    </MemberHeader>
+
+                    {goal && <GoalBadge>{goal}</GoalBadge>}
+
+                    <CardBottom>
+                      <JoinedDate>
+                        <Calendar size={13} />
+                        <span>{new Date(member.joinedAt).toLocaleDateString()}</span>
+                      </JoinedDate>
+                      <ActionsRow>
+                        <ApproveBtn
+                          type="button"
+                          onClick={() => handleApprove(member)}
+                          data-testid={`approve-member-${member.id}`}
+                        >
+                          <Check size={14} />
+                          <span>{t('gym.approve')}</span>
+                        </ApproveBtn>
+                        <RejectBtn
+                          type="button"
+                          onClick={() => handleReject(member)}
+                          data-testid={`reject-member-${member.id}`}
+                        >
+                          <X size={14} />
+                          <span>{t('gym.reject')}</span>
+                        </RejectBtn>
+                      </ActionsRow>
+                    </CardBottom>
+                  </PendingCard>
+                );
+              })}
             </Grid>
           </PendingSection>
         )}
@@ -211,39 +223,49 @@ export default function GymMembersPage() {
         )}
 
         <Grid>
-          {filteredMembers.map((member) => (
-            <MemberCard key={member.id} data-testid={`member-card-${member.id}`}>
-              <MemberHeader>
-                <Avatar $img={member.client?.avatarUrl} />
-                <MemberInfo>
-                  <MemberName>{member.client?.username}</MemberName>
-                  <MemberEmail>{member.client?.email}</MemberEmail>
-                </MemberInfo>
-              </MemberHeader>
+          {filteredMembers.map((member) => {
+            const username = member.client?.username || member.username || 'Member';
+            const email = member.client?.email || member.email || '';
+            const avatarImg = member.client?.avatarUrl || member.avatarUrl;
+            const goal =
+              member.client?.userProfile?.goal ||
+              member.client?.profile?.goal ||
+              member.goal;
 
-              {member.client?.userProfile?.goal && (
-                <GoalBadge>{member.client.userProfile.goal}</GoalBadge>
-              )}
+            return (
+              <MemberCard key={member.id} data-testid={`member-card-${member.id}`}>
+                <MemberHeader>
+                  <Avatar $img={avatarImg}>
+                    {!avatarImg && <UserRound size={18} color="#7c84aa" />}
+                  </Avatar>
+                  <MemberInfo>
+                    <MemberName>{username}</MemberName>
+                    {email && <MemberEmail>{email}</MemberEmail>}
+                  </MemberInfo>
+                </MemberHeader>
 
-              <CardBottom>
-                <JoinedDate>
-                  <Calendar size={13} />
-                  <span>
-                    Joined {new Date(member.joinedAt).toLocaleDateString()}
-                  </span>
-                </JoinedDate>
-                <RemoveBtn
-                  type="button"
-                  onClick={() => handleRemove(member)}
-                  title={t('gym.removeMember')}
-                  data-testid={`remove-member-${member.id}`}
-                >
-                  <Trash2 size={14} />
-                  <span>{t('gym.removeMember')}</span>
-                </RemoveBtn>
-              </CardBottom>
-            </MemberCard>
-          ))}
+                {goal && <GoalBadge>{goal}</GoalBadge>}
+
+                <CardBottom>
+                  <JoinedDate>
+                    <Calendar size={13} />
+                    <span>
+                      Joined {new Date(member.joinedAt).toLocaleDateString()}
+                    </span>
+                  </JoinedDate>
+                  <RemoveBtn
+                    type="button"
+                    onClick={() => handleRemove(member)}
+                    title={t('gym.removeMember')}
+                    data-testid={`remove-member-${member.id}`}
+                  >
+                    <Trash2 size={14} />
+                    <span>{t('gym.removeMember')}</span>
+                  </RemoveBtn>
+                </CardBottom>
+              </MemberCard>
+            );
+          })}
         </Grid>
 
         {/* FACILITY QR & JOIN CODE MODAL */}
@@ -437,6 +459,9 @@ const Avatar = styled.div<{ $img?: string | null }>`
       : 'linear-gradient(180deg, #2c3357 0%, #1b203d 100%)'};
   border: 1px solid #303a63;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MemberInfo = styled.div`

@@ -355,6 +355,56 @@ describe('Gym Pages', () => {
         expect(writeTextMock).toHaveBeenCalledWith('IRON-JOIN-99');
       });
     });
+
+    it('renders members with flat properties, goal badge, and fallback avatar', async () => {
+      const mockFlatMembers: GymMember[] = [
+        {
+          id: 'member-flat-1',
+          gymId: 'g-1',
+          clientId: 'client-flat-1',
+          status: 'ACTIVE',
+          joinedAt: new Date().toISOString(),
+          username: 'FlatAthleteBob',
+          email: 'bob@example.com',
+          goal: 'Build Muscle',
+        },
+      ];
+
+      vi.spyOn(gymsApi, 'fetchMyGymMembers').mockResolvedValue(mockFlatMembers);
+      vi.spyOn(gymsApi, 'fetchMyPendingMembers').mockResolvedValue([]);
+      vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+        gym: {
+          id: 'g-1',
+          userId: 'u-gym',
+          name: 'IronHQ',
+          tier: 'plus',
+          memberCapacity: 100,
+          trialEndsAt: '2026-12-31',
+          isActive: true,
+        },
+        activeMembersCount: 1,
+        capacity: 100,
+        coachesCount: 1,
+        routinesCount: 5,
+        trialDaysRemaining: 15,
+        isTrialActive: false,
+      });
+
+      render(<GymMembersPage />, { wrapper: createWrapper() });
+
+      expect(await screen.findByText('FlatAthleteBob')).toBeInTheDocument();
+      expect(screen.getByText('bob@example.com')).toBeInTheDocument();
+      expect(screen.getByText('Build Muscle')).toBeInTheDocument();
+      expect(screen.getByText(/Joined/i)).toBeInTheDocument();
+
+      // Test search filter on flat properties
+      const searchInput = screen.getByRole('textbox');
+      fireEvent.change(searchInput, { target: { value: 'bob' } });
+      expect(screen.getByText('FlatAthleteBob')).toBeInTheDocument();
+
+      fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
+      expect(screen.queryByText('FlatAthleteBob')).not.toBeInTheDocument();
+    });
   });
 });
 
