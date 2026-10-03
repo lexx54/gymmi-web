@@ -98,6 +98,9 @@
     "lockout": "Demasiados intentos. Inténtalo de nuevo en {{time}}",
     "invalidCredentials": "Correo/contraseña inválidos",
     "loginFailed": "No se pudo iniciar sesión. Revisa tus credenciales.",
+    "userNotFound": "No se encontró ninguna cuenta con este correo o usuario.",
+    "incorrectPassword": "Contraseña incorrecta. Por favor verifícala e inténtalo de nuevo.",
+    "accountInactive": "Tu cuenta está desactivada. Por favor contacta al soporte.",
     "accountCreated": "Cuenta creada correctamente.",
     "signupFailed": "No se pudo crear la cuenta. Inténtalo de nuevo.",
     "signupUnavailable": "El registro no está disponible temporalmente. Inténtalo más tarde.",
@@ -137,6 +140,7 @@
     "age": "Edad",
     "agePlaceholder": "ej. 25",
     "gender": "Género",
+    "selectGender": "Selecciona tu género",
     "genderMale": "Masculino",
     "genderFemale": "Femenino",
     "genderOther": "Otro",
@@ -144,13 +148,15 @@
     "height": "Estatura",
     "weight": "Peso",
     "fitnessGoal": "Meta Principal",
+    "selectGoal": "Selecciona tu meta",
     "customGoalPlaceholder": "O describe tu meta personalizada...",
     "goals": {
       "buildMuscle": "Ganar Músculo",
       "loseFat": "Perder Grasa",
       "gainStrength": "Aumentar Fuerza",
       "endurance": "Resistencia",
-      "generalFitness": "Salud y Estado Físico"
+      "generalFitness": "Salud y Estado Físico",
+      "custom": "Otro (Personalizado)"
     },
     "servicesDescription": "Sobre tus Servicios",
     "servicesPlaceholder": "Describe tu metodología de entrenamiento, experiencia y qué pueden esperar los clientes...",
@@ -226,7 +232,7 @@
     "removeLogo": "Eliminar logotipo",
     "photoUploadError": "No se pudo subir la imagen. Inténtalo de nuevo.",
     "photoSizeError": "La imagen debe pesar menos de 3MB.",
-    "photoTypeError": "Por favor sube una imagen válida (JPEG, PNG o WebP).",
+    "photoTypeError": "Por favor sube una imagen válida (JPEG, PNG, WebP o HEIF/HEIC).",
     "uploading": "Subiendo...",
     "optional": "Opcional",
     "avatarPreviewAlt": "Vista previa de la foto de perfil",
@@ -1250,6 +1256,89 @@
     "validUntilDetail": "Válido hasta {{date}}",
     "manageBilling": "Gestionar Suscripción y Facturación",
     "upgradePrompt": "Pásate a Gymmi Plus para desbloquear rutinas ilimitadas, ejercicios personalizados y analíticas avanzadas de progreso."
+  },
+  "tour": {
+    "stepCounter": "Paso {{current}} de {{total}}",
+    "skip": "Saltar tour",
+    "finish": "Comenzar",
+    "restartTour": "Reiniciar Tour",
+    "restartTourDescription": "Vuelve a ver el recorrido interactivo según tu rol de usuario.",
+    "client": {
+      "workouts": {
+        "title": "Entrenamientos y Rutina Activa",
+        "description": "Accede a tus rutinas de entrenamiento, registra series activas en tiempo real con temporizador de descanso y progreso de peso."
+      },
+      "exercises": {
+        "title": "Catálogo de Ejercicios y Anatomía",
+        "description": "Explora más de 100 ejercicios con mapa anatómico muscular e instrucciones guiadas multi-ángulo."
+      },
+      "community": {
+        "title": "Comunidad y Entrenadores",
+        "description": "Descubre entrenadores certificados, únete a gimnasios locales con códigos QR y compite en las tablas de clasificación."
+      },
+      "analytics": {
+        "title": "Métricas y Rendimiento",
+        "description": "Monitorea tu volumen semanal acumulado, consistencia diaria y nuevos récords personales (PRs)."
+      }
+    },
+    "trainer": {
+      "clients": {
+        "title": "Gestión de Clientes",
+        "description": "Visualiza tus atletas contratados, gestiona solicitudes de entrenamiento entrantes y monitorea el cumplimiento de tus alumnos."
+      },
+      "workouts": {
+        "title": "Creador y Asignación de Rutinas",
+        "description": "Diseña planes personalizados por semanas y días de entrenamiento y asígnalos directamente a tus clientes."
+      },
+      "exercises": {
+        "title": "Ejercicios Personalizados",
+        "description": "Crea variantes de ejercicios exclusivos para tus clientes con grupos musculares específicos y notas técnicas."
+      },
+      "classifications": {
+        "title": "Clasificaciones y Estándares",
+        "description": "Supervisa el progreso de fuerza de tus atletas clasificados bajo los estándares de 5 niveles."
+      }
+    },
+    "gym": {
+      "dashboard": {
+        "title": "Panel de Instalación",
+        "description": "Controla la capacidad en tiempo real de tu gimnasio, estado de membresía o prueba y acciones rápidas de rutinas."
+      },
+      "members": {
+        "title": "Directorio de Miembros",
+        "description": "Gestiona tu lista de socios activos, genera códigos QR de ingreso instantáneo y enlaces de invitación."
+      },
+      "coaches": {
+        "title": "Entrenadores Afiliados",
+        "description": "Supervisa el equipo de entrenadores aprobados en tu instalación y revisa solicitudes de vinculación pendientes."
+      },
+      "catalog": {
+        "title": "Catálogo de Rutinas del Gimnasio",
+        "description": "Publica plantillas de entrenamiento oficiales exclusivas para los socios de tu instalación."
+      },
+      "articles": {
+        "title": "Artículos y Noticias",
+        "description": "Comparte publicaciones educativas, consejos de nutrición y anuncios comunitarios con tus miembros."
+      }
+    },
+    "admin": {
+      "dashboard": {
+        "title": "Panel de Control de la Plataforma",
+        "description": "Supervisa el estado global de Gymmi y las métricas clave de salud de la plataforma."
+      },
+      "permissions": {
+        "title": "Permisos y Roles (RBAC)",
+        "description": "Configura la matriz de permisos por recurso y las capacidades de cada rol del sistema."
+      },
+      "users": {
+        "title": "Directorio de Usuarios",
+        "description": "Administra cuentas de usuario, asignación de planes Plus y estados de activación."
+      },
+      "payments": {
+        "title": "Pagos y Facturación",
+        "description": "Audita registros de transacciones, ingresos de suscripciones y facturación global."
+      }
+    }
   }
 }
 

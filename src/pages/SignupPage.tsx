@@ -150,6 +150,7 @@ export default function SignupPage() {
   const currentAmenities = watch('gymAmenities') || [];
   const selectedGoal = watch('goal') || '';
   const selectedGender = watch('gender') || '';
+  const [isCustomGoal, setIsCustomGoal] = useState(false);
 
   const processCoverFile = async (file: File) => {
     setUploadingCover(true);
@@ -867,19 +868,25 @@ export default function SignupPage() {
 
                     <FieldGroup>
                       <Label>{t('auth.gender')}</Label>
-                      <GenderGrid>
-                        {['male', 'female', 'other'].map((g) => (
-                          <GenderBtn
-                            key={g}
-                            type="button"
-                            $selected={selectedGender === g}
-                            onClick={() => setValue('gender', g, { shouldValidate: true })}
-                            data-testid={`gender-${g}`}
-                          >
-                            {t(`auth.gender${g.charAt(0).toUpperCase() + g.slice(1)}`)}
-                          </GenderBtn>
-                        ))}
-                      </GenderGrid>
+                      <StyledSelect
+                        {...register('gender')}
+                        $hasError={Boolean(errors.gender)}
+                        data-testid="select-gender"
+                      >
+                        <option value="">{t('auth.selectGender')}</option>
+                        <option value="male" data-testid="gender-male">
+                          {t('auth.genderMale')}
+                        </option>
+                        <option value="female" data-testid="gender-female">
+                          {t('auth.genderFemale')}
+                        </option>
+                        <option value="other" data-testid="gender-other">
+                          {t('auth.genderOther')}
+                        </option>
+                        <option value="preferNot" data-testid="gender-preferNot">
+                          {t('auth.genderPreferNot')}
+                        </option>
+                      </StyledSelect>
                       {errors.gender && <ErrorMsg>{errors.gender.message}</ErrorMsg>}
                     </FieldGroup>
                   </TwoColRow>
@@ -951,37 +958,53 @@ export default function SignupPage() {
                     </FieldGroup>
                   </TwoColRow>
 
-                  {/* Fitness Goal Chips (Athletes Only) */}
+                  {/* Fitness Goal Dropdown (Athletes Only) */}
                   {!isTrainer && (
                     <FieldGroup>
                       <Label>{t('auth.fitnessGoal')}</Label>
-                      <ChipsWrap>
-                        {PRESET_GOALS.map((g) => {
-                          const label = t(g.labelKey);
-                          const isSelected = selectedGoal === label;
-                          return (
-                            <ChipBtn
-                              key={g.key}
-                              type="button"
-                              $selected={isSelected}
-                              onClick={() => setValue('goal', label, { shouldValidate: true })}
-                              data-testid={`goal-${g.key}`}
-                            >
-                              {label}
-                            </ChipBtn>
-                          );
-                        })}
-                      </ChipsWrap>
+                      <StyledSelect
+                        data-testid="select-goal"
+                        value={
+                          isCustomGoal || (selectedGoal && !PRESET_GOALS.some(g => t(g.labelKey) === selectedGoal))
+                            ? '__custom__'
+                            : selectedGoal
+                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '__custom__') {
+                            setIsCustomGoal(true);
+                            if (PRESET_GOALS.some(g => t(g.labelKey) === selectedGoal)) {
+                              setValue('goal', '', { shouldValidate: true });
+                            }
+                          } else {
+                            setIsCustomGoal(false);
+                            setValue('goal', val, { shouldValidate: true });
+                            clearErrors('goal');
+                          }
+                        }}
+                        $hasError={Boolean(errors.goal)}
+                      >
+                        <option value="">{t('auth.selectGoal')}</option>
+                        {PRESET_GOALS.map((g) => (
+                          <option key={g.key} value={t(g.labelKey)} data-testid={`goal-${g.key}`}>
+                            {t(g.labelKey)}
+                          </option>
+                        ))}
+                        <option value="__custom__" data-testid="goal-custom">
+                          {t('auth.goals.custom')}
+                        </option>
+                      </StyledSelect>
 
-                      {/* Custom goal input */}
-                      <StyledInput
-                        type="text"
-                        placeholder={t('auth.customGoalPlaceholder')}
-                        value={selectedGoal}
-                        onChange={(e) => setValue('goal', e.target.value, { shouldValidate: true })}
-                        style={{ marginTop: '0.65rem' }}
-                        data-testid="input-custom-goal"
-                      />
+                      {(isCustomGoal || (selectedGoal && !PRESET_GOALS.some(g => t(g.labelKey) === selectedGoal))) && (
+                        <StyledInput
+                          type="text"
+                          placeholder={t('auth.customGoalPlaceholder')}
+                          value={selectedGoal}
+                          onChange={(e) => setValue('goal', e.target.value, { shouldValidate: true })}
+                          style={{ marginTop: '0.65rem' }}
+                          data-testid="input-custom-goal"
+                        />
+                      )}
                       {errors.goal && <ErrorMsg>{errors.goal.message}</ErrorMsg>}
                     </FieldGroup>
                   )}
@@ -1787,6 +1810,29 @@ const StyledTextarea = styled.textarea<{ $hasError?: boolean }>`
 
   &::placeholder {
     color: #697092;
+  }
+`;
+
+const StyledSelect = styled.select<{ $hasError?: boolean }>`
+  width: 100%;
+  padding: 0.82rem 1.15rem;
+  border-radius: 9999px;
+  background-color: #0f1329;
+  border: 1px solid ${({ $hasError }) => ($hasError ? '#ef233c' : 'rgba(124, 132, 170, 0.22)')};
+  color: #ffffff;
+  font-size: 0.88rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  cursor: pointer;
+
+  &:focus {
+    border-color: #ef233c;
+  }
+
+  option {
+    background-color: #0f1329;
+    color: #ffffff;
   }
 `;
 

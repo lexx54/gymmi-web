@@ -12,6 +12,33 @@ import { createLoginSchema, type LoginFormValues } from '../schemas/auth';
 
 const LOCKOUT_DURATION = 180_000;
 
+export const resolveLoginErrorMessage = (
+  rawMessage: string | undefined,
+  t: (key: string, options?: any) => string,
+): string => {
+  if (!rawMessage) return t('auth.loginFailed');
+  const normalized = rawMessage.toLowerCase();
+  if (
+    normalized.includes('no account found') ||
+    normalized.includes('no se encontró ninguna cuenta')
+  ) {
+    return t('auth.userNotFound');
+  }
+  if (
+    normalized.includes('incorrect password') ||
+    normalized.includes('contraseña incorrecta')
+  ) {
+    return t('auth.incorrectPassword');
+  }
+  if (
+    normalized.includes('deactivated') ||
+    normalized.includes('desactivada')
+  ) {
+    return t('auth.accountInactive');
+  }
+  return rawMessage;
+};
+
 const errorTextStyle = { color: '#d90429', fontSize: '0.75rem', marginTop: '0.375rem' } as const;
 
 export default function LoginPage() {
@@ -71,11 +98,10 @@ export default function LoginPage() {
             setLockedUntil(Date.now() + LOCKOUT_DURATION);
             return;
           }
-          toast.error(
+          const rawMessage =
             ax.response?.data?.message ||
-              (err instanceof Error ? err.message : '') ||
-              t('auth.loginFailed'),
-          );
+            (err instanceof Error ? err.message : '');
+          toast.error(resolveLoginErrorMessage(rawMessage, t));
         },
       },
     );

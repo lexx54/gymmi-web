@@ -98,6 +98,9 @@
     "lockout": "Too many attempts. Try again in {{time}}",
     "invalidCredentials": "Invalid email/password",
     "loginFailed": "Login failed. Please check your credentials.",
+    "userNotFound": "No account found with this email or username.",
+    "incorrectPassword": "Incorrect password. Please verify and try again.",
+    "accountInactive": "Your account is deactivated. Please contact support.",
     "accountCreated": "Account created successfully!",
     "signupFailed": "Sign up failed. Please try again.",
     "signupUnavailable": "Signup is temporarily unavailable. Please try again later.",
@@ -137,6 +140,7 @@
     "age": "Age",
     "agePlaceholder": "e.g. 25",
     "gender": "Gender",
+    "selectGender": "Select gender",
     "genderMale": "Male",
     "genderFemale": "Female",
     "genderOther": "Other",
@@ -144,13 +148,15 @@
     "height": "Height",
     "weight": "Weight",
     "fitnessGoal": "Primary Fitness Goal",
+    "selectGoal": "Select your goal",
     "customGoalPlaceholder": "Or describe your personal goal...",
     "goals": {
       "buildMuscle": "Build Muscle",
       "loseFat": "Lose Fat",
       "gainStrength": "Gain Strength",
       "endurance": "Endurance",
-      "generalFitness": "General Fitness"
+      "generalFitness": "General Fitness",
+      "custom": "Other (Custom)"
     },
     "servicesDescription": "About Your Services",
     "servicesPlaceholder": "Describe your coaching methodology, experience, and what clients can expect...",
@@ -226,7 +232,7 @@
     "removeLogo": "Remove Logo",
     "photoUploadError": "Failed to upload image. Please try again.",
     "photoSizeError": "Image must be less than 3MB.",
-    "photoTypeError": "Please upload a valid image (JPEG, PNG, or WebP).",
+    "photoTypeError": "Please upload a valid image (JPEG, PNG, WebP, or HEIF/HEIC).",
     "uploading": "Uploading...",
     "optional": "Optional",
     "avatarPreviewAlt": "Profile photo preview",
@@ -1251,6 +1257,89 @@
     "validUntilDetail": "Valid until {{date}}",
     "manageBilling": "Manage Subscription & Billing",
     "upgradePrompt": "Upgrade to Gymmi Plus to unlock unlimited routines, custom exercises, and advanced progress analytics."
+  },
+  "tour": {
+    "stepCounter": "Step {{current}} of {{total}}",
+    "skip": "Skip tour",
+    "finish": "Get Started",
+    "restartTour": "Restart Tour",
+    "restartTourDescription": "Replay the interactive guided tour for your account role.",
+    "client": {
+      "workouts": {
+        "title": "Workouts & Active Tracker",
+        "description": "Access training routines, log active sets in real-time with rest timers, and track weight progression."
+      },
+      "exercises": {
+        "title": "Exercise Catalog & Anatomy",
+        "description": "Explore 100+ exercises with interactive anatomical muscle heatmaps and multi-angle technique specs."
+      },
+      "community": {
+        "title": "Community & Coaching",
+        "description": "Discover certified personal trainers, connect with local gyms using QR codes, and compete on the leaderboard."
+      },
+      "analytics": {
+        "title": "Performance Analytics",
+        "description": "Track weekly volume trends, daily consistency, and personal records across all major lifts."
+      }
+    },
+    "trainer": {
+      "clients": {
+        "title": "Client Management",
+        "description": "Review contracted athletes, manage incoming coaching requests, and monitor athlete compliance."
+      },
+      "workouts": {
+        "title": "Routine Assignment",
+        "description": "Build custom multi-week routines and assign them directly to your active roster of clients."
+      },
+      "exercises": {
+        "title": "Custom Exercise Library",
+        "description": "Create specialized exercise variations and assign them to custom workout templates."
+      },
+      "classifications": {
+        "title": "Classifications & Standards",
+        "description": "Monitor strength progression across the 5 standard tiers and celebrate client PR breakthroughs."
+      }
+    },
+    "gym": {
+      "dashboard": {
+        "title": "Facility Dashboard",
+        "description": "Keep track of active member capacity, trial status, and quick facility routine actions."
+      },
+      "members": {
+        "title": "Members Directory",
+        "description": "Manage active gym members, generate instant QR join codes, and invite new athletes."
+      },
+      "coaches": {
+        "title": "Coaches & Affiliations",
+        "description": "Supervise your approved personal coaching staff and review pending coach affiliation applications."
+      },
+      "catalog": {
+        "title": "Curated Routine Catalog",
+        "description": "Publish official facility workout routines available exclusively to your gym members."
+      },
+      "articles": {
+        "title": "Facility Articles",
+        "description": "Publish training tips, facility announcements, and nutritional advice for your community."
+      }
+    },
+    "admin": {
+      "dashboard": {
+        "title": "Platform Dashboard",
+        "description": "High-level overview of Gymmi platform health, system activity, and registered entities."
+      },
+      "permissions": {
+        "title": "Permissions & RBAC",
+        "description": "Inspect and manage granular permission policies and system role assignments."
+      },
+      "users": {
+        "title": "User Management",
+        "description": "Manage all registered user accounts, subscription entitlements, and active statuses."
+      },
+      "payments": {
+        "title": "Payments & Subscriptions",
+        "description": "Review platform transaction records, active subscriptions, and revenue tracking."
+      }
+    }
   }
 }
 

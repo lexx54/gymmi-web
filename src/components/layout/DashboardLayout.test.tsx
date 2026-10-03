@@ -120,4 +120,40 @@ describe('DashboardLayout (Gym Role)', () => {
     expect(screen.getByText(/25 \/ 100 Members/i)).toBeInTheDocument();
     expect(screen.queryByTestId('gym-upgrade-btn')).not.toBeInTheDocument();
   });
+
+  it('triggers SpotlightTour automatically on first login if tour has not been seen', async () => {
+    localStorage.clear();
+    vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+      id: 'g-1',
+      name: 'IronHQ',
+      tier: 'plus',
+      activeMembersCount: 25,
+      capacity: 100,
+    } as any);
+
+    render(<DashboardLayout />, { wrapper: createWrapper() });
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('spotlight-tour')).toBeInTheDocument();
+      },
+      { timeout: 2000 }
+    );
+  });
+
+  it('does not trigger SpotlightTour if user has already seen it', async () => {
+    localStorage.setItem('@gymmi:tour_seen_gym-owner-1', 'true');
+    vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+      id: 'g-1',
+      name: 'IronHQ',
+      tier: 'plus',
+      activeMembersCount: 25,
+      capacity: 100,
+    } as any);
+
+    render(<DashboardLayout />, { wrapper: createWrapper() });
+
+    await new Promise((r) => setTimeout(r, 450));
+    expect(screen.queryByTestId('spotlight-tour')).toBeNull();
+  });
 });

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Clock, Dumbbell, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,8 @@ import { StartWorkoutButton } from '../dashboard/StartWorkoutButton';
 import { StatStack } from '../dashboard/StatStack';
 import { WeeklyProgressCard } from '../dashboard/WeeklyProgressCard';
 import { ActiveWorkoutCard } from '../dashboard/ActiveWorkoutCard';
+import { SpotlightTour } from '../tour/SpotlightTour';
+import { hasSeenUserTour } from '../../services/storage/tourStorage';
 import { useAuth } from '../../context/AuthContext';
 import { useMyGym } from '../../hooks/useGyms';
 import { Sidebar } from './Sidebar';
@@ -35,16 +38,29 @@ export function DashboardLayout() {
   const capacity =
     gymData?.capacity ?? gymData?.memberCapacity ?? (gymData?.gym?.memberCapacity ?? 100);
 
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (user?.id && !hasSeenUserTour(user.id)) {
+      const timer = setTimeout(() => {
+        setIsTourOpen(true);
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [user?.id]);
+
   return (
     <LayoutShell>
       <Sidebar username={username} />
       <MainPanel>
         <TopBar />
-        <HeaderArea>
+        <HeaderArea data-tour="dashboard-header">
           <DashboardHeader username={username} />
-          <ActiveWorkoutCard enabled={isClient} />
+          <div data-tour="active-workout">
+            <ActiveWorkoutCard enabled={isClient} />
+          </div>
           {isGym && gymData && (
-            <GymTrialBanner data-testid="gym-trial-banner">
+            <GymTrialBanner data-testid="gym-trial-banner" data-tour="gym-banner">
               <BannerLeft>
                 <Clock size={18} />
                 <span>
@@ -92,6 +108,12 @@ export function DashboardLayout() {
           <RecentActivity />
         </ContentGrid>
         {isClient && <StartWorkoutButton />}
+        <SpotlightTour
+          userId={user?.id}
+          roleName={user?.role?.name}
+          isOpen={isTourOpen}
+          onClose={() => setIsTourOpen(false)}
+        />
       </MainPanel>
     </LayoutShell>
   );

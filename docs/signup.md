@@ -6,7 +6,7 @@ Interactive multi-step registration slider with live validation, physical metric
 
 - Guides users through a multi-step registration flow:
   - **Step 1 (Account Credentials & Role)**: Email, username, password, confirm password, interactive role selector cards (Athlete / Personal Trainer / Gym), optional profile photo uploader (all users), and optional trainer logo / gym logo uploader.
-  - **Step 2 (Physical Profile for Athlete/Trainer)**: Age, gender, height (with cm/ft live toggle, normalized to cm), weight (with kg/lbs live toggle, normalized to kg), fitness goals (preset chips + custom goal).
+  - **Step 2 (Physical Profile for Athlete/Trainer)**: Age, gender select dropdown, height (with cm/ft live toggle, normalized to cm), weight (with kg/lbs live toggle, normalized to kg), fitness goals select dropdown (preset goals + custom goal text input toggle).
   - **Step 2 (Facility Profile for Gyms)**: Facility name, description, address, city, website, phone number, amenities selector (preset chips + custom chips), and facility cover image. Displays 30-Day Free Trial (100 members capacity) onboarding banner.
   - **Step 3 for Trainers (Coaching Profile)**: Services description, monthly rate ($ USD), specialization tags (preset chips + custom tag adder), and optional trainer logo uploader. Gym affiliations are no longer self-declared during registration; they are established via the formal facility affiliation workflow.
   - **Confirmation Step (Step 3 for Clients & Gyms, Step 4 for Trainers)**: Complete breakdown cards including photo/logo thumbnail previews with quick "Edit" jump links to amend any step, followed by the final "Confirm & Create Account" submission.
@@ -22,8 +22,8 @@ Interactive multi-step registration slider with live validation, physical metric
 - `src/schemas/auth.ts`: Zod validation schemas for Step 1 (`createStep1Schema`), Step 2 (`createStep2Schema`, `createStep2GymSchema`), Trainer Step 3 (`createStep3TrainerSchema`), and full form (`createSignupSchema`).
 - `src/types/auth.ts`: TypeScript types for `UserProfileParams`, `TrainerProfileParams`, `GymProfileParams`, `AuthUser`, and `SignupParams` supporting `avatarUrl`, `logoUrl`, and `gymProfile`.
 - `src/services/api/auth.ts`: `signupApi` supporting the expanded payload, and `getPresignedUrlApi`.
-- `src/i18n/locales/en.json` & `es.json`: Full bilingual translations for step indicators, form labels, units, goal chips, specialization presets, summary cards, photo/logo uploaders, gym facility details, gym database selection, and validation errors.
-- `src/pages/SignupPage.test.tsx`: Comprehensive unit tests covering step transitions, role differences (including Gym registration), image upload and preview, edit navigation, gym database chips and dropdown selection, validation errors, and mutation calls.
+- `src/i18n/locales/en.json` & `es.json`: Full bilingual translations for step indicators, form labels, units, goal options, dropdown placeholders, specialization presets, summary cards, photo/logo uploaders, gym facility details, gym database selection, and validation errors.
+- `src/pages/SignupPage.test.tsx`: Comprehensive unit tests covering step transitions, role differences (including Gym registration), image upload and preview, edit navigation, select dropdowns for gender and goal, gym database chips and dropdown selection, validation errors, and mutation calls.
 
 ## Constraints and decisions
 
@@ -40,13 +40,10 @@ Interactive multi-step registration slider with live validation, physical metric
 
 ## Changes made by current task
 
-- Removed informal profile-level gym inputs and database dropdown from Trainer Step 3 in `SignupPage.tsx`.
-- Removed gym row from the trainer confirmation card in Step 4.
-- Removed `gyms` from trainer signup submission payload and step validation.
-- Updated `SignupPage.test.tsx` to verify that Step 3 does not render informal gym input fields.
-- Localized trainer specializations in `SignupPage.tsx`:
-  - Replaced hardcoded English array with `PRESET_SPECIALIZATIONS` and `t(preset.labelKey)`.
-  - In Step 3, preset chips display in Spanish ("Hipertrofia", "Pérdida de Peso", "Calistenia", etc.) when Spanish is selected, and in English when English is selected.
-  - Step 4 (Confirmation) summary card dynamically translates selected specializations using `getSpecializationLabel(spec, t)`.
+- Replaced badge chips with select dropdowns for Gender and Fitness Goal during user creation:
+  - Replaced gender selection grid/buttons with styled select dropdown on Step 2 in `SignupPage.tsx`.
+  - Replaced goal chips with styled select dropdown on Step 2 in `SignupPage.tsx`, retaining conditional text input when "Other (Custom)" is selected.
+  - Added localized keys `auth.selectGender`, `auth.selectGoal`, and `auth.goals.custom` to `en.json` and `es.json`.
+  - Updated `SignupPage.test.tsx` with unit tests verifying gender and goal dropdown selection and custom goal toggle.
 
 

@@ -60,6 +60,19 @@ describe('imageUpload utils', () => {
     );
   });
 
+  it('accepts image/heic and image/heif types', async () => {
+    const heicFile = new File(['dummy'], 'photo.heic', { type: 'image/heic' });
+    vi.mocked(authApi.getPresignedUrlApi).mockResolvedValue({
+      presignedUrl: 'https://r2.cloudflarestorage.com/upload/avatars/123.heic',
+      publicUrl: 'https://cdn.gymmi.com/avatars/123.heic',
+      key: 'avatars/123.heic',
+    });
+    vi.mocked(axios.put).mockResolvedValue({ status: 200 } as any);
+
+    const url = await uploadImageDirectly(heicFile, 'avatar');
+    expect(url).toBe('https://cdn.gymmi.com/avatars/123.heic');
+  });
+
   it('uploads valid image directly with Cache-Control header and correct purpose', async () => {
     const file = new File(['image-bytes'], 'gym-cover.jpg', {
       type: 'image/jpeg',

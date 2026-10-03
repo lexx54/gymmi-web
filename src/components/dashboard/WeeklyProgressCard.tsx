@@ -72,7 +72,7 @@ export function WeeklyProgressCard() {
   const trainerDaily = trainerData?.clientActivity?.daily ?? [];
 
   return (
-    <Card data-testid="weekly-progress-card">
+    <Card data-testid="weekly-progress-card" data-tour="weekly-progress">
       <HeaderRow>
         <div>
           <Eyebrow>{t('dashboard.weeklyProgress')}</Eyebrow>

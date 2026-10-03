@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
-import LoginPage from './LoginPage';
+import LoginPage, { resolveLoginErrorMessage } from './LoginPage';
 
 const mockMutate = vi.fn();
 const mockToastError = vi.fn();
@@ -139,6 +139,66 @@ describe('LoginPage', () => {
     });
   });
 
+  it('shows userNotFound error toast when user does not exist', async () => {
+    mockMutate.mockImplementation((_vars, opts) => {
+      opts?.onError?.({
+        response: { data: { message: 'No account found with this email or username' } },
+        message: 'Request failed',
+      });
+    });
+
+    const user = userEvent.setup();
+    render(<LoginPage />, { wrapper: createWrapper() });
+
+    await user.type(screen.getByPlaceholderText('email@mail.com'), 'unknown@test.com');
+    await user.type(screen.getByPlaceholderText('Password'), 'wrong12');
+    await user.click(screen.getByRole('button', { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalledWith('No account found with this email or username.');
+    });
+  });
+
+  it('shows incorrectPassword error toast when password is wrong', async () => {
+    mockMutate.mockImplementation((_vars, opts) => {
+      opts?.onError?.({
+        response: { data: { message: 'Incorrect password. Please verify and try again' } },
+        message: 'Request failed',
+      });
+    });
+
+    const user = userEvent.setup();
+    render(<LoginPage />, { wrapper: createWrapper() });
+
+    await user.type(screen.getByPlaceholderText('email@mail.com'), 'user@test.com');
+    await user.type(screen.getByPlaceholderText('Password'), 'wrong12');
+    await user.click(screen.getByRole('button', { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalledWith('Incorrect password. Please verify and try again.');
+    });
+  });
+
+  it('shows accountInactive error toast when account is deactivated', async () => {
+    mockMutate.mockImplementation((_vars, opts) => {
+      opts?.onError?.({
+        response: { data: { message: 'Your account is deactivated. Please contact support' } },
+        message: 'Request failed',
+      });
+    });
+
+    const user = userEvent.setup();
+    render(<LoginPage />, { wrapper: createWrapper() });
+
+    await user.type(screen.getByPlaceholderText('email@mail.com'), 'user@test.com');
+    await user.type(screen.getByPlaceholderText('Password'), 'wrong12');
+    await user.click(screen.getByRole('button', { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalledWith('Your account is deactivated. Please contact support.');
+    });
+  });
+
   it('displays lockout message on 429 error', async () => {
     mockMutate.mockImplementation(
       (
@@ -160,5 +220,29 @@ describe('LoginPage', () => {
       expect(screen.getByText(/Too many attempts/i)).toBeInTheDocument();
     });
     expect(mockToastError).not.toHaveBeenCalled();
+  });
+});
+
+describe('resolveLoginErrorMessage (web)', () => {
+  const t = (k: string) => k;
+
+  it('resolves userNotFound for English and Spanish server messages', () => {
+    expect(resolveLoginErrorMessage('No account found with this email or username', t)).toBe('auth.userNotFound');
+    expect(resolveLoginErrorMessage('No se encontró ninguna cuenta con este correo o usuario', t)).toBe('auth.userNotFound');
+  });
+
+  it('resolves incorrectPassword for English and Spanish server messages', () => {
+    expect(resolveLoginErrorMessage('Incorrect password. Please verify and try again', t)).toBe('auth.incorrectPassword');
+    expect(resolveLoginErrorMessage('Contraseña incorrecta. Por favor verifícala e inténtalo de nuevo', t)).toBe('auth.incorrectPassword');
+  });
+
+  it('resolves accountInactive for deactivated server messages', () => {
+    expect(resolveLoginErrorMessage('Your account is deactivated. Please contact support', t)).toBe('auth.accountInactive');
+    expect(resolveLoginErrorMessage('Tu cuenta está desactivada. Por favor contacta al soporte', t)).toBe('auth.accountInactive');
+  });
+
+  it('returns raw message if unknown and default fallback if undefined', () => {
+    expect(resolveLoginErrorMessage('Some other error', t)).toBe('Some other error');
+    expect(resolveLoginErrorMessage(undefined, t)).toBe('auth.loginFailed');
   });
 });

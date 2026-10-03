@@ -12,37 +12,38 @@ interface SidebarItem {
   labelKey: string;
   to: string;
   icon: typeof LayoutDashboard;
+  tourId?: string;
 }
 
 const sidebarItems: SidebarItem[] = [
-  { labelKey: 'nav.dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { labelKey: 'nav.workouts', to: '/workout', icon: Dumbbell },
-  { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
-  { labelKey: 'nav.analytics', to: '/analytics', icon: BarChart3 },
-  { labelKey: 'nav.articles', to: '/articles', icon: BookOpen },
-  { labelKey: 'nav.billing', to: '/billing', icon: CreditCard },
-  { labelKey: 'nav.settings', to: '/settings', icon: Settings },
+  { labelKey: 'nav.dashboard', to: '/dashboard', icon: LayoutDashboard, tourId: 'nav-dashboard' },
+  { labelKey: 'nav.workouts', to: '/workout', icon: Dumbbell, tourId: 'nav-workouts' },
+  { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen, tourId: 'nav-exercises' },
+  { labelKey: 'nav.analytics', to: '/analytics', icon: BarChart3, tourId: 'nav-analytics' },
+  { labelKey: 'nav.articles', to: '/articles', icon: BookOpen, tourId: 'nav-articles' },
+  { labelKey: 'nav.billing', to: '/billing', icon: CreditCard, tourId: 'nav-billing' },
+  { labelKey: 'nav.settings', to: '/settings', icon: Settings, tourId: 'nav-settings' },
 ];
 
 const gymItems: SidebarItem[] = [
-  { labelKey: 'nav.dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { labelKey: 'nav.catalog', to: '/gym/catalog', icon: Dumbbell },
-  { labelKey: 'nav.coaches', to: '/gym/coaches', icon: Shield },
-  { labelKey: 'nav.members', to: '/gym/members', icon: Users },
-  { labelKey: 'nav.classifications', to: '/gym/classifications', icon: Trophy },
-  { labelKey: 'nav.articles', to: '/gym/articles', icon: BookOpen },
-  { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen },
-  { labelKey: 'nav.billing', to: '/billing', icon: CreditCard },
-  { labelKey: 'nav.settings', to: '/settings', icon: Settings },
+  { labelKey: 'nav.dashboard', to: '/dashboard', icon: LayoutDashboard, tourId: 'nav-dashboard' },
+  { labelKey: 'nav.catalog', to: '/gym/catalog', icon: Dumbbell, tourId: 'nav-catalog' },
+  { labelKey: 'nav.coaches', to: '/gym/coaches', icon: Shield, tourId: 'nav-coaches' },
+  { labelKey: 'nav.members', to: '/gym/members', icon: Users, tourId: 'nav-members' },
+  { labelKey: 'nav.classifications', to: '/gym/classifications', icon: Trophy, tourId: 'nav-classifications' },
+  { labelKey: 'nav.articles', to: '/gym/articles', icon: BookOpen, tourId: 'nav-articles' },
+  { labelKey: 'nav.exercises', to: '/exercises', icon: NotebookPen, tourId: 'nav-exercises' },
+  { labelKey: 'nav.billing', to: '/billing', icon: CreditCard, tourId: 'nav-billing' },
+  { labelKey: 'nav.settings', to: '/settings', icon: Settings, tourId: 'nav-settings' },
 ];
 
 /**
  * Displays the main dashboard navigation sidebar.
  */
 const adminItems: SidebarItem[] = [
-  { labelKey: 'nav.permissions', to: '/admin/permissions', icon: Shield },
-  { labelKey: 'nav.users', to: '/admin/users', icon: Users },
-  { labelKey: 'nav.payments', to: '/admin/payments', icon: CreditCard },
+  { labelKey: 'nav.permissions', to: '/admin/permissions', icon: Shield, tourId: 'nav-permissions' },
+  { labelKey: 'nav.users', to: '/admin/users', icon: Users, tourId: 'nav-users' },
+  { labelKey: 'nav.payments', to: '/admin/payments', icon: CreditCard, tourId: 'nav-payments' },
 ];
 
 export function Sidebar({ username }: SidebarProps) {
@@ -57,11 +58,11 @@ export function Sidebar({ username }: SidebarProps) {
   const displayedItems = isGym ? gymItems : sidebarItems;
   const roleItems: SidebarItem[] = isTrainer
     ? [
-        { labelKey: 'nav.clients', to: '/clients', icon: Users },
-        { labelKey: 'nav.classifications', to: '/classifications', icon: Trophy },
+        { labelKey: 'nav.clients', to: '/clients', icon: Users, tourId: 'nav-clients' },
+        { labelKey: 'nav.classifications', to: '/classifications', icon: Trophy, tourId: 'nav-classifications' },
       ]
     : isClient
-      ? [{ labelKey: 'nav.trainersAndGyms', to: '/trainers', icon: Handshake }]
+      ? [{ labelKey: 'nav.trainersAndGyms', to: '/trainers', icon: Handshake, tourId: 'nav-trainers' }]
       : [];
 
   const handleSignOut = async () => {
@@ -87,7 +88,7 @@ export function Sidebar({ username }: SidebarProps) {
 
             return (
               <li key={item.labelKey}>
-                <NavItemLink to={item.to} end>
+                <NavItemLink to={item.to} end data-tour={item.tourId}>
                   <Icon size={16} aria-hidden />
                   <span>{t(item.labelKey)}</span>
                 </NavItemLink>
@@ -98,7 +99,7 @@ export function Sidebar({ username }: SidebarProps) {
             const Icon = item.icon;
             return (
               <li key={item.labelKey}>
-                <NavItemLink to={item.to}>
+                <NavItemLink to={item.to} data-tour={item.tourId}>
                   <Icon size={16} aria-hidden />
                   <span>{t(item.labelKey)}</span>
                 </NavItemLink>
@@ -115,7 +116,7 @@ export function Sidebar({ username }: SidebarProps) {
                 const Icon = item.icon;
                 return (
                   <li key={item.labelKey}>
-                    <NavItemLink to={item.to} end>
+                    <NavItemLink to={item.to} end data-tour={item.tourId}>
                       <Icon size={16} aria-hidden />
                       <span>{t(item.labelKey)}</span>
                     </NavItemLink>

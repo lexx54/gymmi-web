@@ -125,7 +125,7 @@ export function StatStack() {
   }
 
   return (
-    <Stack>
+    <Stack data-tour="stat-stack">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (

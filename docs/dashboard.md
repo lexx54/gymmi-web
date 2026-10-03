@@ -58,3 +58,11 @@ Web dashboard delivering role-tailored training overviews, weekly charts, and ke
   - Backend `getMyGym` now computes and returns `isTrialActive: boolean`, `trialDaysRemaining: number`, `capacity: number`, `coachesCount`, `routinesCount`, and `gym` nested object.
   - `DashboardLayout` derives `gymTier`, `isTrial`, `isTrialActive`, `trialDaysRemaining`, and `capacity` defensively with robust fallbacks.
   - Added unit test suite in `src/components/layout/DashboardLayout.test.tsx`.
+- Implemented Role-Based First-Time Login Spotlight Tour:
+  - Created `src/services/storage/tourStorage.ts` persisting per-user seen status via localStorage (`@gymmi:tour_seen_${userId}`).
+  - Created `src/constants/tourSteps.ts` configuring specific spotlight steps tailored for `Client`, `Trainer`, `Gym`, and `Admin`.
+  - Created `src/components/tour/SpotlightTour.tsx` with animated SVG mask spotlight, floating card position clamping, keyboard shortcuts (Escape, arrows), and step indicators.
+  - Added `data-tour` target attributes in `Sidebar.tsx`, `DashboardLayout.tsx`, `WeeklyProgressCard.tsx`, and `StatStack.tsx`.
+  - Added "Restart Tour" capability in `DataManagementCard.tsx` (under Settings) enabling users to re-trigger their role tour anytime.
+  - Added full bilingual copy for all roles in `src/i18n/locales/en.json` and `es.json`.
+  - Added unit test suites in `SpotlightTour.test.tsx`, `tourStorage.test.ts`, and updated `DashboardLayout.test.tsx` and `DataManagementCard.test.tsx` (all 51 test files passing).

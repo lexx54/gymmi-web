@@ -4,8 +4,11 @@ import { getPresignedUrlApi } from '../services/api/auth';
 export const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB
 export const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
+  'image/jpg',
   'image/png',
   'image/webp',
+  'image/heic',
+  'image/heif',
 ];
 
 export interface CompressImageOptions {
@@ -134,10 +137,13 @@ export async function uploadImageDirectly(
     throw new Error('FILE_TOO_LARGE');
   }
 
-  const fileType = (compressedBlob.type || file.type) as
+  const rawType = compressedBlob.type || file.type;
+  const fileType = (rawType === 'image/jpg' ? 'image/jpeg' : rawType) as
     | 'image/jpeg'
     | 'image/png'
-    | 'image/webp';
+    | 'image/webp'
+    | 'image/heic'
+    | 'image/heif';
 
   const { presignedUrl, publicUrl } = await getPresignedUrlApi({
     fileType,

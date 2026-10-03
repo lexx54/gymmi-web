@@ -141,10 +141,10 @@ describe('SignupPage Multi-Step Flow', () => {
     });
 
     await user.type(screen.getByTestId('input-age'), '26');
-    await user.click(screen.getByTestId('gender-male'));
+    await user.selectOptions(screen.getByTestId('select-gender'), 'male');
     await user.type(screen.getByTestId('input-height'), '182');
     await user.type(screen.getByTestId('input-weight'), '78');
-    await user.click(screen.getByTestId('goal-buildMuscle'));
+    await user.selectOptions(screen.getByTestId('select-goal'), screen.getByTestId('goal-buildMuscle'));
 
     await user.click(screen.getByTestId('step2-next'));
 
@@ -206,7 +206,7 @@ describe('SignupPage Multi-Step Flow', () => {
       expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
     });
     await user.type(screen.getByTestId('input-age'), '31');
-    await user.click(screen.getByTestId('gender-female'));
+    await user.selectOptions(screen.getByTestId('select-gender'), 'female');
     await user.type(screen.getByTestId('input-height'), '165');
     await user.type(screen.getByTestId('input-weight'), '60');
     expect(screen.queryByTestId('input-custom-goal')).not.toBeInTheDocument();
@@ -343,10 +343,10 @@ describe('SignupPage Multi-Step Flow', () => {
       expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
     });
     await user.type(screen.getByTestId('input-age'), '25');
-    await user.click(screen.getByTestId('gender-male'));
+    await user.selectOptions(screen.getByTestId('select-gender'), 'male');
     await user.type(screen.getByTestId('input-height'), '175');
     await user.type(screen.getByTestId('input-weight'), '70');
-    await user.click(screen.getByTestId('goal-buildMuscle'));
+    await user.selectOptions(screen.getByTestId('select-goal'), screen.getByTestId('goal-buildMuscle'));
     await user.click(screen.getByTestId('step2-next'));
 
     // Confirmation
@@ -392,10 +392,10 @@ describe('SignupPage Multi-Step Flow', () => {
       expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
     });
     await user.type(screen.getByTestId('input-age'), '25');
-    await user.click(screen.getByTestId('gender-other'));
+    await user.selectOptions(screen.getByTestId('select-gender'), 'other');
     await user.type(screen.getByTestId('input-height'), '170');
     await user.type(screen.getByTestId('input-weight'), '65');
-    await user.click(screen.getByTestId('goal-buildMuscle'));
+    await user.selectOptions(screen.getByTestId('select-goal'), screen.getByTestId('goal-buildMuscle'));
     await user.click(screen.getByTestId('step2-next'));
 
     // Confirmation
@@ -489,7 +489,7 @@ describe('SignupPage Multi-Step Flow', () => {
       expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
     });
     await user.type(screen.getByTestId('input-age'), '30');
-    await user.click(screen.getByTestId('gender-male'));
+    await user.selectOptions(screen.getByTestId('select-gender'), 'male');
     await user.type(screen.getByTestId('input-height'), '180');
     await user.type(screen.getByTestId('input-weight'), '85');
     await user.click(screen.getByTestId('step2-next'));
@@ -550,7 +550,7 @@ describe('SignupPage Multi-Step Flow', () => {
       expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
     });
     await user.type(screen.getByTestId('input-age'), '29');
-    await user.click(screen.getByTestId('gender-female'));
+    await user.selectOptions(screen.getByTestId('select-gender'), 'female');
     await user.type(screen.getByTestId('input-height'), '170');
     await user.type(screen.getByTestId('input-weight'), '65');
     await user.click(screen.getByTestId('step2-next'));
@@ -595,5 +595,45 @@ describe('SignupPage Multi-Step Flow', () => {
       }),
       expect.any(Object),
     );
+  });
+
+  it('renders dropdowns for gender and fitness goal, and toggles custom goal input', async () => {
+    const user = userEvent.setup();
+    render(<SignupPage />, { wrapper: createWrapper() });
+
+    // Advance to Step 2
+    await user.type(screen.getByTestId('input-email'), 'dropdowns@test.com');
+    await user.type(screen.getByTestId('input-username'), 'dropdownuser');
+    await user.type(screen.getByTestId('input-password'), 'password123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'password123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-2')).toBeInTheDocument();
+    });
+
+    const genderSelect = screen.getByTestId('select-gender') as HTMLSelectElement;
+    const goalSelect = screen.getByTestId('select-goal') as HTMLSelectElement;
+
+    expect(genderSelect).toBeInTheDocument();
+    expect(goalSelect).toBeInTheDocument();
+
+    // Select gender
+    await user.selectOptions(genderSelect, 'female');
+    expect(genderSelect.value).toBe('female');
+
+    // Initially custom goal input is not visible
+    expect(screen.queryByTestId('input-custom-goal')).not.toBeInTheDocument();
+
+    // Select custom goal
+    await user.selectOptions(goalSelect, '__custom__');
+    expect(screen.getByTestId('input-custom-goal')).toBeInTheDocument();
+
+    // Type custom goal
+    await user.type(screen.getByTestId('input-custom-goal'), 'Marathon Training');
+
+    // Switch back to preset goal
+    await user.selectOptions(goalSelect, screen.getByTestId('goal-buildMuscle'));
+    expect(screen.queryByTestId('input-custom-goal')).not.toBeInTheDocument();
   });
 });
