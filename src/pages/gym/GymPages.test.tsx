@@ -348,6 +348,12 @@ describe('Gym Pages', () => {
       expect(await screen.findByTestId('facility-qr-modal')).toBeInTheDocument();
       expect(screen.getByText('IRON-JOIN-99')).toBeInTheDocument();
 
+      const qrImage = screen.getByTestId('facility-qr-image');
+      expect(qrImage).toHaveAttribute(
+        'src',
+        expect.stringContaining(encodeURIComponent('gymmi://community?code=IRON-JOIN-99')),
+      );
+
       const copyBtn = screen.getByTestId('copy-join-code-btn');
       fireEvent.click(copyBtn);
 

@@ -292,9 +292,10 @@ export default function GymMembersPage() {
                   {joinCode && (
                     <QrImage
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
-                        `${window.location.origin}/trainers?tab=gyms&code=${joinCode}`,
+                        `gymmi://community?code=${joinCode}`,
                       )}`}
                       alt={`Join QR Code for ${gymName}`}
+                      data-testid="facility-qr-image"
                     />
                   )}
                   <QrHelpText>{t('gym.scanQrToJoin')}</QrHelpText>

@@ -168,6 +168,9 @@ describe('TrainersPage and ClientGymsSection', () => {
     const input = screen.getByTestId('join-code-input') as HTMLInputElement;
     expect(input.value).toBe('EXPRESS99');
 
+    const openAppBtn = screen.getByTestId('open-in-app-btn');
+    expect(openAppBtn).toHaveAttribute('href', 'gymmi://community?code=EXPRESS99');
+
     // Submit join by code
     const submitBtn = screen.getByTestId('join-code-submit-btn');
     fireEvent.click(submitBtn);

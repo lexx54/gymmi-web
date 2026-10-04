@@ -55,10 +55,11 @@ Web console interface for Gym facilities to manage their curated workout catalog
 - **Gym Facility QR & Pending Requests Management**:
   - Added "Facility QR & Join Code" action button in `GymMembersPage` opening a modal with:
     - Facility logo and branding.
-    - Printable/scannable QR code deep linking to `${window.location.origin}/trainers?tab=gyms&code=${joinCode}`.
+    - Printable/scannable QR code deep linking to `gymmi://community?code=${joinCode}` to immediately open the mobile app in Community and pre-fill the join code.
     - Alphanumeric join code with copy-to-clipboard action.
     - Print QR button.
   - Added "Pending Member Requests" section in `GymMembersPage` with athlete information and Approve / Reject actions.
+  - Added "Open in Gymmi App" action button in `ClientGymsSection.tsx` linking to `gymmi://community?code=...` when join code is present.
 - **Added Comprehensive Unit Tests**:
   - Added `TrainersPage.test.tsx` testing tab switching, active gym card, pending request banner, URL query param auto-fill, and directory membership requests (5 tests passing).
   - Extended `GymPages.test.tsx` with pending member approvals/rejections and facility QR modal tests (6 tests passing).

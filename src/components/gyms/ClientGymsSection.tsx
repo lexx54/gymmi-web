@@ -9,6 +9,7 @@ import {
   Search,
   Send,
   Shield,
+  Smartphone,
   Trash2,
   Users,
 } from 'lucide-react';
@@ -226,6 +227,18 @@ export function ClientGymsSection() {
             <span>{joinByCodeMutation.isPending ? t('common.loading') : t('gym.joinInstantly')}</span>
           </JoinCodeSubmitBtn>
         </JoinCodeForm>
+
+        {joinCodeInput.trim() && (
+          <OpenInAppRow>
+            <OpenInAppBtn
+              href={`gymmi://community?code=${joinCodeInput.trim()}`}
+              data-testid="open-in-app-btn"
+            >
+              <Smartphone size={14} />
+              <span>{t('gym.openInApp', 'Open in Gymmi App')}</span>
+            </OpenInAppBtn>
+          </OpenInAppRow>
+        )}
       </JoinCodeCard>
 
       {/* 3. EXPLORE GYMS DIRECTORY */}
@@ -917,5 +930,33 @@ const RequestGymBtn = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+`;
+
+const OpenInAppRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+`;
+
+const OpenInAppBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffb3b1;
+  background: rgba(239, 35, 60, 0.12);
+  border: 1px solid rgba(239, 35, 60, 0.28);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(239, 35, 60, 0.22);
+    color: #fff;
+    transform: translateY(-1px);
   }
 `;
