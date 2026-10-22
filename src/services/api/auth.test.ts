@@ -72,6 +72,8 @@ describe('signupApi', () => {
       username: 'newuser',
       password: 'pass123',
       role: 'Client',
+      acceptTerms: true,
+      termsVersion: '2026-10-21',
     });
 
     expect(mockPost).toHaveBeenCalledWith('/auth/signup', {
@@ -79,6 +81,8 @@ describe('signupApi', () => {
       username: 'newuser',
       password: 'pass123',
       role: 'Client',
+      acceptTerms: true,
+      termsVersion: '2026-10-21',
     });
     expect(result).toEqual(response);
   });

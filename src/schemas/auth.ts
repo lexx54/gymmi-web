@@ -131,6 +131,10 @@ export const createSignupSchema = (t: TFunction) =>
       gymPhoneNumber: z.string().optional(),
       gymAmenities: z.array(z.string()).optional(),
       gymCoverUrl: z.string().optional(),
+      // Final step: Terms of Service + Privacy Policy consent
+      acceptTerms: z
+        .boolean()
+        .refine((value) => value === true, t('auth.validation.termsRequired')),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('auth.validation.passwordMismatch'),

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Dumbbell, Globe } from 'lucide-react';
 
@@ -65,9 +66,9 @@ export const LandingFooter: React.FC = () => {
         <FooterBottom>
           <Copyright>{t('landing.footer.copyright')}</Copyright>
           <LegalLinks>
-            <LegalText>{t('landing.footer.privacy')}</LegalText>
+            <LegalLink to="/privacy">{t('landing.footer.privacy')}</LegalLink>
             <span>•</span>
-            <LegalText>{t('landing.footer.terms')}</LegalText>
+            <LegalLink to="/terms">{t('landing.footer.terms')}</LegalLink>
           </LegalLinks>
         </FooterBottom>
       </FooterInner>
@@ -223,6 +224,12 @@ const LegalLinks = styled.div`
   font-size: 0.8125rem;
 `;
 
-const LegalText = styled.span`
-  color: #64748b;
+const LegalLink = styled(Link)`
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ffffff;
+  }
 `;

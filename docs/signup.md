@@ -47,3 +47,11 @@ Interactive multi-step registration slider with live validation, physical metric
   - Updated `SignupPage.test.tsx` with unit tests verifying gender and goal dropdown selection and custom goal toggle.
 
 
+
+## Terms consent
+
+- The confirmation step has a required "I agree to the Terms of Service and Privacy Policy" checkbox (`input-accept-terms`). The links open `/terms` and `/privacy` in a new tab, so the form state is kept.
+- `createSignupSchema` validates `acceptTerms` (must be `true`, message `auth.validation.termsRequired`).
+- The signup payload sends `acceptTerms: true` and `termsVersion: LEGAL_CONFIG.lastUpdated`. When the Terms change, bump `lastUpdated` in `src/constants/legal.constants.ts` and `TERMS_VERSION` in `gymmi/src/constants/legal.ts`.
+- `SignupParams` (`src/types/auth.ts`) requires both fields. `AuthContext.signUp` and `useSignup` now take a full `SignupParams`.
+- The minimum age stays 14 (`createStep2Schema` and `createSignupSchema`). The API DTO now matches it.

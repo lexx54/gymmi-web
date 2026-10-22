@@ -57,7 +57,8 @@
     "payments": "Pagos",
     "streak": "Racha de 7 días",
     "signOut": "Cerrar sesión",
-    "dashboardNavigation": "Navegación del panel"
+    "dashboardNavigation": "Navegación del panel",
+    "reports": "Denuncias"
   },
   "auth": {
     "quote": "\"El único mal entrenamiento es el que no hiciste.\"",
@@ -129,7 +130,8 @@
       "pricePositive": "La tarifa no puede ser negativa",
       "specializationsMin": "Selecciona al menos 1 especialización",
       "gymsMax": "Puedes agregar hasta 3 gimnasios",
-      "gymNameMin": "El nombre del gimnasio debe tener al menos 2 caracteres"
+      "gymNameMin": "El nombre del gimnasio debe tener al menos 2 caracteres",
+      "termsRequired": "Debes aceptar los Términos de Servicio y la Política de Privacidad"
     },
     "stepAccount": "Cuenta",
     "stepBody": "Cuerpo y Metas",
@@ -238,7 +240,13 @@
     "avatarPreviewAlt": "Vista previa de la foto de perfil",
     "logoPreviewAlt": "Vista previa del logotipo de entrenador",
     "dropzonePrompt": "Arrastra y suelta tu archivo aquí o",
-    "chooseFile": "Elige un archivo"
+    "chooseFile": "Elige un archivo",
+    "consent": {
+      "prefix": "Acepto los",
+      "terms": "Términos de Servicio",
+      "and": "y la",
+      "privacy": "Política de Privacidad"
+    }
   },
   "gym": {
     "catalog": "Catálogo de Rutinas",
@@ -759,7 +767,24 @@
     "logoUpdated": "¡Logo de entrenador actualizado con éxito!",
     "publicProfilePreview": "Vista previa de perfil público",
     "publicProfileNotice": "Así es como los atletas ven tu perfil de entrenador cuando buscan entrenadores para solicitar contratos.",
-    "simulationHint": "Los atletas seleccionan la duración del contrato (de 1 semana a 3 meses) para solicitar tu asesoría."
+    "simulationHint": "Los atletas seleccionan la duración del contrato (de 1 semana a 3 meses) para solicitar tu asesoría.",
+    "deleteAccount": {
+      "title": "Eliminar cuenta",
+      "description": "Elimina de forma permanente tu cuenta de Gymmi y tus datos personales: perfil, entrenamientos, asignaciones, contratos, artículos, comentarios e imágenes subidas. Esta acción no se puede deshacer.",
+      "button": "Eliminar cuenta",
+      "modalTitle": "¿Eliminar tu cuenta?",
+      "modalDescription": "Esto elimina tu cuenta de forma permanente. Se cerrará tu sesión y no podrás recuperarla.",
+      "consequenceData": "Se eliminan tu perfil, entrenamientos, sesiones, asignaciones, contratos, artículos y comentarios.",
+      "consequenceMedia": "Se borran tu foto de perfil, logos y demás imágenes subidas.",
+      "consequencePayments": "Los registros de pago exigidos por ley se conservan anonimizados y sin vínculo contigo.",
+      "passwordLabel": "Confirma tu contraseña actual",
+      "confirmLabel": "Escribe {{word}} para confirmar",
+      "confirm": "Eliminar definitivamente",
+      "deleting": "Eliminando…",
+      "cancel": "Cancelar",
+      "success": "Tu cuenta ha sido eliminada.",
+      "error": "No pudimos eliminar tu cuenta. Inténtalo de nuevo."
+    }
   },
   "admin": {
     "userUpdated": "Usuario actualizado",
@@ -806,6 +831,41 @@
       "rejectedToast": "Pago rechazado.",
       "approveFailed": "No se pudo aprobar el pago.",
       "rejectFailed": "No se pudo rechazar el pago."
+    },
+    "reports": {
+      "title": "Denuncias de contenido",
+      "desc": "Revisa los artículos, comentarios y usuarios denunciados. Las denuncias deben atenderse en menos de 24 horas.",
+      "statuses": {
+        "ALL": "Todas",
+        "OPEN": "Abiertas",
+        "ACTION_TAKEN": "Con acción",
+        "DISMISSED": "Descartadas"
+      },
+      "targetTypes": {
+        "ARTICLE": "Artículo",
+        "COMMENT": "Comentario",
+        "USER": "Usuario"
+      },
+      "reportedBy": "Denunciado por",
+      "author": "Autor",
+      "reason": "Motivo",
+      "details": "Detalles",
+      "snapshot": "Contenido denunciado",
+      "reportedAt": "Denunciado",
+      "empty": "No hay denuncias que revisar.",
+      "dismiss": "Descartar",
+      "removeContent": "Eliminar contenido",
+      "deactivateUser": "Desactivar usuario",
+      "removeAndDeactivate": "Eliminar y desactivar",
+      "confirmDeactivate": "¿Desactivar a {{username}}? Se cerrará su sesión y no podrá iniciar sesión.",
+      "resolved": "Denuncia actualizada",
+      "resolveFailed": "No se pudo actualizar la denuncia",
+      "inactive": "Inactivo",
+      "deletedUser": "Usuario eliminado",
+      "overdue": "Más de 24 h",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {{page}} de {{total}}"
     }
   },
   "contracts": {
@@ -842,8 +902,8 @@
       "PENDING": "Pendiente",
       "ACCEPTED": "Aceptado",
       "REJECTED": "Rechazado",
-      "CANCELLED": "Cancelado"
-      ,"ENDED": "Finalizado"
+      "CANCELLED": "Cancelado",
+      "ENDED": "Finalizado"
     }
   },
   "entitlements": {
@@ -1196,6 +1256,34 @@
       "feed": "Aún no hay artículos disponibles. ¡Cuando tus entrenadores o gimnasio publiquen, aparecerán aquí!",
       "saved": "No has guardado ningún artículo aún. Haz clic en el icono de marcador para guardarlo.",
       "myArticles": "Aún no has publicado ningún artículo. Haz clic en 'Nuevo artículo' para comenzar."
+    },
+    "moderation": {
+      "report": "Denunciar",
+      "reportArticle": "Denunciar artículo",
+      "reportComment": "Denunciar comentario",
+      "block": "Bloquear",
+      "blockAuthor": "Bloquear autor",
+      "blockUser": "Bloquear usuario",
+      "blockConfirm": "¿Bloquear a {{username}}? Ya no verás sus artículos ni comentarios.",
+      "blocked": "Has bloqueado a {{username}}",
+      "reportTitle": "Denunciar contenido",
+      "reportSubtitle": "Cuéntanos qué ocurre. Nuestro equipo revisa cada denuncia en menos de 24 horas.",
+      "reasonLabel": "Motivo",
+      "reasons": {
+        "SPAM": "Spam o publicidad",
+        "HARASSMENT": "Acoso o intimidación",
+        "HATE_SPEECH": "Discurso de odio",
+        "SEXUAL_CONTENT": "Contenido sexual",
+        "VIOLENCE": "Violencia o actos peligrosos",
+        "MISINFORMATION": "Desinformación de salud peligrosa",
+        "OTHER": "Otro motivo"
+      },
+      "detailsLabel": "Detalles adicionales (opcional)",
+      "detailsPlaceholder": "Añade cualquier contexto que nos ayude a revisar la denuncia",
+      "submit": "Enviar denuncia",
+      "cancel": "Cancelar",
+      "reported": "Gracias. Nuestro equipo la revisará en menos de 24 horas.",
+      "reportFailed": "No se pudo enviar la denuncia. Inténtalo de nuevo."
     }
   },
   "billing": {
@@ -1340,6 +1428,376 @@
         "description": "Audita registros de transacciones, ingresos de suscripciones y facturación global."
       }
     }
+  },
+  "terms": {
+    "metaTitle": "Términos de Servicio · Gymmi",
+    "eyebrow": "Legal",
+    "title": "Términos de Servicio",
+    "subtitle": "Estos Términos rigen el uso del sitio web, el portal web y las aplicaciones móviles de Gymmi para iOS y Android. Léelos con atención.",
+    "lastUpdated": "Última actualización: {{date}}",
+    "tocTitle": "Contenido",
+    "backHome": "Volver al inicio",
+    "contactTitle": "¿Preguntas sobre estos Términos?",
+    "contactBody": "Escríbenos y te responderemos lo antes posible.",
+    "sections": [
+      {
+        "id": "acceptance",
+        "title": "1. Aceptación de estos Términos",
+        "paragraphs": [
+          "Estos Términos de Servicio (los \"Términos\") son un acuerdo vinculante entre tú y {{company}} (\"Gymmi\", \"nosotros\") que cubre el sitio web de Gymmi, el portal web, las aplicaciones móviles de Gymmi y las API y servicios relacionados (en conjunto, el \"Servicio\").",
+          "Al crear una cuenta, descargar la app o usar el Servicio de cualquier otra forma, confirmas que has leído, entendido y aceptas estos Términos y nuestra Política de Privacidad. Si no estás de acuerdo, no uses el Servicio."
+        ]
+      },
+      {
+        "id": "eligibility",
+        "title": "2. Requisitos de edad",
+        "paragraphs": [
+          "Debes tener al menos {{minAge}} años para crear una cuenta. Si eres menor de edad según las leyes de tu país, solo puedes usar el Servicio con el consentimiento y la supervisión de tu madre, padre o representante legal, quien acepta estos Términos en tu nombre y es responsable de tu uso del Servicio.",
+          "No puedes usar el Servicio si la ley aplicable te lo prohíbe, o si suspendimos o eliminamos tu cuenta anteriormente."
+        ]
+      },
+      {
+        "id": "accounts",
+        "title": "3. Tu cuenta",
+        "paragraphs": [
+          "Te registras como Atleta (Cliente), Entrenador Personal o Gimnasio. Te comprometes a proporcionar información veraz, incluido tu perfil físico, tus credenciales de entrenador o los datos de tu instalación, y a mantenerla actualizada.",
+          "Eres responsable de mantener tu contraseña en secreto y de toda la actividad de tu cuenta. Avísanos de inmediato a {{email}} si sospechas de un acceso no autorizado. Podemos bloquear temporalmente el inicio de sesión tras varios intentos fallidos para proteger tu cuenta."
+        ]
+      },
+      {
+        "id": "service",
+        "title": "4. Qué ofrece Gymmi",
+        "paragraphs": [
+          "Gymmi es una plataforma de entrenamiento. Te permite crear y seguir rutinas, consultar un catálogo de ejercicios, registrar sesiones, ver analíticas, clasificaciones de fuerza y rankings, leer y publicar artículos, y conectar a Atletas con Entrenadores Personales y Gimnasios.",
+          "Podemos añadir, cambiar o eliminar funciones en cualquier momento. Algunas funciones solo están disponibles en ciertas plataformas, roles o planes."
+        ]
+      },
+      {
+        "id": "health",
+        "title": "5. Aviso de salud y actividad física",
+        "paragraphs": [
+          "Gymmi no es un servicio médico y no ofrece consejo, diagnóstico ni tratamiento médico. Las rutinas, instrucciones de ejercicios, artículos, analíticas, estimaciones de 1RM y niveles de fuerza son solo información general y estimaciones.",
+          "Consulta a un médico antes de comenzar cualquier programa de ejercicio, sobre todo si estás embarazada, tienes una condición médica o te estás recuperando de una lesión. Detén el ejercicio de inmediato y busca ayuda médica si sientes dolor, mareo o falta de aire.",
+          "El ejercicio físico conlleva un riesgo inherente de lesión. Entrenas de forma voluntaria y bajo tu propio riesgo, y eres responsable de usar la técnica, el equipo y la supervisión adecuados."
+        ]
+      },
+      {
+        "id": "trainers-gyms",
+        "title": "6. Entrenadores, gimnasios y contratos",
+        "paragraphs": [
+          "Los Entrenadores Personales y los Gimnasios son terceros independientes. No son empleados, agentes ni representantes de Gymmi. No verificamos certificaciones, titulaciones ni el estado de las instalaciones, y no garantizamos la calidad ni los resultados de ningún entrenamiento o instalación.",
+          "Los contratos de entrenamiento, tarifas y membresías se acuerdan directamente entre Atletas, Entrenadores y Gimnasios. Salvo que se indique lo contrario, Gymmi no es parte de esos acuerdos ni procesa pagos entre ellos. Cualquier disputa debe resolverse entre las partes involucradas.",
+          "Los Entrenadores y Gimnasios que reciben datos de un Atleta (como su historial de entrenamientos y analíticas) a través del Servicio solo pueden usarlos para prestar sus servicios a ese Atleta, y deben protegerlos conforme a la ley aplicable."
+        ]
+      },
+      {
+        "id": "plans",
+        "title": "7. Planes, pagos y pruebas gratuitas",
+        "paragraphs": [
+          "Gymmi ofrece un plan Gratis y un plan de pago Plus. Los límites de cada plan (por ejemplo, número de rutinas, clientes o ejercicios personalizados) se muestran en nuestra página de precios y pueden cambiar con aviso previo.",
+          "Las suscripciones Plus se compran únicamente en el portal web de Gymmi, mediante los métodos de pago manual indicados allí (como Pago Móvil, transferencia bancaria, Zinli, Binance Pay o Zelle). Envías la referencia y el comprobante de pago, y nuestro equipo lo verifica manualmente. Una vez aprobado, tu plan queda activo por 30 días (mensual) o 365 días (anual), sumados a cualquier tiempo pagado restante. Las suscripciones no se renuevan automáticamente.",
+          "Las aplicaciones móviles de Gymmi no venden suscripciones ni contenido digital y no usan la Compra Integrada de Apple ni Google Play Billing. Las funciones que desbloquees en la web estarán disponibles en las apps móviles al iniciar sesión con la misma cuenta.",
+          "Las nuevas cuentas de Gimnasio pueden recibir una prueba gratuita con la duración y capacidad de miembros indicadas durante el registro. Cuando termina una prueba o un periodo pagado, tu cuenta vuelve a los límites del plan Gratis. El contenido que supere esos límites puede ocultarse, no eliminarse, hasta que vuelvas a mejorar tu plan.",
+          "Los pagos son definitivos una vez verificados, salvo cuando la ley exija un reembolso o no activemos el plan que pagaste. Si un pago no puede verificarse, lo rechazaremos y te explicaremos el motivo. Para solicitar un reembolso, escribe a {{email}}."
+        ]
+      },
+      {
+        "id": "content",
+        "title": "8. Tu contenido",
+        "paragraphs": [
+          "Conservas la propiedad del contenido que envías, incluidas rutinas, ejercicios personalizados, artículos, comentarios, fotos, logos y comprobantes de pago (\"Contenido de Usuario\"). Otorgas a Gymmi una licencia mundial, no exclusiva y gratuita para alojar, almacenar, reproducir, traducir, mostrar y distribuir tu Contenido de Usuario solo en la medida necesaria para operar y mejorar el Servicio y mostrarlo a las personas con quienes lo compartes.",
+          "Confirmas que tienes los derechos necesarios para compartir tu Contenido de Usuario y que no infringe derechos de terceros. Las rutinas o ejercicios que compartes o asignas pueden ser copiados por quienes los reciben."
+        ]
+      },
+      {
+        "id": "conduct",
+        "title": "9. Normas de la comunidad y tolerancia cero",
+        "paragraphs": [
+          "Gymmi tiene tolerancia cero con el contenido inapropiado y los usuarios abusivos. No debes publicar, subir ni compartir nada que:"
+        ],
+        "bullets": [
+          "sea sexualmente explícito, pornográfico, violento, de odio, discriminatorio o acosador;",
+          "amenace, intimide, difame o suplante a otra persona;",
+          "promueva autolesiones, trastornos alimentarios, drogas ilegales o el uso inseguro de sustancias para mejorar el rendimiento;",
+          "contenga spam, estafas, malware o publicidad no solicitada;",
+          "infrinja derechos de propiedad intelectual o de privacidad, o revele datos personales de otra persona sin su permiso;",
+          "sea ilegal de cualquier otro modo o perjudicial para menores."
+        ],
+        "paragraphsAfter": [
+          "Tampoco debes aplicar ingeniería inversa, extraer datos masivamente, sobrecargar o interferir con el Servicio, eludir los límites de los planes o las medidas de seguridad, ni acceder a cuentas de otros usuarios.",
+          "Puedes reportar contenido inapropiado o usuarios abusivos directamente en la app o el portal web: usa Reportar en cualquier artículo, comentario o usuario, y usa Bloquear para ocultar los artículos y comentarios de un usuario. También puedes escribir a {{email}}. Revisamos los reportes en un plazo de 24 horas y podemos eliminar el contenido y suspender o eliminar las cuentas responsables sin previo aviso."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "10. Servicios de terceros",
+        "paragraphs": [
+          "El Servicio depende de proveedores externos, por ejemplo alojamiento en la nube, Cloudflare R2 para almacenar imágenes y Google Gemini para traducir los textos del catálogo de ejercicios entre inglés y español. El tratamiento de datos que realizan se describe en nuestra Política de Privacidad.",
+          "Los enlaces a sitios web o proveedores de pago de terceros se ofrecen por conveniencia. No somos responsables de su contenido, disponibilidad ni condiciones."
+        ]
+      },
+      {
+        "id": "privacy",
+        "title": "11. Privacidad",
+        "paragraphs": [
+          "Nuestra Política de Privacidad, publicada en /privacy en el sitio web de Gymmi, explica qué datos personales recopilamos, incluidos tu perfil físico, historial de entrenamientos, fotos y referencias de pago, cómo los usamos, con quién los compartimos y los derechos que tienes. Al usar el Servicio reconoces dicha política."
+        ]
+      },
+      {
+        "id": "termination",
+        "title": "12. Eliminación, suspensión y cierre de la cuenta",
+        "paragraphs": [
+          "Puedes dejar de usar el Servicio en cualquier momento y eliminar tu cuenta tú mismo: en la app de Gymmi ve a Perfil → Eliminar cuenta, o en la web ve a Ajustes → Eliminar cuenta (no necesitas instalar la app). Deberás confirmar tu contraseña. La eliminación es inmediata y permanente: se borran tu perfil, entrenamientos, sesiones, asignaciones, contratos, artículos, comentarios e imágenes subidas, y los registros de pago que debemos conservar por obligaciones legales, fiscales o de prevención de fraude se anonimizan y se desvinculan de ti.",
+          "Si no puedes acceder a tu cuenta, también puedes solicitar la eliminación escribiendo a {{email}} desde el correo registrado en tu cuenta; eliminaremos o anonimizaremos tus datos en un plazo de 30 días.",
+          "Podemos suspender o cancelar tu acceso en cualquier momento si incumples estos Términos, si la ley lo exige o para proteger a los usuarios o al Servicio. Las secciones que por su naturaleza deban subsistir tras la cancelación (incluidas las licencias de contenido ya otorgadas a destinatarios, los avisos y las limitaciones de responsabilidad) seguirán vigentes."
+        ]
+      },
+      {
+        "id": "ip",
+        "title": "13. Propiedad intelectual de Gymmi",
+        "paragraphs": [
+          "El Servicio, incluido su software, diseño, logos, el nombre Gymmi y el catálogo de ejercicios y medios que proporcionamos, pertenece a Gymmi o a sus licenciantes y está protegido por las leyes de propiedad intelectual. Te otorgamos una licencia personal, revocable, no exclusiva e intransferible para usar el Servicio según su finalidad y conforme a estos Términos."
+        ]
+      },
+      {
+        "id": "app-stores",
+        "title": "14. Tiendas de aplicaciones móviles",
+        "paragraphs": [
+          "Si descargas la app de Gymmi desde la Apple App Store o Google Play, también aplica lo siguiente:"
+        ],
+        "bullets": [
+          "Estos Términos son únicamente entre tú y Gymmi, no con Apple Inc. ni Google LLC. Gymmi, y no Apple ni Google, es el único responsable de la app y su contenido.",
+          "Tu licencia de uso de la app se limita a dispositivos Apple o Android que poseas o controles, según lo permitan las reglas de uso de la tienda.",
+          "Apple y Google no tienen obligación alguna de ofrecer mantenimiento ni soporte para la app.",
+          "Si la app no cumple con alguna garantía aplicable, puedes notificarlo a Apple, y Apple te reembolsará el precio de compra (si lo hubo). En la máxima medida permitida por la ley, Apple no tendrá ninguna otra obligación de garantía respecto de la app.",
+          "Gymmi, y no Apple, es responsable de atender cualquier reclamación relacionada con la app o su uso, incluidas las de responsabilidad por producto, incumplimiento de requisitos legales o regulatorios, y protección del consumidor o privacidad.",
+          "Gymmi, y no Apple, es responsable de investigar, defender, resolver y liquidar cualquier reclamación de terceros que alegue que la app infringe derechos de propiedad intelectual.",
+          "Declaras que no te encuentras en un país sujeto a embargo del Gobierno de EE. UU. ni designado como país que \"apoya el terrorismo\", y que no figuras en ninguna lista de partes prohibidas o restringidas del Gobierno de EE. UU.",
+          "Debes cumplir los términos de terceros aplicables (como los de tu operador móvil) al usar la app.",
+          "Apple y sus subsidiarias son terceros beneficiarios de estos Términos y, una vez que los aceptas, tienen derecho a hacerlos cumplir frente a ti."
+        ]
+      },
+      {
+        "id": "disclaimers",
+        "title": "15. Exención de garantías",
+        "paragraphs": [
+          "El Servicio se ofrece \"tal cual\" y \"según disponibilidad\". En la máxima medida permitida por la ley, renunciamos a toda garantía, expresa o implícita, incluida la idoneidad para un fin determinado, la exactitud de analíticas o estimaciones y el funcionamiento ininterrumpido o libre de errores."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "16. Limitación de responsabilidad",
+        "paragraphs": [
+          "En la máxima medida permitida por la ley, Gymmi no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos, ni de lesiones, pérdida de datos, beneficios o reputación, derivados del uso del Servicio, del ejercicio físico o de la conducta de Entrenadores, Gimnasios u otros usuarios.",
+          "Nuestra responsabilidad total por cualquier reclamación relacionada con el Servicio se limita al importe que pagaste a Gymmi en los 12 meses anteriores a la reclamación, o a 50 USD si no pagaste nada. Nada en estos Términos limita la responsabilidad que la ley no permita limitar."
+        ]
+      },
+      {
+        "id": "indemnity",
+        "title": "17. Indemnización",
+        "paragraphs": [
+          "Aceptas defender e indemnizar a Gymmi frente a reclamaciones, pérdidas y gastos (incluidos honorarios legales razonables) derivados de tu Contenido de Usuario, de tus servicios de entrenamiento o de tu instalación, o de tu incumplimiento de estos Términos o de la ley."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "18. Cambios en estos Términos",
+        "paragraphs": [
+          "Podemos actualizar estos Términos ocasionalmente. Cambiaremos la fecha de \"Última actualización\" y, en caso de cambios importantes, te avisaremos por correo o dentro del Servicio antes de que entren en vigor. Si sigues usando el Servicio después de que los cambios entren en vigor, aceptas los Términos actualizados."
+        ]
+      },
+      {
+        "id": "law",
+        "title": "19. Ley aplicable",
+        "paragraphs": [
+          "Estos Términos se rigen por las leyes de {{jurisdiction}}, sin considerar sus normas sobre conflicto de leyes. Esto no te priva de la protección de las leyes de consumo obligatorias del país donde vives.",
+          "Si alguna disposición de estos Términos se considera inaplicable, las demás seguirán vigentes. Que no hagamos cumplir una disposición no supone renunciar a ella."
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "20. Contacto",
+        "paragraphs": [
+          "Para preguntas sobre estos Términos, eliminar tu cuenta o reportar contenido, escríbenos a {{email}}."
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "metaTitle": "Política de Privacidad · Gymmi",
+    "eyebrow": "Legal",
+    "title": "Política de Privacidad",
+    "subtitle": "Esta política explica qué datos personales recopila Gymmi a través de su sitio web, el portal web y las aplicaciones móviles para iOS y Android, para qué los usamos, con quién los compartimos y qué opciones tienes.",
+    "lastUpdated": "Última actualización: {{date}}",
+    "tocTitle": "Contenido",
+    "backHome": "Volver al inicio",
+    "contactTitle": "¿Preguntas sobre tu privacidad?",
+    "contactBody": "Escríbenos para acceder, corregir o eliminar tus datos, o con cualquier duda de privacidad.",
+    "sections": [
+      {
+        "id": "intro",
+        "title": "1. Quiénes somos",
+        "paragraphs": [
+          "{{company}} (\"Gymmi\", \"nosotros\") opera el sitio web de Gymmi, el portal web, las aplicaciones móviles de Gymmi y las API y servicios relacionados (en conjunto, el \"Servicio\"). Somos responsables de los datos personales descritos en esta Política de Privacidad.",
+          "Esta política aplica a todos los usuarios de Gymmi: Atletas (Clientes), Entrenadores Personales y Gimnasios. Debe leerse junto con nuestros Términos de Servicio."
+        ]
+      },
+      {
+        "id": "collect",
+        "title": "2. Datos que recopilamos",
+        "paragraphs": [
+          "Solo recopilamos los datos que nos proporcionas o que se generan al usar el Servicio:"
+        ],
+        "bullets": [
+          "Datos de la cuenta: correo electrónico, nombre de usuario y contraseña. Nunca guardamos tu contraseña en texto plano; solo conservamos un hash irreversible. También guardamos tu rol, plan y fechas de la cuenta.",
+          "Perfil físico (Atletas): edad, género, estatura, peso y objetivo de entrenamiento.",
+          "Datos de entrenamiento: rutinas, ejercicios personalizados, sesiones de entrenamiento (hora de inicio y fin, series, pesos, repeticiones, descanso y esfuerzo percibido) y las analíticas, récords personales, clasificaciones de fuerza y posiciones en rankings calculadas a partir de ellas.",
+          "Perfil de entrenador: descripción, especializaciones, tarifa mensual, gimnasios donde entrenas y tu logo.",
+          "Datos del gimnasio: nombre, descripción, dirección, ciudad, teléfono, sitio web, servicios, logo, imagen de portada, capacidad de miembros y la lista de miembros y entrenadores afiliados.",
+          "Imágenes que subes: fotos de perfil, logos de entrenadores y gimnasios, portadas de gimnasios, portadas de artículos y comprobantes de pago.",
+          "Datos de pago: plan, ciclo de facturación, monto, método de pago, número de referencia, banco de origen, teléfono del pagador, cédula de identidad del pagador y la imagen del comprobante que envías, además del estado y las notas de nuestra revisión. No recopilamos ni guardamos números de tarjeta.",
+          "Contenido de la comunidad: artículos, comentarios, \"me gusta\" y guardados.",
+          "Datos de relaciones: contratos con entrenadores (fechas, estado y el mensaje opcional que envíes), membresías de gimnasios y afiliaciones de entrenadores.",
+          "Datos técnicos: tokens de inicio de sesión que mantienen tu sesión abierta, y tu dirección IP, que usamos temporalmente para bloquear tráfico abusivo y no guardamos en tu perfil."
+        ]
+      },
+      {
+        "id": "not-collected",
+        "title": "3. Datos que no recopilamos",
+        "paragraphs": [
+          "Gymmi no recopila tu ubicación precisa, contactos, historial de navegación, identificadores publicitarios ni datos de Apple Salud o Google Fit. Las aplicaciones no contienen publicidad ni SDK de seguimiento o analítica de terceros, y no te rastreamos en apps o sitios web de otras empresas.",
+          "Las aplicaciones móviles solo piden acceso a tu cámara o galería de fotos cuando decides agregar una imagen, como una foto de perfil o un comprobante de pago. Solo se sube la imagen que seleccionas."
+        ]
+      },
+      {
+        "id": "use",
+        "title": "4. Cómo usamos tus datos",
+        "paragraphs": [
+          "Usamos cada tipo de dato solo para los fines siguientes:"
+        ],
+        "bullets": [
+          "Datos de la cuenta: para crear y proteger tu cuenta, iniciar tu sesión y contactarte sobre tu cuenta, pagos o reportes.",
+          "Perfil físico y datos de entrenamiento: para registrar tu entrenamiento y calcular analíticas, 1RM estimados, clasificaciones de fuerza y rankings, y para compartir tu progreso con los Entrenadores y Gimnasios con los que te conectes.",
+          "Datos de entrenadores y gimnasios: para mostrar tu perfil público y que los Atletas te encuentren, y para gestionar contratos, miembros y entrenadores.",
+          "Imágenes: para mostrarlas donde las agregaste y, en el caso de los comprobantes, para verificar tu pago.",
+          "Datos de pago: para verificar pagos manuales, activar tu plan, prevenir fraudes y cumplir obligaciones contables y fiscales.",
+          "Contenido de la comunidad: para publicarlo a otros usuarios y moderarlo según nuestras reglas de tolerancia cero.",
+          "Datos técnicos: para mantener el Servicio seguro, prevenir abusos y corregir problemas."
+        ],
+        "paragraphsAfter": [
+          "No vendemos tus datos personales, no los usamos para publicidad ni para decisiones automatizadas que tengan efectos legales o igualmente significativos sobre ti."
+        ]
+      },
+      {
+        "id": "legal-bases",
+        "title": "5. Bases legales",
+        "paragraphs": [
+          "Tratamos tus datos porque son necesarios para prestarte el Servicio que contrataste, porque diste tu consentimiento (por ejemplo, para un perfil físico opcional o para conectarte con un Entrenador o Gimnasio), para cumplir obligaciones legales (como conservar registros de pago) y por nuestro interés legítimo en mantener el Servicio seguro y libre de abusos. Cuando nos basamos en tu consentimiento, puedes retirarlo en cualquier momento."
+        ]
+      },
+      {
+        "id": "sharing-users",
+        "title": "6. Qué pueden ver otros usuarios",
+        "paragraphs": [
+          "Parte de tus datos es visible para otros usuarios para que el Servicio funcione:"
+        ],
+        "bullets": [
+          "Los Entrenadores Personales con los que tengas un contrato activo pueden ver tu nombre de usuario, correo electrónico, sesiones de entrenamiento y analíticas.",
+          "Los Gimnasios a los que te unas pueden ver tu nombre de usuario, correo electrónico, foto de perfil, perfil físico (edad, género, estatura, peso y objetivo) y el entrenamiento relacionado con las rutinas que el Gimnasio o sus entrenadores te asignen.",
+          "Los perfiles de Entrenadores y Gimnasios, los artículos publicados, los comentarios y tu nombre de usuario y foto de perfil junto a ellos son visibles para otros usuarios. Los rankings muestran tu nombre de usuario y posición.",
+          "Las rutinas o ejercicios que compartas o asignes pueden ser vistos y copiados por quienes los reciban."
+        ],
+        "paragraphsAfter": [
+          "Los Entrenadores y Gimnasios solo pueden usar los datos de un Atleta para prestarle sus servicios. Al terminar un contrato o salir de un Gimnasio, se detiene el acceso a nuevos datos."
+        ]
+      },
+      {
+        "id": "processors",
+        "title": "7. Proveedores de servicios",
+        "paragraphs": [
+          "Usamos un número reducido de proveedores que tratan datos en nuestro nombre, bajo contratos que limitan su uso a prestarnos su servicio:"
+        ],
+        "bullets": [
+          "Proveedores de alojamiento en la nube y bases de datos, que ejecutan nuestros servidores y guardan los datos de cuenta, perfil, entrenamiento y pagos.",
+          "Cloudflare R2, que almacena las imágenes que subes (fotos de perfil, logos, portadas y comprobantes de pago).",
+          "Google Gemini, que usamos únicamente para traducir textos del catálogo de ejercicios entre inglés y español. No enviamos tus datos personales a Gemini."
+        ],
+        "paragraphsAfter": [
+          "También podemos divulgar datos cuando la ley o una solicitud legal válida lo exija, para proteger los derechos, la seguridad o la propiedad de nuestros usuarios o de Gymmi, o como parte de una fusión o venta del negocio, en cuyo caso el sucesor deberá respetar esta política."
+        ]
+      },
+      {
+        "id": "retention",
+        "title": "8. Cuánto tiempo conservamos los datos",
+        "paragraphs": [
+          "Conservamos tus datos mientras tu cuenta esté activa. Las imágenes que reemplazas, como una foto de perfil o un logo anterior, se eliminan. El contenido que borras, como un entrenamiento, artículo o comentario, se elimina del Servicio.",
+          "Cuando eliminas tu cuenta, tus datos personales se borran de inmediato (o en un plazo de 30 días si lo solicitas por correo). Podemos conservar registros de pago anonimizados durante el tiempo que exijan las leyes contables, fiscales o antifraude, y los datos necesarios para resolver una disputa o hacer cumplir nuestros Términos hasta que se resuelva."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "9. Seguridad",
+        "paragraphs": [
+          "Protegemos tus datos con conexiones cifradas (HTTPS), contraseñas con hash, tokens de sesión de corta duración, controles de acceso por rol y límites de intentos contra ataques de fuerza bruta. Los archivos subidos reciben nombres aleatorios imposibles de adivinar.",
+          "Ningún sistema es completamente seguro. Si detectamos una brecha que afecte tus datos personales, te lo notificaremos a ti y a las autoridades según lo exija la ley."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "10. Tus derechos y opciones",
+        "paragraphs": [
+          "Según el lugar donde vivas, tienes derecho a:"
+        ],
+        "bullets": [
+          "acceder a los datos personales que tenemos sobre ti y obtener una copia;",
+          "corregir datos inexactos; puedes editar la mayor parte de tu perfil directamente en la app o el portal web;",
+          "eliminar tu cuenta y tus datos personales;",
+          "oponerte a ciertos tratamientos o limitarlos, y retirar tu consentimiento en cualquier momento;",
+          "recibir tus datos en un formato portable;",
+          "presentar una reclamación ante tu autoridad local de protección de datos."
+        ],
+        "paragraphsAfter": [
+          "Para ejercer cualquiera de estos derechos, escribe a {{email}} desde el correo registrado en tu cuenta. Podemos pedirte que confirmes tu identidad y responderemos en un plazo de 30 días."
+        ]
+      },
+      {
+        "id": "deletion",
+        "title": "11. Eliminar tu cuenta",
+        "paragraphs": [
+          "Puedes eliminar tu cuenta de Gymmi tú mismo en cualquier momento: en la app de Gymmi ve a Perfil → Eliminar cuenta, o en el portal web ve a Ajustes → Eliminar cuenta (no necesitas instalar la app). Se te pedirá confirmar tu contraseña. La eliminación es inmediata y permanente y borra tu cuenta, perfil, historial de entrenamientos, imágenes, contratos, membresías, artículos y comentarios. Los registros de pago que la ley nos obliga a conservar se anonimizan y se desvinculan de ti, como se describe en la sección 8.",
+          "Si no puedes iniciar sesión, puedes solicitar la eliminación escribiendo a {{email}} desde el correo registrado en tu cuenta; la completaremos en un plazo de 30 días.",
+          "Desinstalar la app no elimina tu cuenta."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "12. Menores de edad",
+        "paragraphs": [
+          "El Servicio no está dirigido a menores de {{minAge}} años, y debes tener al menos {{minAge}} años para crear una cuenta. Si eres menor de la mayoría de edad legal donde vives, solo puedes usar el Servicio con el consentimiento y la supervisión de tu padre, madre o tutor legal.",
+          "Si descubrimos que hemos recopilado datos personales de un menor de {{minAge}} años, los eliminaremos. Los padres o tutores que crean que esto ha ocurrido pueden escribirnos a {{email}}."
+        ]
+      },
+      {
+        "id": "transfers",
+        "title": "13. Transferencias internacionales",
+        "paragraphs": [
+          "Nuestros proveedores pueden almacenar y tratar tus datos en servidores fuera de tu país, incluido Estados Unidos. Cuando transferimos datos a otros países, tomamos medidas para que mantengan un nivel de protección acorde con esta política y con la ley aplicable."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "14. Cambios en esta política",
+        "paragraphs": [
+          "Podemos actualizar esta Política de Privacidad periódicamente. Cambiaremos la fecha de \"Última actualización\" y, si los cambios son importantes, te avisaremos por correo o dentro del Servicio antes de que entren en vigor."
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "15. Contacto",
+        "paragraphs": [
+          "Para preguntas de privacidad, solicitudes sobre tus datos o la eliminación de tu cuenta, contacta a {{company}} en {{email}}. Esta política se rige por las leyes de {{jurisdiction}}, sin privarte de la protección de las leyes imperativas de protección de datos del país donde vives."
+        ]
+      }
+    ]
   }
 }
-

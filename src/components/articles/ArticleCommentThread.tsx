@@ -1,4 +1,4 @@
-import { MessageSquare, Send, Trash2 } from 'lucide-react';
+import { Ban, Flag, MessageSquare, Send, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -8,6 +8,10 @@ import {
   useCreateArticleComment,
   useDeleteArticleComment,
 } from '../../hooks/useArticles';
+import { useBlockUser } from '../../hooks/useModeration';
+import { useAuth } from '../../context/AuthContext';
+import type { ArticleCommentItem } from '../../types/articles';
+import { ReportDialog } from './ReportDialog';
 
 interface ArticleCommentThreadProps {
   articleId: string;
@@ -19,6 +23,9 @@ export function ArticleCommentThread({ articleId }: ArticleCommentThreadProps) {
   const { data: comments = [], isLoading } = useArticleComments(articleId);
   const createCommentMutation = useCreateArticleComment();
   const deleteCommentMutation = useDeleteArticleComment();
+  const blockUserMutation = useBlockUser();
+  const { user } = useAuth();
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
 
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +45,17 @@ export function ArticleCommentThread({ articleId }: ArticleCommentThreadProps) {
     try {
       await deleteCommentMutation.mutateAsync({ articleId, commentId });
       toast.success(t('common.success'));
+    } catch {
+      toast.error(t('common.error'));
+    }
+  };
+
+  const handleBlock = async (commentUser: ArticleCommentItem['user']) => {
+    const username = commentUser.displayName || commentUser.username;
+    if (!window.confirm(t('articles.moderation.blockConfirm', { username }))) return;
+    try {
+      await blockUserMutation.mutateAsync(commentUser.id);
+      toast.success(t('articles.moderation.blocked', { username }));
     } catch {
       toast.error(t('common.error'));
     }
@@ -100,6 +118,28 @@ export function ArticleCommentThread({ articleId }: ArticleCommentThreadProps) {
                     minute: '2-digit',
                   })}
                 </Timestamp>
+                {comment.user.id !== user?.id && (
+                  <IconActions>
+                    <IconBtn
+                      type="button"
+                      onClick={() => setReportingCommentId(comment.id)}
+                      title={t('articles.moderation.reportComment')}
+                      aria-label={t('articles.moderation.reportComment')}
+                      data-testid={`report-comment-${comment.id}`}
+                    >
+                      <Flag size={13} />
+                    </IconBtn>
+                    <IconBtn
+                      type="button"
+                      onClick={() => handleBlock(comment.user)}
+                      title={t('articles.moderation.blockUser')}
+                      aria-label={t('articles.moderation.blockUser')}
+                      data-testid={`block-comment-author-${comment.id}`}
+                    >
+                      <Ban size={13} />
+                    </IconBtn>
+                  </IconActions>
+                )}
                 {comment.canDelete && (
                   <DeleteBtn
                     type="button"
@@ -116,6 +156,14 @@ export function ArticleCommentThread({ articleId }: ArticleCommentThreadProps) {
           </CommentItem>
         ))}
       </List>
+
+      {reportingCommentId && (
+        <ReportDialog
+          targetType="COMMENT"
+          targetId={reportingCommentId}
+          onClose={() => setReportingCommentId(null)}
+        />
+      )}
     </Container>
   );
 }
@@ -256,6 +304,32 @@ const Username = styled.span`
 const Timestamp = styled.span`
   font-size: 0.72rem;
   color: #7c84aa;
+`;
+
+const IconActions = styled.div`
+  display: flex;
+  gap: 0.15rem;
+  margin-left: auto;
+
+  & + button {
+    margin-left: 0;
+  }
+`;
+
+const IconBtn = styled.button`
+  background: transparent;
+  border: none;
+  color: #7c84aa;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #ef233c;
+  }
 `;
 
 const DeleteBtn = styled.button`

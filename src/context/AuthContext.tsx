@@ -6,14 +6,14 @@ import {
   getTokens,
   clearTokens,
 } from '../services/storage/tokenStorage';
-import type { AuthUser } from '../types/auth';
+import type { AuthUser, SignupParams } from '../types/auth';
 
 type AuthContextType = {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (identifier: string, password: string) => Promise<void>;
-  signUp: (email: string, username: string, password: string, role: string) => Promise<void>;
+  signUp: (params: SignupParams) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -57,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(response.user);
   };
 
-  const signUp = async (email: string, username: string, password: string, role: string) => {
-    const response = await signupApi({ email, username, password, role });
+  const signUp = async (params: SignupParams) => {
+    const response = await signupApi(params);
     saveTokens(response.accessToken, response.refreshToken);
     setUser(response.user);
   };

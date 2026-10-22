@@ -33,3 +33,4 @@ The web frontend implementation for the Articles knowledge hub and community fee
   - Retained an expandable secondary toggle ("Paste URL") for manual link entry without cluttering the primary UI.
 - Uploads now send `Cache-Control: public, max-age=31536000, immutable` headers.
 - Added comprehensive unit tests in `src/components/articles/ArticleEditorModal.test.tsx` verifying field rendering, dropzone interactions, image preview, removal, and submission (all 6 tests passing).
+- Added Report and Block actions to the article reader and comment thread, and an admin review queue at `/admin/reports`. See [moderation.md](moderation.md).

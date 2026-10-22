@@ -87,6 +87,8 @@ describe('useSignup', () => {
       username: 'user',
       password: 'pass123',
       role: 'Client',
+      acceptTerms: true,
+      termsVersion: '2026-10-21',
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -95,6 +97,8 @@ describe('useSignup', () => {
       username: 'user',
       password: 'pass123',
       role: 'Client',
+      acceptTerms: true,
+      termsVersion: '2026-10-21',
     });
   });
 
@@ -110,6 +114,8 @@ describe('useSignup', () => {
       username: 'user',
       password: 'pass',
       role: 'Client',
+      acceptTerms: true,
+      termsVersion: '2026-10-21',
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));

@@ -89,4 +89,10 @@ test.describe('Landing Page', () => {
     await langBtn.click();
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Coaching Meets Execution');
   });
+
+  test('opens the Terms of Service page from the footer', async ({ page }) => {
+    await page.getByRole('link', { name: 'Terms of Service' }).click();
+    await expect(page).toHaveURL(/\/terms$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Terms of Service');
+  });
 });

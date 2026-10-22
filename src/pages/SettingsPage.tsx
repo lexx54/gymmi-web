@@ -3,6 +3,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { TopBar } from '../components/layout/TopBar';
 import { AccountSettingsCard } from '../components/settings/AccountSettingsCard';
 import { DataManagementCard } from '../components/settings/DataManagementCard';
+import { DeleteAccountCard } from '../components/settings/DeleteAccountCard';
 import { ProfileHeroCard } from '../components/settings/ProfileHeroCard';
 import { SettingsFooter } from '../components/settings/SettingsFooter';
 import {
@@ -56,6 +57,7 @@ export default function SettingsPage() {
             <CoachingProfileCard userProfile={effectiveProfile} isLoading={isLoading} />
           )}
           <DataManagementCard />
+          <DeleteAccountCard />
           <SettingsFooter />
         </SettingsContent>
       </SettingsMain>

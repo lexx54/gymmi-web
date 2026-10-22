@@ -10,6 +10,7 @@ Provides user profile inspection, physical body metric management, professional 
   3. **Physical Profile Card**: Replaces mock training metrics card. Displays Age, Gender, Height, Weight, and Fitness Goal with live `cm`/`ft` and `kg`/`lbs` toggles. Offers inline "Edit Profile" mode with live validation and mutation saving.
   4. **Coaching Profile Card (Trainers Only)**: Displayed exclusively for users with the `Trainer` role. Shows Monthly Rate ($ USD), Specializations, verified Gym Affiliations, and Services Bio. Offers inline "Edit Credentials" mode with preset chips, custom tag adder, and services textarea. Gym affiliations are displayed from formal facility approvals (`gym_coaches`) and cannot be arbitrarily edited here.
   5. **Data Card**: Device preferences and data management options (language is managed globally via the standardized TopBar).
+  6. **Delete Account (danger zone)**: `DeleteAccountCard` opens a confirmation modal that requires the current password and typing `DELETE`. It calls `DELETE /user/me`, then clears the React Query cache, signs out and redirects to `/login`. This is also the web deletion entry point Google Play requires for people without the app installed.
 
 ## Key files
 
@@ -18,7 +19,8 @@ Provides user profile inspection, physical body metric management, professional 
 - `src/components/settings/CoachingProfileCard.tsx`: Card for viewing and editing trainer coaching credentials.
 - `src/components/settings/ProfileHeroCard.tsx`: Hero card dynamically adapting to Client vs Trainer roles.
 - `src/components/settings/AccountSettingsCard.tsx`: Account credentials and security controls.
-- `src/services/api/user.ts`: API service with `fetchUserProfileApi` and `updateUserProfileApi`.
+- `src/components/settings/DeleteAccountCard.tsx`: Danger-zone card and confirmation modal for permanent account deletion.
+- `src/services/api/user.ts`: API service with `fetchUserProfileApi`, `updateUserProfileApi` and `deleteAccountApi`.
 - `src/hooks/useUserProfile.ts`: React Query hooks `useUserProfile` and `useUpdateUserProfile`.
 - `src/types/auth.ts`: Types for `FullUserProfile` and `UpdateProfilePayload`.
 - `src/i18n/locales/en.json` & `es.json`: Full English and Spanish localization strings.
@@ -28,6 +30,8 @@ Provides user profile inspection, physical body metric management, professional 
 - **Role-Adaptive Layout**: `CoachingProfileCard` is conditionally rendered only when `role.name === 'Trainer'`. For Athletes (`Client`), it is completely omitted.
 - **Inline Editing**: Instead of redirects or modals, cards switch between view and edit modes inline, preserving user context and flow.
 - **Unit Conversions**: Toggling between `cm`/`ft` or `kg`/`lbs` updates the display on the fly and automatically normalizes to metric (`cm`, `kg`) before saving to the backend.
+
+- **Account deletion**: deletion is permanent and immediate on the API side, so the modal requires both password re-confirmation and a typed `DELETE`. A wrong password returns `403` (not `401`), so the axios refresh interceptor never kicks in, and the server message appears inline in the modal. Strings live under `settings.deleteAccount.*` (EN/ES).
 
 ## Changes made by current task
 
@@ -49,4 +53,4 @@ Provides user profile inspection, physical body metric management, professional 
   - Active preset chips in edit mode render localized text via `t(preset.labelKey)` while maintaining test attributes `data-testid="edit-tag-${preset.defaultEn}"`.
   - View mode tags in `CoachingProfileCard.tsx`, `ProfileHeroCard.tsx`, and `PublicProfileModal.tsx` automatically translate stored database values (English, Spanish, or key) to the current language via `getSpecializationLabel(spec, t)`.
   - Custom unlisted specializations are preserved and displayed as entered.
-
+- Added the "Delete account" danger zone (`DeleteAccountCard.tsx` + `DeleteAccountCard.test.tsx`), `deleteAccountApi`, and EN/ES `settings.deleteAccount.*` strings. Updated Terms section 12 (`terms.sections` → `termination`) to describe in-app/web deletion with email as fallback. `Payment.userId` in `src/types/payments.ts` is now `string | null` (anonymized payments of deleted accounts).

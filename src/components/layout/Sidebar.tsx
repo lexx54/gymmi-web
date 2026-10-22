@@ -1,4 +1,4 @@
-import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy, BookOpen, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart3, NotebookPen, Settings, LogOut, Shield, Users, Handshake, Trophy, BookOpen, CreditCard, Flag } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -44,6 +44,7 @@ const adminItems: SidebarItem[] = [
   { labelKey: 'nav.permissions', to: '/admin/permissions', icon: Shield, tourId: 'nav-permissions' },
   { labelKey: 'nav.users', to: '/admin/users', icon: Users, tourId: 'nav-users' },
   { labelKey: 'nav.payments', to: '/admin/payments', icon: CreditCard, tourId: 'nav-payments' },
+  { labelKey: 'nav.reports', to: '/admin/reports', icon: Flag, tourId: 'nav-reports' },
 ];
 
 export function Sidebar({ username }: SidebarProps) {

@@ -1,21 +1,27 @@
 import {
   Bookmark,
   Calendar,
+  Ban,
   Clock,
+  Flag,
   Heart,
   ShieldCheck,
   UserCheck,
   X,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import styled from 'styled-components';
 import type { ArticleItem } from '../../types/articles';
 import {
   useToggleArticleBookmark,
   useToggleArticleLike,
 } from '../../hooks/useArticles';
+import { useBlockUser } from '../../hooks/useModeration';
+import { useAuth } from '../../context/AuthContext';
 import { ArticleCommentThread } from './ArticleCommentThread';
+import { ReportDialog } from './ReportDialog';
 
 interface ArticleReaderModalProps {
   article: ArticleItem | null;
@@ -29,6 +35,9 @@ export function ArticleReaderModal({
   const { t } = useTranslation();
   const toggleLikeMutation = useToggleArticleLike();
   const toggleBookmarkMutation = useToggleArticleBookmark();
+  const blockUserMutation = useBlockUser();
+  const { user } = useAuth();
+  const [isReporting, setIsReporting] = useState(false);
 
   // Simple, safe Markdown to structured presentation
   const renderedContent = useMemo(() => {
@@ -74,6 +83,25 @@ export function ArticleReaderModal({
   const handleBookmark = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleBookmarkMutation.mutate(article.id);
+  };
+
+  const isOwnArticle = user?.id === article.authorId;
+  const authorName =
+    article.authorRole === 'GYM'
+      ? article.gym?.name || article.author?.username || ''
+      : article.trainer?.username || article.author?.username || '';
+
+  const handleBlockAuthor = async () => {
+    if (!window.confirm(t('articles.moderation.blockConfirm', { username: authorName }))) {
+      return;
+    }
+    try {
+      await blockUserMutation.mutateAsync(article.authorId);
+      toast.success(t('articles.moderation.blocked', { username: authorName }));
+      onClose();
+    } catch {
+      toast.error(t('common.error'));
+    }
   };
 
   return (
@@ -172,7 +200,39 @@ export function ArticleReaderModal({
                 color={article.isBookmarkedByMe ? '#ef233c' : 'currentColor'}
               />
             </ActionBtn>
+
+            {!isOwnArticle && (
+              <ModerationActions>
+                <ActionBtn
+                  type="button"
+                  onClick={() => setIsReporting(true)}
+                  title={t('articles.moderation.reportArticle')}
+                  data-testid="article-report-btn"
+                >
+                  <Flag size={16} />
+                  <span>{t('articles.moderation.report')}</span>
+                </ActionBtn>
+                <ActionBtn
+                  type="button"
+                  onClick={handleBlockAuthor}
+                  disabled={blockUserMutation.isPending}
+                  title={t('articles.moderation.blockAuthor')}
+                  data-testid="article-block-author-btn"
+                >
+                  <Ban size={16} />
+                  <span>{t('articles.moderation.block')}</span>
+                </ActionBtn>
+              </ModerationActions>
+            )}
           </ActionBar>
+
+          {isReporting && (
+            <ReportDialog
+              targetType="ARTICLE"
+              targetId={article.id}
+              onClose={() => setIsReporting(false)}
+            />
+          )}
 
           <ArticleCommentThread articleId={article.id} />
         </ModalBody>
@@ -351,6 +411,12 @@ const ActionBar = styled.div`
   margin-top: 1.75rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(126, 136, 175, 0.15);
+`;
+
+const ModerationActions = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
 `;
 
 const ActionBtn = styled.button<{ $active?: boolean }>`

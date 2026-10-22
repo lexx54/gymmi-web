@@ -8,6 +8,8 @@ import { RoleRoute } from './components/RoleRoute'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
+const TermsPage = lazy(() => import('./pages/TermsPage'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const SignupPage = lazy(() => import('./pages/SignupPage'))
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
@@ -21,6 +23,7 @@ const TrainersPage = lazy(() => import('./pages/TrainersPage'))
 const AdminPermissionsPage = lazy(() => import('./pages/admin/AdminPermissionsPage'))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'))
 const AdminPaymentsPage = lazy(() => import('./pages/admin/AdminPaymentsPage'))
+const AdminReportsPage = lazy(() => import('./pages/admin/AdminReportsPage'))
 const GymCatalogPage = lazy(() => import('./pages/gym/GymCatalogPage'))
 const GymCoachesPage = lazy(() => import('./pages/gym/GymCoachesPage'))
 const GymMembersPage = lazy(() => import('./pages/gym/GymMembersPage'))
@@ -51,6 +54,8 @@ function App() {
       <Suspense fallback={<PageFallback />}>
         <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
@@ -81,6 +86,7 @@ function App() {
           <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />
           <Route path="/admin/users" element={<RoleRoute role="Admin"><AdminUsersPage /></RoleRoute>} />
           <Route path="/admin/payments" element={<RoleRoute role="Admin"><AdminPaymentsPage /></RoleRoute>} />
+          <Route path="/admin/reports" element={<RoleRoute role="Admin"><AdminReportsPage /></RoleRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { forgotPasswordApi, resetPasswordApi, signupApi } from '../services/api/auth';
-import type { ForgotPasswordParams, ResetPasswordParams } from '../types/auth';
+import type { ForgotPasswordParams, ResetPasswordParams, SignupParams } from '../types/auth';
 
 export function useLogin() {
   const { signIn } = useAuth();
@@ -14,8 +14,7 @@ export function useLogin() {
 
 export function useSignup() {
   return useMutation({
-    mutationFn: (params: { email: string; username: string; password: string; role: string }) =>
-      signupApi(params),
+    mutationFn: (params: SignupParams) => signupApi(params),
   });
 }
 

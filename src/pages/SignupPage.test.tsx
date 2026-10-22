@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
 import SignupPage from './SignupPage';
+import { LEGAL_CONFIG } from '../constants/legal.constants';
 
 const mockMutate = vi.fn();
 const mockNavigate = vi.fn();
@@ -161,6 +162,7 @@ describe('SignupPage Multi-Step Flow', () => {
     expect(screen.getByText('78 kg')).toBeInTheDocument();
 
     // Confirm & Create Account
+    await user.click(screen.getByTestId('input-accept-terms'));
     await user.click(screen.getByTestId('confirm-signup-btn'));
 
     await waitFor(() => {
@@ -170,6 +172,8 @@ describe('SignupPage Multi-Step Flow', () => {
           username: 'clientuser',
           password: 'securepassword',
           role: 'Client',
+          acceptTerms: true,
+          termsVersion: LEGAL_CONFIG.lastUpdated,
           profile: {
             age: 26,
             gender: 'male',
@@ -235,6 +239,7 @@ describe('SignupPage Multi-Step Flow', () => {
     expect(screen.getByText('Hypertrophy')).toBeInTheDocument();
 
     // Submit
+    await user.click(screen.getByTestId('input-accept-terms'));
     await user.click(screen.getByTestId('confirm-signup-btn'));
 
     await waitFor(() => {
@@ -244,6 +249,8 @@ describe('SignupPage Multi-Step Flow', () => {
           username: 'protrainer',
           password: 'trainerpass12',
           role: 'Trainer',
+          acceptTerms: true,
+          termsVersion: LEGAL_CONFIG.lastUpdated,
           profile: {
             age: 31,
             gender: 'female',
@@ -303,6 +310,7 @@ describe('SignupPage Multi-Step Flow', () => {
     expect(screen.getByText('30-Day Free Trial (100 Members)')).toBeInTheDocument();
 
     // Submit
+    await user.click(screen.getByTestId('input-accept-terms'));
     await user.click(screen.getByTestId('confirm-signup-btn'));
 
     await waitFor(() => {
@@ -312,6 +320,8 @@ describe('SignupPage Multi-Step Flow', () => {
           username: 'ironforge',
           password: 'gympass123',
           role: 'Gym',
+          acceptTerms: true,
+          termsVersion: LEGAL_CONFIG.lastUpdated,
           gymProfile: {
             name: 'Iron Forge Gym',
             description: 'Premier strength facility and powerlifting hub.',
@@ -402,6 +412,8 @@ describe('SignupPage Multi-Step Flow', () => {
     await waitFor(() => {
       expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
     });
+
+    await user.click(screen.getByTestId('input-accept-terms'));
 
     await user.click(screen.getByTestId('confirm-signup-btn'));
 
@@ -513,6 +525,7 @@ describe('SignupPage Multi-Step Flow', () => {
     expect(screen.getByTestId('summary-logo-img')).toHaveAttribute('src', 'https://cdn.example.com/logos/my-logo.png');
 
     // Submit
+    await user.click(screen.getByTestId('input-accept-terms'));
     await user.click(screen.getByTestId('confirm-signup-btn'));
 
     expect(mockMutate).toHaveBeenCalledWith(
@@ -580,6 +593,7 @@ describe('SignupPage Multi-Step Flow', () => {
     });
 
     // Submit
+    await user.click(screen.getByTestId('input-accept-terms'));
     await user.click(screen.getByTestId('confirm-signup-btn'));
 
     expect(mockMutate).toHaveBeenCalledWith(
@@ -635,5 +649,49 @@ describe('SignupPage Multi-Step Flow', () => {
     // Switch back to preset goal
     await user.selectOptions(goalSelect, screen.getByTestId('goal-buildMuscle'));
     expect(screen.queryByTestId('input-custom-goal')).not.toBeInTheDocument();
+  });
+
+  it('requires accepting the Terms of Service and Privacy Policy before submitting', async () => {
+    const user = userEvent.setup();
+    render(createElement(SignupPage), { wrapper: createWrapper() });
+
+    await user.click(screen.getByTestId('role-gym'));
+    await user.type(screen.getByTestId('input-email'), 'gymowner@ironforge.com');
+    await user.type(screen.getByTestId('input-username'), 'ironforge');
+    await user.type(screen.getByTestId('input-password'), 'gympass123');
+    await user.type(screen.getByTestId('input-confirmPassword'), 'gympass123');
+    await user.click(screen.getByTestId('step1-next'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('input-gym-name')).toBeInTheDocument();
+    });
+    await user.type(screen.getByTestId('input-gym-name'), 'Iron Forge');
+    await user.click(screen.getByTestId('step2-gym-next'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('signup-step-confirmation')).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute('href', '/terms');
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/privacy');
+
+    await user.click(screen.getByTestId('confirm-signup-btn'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('accept-terms-error')).toHaveTextContent(
+        'You must accept the Terms of Service and Privacy Policy',
+      );
+    });
+    expect(mockMutate).not.toHaveBeenCalled();
+
+    await user.click(screen.getByTestId('input-accept-terms'));
+    await user.click(screen.getByTestId('confirm-signup-btn'));
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith(
+        expect.objectContaining({ acceptTerms: true, termsVersion: LEGAL_CONFIG.lastUpdated }),
+        expect.any(Object),
+      );
+    });
   });
 });

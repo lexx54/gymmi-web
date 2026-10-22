@@ -20,7 +20,7 @@ export interface PaymentUserSummary {
 
 export interface Payment {
   id: string;
-  userId: string;
+  userId: string | null;
   user?: PaymentUserSummary;
   roleName: string;
   plan: string;

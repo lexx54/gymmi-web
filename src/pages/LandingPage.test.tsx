@@ -215,4 +215,16 @@ describe('LandingPage', () => {
     await user.click(gymFaq);
     expect(screen.getByText(/Gym facilities receive a dedicated management web console/i)).toBeInTheDocument();
   });
+
+  it('links to the Terms of Service page from the footer', () => {
+    render(<LandingPage />, { wrapper: createWrapper() });
+
+    expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute('href', '/terms');
+  });
+
+  it('links to the Privacy Policy page from the footer', () => {
+    render(<LandingPage />, { wrapper: createWrapper() });
+
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/privacy');
+  });
 });

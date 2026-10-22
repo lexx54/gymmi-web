@@ -34,6 +34,7 @@ import {
   type SignupFormValues,
 } from '../schemas/auth';
 import type { SignupParams } from '../types/auth';
+import { LEGAL_CONFIG } from '../constants/legal.constants';
 import { uploadImageDirectly } from '../utils/imageUpload';
 import {
   PRESET_SPECIALIZATIONS,
@@ -125,6 +126,7 @@ export default function SignupPage() {
       gymPhoneNumber: '',
       gymAmenities: [],
       gymCoverUrl: '',
+      acceptTerms: false,
     },
   });
 
@@ -463,6 +465,8 @@ export default function SignupPage() {
       username: data.username,
       password: data.password,
       role: data.role,
+      acceptTerms: true,
+      termsVersion: LEGAL_CONFIG.lastUpdated,
       ...(data.avatarUrl ? { avatarUrl: data.avatarUrl } : {}),
       ...(data.role === 'Gym'
         ? {
@@ -1547,6 +1551,29 @@ export default function SignupPage() {
                     </SummaryCard>
                   )}
 
+                  {/* Terms of Service + Privacy Policy consent (required) */}
+                  <ConsentLabel data-testid="signup-terms-consent">
+                    <ConsentCheckbox
+                      type="checkbox"
+                      {...register('acceptTerms')}
+                      aria-invalid={Boolean(errors.acceptTerms)}
+                      data-testid="input-accept-terms"
+                    />
+                    <span>
+                      {t('auth.consent.prefix')}{' '}
+                      <ConsentLink href="/terms" target="_blank" rel="noopener noreferrer">
+                        {t('auth.consent.terms')}
+                      </ConsentLink>{' '}
+                      {t('auth.consent.and')}{' '}
+                      <ConsentLink href="/privacy" target="_blank" rel="noopener noreferrer">
+                        {t('auth.consent.privacy')}
+                      </ConsentLink>
+                    </span>
+                  </ConsentLabel>
+                  {errors.acceptTerms && (
+                    <ErrorMsg data-testid="accept-terms-error">{errors.acceptTerms.message}</ErrorMsg>
+                  )}
+
                   {/* Final Actions */}
                   <NavActions>
                     <SecondaryBtn type="button" onClick={() => setStep(isTrainer ? 3 : 2)}>
@@ -2058,6 +2085,36 @@ const RemoveBtn = styled.button`
   display: flex;
   align-items: center;
   padding: 0;
+`;
+
+const ConsentLabel = styled.label`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #c4c9de;
+  cursor: pointer;
+`;
+
+const ConsentCheckbox = styled.input`
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.1rem;
+  accent-color: #ef233c;
+  cursor: pointer;
+`;
+
+const ConsentLink = styled.a`
+  color: #ef233c;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const NavActions = styled.div`

@@ -57,7 +57,8 @@
     "payments": "Payments",
     "streak": "7 day streak",
     "signOut": "Sign out",
-    "dashboardNavigation": "Dashboard navigation"
+    "dashboardNavigation": "Dashboard navigation",
+    "reports": "Reports"
   },
   "auth": {
     "quote": "\"The only bad workout is the one that didn't happen.\"",
@@ -129,7 +130,8 @@
       "pricePositive": "Price cannot be negative",
       "specializationsMin": "Select at least 1 specialization tag",
       "gymsMax": "You can add up to 3 gyms",
-      "gymNameMin": "Facility name must be at least 2 characters"
+      "gymNameMin": "Facility name must be at least 2 characters",
+      "termsRequired": "You must accept the Terms of Service and Privacy Policy"
     },
     "stepAccount": "Account",
     "stepBody": "Body & Goals",
@@ -238,7 +240,13 @@
     "avatarPreviewAlt": "Profile photo preview",
     "logoPreviewAlt": "Trainer logo preview",
     "dropzonePrompt": "Drag and Drop file here or",
-    "chooseFile": "Choose file"
+    "chooseFile": "Choose file",
+    "consent": {
+      "prefix": "I agree to the",
+      "terms": "Terms of Service",
+      "and": "and the",
+      "privacy": "Privacy Policy"
+    }
   },
   "gym": {
     "catalog": "Routine Catalog",
@@ -759,7 +767,24 @@
     "logoUpdated": "Trainer logo updated successfully!",
     "publicProfilePreview": "Public Profile Preview",
     "publicProfileNotice": "This is how athletes see your coaching profile when browsing trainers to request contracts.",
-    "simulationHint": "Athletes select a contract duration (1 week to 3 months) to request your coaching."
+    "simulationHint": "Athletes select a contract duration (1 week to 3 months) to request your coaching.",
+    "deleteAccount": {
+      "title": "Delete account",
+      "description": "Permanently delete your Gymmi account and personal data: profile, workouts, assignments, contracts, articles, comments and uploaded images. This cannot be undone.",
+      "button": "Delete account",
+      "modalTitle": "Delete your account?",
+      "modalDescription": "This permanently deletes your account. You will be signed out and cannot recover it.",
+      "consequenceData": "Your profile, workouts, sessions, assignments, contracts, articles and comments are deleted.",
+      "consequenceMedia": "Your profile photo, logos and other uploaded images are removed.",
+      "consequencePayments": "Payment records required by law are kept, anonymized and no longer linked to you.",
+      "passwordLabel": "Confirm your current password",
+      "confirmLabel": "Type {{word}} to confirm",
+      "confirm": "Permanently delete",
+      "deleting": "Deleting…",
+      "cancel": "Cancel",
+      "success": "Your account has been deleted.",
+      "error": "We couldn't delete your account. Please try again."
+    }
   },
   "admin": {
     "userUpdated": "User updated",
@@ -806,6 +831,41 @@
       "rejectedToast": "Payment rejected.",
       "approveFailed": "Failed to approve payment.",
       "rejectFailed": "Failed to reject payment."
+    },
+    "reports": {
+      "title": "Content reports",
+      "desc": "Review reported articles, comments and users. Reports must be handled within 24 hours.",
+      "statuses": {
+        "ALL": "All",
+        "OPEN": "Open",
+        "ACTION_TAKEN": "Action taken",
+        "DISMISSED": "Dismissed"
+      },
+      "targetTypes": {
+        "ARTICLE": "Article",
+        "COMMENT": "Comment",
+        "USER": "User"
+      },
+      "reportedBy": "Reported by",
+      "author": "Author",
+      "reason": "Reason",
+      "details": "Details",
+      "snapshot": "Reported content",
+      "reportedAt": "Reported",
+      "empty": "No reports to review.",
+      "dismiss": "Dismiss",
+      "removeContent": "Remove content",
+      "deactivateUser": "Deactivate user",
+      "removeAndDeactivate": "Remove and deactivate",
+      "confirmDeactivate": "Deactivate {{username}}? They will be signed out and unable to log in.",
+      "resolved": "Report updated",
+      "resolveFailed": "Could not update the report",
+      "inactive": "Inactive",
+      "deletedUser": "Deleted user",
+      "overdue": "Over 24h",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {{page}} of {{total}}"
     }
   },
   "contracts": {
@@ -842,8 +902,8 @@
       "PENDING": "Pending",
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected",
-      "CANCELLED": "Cancelled"
-      ,"ENDED": "Ended"
+      "CANCELLED": "Cancelled",
+      "ENDED": "Ended"
     }
   },
   "entitlements": {
@@ -1197,6 +1257,34 @@
       "feed": "No articles available yet. When your coaches or gym post articles, they will appear here!",
       "saved": "You haven't bookmarked any articles yet. Click the bookmark icon on any article to save it for later.",
       "myArticles": "You haven't authored any articles yet. Click 'New Article' to create your first post."
+    },
+    "moderation": {
+      "report": "Report",
+      "reportArticle": "Report article",
+      "reportComment": "Report comment",
+      "block": "Block",
+      "blockAuthor": "Block author",
+      "blockUser": "Block user",
+      "blockConfirm": "Block {{username}}? You will no longer see their articles or comments.",
+      "blocked": "{{username}} has been blocked",
+      "reportTitle": "Report content",
+      "reportSubtitle": "Tell us what's wrong. Our team reviews every report within 24 hours.",
+      "reasonLabel": "Reason",
+      "reasons": {
+        "SPAM": "Spam or advertising",
+        "HARASSMENT": "Harassment or bullying",
+        "HATE_SPEECH": "Hate speech",
+        "SEXUAL_CONTENT": "Sexual content",
+        "VIOLENCE": "Violence or dangerous acts",
+        "MISINFORMATION": "Harmful health misinformation",
+        "OTHER": "Something else"
+      },
+      "detailsLabel": "Additional details (optional)",
+      "detailsPlaceholder": "Add any context that helps us review this report",
+      "submit": "Send report",
+      "cancel": "Cancel",
+      "reported": "Thanks. Our team will review this within 24 hours.",
+      "reportFailed": "Could not send the report. Please try again."
     }
   },
   "billing": {
@@ -1341,6 +1429,376 @@
         "description": "Review platform transaction records, active subscriptions, and revenue tracking."
       }
     }
+  },
+  "terms": {
+    "metaTitle": "Terms of Service · Gymmi",
+    "eyebrow": "Legal",
+    "title": "Terms of Service",
+    "subtitle": "These Terms govern your use of the Gymmi website, web portal, and mobile apps for iOS and Android. Please read them carefully.",
+    "lastUpdated": "Last updated: {{date}}",
+    "tocTitle": "Contents",
+    "backHome": "Back to home",
+    "contactTitle": "Questions about these Terms?",
+    "contactBody": "Write to us and we will get back to you as soon as possible.",
+    "sections": [
+      {
+        "id": "acceptance",
+        "title": "1. Acceptance of these Terms",
+        "paragraphs": [
+          "These Terms of Service (the \"Terms\") are a binding agreement between you and {{company}} (\"Gymmi\", \"we\", \"us\") covering the Gymmi website, the web portal, the Gymmi mobile applications, and the related APIs and services (together, the \"Service\").",
+          "By creating an account, downloading the app, or otherwise using the Service, you confirm that you have read, understood, and agree to these Terms and to our Privacy Policy. If you do not agree, do not use the Service."
+        ]
+      },
+      {
+        "id": "eligibility",
+        "title": "2. Eligibility",
+        "paragraphs": [
+          "You must be at least {{minAge}} years old to create an account. If you are under the age of legal majority where you live, you may only use the Service with the consent and supervision of a parent or legal guardian, who agrees to these Terms on your behalf and is responsible for your use of the Service.",
+          "You may not use the Service if you are barred from doing so under applicable law, or if your account was previously suspended or removed by us."
+        ]
+      },
+      {
+        "id": "accounts",
+        "title": "3. Your account",
+        "paragraphs": [
+          "You register as an Athlete (Client), a Personal Trainer, or a Gym. You agree to provide accurate information, including your physical profile, coaching credentials, or facility details, and to keep it up to date.",
+          "You are responsible for keeping your password confidential and for all activity under your account. Tell us immediately at {{email}} if you suspect unauthorized access. We may temporarily lock sign-in after repeated failed attempts to protect your account."
+        ]
+      },
+      {
+        "id": "service",
+        "title": "4. What Gymmi provides",
+        "paragraphs": [
+          "Gymmi is a training platform. It lets you build and follow workout routines, browse an exercise catalog, log workout sessions, view training analytics, strength classifications and leaderboards, read and publish articles, and connect Athletes with Personal Trainers and Gyms.",
+          "We may add, change, or remove features at any time. Some features are only available on certain platforms, roles, or plans."
+        ]
+      },
+      {
+        "id": "health",
+        "title": "5. Health and fitness disclaimer",
+        "paragraphs": [
+          "Gymmi is not a medical service and does not provide medical advice, diagnosis, or treatment. Routines, exercise instructions, articles, analytics, estimated one-rep maxes, and strength tiers are for general information only and are estimates.",
+          "Consult a physician before starting any exercise program, especially if you are pregnant, have a medical condition, or are recovering from an injury. Stop exercising immediately and seek medical help if you feel pain, dizziness, or shortness of breath.",
+          "Physical exercise carries an inherent risk of injury. You exercise voluntarily and at your own risk, and you are responsible for using proper technique, equipment, and supervision."
+        ]
+      },
+      {
+        "id": "trainers-gyms",
+        "title": "6. Trainers, gyms, and contracts",
+        "paragraphs": [
+          "Personal Trainers and Gyms are independent third parties. They are not employees, agents, or representatives of Gymmi. We do not verify certifications, qualifications, or facility conditions, and we do not guarantee the quality or results of any coaching or facility.",
+          "Coaching contracts, rates, and gym memberships are agreed directly between Athletes, Trainers, and Gyms. Unless stated otherwise, Gymmi is not a party to those agreements and does not process payments between them. Any dispute about them must be resolved between the parties involved.",
+          "Trainers and Gyms who receive Athlete data (such as workout history and analytics) through the Service may only use it to provide their services to that Athlete, and must protect it in line with applicable law."
+        ]
+      },
+      {
+        "id": "plans",
+        "title": "7. Plans, payments, and trials",
+        "paragraphs": [
+          "Gymmi offers a Free plan and a paid Plus plan. Plan limits (for example, the number of routines, clients, or custom exercises) are shown on our pricing page and may change with notice.",
+          "Plus subscriptions are purchased only on the Gymmi web portal, using the manual payment methods listed there (such as Pago Móvil, bank transfer, Zinli, Binance Pay, or Zelle). You submit your payment reference and receipt, and our team verifies it manually. Once approved, your plan is active for 30 days (monthly) or 365 days (annual), added to any remaining paid time. Subscriptions do not renew automatically.",
+          "The Gymmi mobile apps do not sell subscriptions or digital content and do not use Apple In-App Purchase or Google Play Billing. Features you unlock on the web are available in the mobile apps when you sign in to the same account.",
+          "New Gym accounts may receive a free trial with the duration and member capacity shown during signup. When a trial or paid period ends, your account returns to the Free plan limits. Content above those limits may be hidden, not deleted, until you upgrade again.",
+          "Payments are final once verified, except where a refund is required by law or we fail to activate the plan you paid for. If a payment cannot be verified, we will reject it and tell you why. To request a refund, contact {{email}}."
+        ]
+      },
+      {
+        "id": "content",
+        "title": "8. Your content",
+        "paragraphs": [
+          "You keep ownership of the content you submit, including routines, custom exercises, articles, comments, photos, logos, and payment receipts (\"User Content\"). You grant Gymmi a worldwide, non-exclusive, royalty-free license to host, store, reproduce, translate, display, and distribute your User Content only as needed to operate and improve the Service and to show it to the people you share it with.",
+          "You confirm that you have the rights needed to share your User Content and that it does not infringe anyone's rights. Routines or exercises that you share or assign can be copied by the people who receive them."
+        ]
+      },
+      {
+        "id": "conduct",
+        "title": "9. Community rules and zero tolerance",
+        "paragraphs": [
+          "Gymmi has zero tolerance for objectionable content and abusive users. You must not post, upload, or share anything that:"
+        ],
+        "bullets": [
+          "is sexually explicit, pornographic, violent, hateful, discriminatory, or harassing;",
+          "threatens, bullies, defames, or impersonates another person;",
+          "promotes self-harm, eating disorders, illegal drugs, or unsafe use of performance-enhancing substances;",
+          "contains spam, scams, malware, or unsolicited advertising;",
+          "infringes intellectual property or privacy rights, or discloses someone else's personal data without permission;",
+          "is otherwise illegal or harmful to minors."
+        ],
+        "paragraphsAfter": [
+          "You also must not reverse engineer, scrape, overload, or interfere with the Service, bypass plan limits or security measures, or access other users' accounts.",
+          "You can report objectionable content or abusive users directly in the app or web portal: use Report on any article, comment, or user, and use Block to hide a user's articles and comments from you. You can also write to {{email}}. We review reports within 24 hours, and we may remove content and suspend or remove the accounts responsible without notice."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "10. Third-party services",
+        "paragraphs": [
+          "The Service relies on third-party providers, for example cloud hosting, Cloudflare R2 for storing images, and Google Gemini to translate exercise catalog text between English and Spanish. Their processing of data is described in our Privacy Policy.",
+          "Links to third-party websites or payment providers are offered for convenience. We are not responsible for their content, availability, or terms."
+        ]
+      },
+      {
+        "id": "privacy",
+        "title": "11. Privacy",
+        "paragraphs": [
+          "Our Privacy Policy, published at /privacy on the Gymmi website, explains what personal data we collect, including your physical profile, workout history, photos, and payment references, how we use it, who we share it with, and the rights you have. By using the Service you acknowledge that policy."
+        ]
+      },
+      {
+        "id": "termination",
+        "title": "12. Account deletion, suspension, and termination",
+        "paragraphs": [
+          "You can stop using the Service at any time and delete your account yourself: in the Gymmi app go to Profile → Delete account, or on the web go to Settings → Delete account (no app installation needed). You must confirm your password. Deletion is immediate and permanent: your profile, workouts, sessions, assignments, contracts, articles, comments and uploaded images are deleted, and payment records we must keep for legal, tax, or anti-fraud obligations are anonymized and detached from you.",
+          "If you cannot access your account, you can also request deletion by writing to {{email}} from the email address registered to your account; we will delete or anonymize your data within 30 days.",
+          "We may suspend or terminate your access at any time if you violate these Terms, if required by law, or to protect users or the Service. Sections that by their nature should survive termination (including content licenses already granted to recipients, disclaimers, and limitations of liability) will survive."
+        ]
+      },
+      {
+        "id": "ip",
+        "title": "13. Gymmi's intellectual property",
+        "paragraphs": [
+          "The Service, including its software, design, logos, the Gymmi name, and the exercise catalog and media we provide, belongs to Gymmi or its licensors and is protected by intellectual property laws. We grant you a personal, revocable, non-exclusive, non-transferable license to use the Service for its intended purpose in line with these Terms."
+        ]
+      },
+      {
+        "id": "app-stores",
+        "title": "14. Mobile app stores",
+        "paragraphs": [
+          "If you download the Gymmi app from the Apple App Store or Google Play, the following also applies:"
+        ],
+        "bullets": [
+          "These Terms are between you and Gymmi only, not with Apple Inc. or Google LLC. Gymmi, not Apple or Google, is solely responsible for the app and its content.",
+          "Your license to use the app is limited to Apple-branded or Android devices that you own or control, as permitted by the store's usage rules.",
+          "Apple and Google have no obligation to provide maintenance or support for the app.",
+          "If the app fails to conform to any applicable warranty, you may notify Apple, and Apple will refund the purchase price (if any). To the maximum extent permitted by law, Apple has no other warranty obligation with respect to the app.",
+          "Gymmi, not Apple, is responsible for addressing any claims relating to the app or your use of it, including product liability claims, claims that the app fails to meet legal or regulatory requirements, and consumer protection or privacy claims.",
+          "Gymmi, not Apple, is responsible for the investigation, defense, settlement, and discharge of any third-party claim that the app infringes intellectual property rights.",
+          "You confirm that you are not located in a country subject to a U.S. Government embargo or designated as a \"terrorist supporting\" country, and that you are not on any U.S. Government list of prohibited or restricted parties.",
+          "You must comply with applicable third-party terms (such as your mobile carrier's) when using the app.",
+          "Apple and its subsidiaries are third-party beneficiaries of these Terms and, once you accept them, have the right to enforce them against you."
+        ]
+      },
+      {
+        "id": "disclaimers",
+        "title": "15. Disclaimers",
+        "paragraphs": [
+          "The Service is provided \"as is\" and \"as available\". To the maximum extent permitted by law, we disclaim all warranties, express or implied, including fitness for a particular purpose, accuracy of analytics or estimates, and uninterrupted or error-free operation."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "16. Limitation of liability",
+        "paragraphs": [
+          "To the maximum extent permitted by law, Gymmi will not be liable for indirect, incidental, special, consequential, or punitive damages, or for injuries, loss of data, profits, or goodwill, arising from your use of the Service, from exercise, or from the conduct of Trainers, Gyms, or other users.",
+          "Our total liability for any claim related to the Service is limited to the amount you paid Gymmi in the 12 months before the claim, or USD 50 if you paid nothing. Nothing in these Terms limits liability that cannot be limited by law."
+        ]
+      },
+      {
+        "id": "indemnity",
+        "title": "17. Indemnity",
+        "paragraphs": [
+          "You agree to defend and indemnify Gymmi against claims, losses, and expenses (including reasonable legal fees) arising from your User Content, your coaching or facility services, or your violation of these Terms or of the law."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "18. Changes to these Terms",
+        "paragraphs": [
+          "We may update these Terms from time to time. We will change the \"Last updated\" date and, for material changes, notify you by email or in the Service before they take effect. If you continue to use the Service after the changes take effect, you accept the updated Terms."
+        ]
+      },
+      {
+        "id": "law",
+        "title": "19. Governing law",
+        "paragraphs": [
+          "These Terms are governed by the laws of {{jurisdiction}}, without regard to conflict-of-law rules. This does not deprive you of the protection of mandatory consumer laws of the country where you live.",
+          "If any provision of these Terms is found unenforceable, the rest remain in effect. Our failure to enforce a provision is not a waiver of it."
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "20. Contact",
+        "paragraphs": [
+          "For questions about these Terms, account deletion, or to report content, contact us at {{email}}."
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "metaTitle": "Privacy Policy · Gymmi",
+    "eyebrow": "Legal",
+    "title": "Privacy Policy",
+    "subtitle": "This policy explains what personal data Gymmi collects through its website, web portal, and mobile apps for iOS and Android, why we collect it, who we share it with, and the choices you have.",
+    "lastUpdated": "Last updated: {{date}}",
+    "tocTitle": "Contents",
+    "backHome": "Back to home",
+    "contactTitle": "Questions about your privacy?",
+    "contactBody": "Write to us to access, correct, or delete your data, or with any privacy question.",
+    "sections": [
+      {
+        "id": "intro",
+        "title": "1. Who we are",
+        "paragraphs": [
+          "{{company}} (\"Gymmi\", \"we\", \"us\") operates the Gymmi website, the web portal, the Gymmi mobile applications, and the related APIs and services (together, the \"Service\"). We are responsible for the personal data described in this Privacy Policy.",
+          "This policy applies to every Gymmi user: Athletes (Clients), Personal Trainers, and Gyms. It should be read together with our Terms of Service."
+        ]
+      },
+      {
+        "id": "collect",
+        "title": "2. Data we collect",
+        "paragraphs": [
+          "We only collect the data you give us or that is created when you use the Service:"
+        ],
+        "bullets": [
+          "Account data: email address, username, and password. We never store your password in plain text; we keep only a one-way hash of it. We also keep your role, plan, and account dates.",
+          "Physical profile (Athletes): age, gender, height, weight, and fitness goal.",
+          "Workout data: routines, custom exercises, workout sessions (start and end times, sets, weights, repetitions, rest, and effort ratings), and the analytics, personal records, strength classifications, and leaderboard positions calculated from them.",
+          "Trainer profile: description, specializations, monthly rate, gyms where you train, and your logo.",
+          "Gym data: gym name, description, address, city, phone number, website, amenities, logo, cover image, member capacity, and the list of members and affiliated coaches.",
+          "Images you upload: profile photos, trainer and gym logos, gym covers, article covers, and payment receipts.",
+          "Payment data: plan, billing cycle, amount, payment method, reference number, originating bank, payer phone number, payer national ID number, and the receipt image you submit, plus our review status and notes. We do not collect or store card numbers.",
+          "Community content: articles, comments, likes, and bookmarks.",
+          "Relationship data: trainer contracts (dates, status, and the optional message you send), gym memberships and coach affiliations.",
+          "Technical data: sign-in tokens that keep you logged in, and your IP address, which we use temporarily to block abusive traffic and do not store in your profile."
+        ]
+      },
+      {
+        "id": "not-collected",
+        "title": "3. Data we do not collect",
+        "paragraphs": [
+          "Gymmi does not collect your precise location, contacts, browsing history, advertising identifiers, or data from Apple Health or Google Fit. The apps contain no advertising and no third-party tracking or analytics SDKs, and we do not track you across other companies' apps or websites.",
+          "The mobile apps ask for access to your camera or photo library only when you choose to add an image, such as a profile photo or a payment receipt. Only the image you select is uploaded."
+        ]
+      },
+      {
+        "id": "use",
+        "title": "4. How we use your data",
+        "paragraphs": [
+          "We use each type of data only for the purposes below:"
+        ],
+        "bullets": [
+          "Account data: to create and secure your account, sign you in, and contact you about your account, payments, or reports.",
+          "Physical profile and workout data: to log your training and calculate analytics, estimated one-rep maxes, strength classifications, and leaderboards, and to share your progress with the Trainers and Gyms you connect with.",
+          "Trainer and gym data: to show your public profile so Athletes can find you and to manage contracts, members, and coaches.",
+          "Images: to display them where you added them, and in the case of receipts, to verify your payment.",
+          "Payment data: to verify manual payments, activate your plan, prevent fraud, and meet accounting and tax obligations.",
+          "Community content: to publish it to other users and to moderate it under our zero-tolerance rules.",
+          "Technical data: to keep the Service secure, prevent abuse, and fix problems."
+        ],
+        "paragraphsAfter": [
+          "We do not sell your personal data, use it for advertising, or use it for automated decisions that have legal or similarly significant effects on you."
+        ]
+      },
+      {
+        "id": "legal-bases",
+        "title": "5. Legal bases",
+        "paragraphs": [
+          "We process your data because it is needed to provide the Service you signed up for, because you consented (for example, to an optional physical profile or to connecting with a Trainer or Gym), to comply with legal obligations (such as keeping payment records), and for our legitimate interests in keeping the Service secure and free of abuse. Where we rely on consent, you can withdraw it at any time."
+        ]
+      },
+      {
+        "id": "sharing-users",
+        "title": "6. What other users can see",
+        "paragraphs": [
+          "Some of your data is visible to other users so the Service can work:"
+        ],
+        "bullets": [
+          "Personal Trainers with whom you have an active contract can see your username, email address, workout sessions, and training analytics.",
+          "Gyms you join can see your username, email address, profile photo, physical profile (age, gender, height, weight, and fitness goal), and the training related to routines the Gym or its coaches assign to you.",
+          "Trainer and Gym profiles, published articles, comments, and your username and profile photo next to them are visible to other users. Leaderboards show your username and ranking.",
+          "Routines or exercises that you share or assign can be seen and copied by the people who receive them."
+        ],
+        "paragraphsAfter": [
+          "Trainers and Gyms may only use Athlete data to provide their services to that Athlete. Ending a contract or leaving a Gym stops further access."
+        ]
+      },
+      {
+        "id": "processors",
+        "title": "7. Service providers",
+        "paragraphs": [
+          "We use a small number of providers who process data on our behalf, under contracts that limit their use of it to providing their service to us:"
+        ],
+        "bullets": [
+          "Cloud hosting and database providers, which run our servers and store account, profile, workout, and payment data.",
+          "Cloudflare R2, which stores the images you upload (profile photos, logos, covers, and payment receipts).",
+          "Google Gemini, which we use only to translate exercise catalog text between English and Spanish. We do not send your personal data to Gemini."
+        ],
+        "paragraphsAfter": [
+          "We may also disclose data when required by law or a valid legal request, to protect the rights, safety, or property of our users or Gymmi, or as part of a merger or sale of the business, in which case the successor must honor this policy."
+        ]
+      },
+      {
+        "id": "retention",
+        "title": "8. How long we keep data",
+        "paragraphs": [
+          "We keep your data for as long as your account is active. Images that you replace, such as an old profile photo or logo, are deleted. Content you delete, such as a workout, article, or comment, is removed from the Service.",
+          "When you delete your account, your personal data is deleted immediately (or within 30 days for requests made by email). We may keep anonymized payment records for as long as accounting, tax, or anti-fraud laws require, and data needed to resolve a dispute or enforce our Terms until it is resolved."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "9. Security",
+        "paragraphs": [
+          "We protect your data with encrypted connections (HTTPS), hashed passwords, short-lived sign-in tokens, role-based access controls, and rate limiting against brute-force attempts. Uploaded files get random, unguessable names.",
+          "No system is completely secure. If we learn of a breach that affects your personal data, we will notify you and the authorities as required by law."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "10. Your rights and choices",
+        "paragraphs": [
+          "Depending on where you live, you have the right to:"
+        ],
+        "bullets": [
+          "access the personal data we hold about you and get a copy of it;",
+          "correct inaccurate data; you can edit most of your profile directly in the app or web portal;",
+          "delete your account and personal data;",
+          "object to or restrict certain processing, and withdraw consent at any time;",
+          "receive your data in a portable format;",
+          "complain to your local data protection authority."
+        ],
+        "paragraphsAfter": [
+          "To exercise any of these rights, write to {{email}} from the email address registered to your account. We may ask you to confirm your identity, and we will reply within 30 days."
+        ]
+      },
+      {
+        "id": "deletion",
+        "title": "11. Deleting your account",
+        "paragraphs": [
+          "You can delete your Gymmi account yourself at any time: in the Gymmi app go to Profile → Delete account, or on the web portal go to Settings → Delete account (no app installation needed). You will be asked to confirm your password. Deletion is immediate and permanent and removes your account, profile, workout history, images, contracts, memberships, articles, and comments. Payment records that we must keep by law are anonymized and detached from you, as described in section 8.",
+          "If you cannot sign in, you can request deletion by writing to {{email}} from the email address registered to your account; we will complete it within 30 days.",
+          "Uninstalling the app does not delete your account."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "12. Children",
+        "paragraphs": [
+          "The Service is not directed to children under {{minAge}}, and you must be at least {{minAge}} years old to create an account. If you are under the age of legal majority where you live, you may only use the Service with the consent and supervision of a parent or legal guardian.",
+          "If we learn that we have collected personal data from a child under {{minAge}}, we will delete it. Parents or guardians who believe this has happened can contact us at {{email}}."
+        ]
+      },
+      {
+        "id": "transfers",
+        "title": "13. International transfers",
+        "paragraphs": [
+          "Our service providers may store and process your data on servers outside your country, including in the United States. When we transfer data internationally, we take steps to make sure it keeps a level of protection consistent with this policy and with applicable law."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "14. Changes to this policy",
+        "paragraphs": [
+          "We may update this Privacy Policy from time to time. We will change the \"Last updated\" date and, for material changes, notify you by email or in the Service before they take effect."
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "15. Contact",
+        "paragraphs": [
+          "For privacy questions, requests about your data, or account deletion, contact {{company}} at {{email}}. This policy is governed by the laws of {{jurisdiction}}, without depriving you of the protection of the mandatory data protection laws of the country where you live."
+        ]
+      }
+    ]
   }
 }
-

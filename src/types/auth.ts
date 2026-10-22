@@ -61,6 +61,10 @@ export type SignupParams = {
   profile?: UserProfileParams;
   trainerProfile?: TrainerProfileParams;
   gymProfile?: GymProfileParams;
+  /** Must be true: the user ticked the Terms of Service / Privacy Policy checkbox. */
+  acceptTerms: true;
+  /** Terms revision the user accepted (LEGAL_CONFIG.lastUpdated). */
+  termsVersion: string;
 };
 
 export type ForgotPasswordParams = {
