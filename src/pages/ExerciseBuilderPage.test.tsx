@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
 import ExerciseBuilderPage from './ExerciseBuilderPage';
@@ -46,10 +46,43 @@ vi.mock('../hooks/useListData', () => ({
   }),
 }));
 
+const mockUpdateMutate = vi.fn();
+const mockNavigate = vi.fn();
+let mockExistingExercise: Record<string, unknown> | undefined;
+
+const catalogExercise = {
+  id: 'ex-1',
+  name: 'Barbell Bench Press',
+  targetMuscle: { en: 'Chest', es: 'Pecho' },
+  equipment: { en: 'Dumbbells', es: 'Mancuernas' },
+  instructions: { en: 'Press the bar', es: 'Empuja la barra' },
+  activationMap: {
+    principal: { en: 'Chest', es: 'Pecho' },
+    secondary: { en: 'Quads', es: 'Cuádriceps' },
+    stabilizers: { en: 'Chest', es: 'Pecho' },
+  },
+  difficulty: 'Intermediate',
+  movementType: 'Compound',
+  tags: ['push'],
+  images: [],
+  ownerId: null,
+  gymId: null,
+  createdAt: '',
+  updatedAt: '',
+};
+
 vi.mock('../hooks/useExercises', () => ({
   useCreateExercise: () => ({
     mutate: vi.fn(),
     isPending: false,
+  }),
+  useUpdateExercise: () => ({
+    mutate: mockUpdateMutate,
+    isPending: false,
+  }),
+  useExercise: (id: string | undefined) => ({
+    data: id ? mockExistingExercise : undefined,
+    isError: false,
   }),
 }));
 
@@ -75,7 +108,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...actual,
-    useNavigate: () => vi.fn(),
+    useNavigate: () => mockNavigate,
     NavLink: ({ children, to }: { children: ReactNode; to: string }) =>
       createElement('a', { href: to }, children),
   };
@@ -99,5 +132,48 @@ describe('ExerciseBuilderPage', () => {
     const { container } = renderWithRouter(<ExerciseBuilderPage />);
 
     expect(container).toBeTruthy();
+  });
+});
+
+describe('ExerciseBuilderPage edit mode', () => {
+  function renderEdit() {
+    return render(
+      <MemoryRouter initialEntries={['/exercises/ex-1/edit']}>
+        <Routes>
+          <Route path="/exercises/:exerciseId/edit" element={<ExerciseBuilderPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('prefills the form and saves changes, keeping untouched translations', () => {
+    mockExistingExercise = catalogExercise;
+    renderEdit();
+
+    expect(screen.getByDisplayValue('Barbell Bench Press')).toBeInTheDocument();
+    fireEvent.change(screen.getByDisplayValue('Barbell Bench Press'), {
+      target: { value: 'Flat Bench Press' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+    expect(mockUpdateMutate).toHaveBeenCalledTimes(1);
+    const [{ id, params }] = mockUpdateMutate.mock.calls[0];
+    expect(id).toBe('ex-1');
+    expect(params.name).toBe('Flat Bench Press');
+    expect(params.instructions).toEqual({ en: 'Press the bar', es: 'Empuja la barra' });
+    expect(params.activationMap.secondary).toEqual({ en: 'Quads', es: 'Cuádriceps' });
+  });
+
+  it('sends admins back to the catalog for user-created exercises', () => {
+    mockExistingExercise = { ...catalogExercise, ownerId: 'trainer-1' };
+    renderEdit();
+
+    expect(screen.queryByDisplayValue('Barbell Bench Press')).not.toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith('/exercises');
+    expect(mockUpdateMutate).not.toHaveBeenCalled();
   });
 });

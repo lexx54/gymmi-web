@@ -47,7 +47,8 @@ export type AllowedUploadPurpose =
   | 'gym-cover'
   | 'gym-logo'
   | 'article-cover'
-  | 'payment-receipt';
+  | 'payment-receipt'
+  | 'exercise-image';
 
 export async function getPresignedUrlApi(params: {
   fileType: string;

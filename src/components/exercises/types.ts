@@ -21,6 +21,8 @@ export type ExerciseDraft = {
   difficulty: Difficulty;
   movementType: MovementType | null;
   tags: ExerciseTag[];
+  /** Uploaded photo URLs, in display order. */
+  images: string[];
 };
 
 export type ExerciseSummary = {

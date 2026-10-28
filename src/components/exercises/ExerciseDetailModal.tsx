@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, ImageIcon, Play, Scan } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ImageIcon, Pencil, Play, Scan } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Modal } from '../common/Modal';
@@ -13,20 +13,26 @@ import {
 type ExerciseDetailModalProps = {
   exercise: Exercise | null;
   onClose: () => void;
+  /** Shown as an "Edit exercise" action when the viewer may edit it. */
+  onEdit?: () => void;
 };
 
 const MEDIA_SLIDES = ['front', 'side', 'video'] as const;
 
 /**
- * Read-only exercise detail overlay. Media is a local carousel mock until
- * image/video upload is wired to the API.
+ * Read-only exercise detail overlay. The carousel shows the exercise's uploaded
+ * photos, or placeholder slides when it has none.
  */
-export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalProps) {
+export function ExerciseDetailModal({ exercise, onClose, onEdit }: ExerciseDetailModalProps) {
   const { t, i18n } = useTranslation();
   const [slideIndex, setSlideIndex] = useState(0);
   const [bodyMapOpen, setBodyMapOpen] = useState(false);
 
-  const slide = MEDIA_SLIDES[slideIndex];
+  const images = exercise?.images ?? [];
+  const hasImages = images.length > 0;
+  const slideCount = hasImages ? images.length : MEDIA_SLIDES.length;
+  const currentIndex = slideIndex < slideCount ? slideIndex : 0;
+  const slide = MEDIA_SLIDES[currentIndex];
   const isVideo = slide === 'video';
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localized = (value: LocalizedText | string | null | undefined) =>
@@ -49,34 +55,45 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
         <>
           <Content>
           <Carousel aria-roledescription="carousel" aria-label={t('exercises.mediaCarousel')}>
-            <Slide>
-              {isVideo ? <Play size={42} aria-hidden /> : <ImageIcon size={42} aria-hidden />}
-              <SlideLabel>{t(`exercises.mediaSlide.${slide}`)}</SlideLabel>
-              <ComingSoon>{t('exercises.mediaComingSoon')}</ComingSoon>
-            </Slide>
+            {hasImages ? (
+              <PhotoSlide>
+                <img
+                  src={images[currentIndex]}
+                  alt={t('exercises.images.alt', {
+                    current: currentIndex + 1,
+                    total: images.length,
+                  })}
+                />
+              </PhotoSlide>
+            ) : (
+              <Slide>
+                {isVideo ? <Play size={42} aria-hidden /> : <ImageIcon size={42} aria-hidden />}
+                <SlideLabel>{t(`exercises.mediaSlide.${slide}`)}</SlideLabel>
+                <ComingSoon>{t('exercises.mediaComingSoon')}</ComingSoon>
+              </Slide>
+            )}
+            {slideCount > 1 ? (
             <CarouselControls>
               <CarouselButton
                 type="button"
                 aria-label={t('exercises.previousMedia')}
                 onClick={() =>
-                  setSlideIndex((value) =>
-                    value === 0 ? MEDIA_SLIDES.length - 1 : value - 1,
-                  )
+                  setSlideIndex(currentIndex === 0 ? slideCount - 1 : currentIndex - 1)
                 }
               >
                 <ChevronLeft size={18} aria-hidden />
               </CarouselButton>
               <Dots>
-                {MEDIA_SLIDES.map((id, index) => (
+                {Array.from({ length: slideCount }, (_, index) => (
                   <Dot
-                    key={id}
+                    key={index}
                     type="button"
-                    $active={index === slideIndex}
+                    $active={index === currentIndex}
                     aria-label={t('exercises.mediaSlideDot', {
                       current: index + 1,
-                      total: MEDIA_SLIDES.length,
+                      total: slideCount,
                     })}
-                    aria-current={index === slideIndex}
+                    aria-current={index === currentIndex}
                     onClick={() => setSlideIndex(index)}
                   />
                 ))}
@@ -85,14 +102,13 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
                 type="button"
                 aria-label={t('exercises.nextMedia')}
                 onClick={() =>
-                  setSlideIndex((value) =>
-                    value === MEDIA_SLIDES.length - 1 ? 0 : value + 1,
-                  )
+                  setSlideIndex(currentIndex === slideCount - 1 ? 0 : currentIndex + 1)
                 }
               >
                 <ChevronRight size={18} aria-hidden />
               </CarouselButton>
             </CarouselControls>
+            ) : null}
           </Carousel>
 
           <MetaGrid>
@@ -159,6 +175,15 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
               </Tags>
             </Field>
           ) : null}
+
+          {onEdit ? (
+            <Footer>
+              <EditButton type="button" onClick={onEdit}>
+                <Pencil size={15} aria-hidden />
+                {t('exercises.editExercise')}
+              </EditButton>
+            </Footer>
+          ) : null}
           </Content>
           <ExerciseBodyMapModal
             isOpen={bodyMapOpen}
@@ -200,6 +225,22 @@ const Slide = styled.div`
   color: #ffb3b1;
   text-align: center;
   padding: 1.5rem;
+`;
+
+const PhotoSlide = styled.div`
+  display: grid;
+  height: 18rem;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 1.15rem;
+  background: #181a2e;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
 `;
 
 const SlideLabel = styled.p`
@@ -361,6 +402,33 @@ const Instructions = styled.p`
   font-size: 0.92rem;
   line-height: 1.55;
   white-space: pre-wrap;
+`;
+
+const Footer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+`;
+
+const EditButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffb3b1 0%, #ff535a 100%);
+  color: #ffffff;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #ffb3b1;
+    outline-offset: 2px;
+  }
 `;
 
 const Tags = styled.div`

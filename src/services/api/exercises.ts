@@ -23,6 +23,12 @@ export type Exercise = {
   difficulty: string;
   movementType: string | null;
   tags: string[];
+  /** Public URLs of uploaded photos, in display order (max 3). */
+  images: string[];
+  /** Creator user id; null for admin-managed catalog exercises. */
+  ownerId?: string | null;
+  /** Owning gym; null unless a gym created the exercise. */
+  gymId?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -36,6 +42,7 @@ export type CreateExerciseParams = {
   difficulty: string;
   movementType?: string | null;
   tags: string[];
+  images?: string[];
 };
 
 export type UpdateExerciseParams = Partial<CreateExerciseParams>;
@@ -144,7 +151,16 @@ function normalizeExercise(exercise: Exercise): Exercise {
       secondary: unwrapLocalizedText(exercise.activationMap?.secondary),
       stabilizers: unwrapLocalizedText(exercise.activationMap?.stabilizers),
     },
+    images: Array.isArray(exercise.images) ? exercise.images : [],
   };
+}
+
+/**
+ * Catalog exercises are the shared library managed by admins, as opposed to
+ * ones created by a client, trainer or gym.
+ */
+export function isCatalogExercise(exercise: Pick<Exercise, 'ownerId' | 'gymId'>): boolean {
+  return !exercise.ownerId && !exercise.gymId;
 }
 
 export async function fetchExercises(): Promise<Exercise[]> {

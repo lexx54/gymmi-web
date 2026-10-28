@@ -6,6 +6,8 @@ type BuilderPageHeaderProps = {
   onDiscard: () => void;
   onPublish: () => void;
   isPublishing?: boolean;
+  /** Switches copy and the required permission to editing an existing exercise. */
+  isEditing?: boolean;
 };
 
 /**
@@ -16,24 +18,31 @@ export function BuilderPageHeader({
   onDiscard,
   onPublish,
   isPublishing = false,
+  isEditing = false,
 }: BuilderPageHeaderProps) {
   const { t } = useTranslation();
 
   return (
     <HeaderRoot>
       <Copy>
-        <Eyebrow>{t('exercises.newEntry')}</Eyebrow>
+        <Eyebrow>{isEditing ? t('exercises.editEntry') : t('exercises.newEntry')}</Eyebrow>
         <Headline>
           {t('exercises.builderTitle')}
         </Headline>
       </Copy>
       <Actions>
         <SecondaryButton type="button" onClick={onDiscard}>
-          {t('exercises.discardDraft')}
+          {isEditing ? t('exercises.discardChanges') : t('exercises.discardDraft')}
         </SecondaryButton>
-        <Can resource="exercises" action="CREATE">
+        <Can resource="exercises" action={isEditing ? 'EDIT' : 'CREATE'}>
           <PrimaryButton type="button" onClick={onPublish} disabled={isPublishing}>
-            {isPublishing ? t('exercises.publishing') : t('exercises.publishExercise')}
+            {isEditing
+              ? isPublishing
+                ? t('exercises.saving')
+                : t('exercises.saveChanges')
+              : isPublishing
+                ? t('exercises.publishing')
+                : t('exercises.publishExercise')}
           </PrimaryButton>
         </Can>
       </Actions>

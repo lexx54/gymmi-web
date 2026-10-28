@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { BasicInfoCard } from '../components/exercises/BasicInfoCard';
 import { BuilderPageHeader } from '../components/exercises/BuilderPageHeader';
 import { DifficultyMovementCard } from '../components/exercises/DifficultyMovementCard';
+import { ExerciseImagesCard } from '../components/exercises/ExerciseImagesCard';
 import { TopBar } from '../components/layout/TopBar';
 import {
   ExercisesContent,
@@ -17,7 +18,6 @@ import {
 } from '../components/exercises/ExercisesShell';
 import { InstructionsCard } from '../components/exercises/InstructionsCard';
 import { LivePreviewDock } from '../components/exercises/LivePreviewDock';
-import { MediaUploadCard } from '../components/exercises/MediaUploadCard';
 import { CreateTagModal } from '../components/exercises/CreateTagModal';
 import { MetadataTagsCard } from '../components/exercises/MetadataTagsCard';
 import { VisualInspirationCard } from '../components/exercises/VisualInspirationCard';
@@ -31,7 +31,7 @@ import type {
 } from '../components/exercises/types';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
-import { useCreateExercise } from '../hooks/useExercises';
+import { useCreateExercise, useExercise, useUpdateExercise } from '../hooks/useExercises';
 import {
   hasAnyEntitlementCapability,
   isEntitlementLimitReached,
@@ -39,8 +39,16 @@ import {
 } from '../hooks/usePermissions';
 import { useListEquipments, useListMuscles } from '../hooks/useListData';
 import { useCreateTag, useTags } from '../hooks/useTags';
-import type { CreateExerciseParams } from '../services/api/exercises';
+import {
+  isCatalogExercise,
+  resolveLocalizedText,
+  type CreateExerciseParams,
+  type Exercise,
+  type LocalizedText,
+  type UpdateExerciseParams,
+} from '../services/api/exercises';
 import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
+import { MAX_EXERCISE_IMAGES } from '../utils/imageUpload';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -52,6 +60,7 @@ const INITIAL_DRAFT: ExerciseDraft = {
   difficulty: 'Intermediate',
   movementType: null,
   tags: [],
+  images: [],
 };
 
 /**
@@ -75,17 +84,64 @@ function draftToCreateParams(draft: ExerciseDraft): CreateExerciseParams {
     difficulty: draft.difficulty,
     movementType: draft.movementType,
     tags: draft.tags,
+    images: draft.images,
+  };
+}
+
+function exerciseToDraft(exercise: Exercise): ExerciseDraft {
+  const english = (value: LocalizedText) => resolveLocalizedText(value, 'en');
+  return {
+    name: exercise.name,
+    targetMuscle: english(exercise.targetMuscle),
+    activationSecondary: english(exercise.activationMap.secondary),
+    activationStabilizers: english(exercise.activationMap.stabilizers),
+    equipment: english(exercise.equipment),
+    instructions: english(exercise.instructions),
+    difficulty: exercise.difficulty as Difficulty,
+    movementType: exercise.movementType as MovementType | null,
+    tags: exercise.tags,
+    images: exercise.images,
   };
 }
 
 /**
- * Exercise builder page for creating a new movement entry.
+ * Keeps the stored translation when the English text was not edited, so
+ * saving an exercise does not overwrite its Spanish copy.
+ */
+function keepOrDuplicate(value: string, original: LocalizedText): LocalizedText {
+  const unchanged = value.trim() === original.en.trim();
+  return unchanged && original.en.trim() && original.es.trim()
+    ? original
+    : duplicateLocalizedText(value);
+}
+
+function draftToUpdateParams(draft: ExerciseDraft, exercise: Exercise): UpdateExerciseParams {
+  return {
+    ...draftToCreateParams(draft),
+    targetMuscle: keepOrDuplicate(draft.targetMuscle, exercise.targetMuscle),
+    equipment: keepOrDuplicate(draft.equipment, exercise.equipment),
+    instructions: keepOrDuplicate(draft.instructions, exercise.instructions),
+    activationMap: {
+      secondary: keepOrDuplicate(draft.activationSecondary, exercise.activationMap.secondary),
+      stabilizers: keepOrDuplicate(draft.activationStabilizers, exercise.activationMap.stabilizers),
+    },
+  };
+}
+
+/**
+ * Exercise builder page for creating a new movement entry, or, at
+ * `/exercises/:exerciseId/edit`, for admins editing a catalog exercise.
  */
 export default function ExerciseBuilderPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
   const createExercise = useCreateExercise();
+  const updateExercise = useUpdateExercise();
+  const { exerciseId } = useParams<{ exerciseId: string }>();
+  const isEditing = Boolean(exerciseId);
+  const { data: existingExercise, isError: isExerciseError } = useExercise(exerciseId);
+  const [loadedExerciseId, setLoadedExerciseId] = useState<string | null>(null);
   const { data: entitlements } = useEntitlements();
   const { data: catalogTags = [] } = useTags();
   const createTag = useCreateTag();
@@ -93,6 +149,12 @@ export default function ExerciseBuilderPage() {
   const [draft, setDraft] = useState<ExerciseDraft>(INITIAL_DRAFT);
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
   const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+
+  if (existingExercise && isCatalogExercise(existingExercise) && loadedExerciseId !== existingExercise.id) {
+    setLoadedExerciseId(existingExercise.id);
+    setDraft(exerciseToDraft(existingExercise));
+  }
   const { data: equipments } = useListEquipments();
   const { data: muscles } = useListMuscles();
   const equipmentOptions = equipments?.map((e) => e.name);
@@ -108,7 +170,18 @@ export default function ExerciseBuilderPage() {
     !isEntitlementLimitReached(entitlements?.limits, entitlements?.usage, 'customExercises');
 
   useEffect(() => {
-    if (entitlements && !canCreateCustomExercise) {
+    if (!isEditing) return;
+    if (isExerciseError) {
+      toast.error(t('exercises.loadExerciseFailed'));
+      navigate('/exercises');
+    } else if (existingExercise && !isCatalogExercise(existingExercise)) {
+      toast.error(t('exercises.notEditable'));
+      navigate('/exercises');
+    }
+  }, [existingExercise, isEditing, isExerciseError, navigate, t]);
+
+  useEffect(() => {
+    if (!isEditing && entitlements && !canCreateCustomExercise) {
       queueMicrotask(() => {
         if (entitlements.isCoveredClient) toast.error(t('entitlements.coveredClient'));
         else setUpsell({
@@ -120,12 +193,14 @@ export default function ExerciseBuilderPage() {
         });
       });
     }
-  }, [canCreateCustomExercise, entitlements, t]);
+  }, [canCreateCustomExercise, entitlements, isEditing, t]);
 
   useEffect(() => {
     if (!muscles?.length) return;
     const names = muscles.map((m) => m.name);
-    const muscleListJustLoaded = prevMuscleKeyRef.current === '' && muscleKey !== '';
+    // When editing, the loaded exercise's activation map wins over suggestions.
+    const muscleListJustLoaded =
+      !isEditing && prevMuscleKeyRef.current === '' && muscleKey !== '';
     prevMuscleKeyRef.current = muscleKey;
 
     setDraft((prev) => {
@@ -144,7 +219,7 @@ export default function ExerciseBuilderPage() {
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `muscleKey` fingerprints `muscles`; including `muscles` retriggers on query ref churn.
-  }, [muscleKey, draft.targetMuscle]);
+  }, [muscleKey, draft.targetMuscle, isEditing]);
 
   const handleActivationSecondaryChange = useCallback((activationSecondary: string) => {
     setDraft((prev) => ({ ...prev, activationSecondary }));
@@ -188,6 +263,17 @@ export default function ExerciseBuilderPage() {
     setDraft((prev) => ({ ...prev, tags: prev.tags.filter((existing) => existing !== tag) }));
   }, []);
 
+  const handleAddImages = useCallback((urls: string[]) => {
+    setDraft((prev) => ({
+      ...prev,
+      images: [...prev.images, ...urls].slice(0, MAX_EXERCISE_IMAGES),
+    }));
+  }, []);
+
+  const handleRemoveImage = useCallback((url: string) => {
+    setDraft((prev) => ({ ...prev, images: prev.images.filter((existing) => existing !== url) }));
+  }, []);
+
   const handleCreateTag = (name: string) => {
     createTag.mutate(
       { name },
@@ -210,7 +296,7 @@ export default function ExerciseBuilderPage() {
   };
 
   const handlePublish = () => {
-    if (!canCreateCustomExercise) {
+    if (!isEditing && !canCreateCustomExercise) {
       if (entitlements?.isCoveredClient) {
         toast.error(t('entitlements.coveredClient'));
         return;
@@ -230,6 +316,27 @@ export default function ExerciseBuilderPage() {
     }
     if (!draft.instructions.trim()) {
       toast.error(t('exercises.instructionsRequired'));
+      return;
+    }
+    if (isUploadingImages) {
+      toast.error(t('exercises.images.stillUploading'));
+      return;
+    }
+
+    if (isEditing) {
+      if (!existingExercise) return;
+      updateExercise.mutate(
+        { id: existingExercise.id, params: draftToUpdateParams(draft, existingExercise) },
+        {
+          onSuccess: () => {
+            toast.success(t('exercises.updated'));
+            navigate('/exercises');
+          },
+          onError: (error) => {
+            toast.error(getApiErrorMessage(error, t('exercises.updateFailed')));
+          },
+        },
+      );
       return;
     }
 
@@ -256,8 +363,10 @@ export default function ExerciseBuilderPage() {
           <BuilderPageHeader
             onDiscard={handleDiscard}
             onPublish={handlePublish}
-            isPublishing={createExercise.isPending}
+            isPublishing={createExercise.isPending || updateExercise.isPending}
+            isEditing={isEditing}
           />
+          {isEditing && !loadedExerciseId ? null : (
           <BentoGrid>
             <LeftColumn>
               <BasicInfoCard
@@ -282,7 +391,12 @@ export default function ExerciseBuilderPage() {
               />
             </LeftColumn>
             <RightColumn>
-              <MediaUploadCard />
+              <ExerciseImagesCard
+                images={draft.images}
+                onAddImages={handleAddImages}
+                onRemoveImage={handleRemoveImage}
+                onUploadingChange={setIsUploadingImages}
+              />
               <DifficultyMovementCard
                 difficulty={draft.difficulty}
                 movementType={draft.movementType}
@@ -299,6 +413,7 @@ export default function ExerciseBuilderPage() {
               <VisualInspirationCard />
             </RightColumn>
           </BentoGrid>
+          )}
         </ExercisesContent>
         <LivePreviewDock />
       </ExercisesMain>

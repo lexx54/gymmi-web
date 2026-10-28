@@ -81,6 +81,7 @@ function App() {
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
+          <Route path="/exercises/:exerciseId/edit" element={<RoleRoute role="Admin"><ExerciseBuilderPage /></RoleRoute>} />
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />

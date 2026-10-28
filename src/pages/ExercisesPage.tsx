@@ -28,6 +28,7 @@ import {
 } from '../hooks/usePermissions';
 import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import {
+  isCatalogExercise,
   resolveLocalizedText,
   type Exercise,
 } from '../services/api/exercises';
@@ -65,6 +66,7 @@ export default function ExercisesPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
+  const isAdmin = user?.role?.name === 'Admin';
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [targetMuscle, setTargetMuscle] = useState('');
@@ -305,6 +307,11 @@ export default function ExercisesPage() {
         <ExerciseDetailModal
           exercise={selectedExercise}
           onClose={() => setSelectedExerciseId(null)}
+          onEdit={
+            isAdmin && selectedExercise && isCatalogExercise(selectedExercise)
+              ? () => navigate(`/exercises/${selectedExercise.id}/edit`)
+              : undefined
+          }
         />
         <ExerciseBulkCsvModal
           isOpen={isBulkModalOpen}

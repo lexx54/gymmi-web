@@ -40,6 +40,7 @@ const sampleExercise = {
   difficulty: 'Intermediate',
   movementType: 'Compound',
   tags: ['Strength'],
+  images: ['https://cdn.gymmi.com/exercise-images/squat.webp'],
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -127,6 +128,15 @@ describe('fetchExercise', () => {
     mockGet.mockRejectedValue(new Error('Not Found'));
 
     await expect(fetchExercise(exerciseId)).rejects.toThrow('Not Found');
+  });
+
+  it('should default missing images to an empty list', async () => {
+    const { images: _images, ...withoutImages } = sampleExercise;
+    mockGet.mockResolvedValue({ data: withoutImages });
+
+    const result = await fetchExercise(exerciseId);
+
+    expect(result.images).toEqual([]);
   });
 });
 
