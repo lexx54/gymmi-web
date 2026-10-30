@@ -417,7 +417,8 @@ const ContactLink = styled.a`
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
-  overflow-wrap: anywhere;
+  flex-shrink: 0;
+  white-space: nowrap;
 `;
 
 const Footer = styled.footer`

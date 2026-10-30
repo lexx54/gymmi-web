@@ -251,6 +251,7 @@
   "gym": {
     "catalog": "Routine Catalog",
     "catalogTitle": "Facility Routine Catalog",
+    "catalogUsage": "{{usage}} of {{limit}} catalog workouts used",
     "catalogDesc": "Curate and publish workouts accessible to all members and coaches of your gym.",
     "coaches": "Affiliated Coaches",
     "coachesTitle": "Affiliated Coaches Management",
@@ -819,6 +820,7 @@
     "paid": "Paid",
     "plan": "Free / Plus",
     "togglePlan": "Toggle plan for {{username}}",
+    "paidPlan": "Paid tier for {{username}}",
     "graceUntil": "Grace until {{date}}",
     "resource": "Resource",
     "userManagement": "User Management",
@@ -930,11 +932,22 @@
   "entitlements": {
     "free": "Free",
     "plus": "Plus",
+    "pro": "Pro",
     "upsellTitle": "Unlock more with Plus",
+    "upsellProTitle": "Unlock more with Pro",
+    "gymUpsellTitle": "Upgrade your gym plan",
+    "seeGymPlans": "See gym plans",
+    "gymCatalogLimit": "Your gym plan includes {{limit}} catalog workouts.",
+    "gymCustomExerciseLimit": "Your gym plan includes {{limit}} custom exercises.",
+    "gymBenefits": {
+      "members": "Up to {{count}} active members",
+      "catalog": "Up to {{count}} catalog workouts",
+      "exercises": "Up to {{count}} custom exercises"
+    },
     "usage": "{{usage}} of {{limit}} used",
     "trainerTemplateLimit": "You can keep two routines on Free. Plus includes 8 routines and 5 custom exercises.",
     "clientTemplateLimit": "You can keep one routine on Free. Plus includes 8 routines and 5 custom exercises.",
-    "trainerSeats": "Free includes 2 accepted clients. Plus includes up to 8.",
+    "trainerSeats": "Free includes 2 accepted clients. Plus includes up to 15.",
     "customExerciseLimit": "Custom exercises are included with Plus, up to 5.",
     "sharing": "Sharing routines and editing trainer templates are included with Plus.",
     "editTemplate": "Editing trainer templates is included with Plus.",
@@ -947,6 +960,11 @@
       "templates": "Up to 8 routine templates",
       "exercises": "Up to 5 private custom exercises",
       "sharing": "Routine sharing and trainer template editing"
+    },
+    "benefitsPro": {
+      "seats": "Up to 35 accepted clients",
+      "templates": "Up to 20 routine templates",
+      "exercises": "Up to 15 private custom exercises"
     }
   },
   "landing": {
@@ -987,7 +1005,7 @@
     "features": {
       "tag": "Core Capabilities",
       "title": "Engineered for Serious Training",
-      "subtitle": "From programming 8-client rosters and managing gym facility catalogs to tracking personal PRs solo, Gymmi provides professional tools built for performance.",
+      "subtitle": "From programming 15-client rosters and managing gym facility catalogs to tracking personal PRs solo, Gymmi provides professional tools built for performance.",
       "tabRoutine": "Routine Builder",
       "tabBodyMap": "Muscle Body Map",
       "tabActive": "Active Workout",
@@ -1024,7 +1042,7 @@
       "coachTag": "For Fitness Coaches",
       "coachTitle": "Scale Your Coaching. Zero Friction.",
       "coachDesc": "Spend less time updating spreadsheets and more time guiding client breakthroughs with a purpose-built coaching portal.",
-      "coachF1": "Manage up to 8 active client contracts seamlessly on the Plus tier",
+      "coachF1": "Manage up to 15 active client contracts seamlessly on the Plus tier",
       "coachF2": "Build multi-week programs and deploy them with single-click routine assignments",
       "coachF3": "Create proprietary custom exercises with specialized cues and targets",
       "coachF4": "Share vetted training templates across fellow coaches in your network",
@@ -1082,7 +1100,7 @@
         "plus": {
           "title": "Coach Plus",
           "desc": "Engineered for active trainers scaling their roster and programs.",
-          "f1": "Up to 8 accepted client contracts",
+          "f1": "Up to 15 accepted client contracts",
           "f2": "Up to 8 owned workout templates",
           "f3": "Up to 5 private custom exercises",
           "f4": "Full routine template editing",
@@ -1092,9 +1110,9 @@
         "pro": {
           "title": "Coach Pro",
           "desc": "For high-volume studios and coaching organizations.",
-          "f1": "Unlimited client contracts",
-          "f2": "Unlimited workout templates",
-          "f3": "Unlimited custom exercises",
+          "f1": "Up to 35 client contracts",
+          "f2": "Up to 20 workout templates",
+          "f3": "Up to 15 custom exercises",
           "f4": "Advanced client compliance analytics",
           "f5": "Team collaboration & coach roster",
           "f6": "Custom branding & PDF export"
@@ -1134,7 +1152,7 @@
           "title": "Gym Plus",
           "desc": "For boutique fitness studios and growing local gyms.",
           "f1": "Up to 100 active gym members",
-          "f2": "Curated facility workout routine catalog",
+          "f2": "Catalog of up to 3 workouts and 5 custom exercises",
           "f3": "Coach affiliations with publishing permissions",
           "f4": "Facility-wide exercise strength classifications",
           "f5": "Member roster & capacity tracking",
@@ -1145,7 +1163,7 @@
           "desc": "For established athletic clubs scaling their community.",
           "f1": "Up to 300 active gym members",
           "f2": "Unlimited coach affiliations & publishers",
-          "f3": "Facility routine catalog with coach submissions",
+          "f3": "Catalog of up to 10 workouts and 10 custom exercises",
           "f4": "Advanced member retention & volume analytics",
           "f5": "Facility leaderboards & strength tiers",
           "f6": "Priority facility listing"
@@ -1153,8 +1171,8 @@
         "maximum": {
           "title": "Gym Maximum",
           "desc": "Flagship facilities and multi-coach fitness complexes.",
-          "f1": "Unlimited active gym members",
-          "f2": "Unlimited coaches & curated routines",
+          "f1": "Up to 500 active gym members",
+          "f2": "Unlimited coaches, up to 20 catalog workouts and 20 custom exercises",
           "f3": "Custom facility branding & cover logo",
           "f4": "Full cohort analytics & volume heatmaps",
           "f5": "Automated facility-wide classifications",

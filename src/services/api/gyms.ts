@@ -72,11 +72,6 @@ export async function removeGymCoach(coachId: string): Promise<{ message: string
   return data;
 }
 
-export async function upgradeGymTier(tier: string): Promise<GymProfile> {
-  const { data } = await apiClient.post<GymProfile>('/gyms/me/upgrade', { tier });
-  return data;
-}
-
 export async function joinGym(gymId: string): Promise<GymMember> {
   const { data } = await apiClient.post<GymMember>(`/gyms/${gymId}/join`);
   return data;

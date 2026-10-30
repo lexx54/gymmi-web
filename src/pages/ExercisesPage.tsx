@@ -23,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
 import {
   hasAnyEntitlementCapability,
+  customExerciseLimitDetails,
   isEntitlementLimitReached,
   useEntitlements,
 } from '../hooks/usePermissions';
@@ -89,13 +90,7 @@ export default function ExercisesPage() {
         toast.error(t('entitlements.coveredClient'));
         return;
       }
-      setUpsell({
-        code: 'PLAN_LIMIT',
-        resource: 'customExercises',
-        limit: entitlements?.limits?.customExercises,
-        usage: entitlements?.usage?.customExercises,
-        message: t('entitlements.customExerciseLimit'),
-      });
+      setUpsell(customExerciseLimitDetails(entitlements, t));
       return;
     }
     if (action === 'create') navigate('/exercises/new');

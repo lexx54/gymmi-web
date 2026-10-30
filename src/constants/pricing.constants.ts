@@ -1,3 +1,5 @@
+import type { GymTier } from '../types/gym';
+
 export type BillingCadence = 'monthly' | 'annual';
 
 export interface PricingFeature {
@@ -15,6 +17,24 @@ export interface PricingPlan {
   ctaKey: string;
   features: PricingFeature[];
 }
+
+/** Mirrors gymmi-api `GYM_LIMITS`; trial gyms get Plus limits. */
+export const GYM_PLAN_LIMITS: Record<
+  GymTier,
+  { members: number; catalogRoutines: number; customExercises: number }
+> = {
+  trial: { members: 100, catalogRoutines: 3, customExercises: 5 },
+  plus: { members: 100, catalogRoutines: 3, customExercises: 5 },
+  pro: { members: 300, catalogRoutines: 10, customExercises: 10 },
+  maximum: { members: 500, catalogRoutines: 20, customExercises: 20 },
+};
+
+export const NEXT_GYM_TIER: Record<GymTier, GymTier | null> = {
+  trial: 'pro',
+  plus: 'pro',
+  pro: 'maximum',
+  maximum: null,
+};
 
 export const PRICING_DATA: {
   trainer: PricingPlan[];
@@ -39,8 +59,8 @@ export const PRICING_DATA: {
     {
       id: 'plus',
       badgeKey: 'landing.pricing.popularBadge',
-      monthlyPrice: 3.99,
-      annualPrice: 3.19,
+      monthlyPrice: 2.99,
+      annualPrice: 2.39,
       ctaKey: 'landing.pricing.upgradePlus',
       features: [
         { textKey: 'landing.pricing.trainer.plus.f1', included: true, highlight: true },
@@ -53,11 +73,9 @@ export const PRICING_DATA: {
     },
     {
       id: 'pro',
-      badgeKey: 'landing.pricing.comingSoonBadge',
-      monthlyPrice: 6.99,
-      annualPrice: 5.59,
-      disabled: true,
-      ctaKey: 'landing.pricing.joinWaitlist',
+      monthlyPrice: 5.99,
+      annualPrice: 4.79,
+      ctaKey: 'landing.pricing.choosePlan',
       features: [
         { textKey: 'landing.pricing.trainer.pro.f1', included: true, highlight: true },
         { textKey: 'landing.pricing.trainer.pro.f2', included: true, highlight: true },

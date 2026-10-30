@@ -33,6 +33,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useCreateExercise, useExercise, useUpdateExercise } from '../hooks/useExercises';
 import {
+  customExerciseLimitDetails,
   hasAnyEntitlementCapability,
   isEntitlementLimitReached,
   useEntitlements,
@@ -184,13 +185,7 @@ export default function ExerciseBuilderPage() {
     if (!isEditing && entitlements && !canCreateCustomExercise) {
       queueMicrotask(() => {
         if (entitlements.isCoveredClient) toast.error(t('entitlements.coveredClient'));
-        else setUpsell({
-          code: 'PLAN_LIMIT',
-          resource: 'customExercises',
-          limit: entitlements.limits?.customExercises,
-          usage: entitlements.usage?.customExercises,
-          message: t('entitlements.customExerciseLimit'),
-        });
+        else setUpsell(customExerciseLimitDetails(entitlements, t));
       });
     }
   }, [canCreateCustomExercise, entitlements, isEditing, t]);
@@ -301,13 +296,7 @@ export default function ExerciseBuilderPage() {
         toast.error(t('entitlements.coveredClient'));
         return;
       }
-      setUpsell({
-        code: 'PLAN_LIMIT',
-        resource: 'customExercises',
-        limit: entitlements?.limits?.customExercises,
-        usage: entitlements?.usage?.customExercises,
-        message: t('entitlements.customExerciseLimit'),
-      });
+      setUpsell(customExerciseLimitDetails(entitlements, t));
       return;
     }
     if (!draft.name.trim()) {

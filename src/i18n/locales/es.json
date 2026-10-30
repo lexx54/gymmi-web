@@ -251,6 +251,7 @@
   "gym": {
     "catalog": "Catálogo de Rutinas",
     "catalogTitle": "Catálogo de Rutinas del Gimnasio",
+    "catalogUsage": "{{usage}} de {{limit}} rutinas del catálogo usadas",
     "catalogDesc": "Diseña y publica rutinas accesibles para todos los miembros y entrenadores de tu gimnasio.",
     "coaches": "Entrenadores Afiliados",
     "coachesTitle": "Gestión de Entrenadores Afiliados",
@@ -819,6 +820,7 @@
     "paid": "Pagado",
     "plan": "Free / Plus",
     "togglePlan": "Cambiar plan de {{username}}",
+    "paidPlan": "Nivel de pago de {{username}}",
     "graceUntil": "Gracia hasta {{date}}",
     "resource": "Recurso",
     "userManagement": "Gestión de usuarios",
@@ -930,11 +932,22 @@
   "entitlements": {
     "free": "Free",
     "plus": "Plus",
+    "pro": "Pro",
     "upsellTitle": "Obtén más con Plus",
+    "upsellProTitle": "Desbloquea más con Pro",
+    "gymUpsellTitle": "Mejora el plan de tu gimnasio",
+    "seeGymPlans": "Ver planes de gimnasio",
+    "gymCatalogLimit": "El plan de tu gimnasio incluye {{limit}} rutinas en el catálogo.",
+    "gymCustomExerciseLimit": "El plan de tu gimnasio incluye {{limit}} ejercicios personalizados.",
+    "gymBenefits": {
+      "members": "Hasta {{count}} miembros activos",
+      "catalog": "Hasta {{count}} rutinas en el catálogo",
+      "exercises": "Hasta {{count}} ejercicios personalizados"
+    },
     "usage": "{{usage}} de {{limit}} usados",
     "trainerTemplateLimit": "Puedes mantener dos rutinas con Free. Plus incluye 8 rutinas y 5 ejercicios personalizados.",
     "clientTemplateLimit": "Puedes mantener una rutina con Free. Plus incluye 8 rutinas y 5 ejercicios personalizados.",
-    "trainerSeats": "Free incluye 2 clientes aceptados. Plus incluye hasta 8.",
+    "trainerSeats": "Free incluye 2 clientes aceptados. Plus incluye hasta 15.",
     "customExerciseLimit": "Plus incluye hasta 5 ejercicios personalizados.",
     "sharing": "Compartir rutinas y editar plantillas de entrenador están incluidos con Plus.",
     "editTemplate": "Editar plantillas de entrenador está incluido con Plus.",
@@ -947,6 +960,11 @@
       "templates": "Hasta 8 plantillas de rutinas",
       "exercises": "Hasta 5 ejercicios personalizados privados",
       "sharing": "Compartir rutinas y editar plantillas de entrenador"
+    },
+    "benefitsPro": {
+      "seats": "Hasta 35 clientes aceptados",
+      "templates": "Hasta 20 plantillas de rutinas",
+      "exercises": "Hasta 15 ejercicios personalizados privados"
     }
   },
   "landing": {
@@ -987,7 +1005,7 @@
     "features": {
       "tag": "Capacidades de la Plataforma",
       "title": "Diseñado para Entrenamiento Riguroso",
-      "subtitle": "Desde gestionar un grupo de 8 clientes y catálogos para gimnasios hasta registrar tus mejores marcas en solitario, Gymmi ofrece herramientas profesionales para el alto rendimiento.",
+      "subtitle": "Desde gestionar un grupo de 15 clientes y catálogos para gimnasios hasta registrar tus mejores marcas en solitario, Gymmi ofrece herramientas profesionales para el alto rendimiento.",
       "tabRoutine": "Creador de Rutinas",
       "tabBodyMap": "Mapa Muscular",
       "tabActive": "Entrenamiento Activo",
@@ -1024,7 +1042,7 @@
       "coachTag": "Para Entrenadores",
       "coachTitle": "Escala Tu Asesoría Sin Complicaciones",
       "coachDesc": "Dedica menos tiempo a hojas de cálculo y más tiempo a transformar los resultados de tus clientes con un portal pensado para entrenadores.",
-      "coachF1": "Gestiona hasta 8 contratos activos de clientes con el plan Plus",
+      "coachF1": "Gestiona hasta 15 contratos activos de clientes con el plan Plus",
       "coachF2": "Crea programas de varias semanas y asígnalos con un solo clic",
       "coachF3": "Añade ejercicios personalizados con notas técnicas e instrucciones privadas",
       "coachF4": "Comparte plantillas probadas con otros entrenadores de tu red",
@@ -1082,7 +1100,7 @@
         "plus": {
           "title": "Entrenador Plus",
           "desc": "Para entrenadores activos que expanden su lista de clientes y programas.",
-          "f1": "Hasta 8 clientes aceptados",
+          "f1": "Hasta 15 clientes aceptados",
           "f2": "Hasta 8 plantillas de rutinas propias",
           "f3": "Hasta 5 ejercicios personalizados privados",
           "f4": "Edición completa de plantillas de rutinas",
@@ -1092,9 +1110,9 @@
         "pro": {
           "title": "Entrenador Pro",
           "desc": "Para gimnasios de alto volumen y organizaciones de entrenamiento.",
-          "f1": "Contratos de clientes ilimitados",
-          "f2": "Plantillas de rutinas ilimitadas",
-          "f3": "Ejercicios personalizados ilimitados",
+          "f1": "Hasta 35 contratos de clientes",
+          "f2": "Hasta 20 plantillas de rutinas",
+          "f3": "Hasta 15 ejercicios personalizados",
           "f4": "Analíticas avanzadas de cumplimiento",
           "f5": "Colaboración en equipo y múltiples entrenadores",
           "f6": "Marca personalizada y exportación a PDF"
@@ -1134,7 +1152,7 @@
           "title": "Gimnasio Plus",
           "desc": "Para estudios boutique y gimnasios locales en crecimiento.",
           "f1": "Hasta 100 socios activos",
-          "f2": "Catálogo de rutinas seleccionadas del centro",
+          "f2": "Catálogo de hasta 3 rutinas y 5 ejercicios personalizados",
           "f3": "Afiliación de entrenadores con permisos de publicación",
           "f4": "Clasificaciones de fuerza en ejercicios del centro",
           "f5": "Listado de socios y control de aforo",
@@ -1145,7 +1163,7 @@
           "desc": "Para clubes deportivos consolidados que escalan su comunidad.",
           "f1": "Hasta 300 socios activos",
           "f2": "Afiliación ilimitada de entrenadores y publicaciones",
-          "f3": "Catálogo del gimnasio con aportes de entrenadores",
+          "f3": "Catálogo de hasta 10 rutinas y 10 ejercicios personalizados",
           "f4": "Analíticas avanzadas de retención y volumen",
           "f5": "Tablas de clasificación del centro y niveles de fuerza",
           "f6": "Posicionamiento prioritario del centro"
@@ -1153,8 +1171,8 @@
         "maximum": {
           "title": "Gimnasio Maximum",
           "desc": "Instalaciones insignia y complejos de entrenamiento multiespacio.",
-          "f1": "Socios activos ilimitados",
-          "f2": "Entrenadores y rutinas seleccionadas ilimitados",
+          "f1": "Hasta 500 socios activos",
+          "f2": "Entrenadores ilimitados, hasta 20 rutinas en el catálogo y 20 ejercicios personalizados",
           "f3": "Marca personalizada y logotipo del centro",
           "f4": "Analíticas completas de cohortes y mapas de calor",
           "f5": "Clasificaciones automáticas en todo el centro",

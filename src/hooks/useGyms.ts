@@ -9,7 +9,6 @@ import {
   rejectGymCoach,
   updateCoachPermissions,
   removeGymCoach,
-  upgradeGymTier,
   fetchPublicGyms,
   fetchPublicGym,
   joinGym,
@@ -123,16 +122,6 @@ export function useRemoveGymCoach() {
     mutationFn: (coachId: string) => removeGymCoach(coachId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: myGymCoachesQueryKey });
-      void queryClient.invalidateQueries({ queryKey: myGymQueryKey });
-    },
-  });
-}
-
-export function useUpgradeGymTier() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (tier: string) => upgradeGymTier(tier),
-    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: myGymQueryKey });
     },
   });

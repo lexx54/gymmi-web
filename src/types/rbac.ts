@@ -1,3 +1,5 @@
+import type { GymTier } from './gym';
+
 export type RoleName = 'Admin' | 'Gym' | 'Trainer' | 'Client';
 
 export type PermissionAction = 'READ' | 'CREATE' | 'EDIT' | 'DELETE';
@@ -10,7 +12,8 @@ export type PermissionCell = {
   allowed: boolean;
 };
 
-export type PlanName = 'free' | 'plus';
+export type PlanName = 'free' | 'plus' | 'pro';
+export type PaidPlan = Exclude<PlanName, 'free'>;
 
 export type EntitlementResource =
   | 'templates'
@@ -36,9 +39,16 @@ export type EntitlementAmounts = Partial<
   Record<Exclude<EntitlementResource, 'sharing'>, number>
 >;
 
+/** A `null` limit means unlimited. */
+export type EntitlementLimits = Partial<
+  Record<Exclude<EntitlementResource, 'sharing'>, number | null>
+>;
+
 export type EntitlementSnapshot = {
+  /** Only for gyms: the tier their limits come from. */
+  gymTier?: GymTier;
   capabilities?: EntitlementCapabilities;
-  limits?: EntitlementAmounts;
+  limits?: EntitlementLimits;
   usage?: EntitlementAmounts;
   isCoveredClient?: boolean;
   downgradeEffectiveAt?: string | null;
@@ -78,4 +88,12 @@ export type AdminUserDto = {
   roleId: string;
   role: { id: string; name: string };
   createdAt: string;
+};
+
+export type AdminUserPatch = {
+  roleId?: string;
+  isActive?: boolean;
+  hasPaid?: boolean;
+  /** Tier to grant or switch to; the API defaults new grants to Plus. */
+  paidPlan?: PaidPlan;
 };

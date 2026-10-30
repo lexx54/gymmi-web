@@ -121,7 +121,7 @@ describe('LandingPage', () => {
     expect(screen.getAllByText('CAN PUBLISH')[0]).toBeInTheDocument();
   });
 
-  it('renders pricing plans with role toggle and disabled Pro plan', async () => {
+  it('renders pricing plans with role toggle and only Athlete Pro disabled', async () => {
     const user = userEvent.setup();
     render(<LandingPage />, { wrapper: createWrapper() });
 
@@ -132,12 +132,11 @@ describe('LandingPage', () => {
     expect(screen.getByText('Free Coach')).toBeInTheDocument();
     expect(screen.getByText('Coach Plus')).toBeInTheDocument();
     expect(screen.getByText('Coach Pro')).toBeInTheDocument();
-    expect(screen.getByText('3.99')).toBeInTheDocument();
-    expect(screen.getByText('6.99')).toBeInTheDocument();
+    expect(screen.getByText('2.99')).toBeInTheDocument();
+    expect(screen.getByText('5.99')).toBeInTheDocument();
 
-    // Check Pro plan is disabled
-    const proButtons = screen.getAllByRole('button', { name: /coming soon/i });
-    expect(proButtons.some((b) => b.hasAttribute('disabled'))).toBe(true);
+    // Coach Pro is purchasable
+    expect(screen.queryByRole('button', { name: /coming soon/i })).not.toBeInTheDocument();
 
     // Switch to Client / Athlete tab
     const clientTab = screen.getByRole('tab', { name: /for athletes & clients/i });
@@ -148,6 +147,10 @@ describe('LandingPage', () => {
     expect(screen.getByText('Athlete Pro')).toBeInTheDocument();
     expect(screen.getByText('1.99')).toBeInTheDocument();
     expect(screen.getByText('2.99')).toBeInTheDocument();
+
+    // Athlete Pro is still disabled
+    const proButtons = screen.getAllByRole('button', { name: /coming soon/i });
+    expect(proButtons.some((b) => b.hasAttribute('disabled'))).toBe(true);
 
     // Switch to Gym Facilities tab
     const gymTab = screen.getByRole('tab', { name: /for gym facilities/i });
@@ -168,15 +171,15 @@ describe('LandingPage', () => {
     render(<LandingPage />, { wrapper: createWrapper() });
 
     // Check monthly Coach Plus price
-    expect(screen.getByText('3.99')).toBeInTheDocument();
+    expect(screen.getByText('2.99')).toBeInTheDocument();
 
     // Click Annual
     const annualBtn = screen.getByRole('button', { name: /annual/i });
     await user.click(annualBtn);
 
     expect(screen.getAllByText(/billed annually/i).length).toBeGreaterThan(0);
-    // Coach Plus annual discounted price ($3.19)
-    expect(screen.getByText('3.19')).toBeInTheDocument();
+    // Coach Plus annual discounted price ($2.39)
+    expect(screen.getByText('2.39')).toBeInTheDocument();
 
     // Switch to Gym tab on Annual
     const gymTab = screen.getByRole('tab', { name: /for gym facilities/i });

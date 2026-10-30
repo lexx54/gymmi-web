@@ -1,4 +1,5 @@
 import type { AxiosError } from 'axios';
+import type { GymTier } from '../../types/gym';
 import type { EntitlementResource, PlanName } from '../../types/rbac';
 
 export type ApiErrorDetails = {
@@ -6,8 +7,10 @@ export type ApiErrorDetails = {
   message?: string | string[];
   resource?: EntitlementResource;
   reason?: string;
-  plan?: PlanName;
-  limit?: number;
+  plan?: PlanName | GymTier;
+  limit?: number | null;
+  /** `gym` when the limit comes from a gym tier. */
+  scope?: 'gym';
   usage?: number;
 };
 

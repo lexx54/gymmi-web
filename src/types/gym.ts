@@ -101,6 +101,8 @@ export interface GymDashboardData {
   pendingMembersCount?: number;
   routinesCount: number;
   catalogRoutinesCount?: number;
+  catalogRoutineLimit?: number;
+  customExerciseLimit?: number;
   trialDaysRemaining: number | null;
   daysRemainingInTrial?: number | null;
   isTrialActive: boolean;

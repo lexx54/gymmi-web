@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import type { TFunction } from 'i18next';
+import type { ApiErrorDetails } from '../services/api/errors';
 import { fetchMyPermissions } from '../services/api/permissions';
 import type {
   EntitlementCapabilities,
   EntitlementResource,
+  EntitlementSnapshot,
   MyPermissionsResponse,
 } from '../types/rbac';
 
@@ -64,11 +67,33 @@ export function hasAnyEntitlementCapability(
 
 /** Checks a numeric quota only when both server values are present. */
 export function isEntitlementLimitReached(
-  limits: Partial<Record<EntitlementResource, number>> | undefined,
+  limits: Partial<Record<EntitlementResource, number | null>> | undefined,
   usage: Partial<Record<EntitlementResource, number>> | undefined,
   resource: EntitlementResource,
 ): boolean {
   const limit = limits?.[resource];
   const used = usage?.[resource];
   return typeof limit === 'number' && typeof used === 'number' && used >= limit;
+}
+
+/** Upsell details for a blocked custom exercise, worded for gyms or users. */
+export function customExerciseLimitDetails(
+  entitlements: EntitlementSnapshot | undefined,
+  t: TFunction,
+): ApiErrorDetails {
+  const limit = entitlements?.limits?.customExercises;
+  const details: ApiErrorDetails = {
+    code: 'PLAN_LIMIT',
+    resource: 'customExercises',
+    limit,
+    usage: entitlements?.usage?.customExercises,
+  };
+  return entitlements?.gymTier
+    ? {
+        ...details,
+        scope: 'gym',
+        plan: entitlements.gymTier,
+        message: t('entitlements.gymCustomExerciseLimit', { limit }),
+      }
+    : { ...details, message: t('entitlements.customExerciseLimit') };
 }

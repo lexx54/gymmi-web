@@ -101,6 +101,32 @@ describe('Gym Pages', () => {
       expect(screen.getByText('Heavy Push Day')).toBeInTheDocument();
       expect(screen.queryByText('Mobility & Core')).not.toBeInTheDocument();
     });
+
+    it('shows catalog usage and offers Gym Pro instead of the builder at the limit', async () => {
+      vi.spyOn(workoutsApi, 'fetchWorkouts').mockResolvedValue([]);
+      vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+        tier: 'plus',
+        activeMembersCount: 15,
+        capacity: 100,
+        coachesCount: 2,
+        routinesCount: 3,
+        catalogRoutinesCount: 3,
+        catalogRoutineLimit: 3,
+        customExerciseLimit: 5,
+        trialDaysRemaining: null,
+        isTrialActive: false,
+      });
+
+      render(<GymCatalogPage />, { wrapper: createWrapper() });
+
+      expect(await screen.findByText('3 of 3 catalog workouts used')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('create-catalog-routine-btn'));
+
+      expect(await screen.findByText('Upgrade your gym plan')).toBeInTheDocument();
+      expect(screen.getByText('Gym Pro')).toBeInTheDocument();
+      expect(screen.getByText('Up to 10 catalog workouts')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'See gym plans' })).toHaveAttribute('href', '/billing');
+    });
   });
 
   describe('GymCoachesPage', () => {

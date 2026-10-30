@@ -7,7 +7,7 @@ export const LEGAL_CONFIG = {
   /** Legal name of the entity that operates Gymmi. */
   companyName: 'Gymmi',
   /** Mailbox for legal notices, account deletion requests, and content reports. */
-  contactEmail: 'support@gymmi.app',
+  contactEmail: 'support@gymmi.site',
   /** Country whose laws govern the Terms. */
   jurisdiction: 'the Bolivarian Republic of Venezuela',
   jurisdictionEs: 'la República Bolivariana de Venezuela',

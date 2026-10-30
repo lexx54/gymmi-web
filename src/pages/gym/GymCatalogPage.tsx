@@ -9,6 +9,8 @@ import { TopBar } from '../../components/layout/TopBar';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkouts, useDeleteWorkout } from '../../hooks/useWorkouts';
 import { useMyGym } from '../../hooks/useGyms';
+import { PlusUpsellModal } from '../../components/entitlements/PlusUpsellModal';
+import type { ApiErrorDetails } from '../../services/api/errors';
 import type { WorkoutRoutine } from '../../services/api/workouts';
 
 export default function GymCatalogPage() {
@@ -19,6 +21,25 @@ export default function GymCatalogPage() {
   const { data: gymData } = useMyGym(true);
   const deleteMutation = useDeleteWorkout();
   const [search, setSearch] = useState('');
+  const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
+  const catalogLimit = gymData?.catalogRoutineLimit;
+  const catalogCount = gymData?.catalogRoutinesCount ?? 0;
+
+  const createRoutine = () => {
+    if (typeof catalogLimit === 'number' && catalogCount >= catalogLimit) {
+      setUpsell({
+        code: 'PLAN_LIMIT',
+        scope: 'gym',
+        resource: 'templates',
+        plan: gymData?.tier,
+        limit: catalogLimit,
+        usage: catalogCount,
+        message: t('entitlements.gymCatalogLimit', { limit: catalogLimit }),
+      });
+      return;
+    }
+    navigate('/workout/new');
+  };
 
   const facilityRoutines = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -50,12 +71,18 @@ export default function GymCatalogPage() {
           <StatPill>
             <Dumbbell size={16} color="#ef233c" />
             <span>
-              <strong>{facilityRoutines.length}</strong> {t('gym.curatedRoutines')}
+              {typeof catalogLimit === 'number' ? (
+                t('gym.catalogUsage', { usage: catalogCount, limit: catalogLimit })
+              ) : (
+                <>
+                  <strong>{facilityRoutines.length}</strong> {t('gym.curatedRoutines')}
+                </>
+              )}
             </span>
           </StatPill>
           <PrimaryActionBtn
             type="button"
-            onClick={() => navigate('/workout/new')}
+            onClick={createRoutine}
             data-testid="create-catalog-routine-btn"
           >
             <Plus size={16} />
@@ -86,7 +113,7 @@ export default function GymCatalogPage() {
             <p>{t('gym.catalogDesc')}</p>
             <PrimaryActionBtn
               type="button"
-              onClick={() => navigate('/workout/new')}
+              onClick={createRoutine}
             >
               <Plus size={16} />
               <span>{t('gym.createRoutine')}</span>
@@ -130,6 +157,11 @@ export default function GymCatalogPage() {
           ))}
         </Grid>
       </Main>
+      <PlusUpsellModal
+        isOpen={Boolean(upsell)}
+        details={upsell ?? undefined}
+        onClose={() => setUpsell(null)}
+      />
     </PageShell>
   );
 }

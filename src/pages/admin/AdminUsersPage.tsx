@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { fetchAdminUsers, fetchRoles, patchAdminUser } from '../../services/api/admin';
 import { getApiErrorMessage } from '../../services/api/errors';
-import type { PaginatedUsers, RoleDto } from '../../types/rbac';
+import type { AdminUserPatch, PaginatedUsers, PaidPlan, RoleDto } from '../../types/rbac';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -35,7 +35,7 @@ export default function AdminUsersPage() {
   const patchMutation = useMutation({
     mutationFn: (vars: {
       userId: string;
-      body: { roleId?: string; isActive?: boolean; hasPaid?: boolean };
+      body: AdminUserPatch;
     }) =>
       patchAdminUser(vars.userId, vars.body),
     onSuccess: () => {
@@ -103,7 +103,7 @@ export default function AdminUsersPage() {
                           />
                         </Td>
                         <Td>
-                          <PlanLabel $plus={(u.plan ?? (u.hasPaid ? 'plus' : 'free')) === 'plus'}>
+                          <PlanLabel $plus={(u.plan ?? (u.hasPaid ? 'plus' : 'free')) !== 'free'}>
                             {t(`entitlements.${u.plan ?? (u.hasPaid ? 'plus' : 'free')}`)}
                           </PlanLabel>
                           <input
@@ -118,6 +118,21 @@ export default function AdminUsersPage() {
                             }
                             style={{ accentColor: '#ff535a', width: 18, height: 18 }}
                           />
+                          {u.hasPaid ? (
+                            <PaidPlanSelect
+                              value={u.plan === 'pro' ? 'pro' : 'plus'}
+                              aria-label={t('admin.paidPlan', { username: u.username })}
+                              onChange={(e) =>
+                                patchMutation.mutate({
+                                  userId: u.id,
+                                  body: { paidPlan: e.target.value as PaidPlan },
+                                })
+                              }
+                            >
+                              <option value="plus">{t('entitlements.plus')}</option>
+                              <option value="pro">{t('entitlements.pro')}</option>
+                            </PaidPlanSelect>
+                          ) : null}
                           {u.downgradeEffectiveAt ? (
                             <GraceText>
                               {t('admin.graceUntil', {
@@ -202,6 +217,12 @@ const RoleSelect = styled.select`
   padding: 0.45rem 0.65rem;
   font-size: 0.85rem;
   outline: none;
+`;
+
+const PaidPlanSelect = styled(RoleSelect)`
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.75rem;
 `;
 
 const Pagination = styled.div`
