@@ -8,6 +8,9 @@ Provides the persistent application shell, sidebar navigation, and standardized 
   1. **Title Section (Left)**: Renders the section title using `'Plus Jakarta Sans'`, bold weight, with clean responsive scaling on smaller viewports. When omitted (e.g. on the Main Dashboard), the left space collapses gracefully into a spacer.
   2. **Actions Slot (Right)**: Allows page-specific utility buttons (such as "+ Create Routine", "+ Create Exercise", or custom filters) to be positioned neatly alongside global controls.
   3. **Language Toggle Pill (Right)**: Global segmented pill control with `EN | ES` toggle. Displays active language state (`#313349` on `#181a2e`) and dynamically invokes `setAppLanguage` from `src/i18n`.
+- **Default language**: Spanish (`DEFAULT_LANGUAGE` in `src/i18n/index.ts`) until the visitor picks one; the choice is saved under `gymmi.language` and mirrored to `<html lang>`.
+- **Signed-out pages**: `/login` and `/forgot-password` show `LanguageToggle` (`src/components/common/LanguageToggle.tsx`), a globe pill in the top-right corner that switches ES ⇄ EN. The landing navbar's globe now saves the choice too.
+- **Tests**: `src/setupTests.ts` switches unit tests to English, and Playwright starts each spec with `gymmi.language=en`, because specs assert the English copy.
 - Replaces legacy heterogeneous header bars and duplicate `HeaderRow` / `SettingsPageTitle` declarations with a single, uniform component.
 
 ## Key files

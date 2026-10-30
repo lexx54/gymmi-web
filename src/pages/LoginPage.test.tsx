@@ -135,11 +135,11 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith('Invalid credentials');
+      expect(mockToastError).toHaveBeenCalledWith('Incorrect email, username or password.');
     });
   });
 
-  it('shows userNotFound error toast when user does not exist', async () => {
+  it('shows the generic credentials error when the user does not exist', async () => {
     mockMutate.mockImplementation((_vars, opts) => {
       opts?.onError?.({
         response: { data: { message: 'No account found with this email or username' } },
@@ -155,11 +155,11 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith('No account found with this email or username.');
+      expect(mockToastError).toHaveBeenCalledWith('Incorrect email, username or password.');
     });
   });
 
-  it('shows incorrectPassword error toast when password is wrong', async () => {
+  it('shows the same generic error when the password is wrong', async () => {
     mockMutate.mockImplementation((_vars, opts) => {
       opts?.onError?.({
         response: { data: { message: 'Incorrect password. Please verify and try again' } },
@@ -175,7 +175,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith('Incorrect password. Please verify and try again.');
+      expect(mockToastError).toHaveBeenCalledWith('Incorrect email, username or password.');
     });
   });
 
@@ -226,14 +226,16 @@ describe('LoginPage', () => {
 describe('resolveLoginErrorMessage (web)', () => {
   const t = (k: string) => k;
 
-  it('resolves userNotFound for English and Spanish server messages', () => {
-    expect(resolveLoginErrorMessage('No account found with this email or username', t)).toBe('auth.userNotFound');
-    expect(resolveLoginErrorMessage('No se encontró ninguna cuenta con este correo o usuario', t)).toBe('auth.userNotFound');
-  });
-
-  it('resolves incorrectPassword for English and Spanish server messages', () => {
-    expect(resolveLoginErrorMessage('Incorrect password. Please verify and try again', t)).toBe('auth.incorrectPassword');
-    expect(resolveLoginErrorMessage('Contraseña incorrecta. Por favor verifícala e inténtalo de nuevo', t)).toBe('auth.incorrectPassword');
+  it.each([
+    'Incorrect email, username or password',
+    'Correo, usuario o contraseña incorrectos',
+    'No account found with this email or username',
+    'No se encontró ninguna cuenta con este correo o usuario',
+    'Incorrect password. Please verify and try again',
+    'Contraseña incorrecta. Por favor verifícala e inténtalo de nuevo',
+    'Invalid email/password',
+  ])('maps "%s" to the one generic credentials message', (message) => {
+    expect(resolveLoginErrorMessage(message, t)).toBe('auth.invalidCredentials');
   });
 
   it('resolves accountInactive for deactivated server messages', () => {

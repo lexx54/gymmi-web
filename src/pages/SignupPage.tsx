@@ -151,7 +151,6 @@ export default function SignupPage() {
   const currentSpecializations = watch('specializations') || [];
   const currentAmenities = watch('gymAmenities') || [];
   const selectedGoal = watch('goal') || '';
-  const selectedGender = watch('gender') || '';
   const [isCustomGoal, setIsCustomGoal] = useState(false);
 
   const processCoverFile = async (file: File) => {
@@ -1966,25 +1965,6 @@ const CheckBadge = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const GenderGrid = styled.div`
-  display: flex;
-  gap: 0.4rem;
-`;
-
-const GenderBtn = styled.button<{ $selected?: boolean }>`
-  flex: 1;
-  padding: 0.75rem 0.35rem;
-  border-radius: 9999px;
-  background-color: ${({ $selected }) => ($selected ? '#ef233c' : '#0f1329')};
-  border: 1px solid ${({ $selected }) => ($selected ? '#ef233c' : 'rgba(124, 132, 170, 0.22)')};
-  color: ${({ $selected }) => ($selected ? '#ffffff' : '#b2b8d8')};
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
 `;
 
 const UnitHeader = styled.div`

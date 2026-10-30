@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, ImageIcon, Pencil, Play, Scan } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ImageIcon, Loader2, Pencil, Play, Scan, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Modal } from '../common/Modal';
@@ -15,6 +15,9 @@ type ExerciseDetailModalProps = {
   onClose: () => void;
   /** Shown as an "Edit exercise" action when the viewer may edit it. */
   onEdit?: () => void;
+  /** Shown as a "Delete" action (with a confirm step) when the viewer may delete it. */
+  onDelete?: () => void;
+  isDeleting?: boolean;
 };
 
 const MEDIA_SLIDES = ['front', 'side', 'video'] as const;
@@ -23,10 +26,23 @@ const MEDIA_SLIDES = ['front', 'side', 'video'] as const;
  * Read-only exercise detail overlay. The carousel shows the exercise's uploaded
  * photos, or placeholder slides when it has none.
  */
-export function ExerciseDetailModal({ exercise, onClose, onEdit }: ExerciseDetailModalProps) {
+export function ExerciseDetailModal({
+  exercise,
+  onClose,
+  onEdit,
+  onDelete,
+  isDeleting = false,
+}: ExerciseDetailModalProps) {
   const { t, i18n } = useTranslation();
   const [slideIndex, setSlideIndex] = useState(0);
   const [bodyMapOpen, setBodyMapOpen] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingFor, setConfirmingFor] = useState<string | null>(null);
+  // Reset the confirm step whenever a different exercise opens.
+  if ((exercise?.id ?? null) !== confirmingFor) {
+    setConfirmingFor(exercise?.id ?? null);
+    setConfirmingDelete(false);
+  }
 
   const images = exercise?.images ?? [];
   const hasImages = images.length > 0;
@@ -176,12 +192,39 @@ export function ExerciseDetailModal({ exercise, onClose, onEdit }: ExerciseDetai
             </Field>
           ) : null}
 
-          {onEdit ? (
+          {onEdit || onDelete ? (
             <Footer>
-              <EditButton type="button" onClick={onEdit}>
-                <Pencil size={15} aria-hidden />
-                {t('exercises.editExercise')}
-              </EditButton>
+              {onDelete && confirmingDelete ? (
+                <ConfirmRow role="group" aria-label={t('exercises.deleteConfirmTitle')}>
+                  <ConfirmText>{t('exercises.deleteConfirm', { name: exercise.name })}</ConfirmText>
+                  <GhostButton
+                    type="button"
+                    onClick={() => setConfirmingDelete(false)}
+                    disabled={isDeleting}
+                  >
+                    {t('common.cancel')}
+                  </GhostButton>
+                  <DangerButton type="button" onClick={onDelete} disabled={isDeleting}>
+                    {isDeleting ? <Spinner size={15} aria-hidden /> : <Trash2 size={15} aria-hidden />}
+                    {isDeleting ? t('exercises.deleting') : t('exercises.deleteConfirmAction')}
+                  </DangerButton>
+                </ConfirmRow>
+              ) : (
+                <>
+                  {onDelete ? (
+                    <GhostButton type="button" onClick={() => setConfirmingDelete(true)}>
+                      <Trash2 size={15} aria-hidden />
+                      {t('exercises.deleteExercise')}
+                    </GhostButton>
+                  ) : null}
+                  {onEdit ? (
+                    <EditButton type="button" onClick={onEdit}>
+                      <Pencil size={15} aria-hidden />
+                      {t('exercises.editExercise')}
+                    </EditButton>
+                  ) : null}
+                </>
+              )}
             </Footer>
           ) : null}
           </Content>
@@ -406,8 +449,74 @@ const Instructions = styled.p`
 
 const Footer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 0.75rem;
   padding-top: 0.25rem;
+`;
+
+const ConfirmRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  width: 100%;
+`;
+
+const ConfirmText = styled.p`
+  flex: 1 1 14rem;
+  margin: 0;
+  color: #ffb4ab;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+`;
+
+const GhostButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: transparent;
+  color: #e4e1e9;
+  padding: 0.7rem 1.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: #ff535a;
+    color: #ffb3b1;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb3b1;
+    outline-offset: 2px;
+  }
+`;
+
+const DangerButton = styled(GhostButton)`
+  border-color: #d90429;
+  background: #d90429;
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    background: #b10322;
+    border-color: #b10322;
+    color: #ffffff;
+  }
+`;
+
+const Spinner = styled(Loader2)`
+  animation: spin 1s linear infinite;
 `;
 
 const EditButton = styled.button`

@@ -9,8 +9,25 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useLogin } from '../hooks/useAuthApi';
 import { createLoginSchema, type LoginFormValues } from '../schemas/auth';
+import { LanguageToggle } from '../components/common/LanguageToggle';
 
 const LOCKOUT_DURATION = 180_000;
+
+const INVALID_CREDENTIAL_PHRASES = [
+  'incorrect email, username or password',
+  'correo, usuario o contraseña incorrectos',
+  'invalid email/password',
+  'correo/contraseña',
+  'invalid credentials',
+  'credenciales inválidas',
+  'no account found',
+  'no se encontró ninguna cuenta',
+  'user not found',
+  'usuario no encontrado',
+  'incorrect password',
+  'contraseña incorrecta',
+  'wrong password',
+];
 
 export const resolveLoginErrorMessage = (
   rawMessage: string | undefined,
@@ -19,22 +36,15 @@ export const resolveLoginErrorMessage = (
   if (!rawMessage) return t('auth.loginFailed');
   const normalized = rawMessage.toLowerCase();
   if (
-    normalized.includes('no account found') ||
-    normalized.includes('no se encontró ninguna cuenta')
-  ) {
-    return t('auth.userNotFound');
-  }
-  if (
-    normalized.includes('incorrect password') ||
-    normalized.includes('contraseña incorrecta')
-  ) {
-    return t('auth.incorrectPassword');
-  }
-  if (
     normalized.includes('deactivated') ||
     normalized.includes('desactivada')
   ) {
     return t('auth.accountInactive');
+  }
+  // Unknown account and wrong password share one message so the login form
+  // never reveals which emails or usernames exist (older API wording included).
+  if (INVALID_CREDENTIAL_PHRASES.some((phrase) => normalized.includes(phrase))) {
+    return t('auth.invalidCredentials');
   }
   return rawMessage;
 };
@@ -127,6 +137,7 @@ export default function LoginPage() {
 
       {/* Right Panel - Form */}
       <FormPanel>
+        <CornerToggle />
         <FormInner>
           {/* Mobile-only branding */}
           <MobileBrand>
@@ -187,12 +198,12 @@ export default function LoginPage() {
 
               {/* Forgot Password */}
               <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
-                <button
-                  type="button"
-                  style={{ fontSize: '0.75rem', color: '#8d99ae', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                <Link
+                  to="/forgot-password"
+                  style={{ fontSize: '0.75rem', color: '#8d99ae', textDecoration: 'none' }}
                 >
                   {t('auth.forgotPassword')}
-                </button>
+                </Link>
               </div>
 
               {/* Sign In Button */}
@@ -322,12 +333,19 @@ const HeroQuote = styled.p`
 `;
 
 const FormPanel = styled.div`
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #edf2f4;
   padding: 3rem;
+`;
+
+const CornerToggle = styled(LanguageToggle)`
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
 `;
 
 const FormInner = styled.div`

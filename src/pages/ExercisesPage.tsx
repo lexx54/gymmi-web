@@ -20,7 +20,8 @@ import type { ExerciseSummary } from '../components/exercises/types';
 import { Can } from '../components/Can';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
-import { useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
+import { useDeleteExercise, useExercises, useUploadExerciseBulkCsv } from '../hooks/useExercises';
+import { canDeleteExercise, canEditExercise } from '../utils/exercisePermissions';
 import {
   hasAnyEntitlementCapability,
   customExerciseLimitDetails,
@@ -29,7 +30,6 @@ import {
 } from '../hooks/usePermissions';
 import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import {
-  isCatalogExercise,
   resolveLocalizedText,
   type Exercise,
 } from '../services/api/exercises';
@@ -67,7 +67,6 @@ export default function ExercisesPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const username = user?.username ?? 'Alex';
-  const isAdmin = user?.role?.name === 'Admin';
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [targetMuscle, setTargetMuscle] = useState('');
@@ -77,6 +76,7 @@ export default function ExercisesPage() {
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const { data: exercises, isLoading, isError } = useExercises();
   const bulkCsvMutation = useUploadExerciseBulkCsv();
+  const deleteMutation = useDeleteExercise();
   const { data: entitlements } = useEntitlements();
   const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
   const canCreateCustomExercise =
@@ -303,10 +303,25 @@ export default function ExercisesPage() {
           exercise={selectedExercise}
           onClose={() => setSelectedExerciseId(null)}
           onEdit={
-            isAdmin && selectedExercise && isCatalogExercise(selectedExercise)
+            selectedExercise && canEditExercise(user, selectedExercise)
               ? () => navigate(`/exercises/${selectedExercise.id}/edit`)
               : undefined
           }
+          onDelete={
+            selectedExercise && canDeleteExercise(user, selectedExercise)
+              ? () =>
+                  deleteMutation.mutate(selectedExercise.id, {
+                    onSuccess: () => {
+                      toast.success(t('exercises.deleted'));
+                      setSelectedExerciseId(null);
+                    },
+                    onError: (error) => {
+                      toast.error(getApiErrorMessage(error, t('exercises.deleteFailed')));
+                    },
+                  })
+              : undefined
+          }
+          isDeleting={deleteMutation.isPending}
         />
         <ExerciseBulkCsvModal
           isOpen={isBulkModalOpen}

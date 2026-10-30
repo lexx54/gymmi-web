@@ -234,3 +234,38 @@ export const createSignupSchema = (t: TFunction) =>
 
 export type SignupFormValues = z.infer<ReturnType<typeof createSignupSchema>>;
 
+
+export const createForgotPasswordSchema = (t: TFunction) =>
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, t('auth.validation.emailRequired'))
+      .email(t('auth.validation.emailInvalid')),
+  });
+
+export type ForgotPasswordFormValues = z.infer<ReturnType<typeof createForgotPasswordSchema>>;
+
+export const createResetPasswordSchema = (t: TFunction) =>
+  z
+    .object({
+      code: z
+        .string()
+        .trim()
+        .min(1, t('auth.validation.codeRequired'))
+        .regex(/^\d{6}$/, t('auth.validation.codeFormat')),
+      newPassword: z
+        .string()
+        .min(1, t('auth.validation.passwordRequired'))
+        .min(8, t('auth.validation.passwordLength', { count: 8 }))
+        .max(72, t('auth.validation.passwordMax', { count: 72 })),
+      confirmPassword: z
+        .string()
+        .min(1, t('auth.validation.confirmPasswordRequired')),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: t('auth.validation.passwordMismatch'),
+      path: ['confirmPassword'],
+    });
+
+export type ResetPasswordFormValues = z.infer<ReturnType<typeof createResetPasswordSchema>>;

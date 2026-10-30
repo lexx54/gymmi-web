@@ -48,4 +48,44 @@ describe('ExerciseDetailModal', () => {
     );
     expect(screen.queryByText('Photos and video coming soon')).not.toBeInTheDocument();
   });
+
+  it('asks for confirmation before deleting', () => {
+    const onDelete = vi.fn();
+    render(<ExerciseDetailModal exercise={exercise} onClose={vi.fn()} onDelete={onDelete} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.getByText(/Delete "Barbell Bench Press"\?/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /delete exercise/i }));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it('can cancel the delete confirmation', () => {
+    const onDelete = vi.fn();
+    render(<ExerciseDetailModal exercise={exercise} onClose={vi.fn()} onDelete={onDelete} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
+  });
+
+  it('disables the confirm buttons while deleting', () => {
+    render(
+      <ExerciseDetailModal exercise={exercise} onClose={vi.fn()} onDelete={vi.fn()} isDeleting />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
+
+    expect(screen.getByRole('button', { name: /deleting/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
+  });
+
+  it('hides the delete action without onDelete', () => {
+    render(<ExerciseDetailModal exercise={exercise} onClose={vi.fn()} />);
+
+    expect(screen.queryByRole('button', { name: /^delete$/i })).not.toBeInTheDocument();
+  });
 });

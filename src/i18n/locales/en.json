@@ -34,7 +34,8 @@
     "description": "Choose the language used across Gymmi on this device.",
     "english": "English",
     "spanish": "Spanish",
-    "changed": "Language updated"
+    "changed": "Language updated",
+    "switchTo": "Change language to {{language}}"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -97,10 +98,8 @@
     "haveAccount": "Already have an account?",
     "needAccount": "Need an account?",
     "lockout": "Too many attempts. Try again in {{time}}",
-    "invalidCredentials": "Invalid email/password",
+    "invalidCredentials": "Incorrect email, username or password.",
     "loginFailed": "Login failed. Please check your credentials.",
-    "userNotFound": "No account found with this email or username.",
-    "incorrectPassword": "Incorrect password. Please verify and try again.",
     "accountInactive": "Your account is deactivated. Please contact support.",
     "accountCreated": "Account created successfully!",
     "signupFailed": "Sign up failed. Please try again.",
@@ -131,7 +130,10 @@
       "specializationsMin": "Select at least 1 specialization tag",
       "gymsMax": "You can add up to 3 gyms",
       "gymNameMin": "Facility name must be at least 2 characters",
-      "termsRequired": "You must accept the Terms of Service and Privacy Policy"
+      "termsRequired": "You must accept the Terms of Service and Privacy Policy",
+      "codeRequired": "Enter the code from the email",
+      "codeFormat": "The code has 6 digits",
+      "passwordMax": "Password must be at most {{count}} characters"
     },
     "stepAccount": "Account",
     "stepBody": "Body & Goals",
@@ -246,6 +248,30 @@
       "terms": "Terms of Service",
       "and": "and the",
       "privacy": "Privacy Policy"
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your account email and we'll send you a 6-digit code.",
+      "sendCode": "Send code",
+      "sending": "Sending…",
+      "resetTitle": "Enter your code",
+      "resetSubtitle": "We sent a 6-digit code to {{email}} if it belongs to an account. It expires in 15 minutes.",
+      "codeLabel": "6-digit code",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm new password",
+      "submit": "Reset password",
+      "submitting": "Resetting…",
+      "resend": "Resend code",
+      "resendIn": "Resend code in {{seconds}}s",
+      "resent": "If the email has an account, a new code is on its way.",
+      "changeEmail": "Use a different email",
+      "success": "Password updated. Sign in with your new password.",
+      "invalidCode": "That code is invalid or expired. Check it or request a new one.",
+      "failed": "Something went wrong. Please try again.",
+      "tooManyAttempts": "Too many attempts. Please wait a minute and try again.",
+      "backToLogin": "Back to sign in",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     }
   },
   "gym": {
@@ -590,7 +616,7 @@
     "updated": "Exercise updated",
     "updateFailed": "Could not update exercise",
     "loadExerciseFailed": "Could not load this exercise",
-    "notEditable": "Only catalog exercises can be edited. Exercises created by users, trainers or gyms belong to their creators.",
+    "notEditable": "You can only edit exercises you created. Catalog exercises are managed by Gymmi.",
     "newEntry": "New Entry",
     "builderTitle": "Define Your Kinetic Edge",
     "requiredColumns": "Required columns",
@@ -684,7 +710,14 @@
     "intermediate": "Intermediate",
     "elite": "Elite",
     "muscleLabel": "{{tier}} muscle",
-    "imageAlt": "Heavy iron weights in a moody dark gym with red accents"
+    "imageAlt": "Heavy iron weights in a moody dark gym with red accents",
+    "deleteExercise": "Delete",
+    "deleteConfirmTitle": "Confirm delete",
+    "deleteConfirm": "Delete \"{{name}}\"? This can't be undone.",
+    "deleteConfirmAction": "Delete exercise",
+    "deleting": "Deleting…",
+    "deleted": "Exercise deleted",
+    "deleteFailed": "Could not delete the exercise. Please try again."
   },
   "analytics": {
     "workoutIntensity": "Workout Intensity",

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Dumbbell, Globe, Menu, X, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { setAppLanguage } from '../../i18n';
 
 export const LandingNavbar: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -13,7 +14,8 @@ export const LandingNavbar: React.FC = () => {
 
   const toggleLanguage = () => {
     const nextLang = i18n.language.startsWith('es') ? 'en' : 'es';
-    i18n.changeLanguage(nextLang);
+    // Saved so the choice survives reloads and carries into the login pages.
+    void setAppLanguage(nextLang);
   };
 
   const handleNavClick = (sectionId: string) => {

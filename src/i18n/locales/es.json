@@ -34,7 +34,8 @@
     "description": "Elige el idioma usado por Gymmi en este dispositivo.",
     "english": "Inglés",
     "spanish": "Español",
-    "changed": "Idioma actualizado"
+    "changed": "Idioma actualizado",
+    "switchTo": "Cambiar idioma a {{language}}"
   },
   "nav": {
     "dashboard": "Panel",
@@ -97,10 +98,8 @@
     "haveAccount": "¿Ya tienes una cuenta?",
     "needAccount": "¿Necesitas una cuenta?",
     "lockout": "Demasiados intentos. Inténtalo de nuevo en {{time}}",
-    "invalidCredentials": "Correo/contraseña inválidos",
+    "invalidCredentials": "Correo, usuario o contraseña incorrectos.",
     "loginFailed": "No se pudo iniciar sesión. Revisa tus credenciales.",
-    "userNotFound": "No se encontró ninguna cuenta con este correo o usuario.",
-    "incorrectPassword": "Contraseña incorrecta. Por favor verifícala e inténtalo de nuevo.",
     "accountInactive": "Tu cuenta está desactivada. Por favor contacta al soporte.",
     "accountCreated": "Cuenta creada correctamente.",
     "signupFailed": "No se pudo crear la cuenta. Inténtalo de nuevo.",
@@ -131,7 +130,10 @@
       "specializationsMin": "Selecciona al menos 1 especialización",
       "gymsMax": "Puedes agregar hasta 3 gimnasios",
       "gymNameMin": "El nombre del gimnasio debe tener al menos 2 caracteres",
-      "termsRequired": "Debes aceptar los Términos de Servicio y la Política de Privacidad"
+      "termsRequired": "Debes aceptar los Términos de Servicio y la Política de Privacidad",
+      "codeRequired": "Ingresa el código del correo",
+      "codeFormat": "El código tiene 6 dígitos",
+      "passwordMax": "La contraseña debe tener como máximo {{count}} caracteres"
     },
     "stepAccount": "Cuenta",
     "stepBody": "Cuerpo y Metas",
@@ -246,6 +248,30 @@
       "terms": "Términos de Servicio",
       "and": "y la",
       "privacy": "Política de Privacidad"
+    },
+    "forgot": {
+      "title": "¿Olvidaste tu contraseña?",
+      "subtitle": "Ingresa el correo de tu cuenta y te enviaremos un código de 6 dígitos.",
+      "sendCode": "Enviar código",
+      "sending": "Enviando…",
+      "resetTitle": "Ingresa tu código",
+      "resetSubtitle": "Si {{email}} pertenece a una cuenta, le enviamos un código de 6 dígitos. Vence en 15 minutos.",
+      "codeLabel": "Código de 6 dígitos",
+      "newPasswordLabel": "Nueva contraseña",
+      "confirmPasswordLabel": "Confirma la nueva contraseña",
+      "submit": "Restablecer contraseña",
+      "submitting": "Restableciendo…",
+      "resend": "Reenviar código",
+      "resendIn": "Reenviar código en {{seconds}} s",
+      "resent": "Si el correo tiene una cuenta, te enviamos un código nuevo.",
+      "changeEmail": "Usar otro correo",
+      "success": "Contraseña actualizada. Inicia sesión con tu nueva contraseña.",
+      "invalidCode": "El código no es válido o venció. Revísalo o solicita uno nuevo.",
+      "failed": "Algo salió mal. Inténtalo de nuevo.",
+      "tooManyAttempts": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+      "backToLogin": "Volver a iniciar sesión",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña"
     }
   },
   "gym": {
@@ -590,7 +616,7 @@
     "updated": "Ejercicio actualizado",
     "updateFailed": "No se pudo actualizar el ejercicio",
     "loadExerciseFailed": "No se pudo cargar este ejercicio",
-    "notEditable": "Solo se pueden editar los ejercicios del catálogo. Los creados por usuarios, entrenadores o gimnasios pertenecen a sus creadores.",
+    "notEditable": "Solo puedes editar los ejercicios que creaste. Los del catálogo los gestiona Gymmi.",
     "newEntry": "Nueva entrada",
     "builderTitle": "Define tu ventaja Kinetic",
     "requiredColumns": "Columnas requeridas",
@@ -684,7 +710,14 @@
     "intermediate": "Intermedio",
     "elite": "Elite",
     "muscleLabel": "Músculo {{tier}}",
-    "imageAlt": "Pesas de hierro en un gimnasio oscuro con acentos rojos"
+    "imageAlt": "Pesas de hierro en un gimnasio oscuro con acentos rojos",
+    "deleteExercise": "Eliminar",
+    "deleteConfirmTitle": "Confirmar eliminación",
+    "deleteConfirm": "¿Eliminar \"{{name}}\"? Esta acción no se puede deshacer.",
+    "deleteConfirmAction": "Eliminar ejercicio",
+    "deleting": "Eliminando…",
+    "deleted": "Ejercicio eliminado",
+    "deleteFailed": "No se pudo eliminar el ejercicio. Inténtalo de nuevo."
   },
   "analytics": {
     "workoutIntensity": "Intensidad de entrenamiento",

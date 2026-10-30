@@ -12,6 +12,7 @@ const TermsPage = lazy(() => import('./pages/TermsPage'))
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const SignupPage = lazy(() => import('./pages/SignupPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
 const ExerciseBuilderPage = lazy(() => import('./pages/ExerciseBuilderPage'))
 const ExercisesPage = lazy(() => import('./pages/ExercisesPage'))
@@ -59,6 +60,7 @@ function App() {
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />} />
@@ -81,7 +83,7 @@ function App() {
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
-          <Route path="/exercises/:exerciseId/edit" element={<RoleRoute role="Admin"><ExerciseBuilderPage /></RoleRoute>} />
+          <Route path="/exercises/:exerciseId/edit" element={<ExerciseBuilderPage />} />
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />

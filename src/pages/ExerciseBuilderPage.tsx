@@ -41,7 +41,6 @@ import {
 import { useListEquipments, useListMuscles } from '../hooks/useListData';
 import { useCreateTag, useTags } from '../hooks/useTags';
 import {
-  isCatalogExercise,
   resolveLocalizedText,
   type CreateExerciseParams,
   type Exercise,
@@ -50,6 +49,7 @@ import {
 } from '../services/api/exercises';
 import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import { MAX_EXERCISE_IMAGES } from '../utils/imageUpload';
+import { canEditExercise } from '../utils/exercisePermissions';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -131,7 +131,8 @@ function draftToUpdateParams(draft: ExerciseDraft, exercise: Exercise): UpdateEx
 
 /**
  * Exercise builder page for creating a new movement entry, or, at
- * `/exercises/:exerciseId/edit`, for admins editing a catalog exercise.
+ * `/exercises/:exerciseId/edit`, for editing an exercise the viewer may change
+ * (Admins: catalog exercises; everyone else: their own custom exercises).
  */
 export default function ExerciseBuilderPage() {
   const navigate = useNavigate();
@@ -152,7 +153,8 @@ export default function ExerciseBuilderPage() {
   const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
   const [isUploadingImages, setIsUploadingImages] = useState(false);
 
-  if (existingExercise && isCatalogExercise(existingExercise) && loadedExerciseId !== existingExercise.id) {
+  const canEditExisting = existingExercise ? canEditExercise(user, existingExercise) : false;
+  if (existingExercise && canEditExisting && loadedExerciseId !== existingExercise.id) {
     setLoadedExerciseId(existingExercise.id);
     setDraft(exerciseToDraft(existingExercise));
   }
@@ -175,11 +177,11 @@ export default function ExerciseBuilderPage() {
     if (isExerciseError) {
       toast.error(t('exercises.loadExerciseFailed'));
       navigate('/exercises');
-    } else if (existingExercise && !isCatalogExercise(existingExercise)) {
+    } else if (existingExercise && !canEditExisting) {
       toast.error(t('exercises.notEditable'));
       navigate('/exercises');
     }
-  }, [existingExercise, isEditing, isExerciseError, navigate, t]);
+  }, [canEditExisting, existingExercise, isEditing, isExerciseError, navigate, t]);
 
   useEffect(() => {
     if (!isEditing && entitlements && !canCreateCustomExercise) {

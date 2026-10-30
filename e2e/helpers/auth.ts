@@ -96,6 +96,8 @@ export async function clearUiSession(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
     sessionStorage.clear();
+    // Keep specs in English; the app's own default is Spanish.
+    localStorage.setItem('gymmi.language', 'en');
   });
 }
 

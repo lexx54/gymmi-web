@@ -11,7 +11,8 @@ export const FAQSection: React.FC = () => {
     { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
     { qKey: 'landing.faq.q2', aKey: 'landing.faq.a2' },
     { qKey: 'landing.faq.q3', aKey: 'landing.faq.a3' },
-    { qKey: 'landing.faq.q4', aKey: 'landing.faq.a4' },
+    // Gemini translation is disabled for now; restore this FAQ when it returns.
+    // { qKey: 'landing.faq.q4', aKey: 'landing.faq.a4' },
     { qKey: 'landing.faq.q5', aKey: 'landing.faq.a5' },
     { qKey: 'landing.faq.q6', aKey: 'landing.faq.a6' },
     { qKey: 'landing.faq.q7', aKey: 'landing.faq.a7' },

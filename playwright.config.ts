@@ -18,6 +18,11 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'on-first-retry',
+    // The app defaults to Spanish; specs assert the English copy.
+    storageState: {
+      cookies: [],
+      origins: [{ origin: baseURL, localStorage: [{ name: 'gymmi.language', value: 'en' }] }],
+    },
   },
   webServer: [
     {
