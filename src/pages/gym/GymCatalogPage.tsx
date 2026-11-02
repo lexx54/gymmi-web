@@ -12,6 +12,7 @@ import { useMyGym } from '../../hooks/useGyms';
 import { PlusUpsellModal } from '../../components/entitlements/PlusUpsellModal';
 import type { ApiErrorDetails } from '../../services/api/errors';
 import type { WorkoutRoutine } from '../../services/api/workouts';
+import { toastGymAccessPaused } from '../../utils/gymAccess';
 
 export default function GymCatalogPage() {
   const { t } = useTranslation();
@@ -26,6 +27,10 @@ export default function GymCatalogPage() {
   const catalogCount = gymData?.catalogRoutinesCount ?? 0;
 
   const createRoutine = () => {
+    if (gymData?.isAccessActive === false) {
+      toastGymAccessPaused(t, navigate);
+      return;
+    }
     if (typeof catalogLimit === 'number' && catalogCount >= catalogLimit) {
       setUpsell({
         code: 'PLAN_LIMIT',

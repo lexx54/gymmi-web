@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import {
@@ -14,6 +15,9 @@ import {
   type BillingCadence,
 } from '../../constants/pricing.constants';
 import { useAuth } from '../../context/AuthContext';
+import { fetchPaymentConfig } from '../../services/api/payments';
+
+const ROLE_TITLE = { trainer: 'Trainer', client: 'Client', gym: 'Gym' } as const;
 
 export const PricingSection: React.FC = () => {
   const { t } = useTranslation();
@@ -24,6 +28,14 @@ export const PricingSection: React.FC = () => {
   const [cadence, setCadence] = useState<BillingCadence>('monthly');
 
   const plans = PRICING_DATA[role];
+  // Prices come from the API (what users are actually charged); the local
+  // values only cover the moment before it answers or if it's unreachable.
+  const { data: config } = useQuery({
+    queryKey: ['payments', 'config'],
+    queryFn: fetchPaymentConfig,
+    staleTime: 5 * 60 * 1000,
+  });
+  const serverPrices = config?.plans?.[ROLE_TITLE[role]];
 
   return (
     <PricingWrapper id="pricing">
@@ -96,7 +108,11 @@ export const PricingSection: React.FC = () => {
           {plans.map((plan) => {
             const isHighlighted = plan.badgeKey === 'landing.pricing.popularBadge';
             const isPro = Boolean(plan.disabled);
-            const price = cadence === 'annual' ? plan.annualPrice : plan.monthlyPrice;
+            const server = serverPrices?.[plan.id];
+            const price =
+              cadence === 'annual'
+                ? (server?.annualMonthly ?? plan.annualPrice)
+                : (server?.monthly ?? plan.monthlyPrice);
             const formattedPrice = Number.isInteger(price) ? price : price.toFixed(2);
 
             return (

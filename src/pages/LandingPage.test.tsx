@@ -121,7 +121,7 @@ describe('LandingPage', () => {
     expect(screen.getAllByText('CAN PUBLISH')[0]).toBeInTheDocument();
   });
 
-  it('renders pricing plans with role toggle and only Athlete Pro disabled', async () => {
+  it('renders pricing plans with every paid plan purchasable, including Athlete Pro', async () => {
     const user = userEvent.setup();
     render(<LandingPage />, { wrapper: createWrapper() });
 
@@ -148,9 +148,10 @@ describe('LandingPage', () => {
     expect(screen.getByText('1.99')).toBeInTheDocument();
     expect(screen.getByText('2.99')).toBeInTheDocument();
 
-    // Athlete Pro is still disabled
-    const proButtons = screen.getAllByRole('button', { name: /coming soon/i });
-    expect(proButtons.some((b) => b.hasAttribute('disabled'))).toBe(true);
+    // Athlete Pro is on sale now, with its real limits
+    expect(screen.queryByRole('button', { name: /coming soon/i })).not.toBeInTheDocument();
+    expect(screen.getByText('Up to 10 owned solo routines')).toBeInTheDocument();
+    expect(screen.getByText('Up to 10 private custom exercises')).toBeInTheDocument();
 
     // Switch to Gym Facilities tab
     const gymTab = screen.getByRole('tab', { name: /for gym facilities/i });

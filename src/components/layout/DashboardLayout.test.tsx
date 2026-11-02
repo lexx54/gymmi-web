@@ -96,6 +96,32 @@ describe('DashboardLayout (Gym Role)', () => {
     expect(screen.getByText(/1 \/ 100 Members/i)).toBeInTheDocument();
   });
 
+  it('pauses growth actions and links to billing once access has lapsed', async () => {
+    vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
+      id: 'g-1',
+      name: 'IronHQ',
+      tier: 'trial',
+      activeMembersCount: 1,
+      capacity: 100,
+      memberCapacity: 100,
+      coachesCount: 0,
+      routinesCount: 0,
+      trialDaysRemaining: 0,
+      daysRemainingInTrial: 0,
+      isTrialActive: false,
+      isAccessActive: false,
+    } as any);
+
+    render(<DashboardLayout />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('gym-trial-banner')).toBeInTheDocument();
+    });
+    expect(screen.getByText(/choose a plan to keep adding members/i)).toBeInTheDocument();
+    expect(screen.getByTestId('gym-create-routine-btn')).toBeDisabled();
+    expect(screen.getByTestId('gym-upgrade-btn')).toHaveTextContent(/Choose a plan/i);
+  });
+
   it('renders active plan badge and hides upgrade button when gym is on a paid tier', async () => {
     vi.spyOn(gymsApi, 'fetchMyGym').mockResolvedValue({
       id: 'g-1',

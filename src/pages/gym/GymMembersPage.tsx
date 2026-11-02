@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import { Sidebar } from '../../components/layout/Sidebar';
@@ -27,9 +28,11 @@ import {
   useRemoveGymMember,
 } from '../../hooks/useGyms';
 import type { GymMember } from '../../types/gym';
+import { toastGymAccessPaused, toastGymActionError } from '../../utils/gymAccess';
 
 export default function GymMembersPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: members = [], isLoading, isError } = useMyGymMembers();
   const { data: pendingMembers = [] } = useMyPendingMembers();
@@ -55,12 +58,18 @@ export default function GymMembersPage() {
     });
   }, [activeMembers, search]);
 
+  const isAccessActive = gymData?.isAccessActive ?? true;
+
   const handleApprove = async (member: GymMember) => {
+    if (!isAccessActive) {
+      toastGymAccessPaused(t, navigate);
+      return;
+    }
     try {
       await approveMemberMutation.mutateAsync(member.id);
       toast.success(t('gym.memberApproved'));
-    } catch {
-      toast.error(t('common.error'));
+    } catch (error) {
+      toastGymActionError(error, t, navigate);
     }
   };
 
@@ -175,6 +184,12 @@ export default function GymMembersPage() {
                       <ActionsRow>
                         <ApproveBtn
                           type="button"
+                          aria-disabled={!isAccessActive}
+                          title={
+                            isAccessActive
+                              ? undefined
+                              : t('gym.accessPaused', 'Trial ended — choose a plan to keep adding members, routines and articles')
+                          }
                           onClick={() => handleApprove(member)}
                           data-testid={`approve-member-${member.id}`}
                         >

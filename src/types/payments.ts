@@ -27,6 +27,9 @@ export interface Payment {
   billingCycle: BillingCycle;
   amountUsd: number;
   amountVes: number | null;
+  /** BCV Bs./USD rate used for `amountVes` (Bolívar methods only). */
+  exchangeRate?: number | null;
+  exchangeRateDate?: string | null;
   paymentMethod: PaymentMethod;
   referenceNumber: string;
   originBank: string | null;
@@ -77,20 +80,40 @@ export interface ZelleConfig {
   name: string;
 }
 
+export interface PlanPrice {
+  monthly: number;
+  annualMonthly: number;
+  /** USD charged for one monthly / one annual payment. */
+  monthlyTotal: number;
+  annualTotal: number;
+}
+
+export interface ExchangeRate {
+  /** Bolívares per USD (official BCV rate). */
+  rate: number;
+  /** BCV "Fecha Valor", YYYY-MM-DD. */
+  validFor: string;
+}
+
+/**
+ * A method is present only when the API has it configured. `exchangeRate`
+ * is null while Bolívar payments are paused (no recent BCV rate).
+ */
 export interface PaymentConfig {
-  pagoMovil: PagoMovilConfig;
-  bankTransfer: BankTransferConfig;
-  zinli: ZinliConfig;
-  binancePay: BinancePayConfig;
-  zelle: ZelleConfig;
+  pagoMovil?: PagoMovilConfig;
+  bankTransfer?: BankTransferConfig;
+  zinli?: ZinliConfig;
+  binancePay?: BinancePayConfig;
+  zelle?: ZelleConfig;
   exchangeRateBcvNote: string;
+  exchangeRate: ExchangeRate | null;
+  /** Prices per role and plan, e.g. `plans.Client.pro.monthlyTotal`. */
+  plans: Record<string, Record<string, PlanPrice>>;
 }
 
 export interface CreatePaymentPayload {
   plan: string;
   billingCycle: BillingCycle;
-  amountUsd: number;
-  amountVes?: number;
   paymentMethod: PaymentMethod;
   referenceNumber: string;
   originBank?: string;
@@ -101,5 +124,5 @@ export interface CreatePaymentPayload {
 }
 
 export interface RejectPaymentPayload {
-  rejectionReason?: string;
+  rejectionReason: string;
 }

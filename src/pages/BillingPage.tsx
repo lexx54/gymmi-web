@@ -38,11 +38,38 @@ import { uploadImageDirectly } from '../utils/imageUpload';
 import { getApiErrorMessage } from '../services/api/errors';
 import { PRICING_DATA } from '../constants/pricing.constants';
 import type { BillingCadence } from '../constants/pricing.constants';
-import type { PaymentMethod, CreatePaymentPayload } from '../types/payments';
+import type { PaymentMethod, CreatePaymentPayload, PaymentConfig } from '../types/payments';
+import {
+  formatRate,
+  formatUsd,
+  formatVes,
+  isBelowActivePlan,
+  isVesMethod,
+  planLabel,
+  toVes,
+} from '../utils/billing';
+
+const ROLE_TITLE = { trainer: 'Trainer', client: 'Client', gym: 'Gym' } as const;
+
+/** Payment method tabs, shown only when the API has that method configured. */
+const METHOD_TABS: Array<{
+  id: PaymentMethod;
+  configKey: 'pagoMovil' | 'bankTransfer' | 'binancePay' | 'zinli' | 'zelle';
+  label: string;
+}> = [
+  { id: 'pago_movil', configKey: 'pagoMovil', label: '🇻🇪 Pago Móvil' },
+  { id: 'bank_transfer', configKey: 'bankTransfer', label: '🏦 Transferencia' },
+  { id: 'binance_pay', configKey: 'binancePay', label: '🟡 Binance Pay (USDT)' },
+  { id: 'zinli', configKey: 'zinli', label: '🟣 Zinli' },
+  { id: 'zelle', configKey: 'zelle', label: '💵 Zelle' },
+];
+
+const availableMethods = (config: PaymentConfig | undefined) =>
+  METHOD_TABS.filter((tab) => Boolean(config?.[tab.configKey]));
 
 export default function BillingPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { data: userProfile } = useUserProfile();
 
@@ -87,17 +114,76 @@ export default function BillingPage() {
   // Check for pending submission
   const pendingPayment = myPayments?.find((p) => p.status === 'PENDING');
 
-  // Current plans for role
-  const availablePlans = PRICING_DATA[roleKey] || PRICING_DATA.client;
-  const selectedPlan =
-    availablePlans.find((p) => p.id === selectedPlanId) ||
-    availablePlans.find((p) => p.id === 'plus') ||
-    availablePlans[0];
+  // Current subscription
+  const hasPaid = Boolean(effectiveUser?.hasPaid);
+  const [now] = useState(() => Date.now());
+  const paidUntilDate = effectiveUser?.paidUntil
+    ? new Date(effectiveUser.paidUntil)
+    : null;
+  const isExpiringSoon =
+    paidUntilDate &&
+    paidUntilDate.getTime() - now < 5 * 24 * 60 * 60 * 1000;
+  const daysRemaining = paidUntilDate
+    ? Math.max(
+        0,
+        Math.ceil(
+          (paidUntilDate.getTime() - now) / (24 * 60 * 60 * 1000),
+        ),
+      )
+    : null;
+  const isPlanActive = hasPaid && Boolean(paidUntilDate && paidUntilDate.getTime() > now);
+  const gymTier = effectiveUser?.gymProfile?.tier;
+  // A gym's plan is its tier; everyone else's is `plan` (Plus when unset).
+  const activePlanId = !isPlanActive
+    ? null
+    : roleKey === 'gym'
+      ? gymTier && gymTier !== 'trial'
+        ? gymTier
+        : null
+      : (effectiveUser?.plan && effectiveUser.plan !== 'free' ? effectiveUser.plan : 'plus');
 
-  const priceToPay =
-    cadence === 'annual'
-      ? selectedPlan.annualPrice * 12
-      : selectedPlan.monthlyPrice;
+  // Prices always come from the API; there are no local fallbacks.
+  const serverPrices = config?.plans?.[ROLE_TITLE[roleKey]];
+  const priceFor = (planId: string): number | null => {
+    const price = serverPrices?.[planId];
+    if (!price) return null;
+    return cadence === 'annual' ? price.annualTotal : price.monthlyTotal;
+  };
+
+  // Plans for this role; smaller than the active plan or unpriced can't be picked.
+  const availablePlans = (PRICING_DATA[roleKey] || PRICING_DATA.client).filter(
+    (p) => p.id !== 'free',
+  );
+  const isPlanSelectable = (planId: string, disabled?: boolean) =>
+    !disabled && !isBelowActivePlan(planId, activePlanId) && priceFor(planId) !== null;
+  const selectablePlans = availablePlans.filter((p) => isPlanSelectable(p.id, p.disabled));
+  const selectedPlan =
+    selectablePlans.find((p) => p.id === selectedPlanId) ??
+    selectablePlans.find((p) => p.id === 'plus') ??
+    selectablePlans[0] ??
+    null;
+  const priceToPay = selectedPlan ? priceFor(selectedPlan.id) : null;
+
+  // Payment method: only configured ones; fall back to the first available.
+  const methods = availableMethods(config);
+  const method: PaymentMethod | null = methods.some((m) => m.id === paymentMethod)
+    ? paymentMethod
+    : (methods[0]?.id ?? null);
+  const exchangeRate = config?.exchangeRate ?? null;
+  const paysInVes = isVesMethod(method);
+  const vesPaused = paysInVes && !exchangeRate;
+  const amountVes =
+    paysInVes && exchangeRate && priceToPay !== null ? toVes(priceToPay, exchangeRate.rate) : null;
+
+  const submitBlockedReason = pendingPayment
+    ? t('billing.blockedPending', 'You already have a payment under review. Wait for it to be reviewed before sending another.')
+    : !selectedPlan || priceToPay === null
+      ? t('billing.blockedNoPlan', 'Plans are not available right now. Please try again later.')
+      : !method
+        ? t('billing.blockedNoMethod', 'No payment methods are available right now.')
+        : vesPaused
+          ? t('billing.vesPaused', 'Bolívar payments are paused until today\'s BCV rate is available. You can pay in USD with Zelle, Zinli or Binance Pay.')
+          : null;
 
   // Mutation
   const createPaymentMutation = useMutation({
@@ -159,12 +245,16 @@ export default function BillingPage() {
       toast.error(t('billing.refRequired', 'Reference number is required.'));
       return;
     }
+    if (submitBlockedReason || !selectedPlan || !method) {
+      if (submitBlockedReason) toast.error(submitBlockedReason);
+      return;
+    }
 
+    // The API charges its own price; we only send what was chosen.
     createPaymentMutation.mutate({
       plan: selectedPlan.id,
       billingCycle: cadence,
-      amountUsd: priceToPay,
-      paymentMethod,
+      paymentMethod: method,
       referenceNumber: referenceNumber.trim(),
       originBank: originBank.trim() || undefined,
       payerPhone: payerPhone.trim() || undefined,
@@ -173,24 +263,6 @@ export default function BillingPage() {
       notes: notes.trim() || undefined,
     });
   };
-
-  // Expiration calculation for active user
-  const hasPaid = Boolean(effectiveUser?.hasPaid);
-  const [now] = useState(() => Date.now());
-  const paidUntilDate = effectiveUser?.paidUntil
-    ? new Date(effectiveUser.paidUntil)
-    : null;
-  const isExpiringSoon =
-    paidUntilDate &&
-    paidUntilDate.getTime() - now < 5 * 24 * 60 * 60 * 1000;
-  const daysRemaining = paidUntilDate
-    ? Math.max(
-        0,
-        Math.ceil(
-          (paidUntilDate.getTime() - now) / (24 * 60 * 60 * 1000),
-        ),
-      )
-    : null;
 
   return (
     <SettingsPageShell>
@@ -207,12 +279,15 @@ export default function BillingPage() {
                   {t('billing.currentPlan', 'CURRENT SUBSCRIPTION')}
                 </SectionLabel>
                 <StatusTitleRow>
-                  <TierBadge $plus={hasPaid}>
-                    {hasPaid ? (
+                  <TierBadge $plus={Boolean(activePlanId)}>
+                    {activePlanId ? (
                       <>
                         <Sparkles size={16} />
                         <span>
-                          {t('billing.plusActive', 'PLUS SUBSCRIPTION ACTIVE')}
+                          {t('billing.planActive', {
+                            plan: planLabel(activePlanId).toUpperCase(),
+                            defaultValue: '{{plan}} SUBSCRIPTION ACTIVE',
+                          })}
                         </span>
                       </>
                     ) : (
@@ -258,7 +333,7 @@ export default function BillingPage() {
                     {t('billing.pendingDetails', {
                       ref: pendingPayment.referenceNumber,
                       method: (pendingPayment.paymentMethod || '').toUpperCase(),
-                      amount: pendingPayment.amountUsd,
+                      amount: pendingPayment.amountUsd.toFixed(2),
                       defaultValue:
                         'Ref #{{ref}} ({{method}} • ${{amount}} USD) submitted on {{date}}. Your plan will update immediately once verified.',
                       date: new Date(
@@ -305,21 +380,24 @@ export default function BillingPage() {
             </SectionHeaderRow>
 
             <PlanCardsGrid>
-              {availablePlans
-                .filter((p) => p.id !== 'free')
-                .map((plan) => {
-                  const isSelected = selectedPlan.id === plan.id;
-                  const price =
-                    cadence === 'annual'
-                      ? plan.annualPrice * 12
-                      : plan.monthlyPrice;
+              {availablePlans.map((plan) => {
+                  const isSelected = selectedPlan?.id === plan.id;
+                  const price = priceFor(plan.id);
+                  const isBelow = isBelowActivePlan(plan.id, activePlanId);
+                  const disabled = !isPlanSelectable(plan.id, plan.disabled);
 
                   return (
                     <PlanOptionCard
                       key={plan.id}
                       $selected={isSelected}
-                      $disabled={plan.disabled}
-                      onClick={() => !plan.disabled && setSelectedPlanId(plan.id)}
+                      $disabled={disabled}
+                      aria-disabled={disabled}
+                      title={
+                        isBelow
+                          ? t('billing.belowCurrentPlanHint', 'You can switch to a smaller plan after your current one ends.')
+                          : undefined
+                      }
+                      onClick={() => !disabled && setSelectedPlanId(plan.id)}
                     >
                       <PlanHeader>
                         <PlanName>
@@ -330,7 +408,12 @@ export default function BillingPage() {
                             {t('landing.pricing.comingSoonBadge', 'Coming Soon')}
                           </DisabledTag>
                         )}
-                        {isSelected && !plan.disabled && (
+                        {isBelow && !plan.disabled && (
+                          <DisabledTag>
+                            {t('billing.belowCurrentPlan', 'Below your plan')}
+                          </DisabledTag>
+                        )}
+                        {isSelected && !disabled && (
                           <SelectedTag>
                             <Check size={12} />
                             <span>{t('common.selected', 'Selected')}</span>
@@ -341,7 +424,11 @@ export default function BillingPage() {
                       <PlanPriceRow>
                         <DollarSign>$</DollarSign>
                         <PriceValue>
-                          {Number.isInteger(price) ? price : price.toFixed(2)}
+                          {price === null
+                            ? '—'
+                            : Number.isInteger(price)
+                              ? price
+                              : price.toFixed(2)}
                         </PriceValue>
                         <PriceSuffix>
                           {cadence === 'annual'
@@ -365,7 +452,7 @@ export default function BillingPage() {
                       </FeaturesList>
                     </PlanOptionCard>
                   );
-                })}
+              })}
             </PlanCardsGrid>
           </CardSurface>
 
@@ -377,53 +464,55 @@ export default function BillingPage() {
             </SectionTitle>
 
             <MethodTabsRow>
-              <MethodTab
-                type="button"
-                $active={paymentMethod === 'pago_movil'}
-                onClick={() => setPaymentMethod('pago_movil')}
-              >
-                🇻🇪 Pago Móvil
-              </MethodTab>
-              <MethodTab
-                type="button"
-                $active={paymentMethod === 'bank_transfer'}
-                onClick={() => setPaymentMethod('bank_transfer')}
-              >
-                🏦 Transferencia
-              </MethodTab>
-              <MethodTab
-                type="button"
-                $active={paymentMethod === 'binance_pay'}
-                onClick={() => setPaymentMethod('binance_pay')}
-              >
-                🟡 Binance Pay (USDT)
-              </MethodTab>
-              <MethodTab
-                type="button"
-                $active={paymentMethod === 'zinli'}
-                onClick={() => setPaymentMethod('zinli')}
-              >
-                🟣 Zinli
-              </MethodTab>
-              <MethodTab
-                type="button"
-                $active={paymentMethod === 'zelle'}
-                onClick={() => setPaymentMethod('zelle')}
-              >
-                💵 Zelle
-              </MethodTab>
+              {methods.map((tab) => (
+                <MethodTab
+                  key={tab.id}
+                  type="button"
+                  $active={method === tab.id}
+                  onClick={() => setPaymentMethod(tab.id)}
+                >
+                  {tab.label}
+                </MethodTab>
+              ))}
             </MethodTabsRow>
+
+            {selectedPlan && priceToPay !== null && (
+              <AmountBox data-testid="billing-amount">
+                <AmountLabel>{t('billing.amountToPay', 'Amount to pay')}</AmountLabel>
+                {paysInVes ? (
+                  amountVes !== null && exchangeRate ? (
+                    <>
+                      <AmountValue>{formatVes(amountVes)}</AmountValue>
+                      <AmountMeta>
+                        {t('billing.vesEquivalent', {
+                          usd: formatUsd(priceToPay),
+                          rate: formatRate(exchangeRate.rate),
+                          date: new Date(`${exchangeRate.validFor}T12:00:00`).toLocaleDateString(i18n.language),
+                          defaultValue: '{{usd}} at the official BCV rate of Bs. {{rate}} per USD ({{date}})',
+                        })}
+                      </AmountMeta>
+                    </>
+                  ) : (
+                    <AmountPaused role="alert">
+                      {t('billing.vesPaused', 'Bolívar payments are paused until today\'s BCV rate is available. You can pay in USD with Zelle, Zinli or Binance Pay.')}
+                    </AmountPaused>
+                  )
+                ) : (
+                  <AmountValue>{formatUsd(priceToPay)} USD</AmountValue>
+                )}
+              </AmountBox>
+            )}
 
             {/* Coordinates Display */}
             <CoordinatesCard>
-              {paymentMethod === 'pago_movil' && config?.pagoMovil && (
+              {method === 'pago_movil' && config?.pagoMovil && (
                 <>
                   <CoordinateRow>
                     <CoordLabel>{t('billing.bank', 'Banco')}:</CoordLabel>
                     <CoordValue>{config.pagoMovil.bank}</CoordValue>
                     <CopyButton
                       type="button"
-                      onClick={() => handleCopy(config.pagoMovil.bank, 'pm-bank')}
+                      onClick={() => handleCopy(config.pagoMovil!.bank, 'pm-bank')}
                     >
                       {copiedKey === 'pm-bank' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                     </CopyButton>
@@ -433,7 +522,7 @@ export default function BillingPage() {
                     <CoordValue>{config.pagoMovil.phone}</CoordValue>
                     <CopyButton
                       type="button"
-                      onClick={() => handleCopy(config.pagoMovil.phone, 'pm-phone')}
+                      onClick={() => handleCopy(config.pagoMovil!.phone, 'pm-phone')}
                     >
                       {copiedKey === 'pm-phone' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                     </CopyButton>
@@ -443,7 +532,7 @@ export default function BillingPage() {
                     <CoordValue>{config.pagoMovil.idNumber}</CoordValue>
                     <CopyButton
                       type="button"
-                      onClick={() => handleCopy(config.pagoMovil.idNumber, 'pm-id')}
+                      onClick={() => handleCopy(config.pagoMovil!.idNumber, 'pm-id')}
                     >
                       {copiedKey === 'pm-id' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                     </CopyButton>
@@ -452,13 +541,10 @@ export default function BillingPage() {
                     <CoordLabel>{t('billing.accountHolder', 'Titular')}:</CoordLabel>
                     <CoordValue>{config.pagoMovil.name}</CoordValue>
                   </CoordinateRow>
-                  <BcvNote>
-                    💡 {config.exchangeRateBcvNote}
-                  </BcvNote>
                 </>
               )}
 
-              {paymentMethod === 'bank_transfer' && config?.bankTransfer && (
+              {method === 'bank_transfer' && config?.bankTransfer && (
                 <>
                   <CoordinateRow>
                     <CoordLabel>{t('billing.bank', 'Banco')}:</CoordLabel>
@@ -469,7 +555,7 @@ export default function BillingPage() {
                     <CoordValue>{config.bankTransfer.accountNumber}</CoordValue>
                     <CopyButton
                       type="button"
-                      onClick={() => handleCopy(config.bankTransfer.accountNumber, 'bt-acc')}
+                      onClick={() => handleCopy(config.bankTransfer!.accountNumber, 'bt-acc')}
                     >
                       {copiedKey === 'bt-acc' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                     </CopyButton>
@@ -485,14 +571,14 @@ export default function BillingPage() {
                 </>
               )}
 
-              {paymentMethod === 'binance_pay' && config?.binancePay && (
+              {method === 'binance_pay' && config?.binancePay && (
                 <>
                   <CoordinateRow>
                     <CoordLabel>Binance Pay ID:</CoordLabel>
                     <CoordValue>{config.binancePay.payId}</CoordValue>
                     <CopyButton
                       type="button"
-                      onClick={() => handleCopy(config.binancePay.payId, 'bin-id')}
+                      onClick={() => handleCopy(config.binancePay!.payId, 'bin-id')}
                     >
                       {copiedKey === 'bin-id' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                     </CopyButton>
@@ -504,27 +590,27 @@ export default function BillingPage() {
                 </>
               )}
 
-              {paymentMethod === 'zinli' && config?.zinli && (
+              {method === 'zinli' && config?.zinli && (
                 <CoordinateRow>
                   <CoordLabel>Zinli Email:</CoordLabel>
                   <CoordValue>{config.zinli.email}</CoordValue>
                   <CopyButton
                     type="button"
-                    onClick={() => handleCopy(config.zinli.email, 'zinli')}
+                    onClick={() => handleCopy(config.zinli!.email, 'zinli')}
                   >
                     {copiedKey === 'zinli' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                   </CopyButton>
                 </CoordinateRow>
               )}
 
-              {paymentMethod === 'zelle' && config?.zelle && (
+              {method === 'zelle' && config?.zelle && (
                 <>
                   <CoordinateRow>
                     <CoordLabel>Zelle Email:</CoordLabel>
                     <CoordValue>{config.zelle.email}</CoordValue>
                     <CopyButton
                       type="button"
-                      onClick={() => handleCopy(config.zelle.email, 'zelle')}
+                      onClick={() => handleCopy(config.zelle!.email, 'zelle')}
                     >
                       {copiedKey === 'zelle' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
                     </CopyButton>
@@ -640,9 +726,20 @@ export default function BillingPage() {
                 />
               </FormGroup>
 
+              {submitBlockedReason && (
+                <BlockedNote role="status">
+                  <AlertTriangle size={16} color="#f59e0b" />
+                  <span>{submitBlockedReason}</span>
+                </BlockedNote>
+              )}
+
               <SubmitButton
                 type="submit"
-                disabled={createPaymentMutation.isPending || isUploadingReceipt}
+                disabled={
+                  createPaymentMutation.isPending ||
+                  isUploadingReceipt ||
+                  Boolean(submitBlockedReason)
+                }
               >
                 <span>
                   {createPaymentMutation.isPending
@@ -684,7 +781,10 @@ export default function BillingPage() {
                       </Td>
                       <Td>{p.paymentMethod.replace('_', ' ').toUpperCase()}</Td>
                       <Td>{p.referenceNumber}</Td>
-                      <Td>${p.amountUsd} USD</Td>
+                      <Td>
+                        {formatUsd(p.amountUsd)} USD
+                        {p.amountVes ? <RejectionNote as="div">{formatVes(p.amountVes)}</RejectionNote> : null}
+                      </Td>
                       <Td>
                         <StatusPill $status={p.status}>
                           {p.status === 'APPROVED' && <CheckCircle2 size={12} />}
@@ -715,6 +815,51 @@ export default function BillingPage() {
 }
 
 /* Styled Components */
+
+const AmountBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(239, 35, 60, 0.08);
+  border: 1px solid rgba(239, 35, 60, 0.25);
+`;
+
+const AmountLabel = styled.span`
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+`;
+
+const AmountValue = styled.strong`
+  font-size: 1.5rem;
+  color: #f8fafc;
+`;
+
+const AmountMeta = styled.span`
+  font-size: 0.8125rem;
+  color: #cbd5e1;
+`;
+
+const AmountPaused = styled.span`
+  font-size: 0.875rem;
+  color: #fbbf24;
+`;
+
+const BlockedNote = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(245, 158, 11, 0.1);
+  color: #fcd34d;
+  font-size: 0.875rem;
+`;
 
 
 const StatusHeader = styled.div`
@@ -1020,12 +1165,6 @@ const CopyButton = styled.button`
   }
 `;
 
-const BcvNote = styled.p`
-  margin: 0.5rem 0 0;
-  font-size: 0.8125rem;
-  color: #f59e0b;
-  line-height: 1.5;
-`;
 
 const FormWrapper = styled.form`
   display: flex;

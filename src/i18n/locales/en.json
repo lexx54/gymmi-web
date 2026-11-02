@@ -345,7 +345,9 @@
     "exploreGyms": "Explore Gyms",
     "searchGyms": "Search gyms by name or city...",
     "noGymsFound": "No gyms found matching your search",
-    "filterCity": "All Cities"
+    "filterCity": "All Cities",
+    "accessPaused": "Trial ended — choose a plan to keep adding members, routines and articles",
+    "choosePlan": "Choose a plan"
   },
   "dashboard": {
     "label": "Dashboard",
@@ -418,7 +420,8 @@
     "rpe": "RPE",
     "target": "Target: {{target}}",
     "addSet": "Add Set",
-    "addSetFromLast": "Add set from last",
+    "addSetsCount": "Add {{count}} sets",
+    "maxSets": "{{max}} sets max",
     "exerciseLibrary": "Exercise Library",
     "exerciseCategories": "Exercise categories",
     "count": "{{count}} Exercises",
@@ -883,10 +886,16 @@
       "openOriginal": "Open Original Image",
       "confirmApprove": "Are you sure you want to approve this payment? This will immediately activate or extend the user's Plus subscription and unhide any restricted routines.",
       "confirmReject": "Reject Payment",
-      "approvedToast": "Payment approved! Plus subscription activated.",
+      "approvedToast": "Payment approved! {{plan}} subscription activated.",
       "rejectedToast": "Payment rejected.",
       "approveFailed": "Failed to approve payment.",
-      "rejectFailed": "Failed to reject payment."
+      "rejectFailed": "Failed to reject payment.",
+      "approveBtnPlan": "Confirm & activate {{plan}}",
+      "approvePrompt": "Approve this payment of {{amount}} USD for {{user}}? Check that this exact amount reached our account.",
+      "approvePromptVes": "In Bolívares: {{amount}}.",
+      "bcvRate": "BCV {{rate}} ({{date}})",
+      "rejectPrompt": "Explain why this payment could not be verified. The user receives this reason by email.",
+      "rejectPlaceholder": "e.g. Reference number not found on bank statement"
     },
     "reports": {
       "title": "Content reports",
@@ -1118,7 +1127,7 @@
       "joinWaitlist": "Coming Soon",
       "startTrial": "Start 30-Day Free Trial",
       "choosePlan": "Get Started",
-      "disclaimer": "Self-serve billing integration is coming soon. Plus plans are currently activated through admin controls and platform invitations.",
+      "disclaimer": "Pay by Pago Móvil, bank transfer, Zinli, Binance Pay or Zelle. Your plan is activated as soon as our team verifies the payment. Bolívar amounts use the official BCV rate of the day.",
       "trainer": {
         "free": {
           "title": "Free Coach",
@@ -1172,12 +1181,10 @@
         },
         "pro": {
           "title": "Athlete Pro",
-          "desc": "Elite athletes seeking performance telemetry and coaching flexibility.",
-          "f1": "Unlimited solo routines",
-          "f2": "Unlimited custom exercises",
-          "f3": "Multiple simultaneous coaches",
-          "f4": "1RM progression & volume charts",
-          "f5": "Priority AI workout recommendations"
+          "desc": "For athletes who build more of their own training.",
+          "f1": "Up to 10 owned solo routines",
+          "f2": "Up to 10 private custom exercises",
+          "f3": "Everything in Plus"
         }
       },
       "gym": {
@@ -1225,8 +1232,8 @@
       "a3": "Gymmi Mobile is built natively for iOS and Android, allowing athletes to log weights, record RPE, and check off sets in real-time right on the gym floor.",
       "q4": "How does Gemini AI translation work?",
       "a4": "Gymmi utilizes Google Gemini AI to translate custom exercises and routine instructions automatically between English and Spanish, enabling seamless bilingual coaching.",
-      "q5": "When will the Pro tier be available?",
-      "a5": "The Pro tier is currently in active development. It will introduce unlimited client capacity, team collaboration for fitness studios, and advanced analytics.",
+      "q5": "Is the Pro plan available?",
+      "a5": "Yes. Pro is available for coaches, athletes and gyms. Athlete Pro raises your limits to 10 solo routines and 10 custom exercises; Coach Pro to 35 clients, 20 routine templates and 15 custom exercises; Gym Pro to 300 members.",
       "q6": "How do Strength Standards & Leaderboards work?",
       "a6": "Gymmi automatically computes peak estimated 1RM using Epley's scientific formula across logged exercise sets. Athletes achieve calibrated strength tiers (Diamond, Platinum, Gold, Silver, Bronze) on core compound lifts. Facility coaches and gym owners can track cohort rankings across weekly, monthly, and all-time cycles.",
       "q7": "How does Gymmi work for gym facilities and studios?",
@@ -1417,7 +1424,16 @@
     "freeBadge": "Free Tier",
     "validUntilDetail": "Valid until {{date}}",
     "manageBilling": "Manage Subscription & Billing",
-    "upgradePrompt": "Upgrade to Gymmi Plus to unlock unlimited routines, custom exercises, and advanced progress analytics."
+    "upgradePrompt": "Upgrade to Gymmi Plus to unlock unlimited routines, custom exercises, and advanced progress analytics.",
+    "planActive": "{{plan}} SUBSCRIPTION ACTIVE",
+    "belowCurrentPlan": "Below your plan",
+    "belowCurrentPlanHint": "You can switch to a smaller plan after your current one ends.",
+    "amountToPay": "Amount to pay",
+    "vesEquivalent": "{{usd}} at the official BCV rate of Bs. {{rate}} per USD ({{date}})",
+    "vesPaused": "Bolívar payments are paused until today's BCV rate is available. You can pay in USD with Zelle, Zinli or Binance Pay.",
+    "blockedPending": "You already have a payment under review. Wait for it to be reviewed before sending another.",
+    "blockedNoPlan": "Plans are not available right now. Please try again later.",
+    "blockedNoMethod": "No payment methods are available right now."
   },
   "tour": {
     "stepCounter": "Step {{current}} of {{total}}",

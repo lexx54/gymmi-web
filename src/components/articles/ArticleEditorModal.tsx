@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import styled from 'styled-components';
 import type {
@@ -17,6 +18,7 @@ import type {
 } from '../../types/articles';
 import { useCreateArticle, useUpdateArticle } from '../../hooks/useArticles';
 import { uploadImageDirectly } from '../../utils/imageUpload';
+import { toastGymActionError } from '../../utils/gymAccess';
 
 interface ArticleEditorModalProps {
   isOpen: boolean;
@@ -38,6 +40,7 @@ export function ArticleEditorModal({
   onClose,
   articleToEdit,
 }: ArticleEditorModalProps) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
@@ -156,8 +159,8 @@ export function ArticleEditorModal({
         toast.success(t('common.success'));
       }
       onClose();
-    } catch {
-      toast.error(t('common.error'));
+    } catch (error) {
+      toastGymActionError(error, t, navigate);
     }
   };
 

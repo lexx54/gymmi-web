@@ -310,10 +310,10 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
           </table>
         </div>
         <div
-          class="sc-kfYpvV fhABFq"
+          class="sc-kfYpvV dsUzQs"
         >
           <button
-            class="sc-fKgHSI kfygBM"
+            class="sc-bCwgXz gBIloH"
             type="button"
           >
             <svg
@@ -346,48 +346,28 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
             Add Set
           </button>
           <button
-            class="sc-fKgHSI kfygBM"
-            disabled=""
+            aria-label="Add 2 sets"
+            class="sc-bCwgXz gBIloH"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-copy-plus"
-              fill="none"
-              height="14"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="14"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <line
-                x1="15"
-                x2="15"
-                y1="12"
-                y2="18"
-              />
-              <line
-                x1="12"
-                x2="18"
-                y1="15"
-                y2="15"
-              />
-              <rect
-                height="14"
-                rx="2"
-                ry="2"
-                width="14"
-                x="8"
-                y="8"
-              />
-              <path
-                d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-              />
-            </svg>
-            Add set from last
+            ×
+            2
+          </button>
+          <button
+            aria-label="Add 3 sets"
+            class="sc-bCwgXz gBIloH"
+            type="button"
+          >
+            ×
+            3
+          </button>
+          <button
+            aria-label="Add 4 sets"
+            class="sc-bCwgXz gBIloH"
+            type="button"
+          >
+            ×
+            4
           </button>
         </div>
       </div>

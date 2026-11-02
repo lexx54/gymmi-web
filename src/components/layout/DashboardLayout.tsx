@@ -34,6 +34,8 @@ export function DashboardLayout() {
     gymData?.trialDaysRemaining ?? gymData?.daysRemainingInTrial ?? 30;
   const isTrialActive =
     gymData?.isTrialActive ?? (isTrial ? trialDaysRemaining > 0 : false);
+  // Older API builds don't send it; treat missing as active.
+  const isAccessActive = gymData?.isAccessActive ?? true;
   const activeMembers = gymData?.activeMembersCount ?? 0;
   const capacity =
     gymData?.capacity ?? gymData?.memberCapacity ?? (gymData?.gym?.memberCapacity ?? 100);
@@ -64,11 +66,13 @@ export function DashboardLayout() {
               <BannerLeft>
                 <Clock size={18} />
                 <span>
-                  {isTrial
-                    ? isTrialActive
-                      ? t('gym.trialEnding', { days: trialDaysRemaining })
-                      : t('gym.trialExpired')
-                    : `${gymTier.toUpperCase()} Plan`}
+                  {!isAccessActive
+                    ? t('gym.accessPaused', 'Trial ended — choose a plan to keep adding members, routines and articles')
+                    : isTrial
+                      ? isTrialActive
+                        ? t('gym.trialEnding', { days: trialDaysRemaining })
+                        : t('gym.trialExpired')
+                      : `${gymTier.toUpperCase()} Plan`}
                 </span>
                 <CapacityBadge>
                   {t('gym.capacityProgress', {
@@ -81,19 +85,20 @@ export function DashboardLayout() {
                 <CreateRoutineBtn
                   type="button"
                   onClick={() => navigate('/workout/new')}
+                  disabled={!isAccessActive}
                   data-testid="gym-create-routine-btn"
                 >
                   <Dumbbell size={15} />
                   <span>{t('gym.createRoutine')}</span>
                 </CreateRoutineBtn>
-                {isTrial && (
+                {(isTrial || !isAccessActive) && (
                   <UpgradeBtn
                     type="button"
-                    onClick={() => navigate('/settings')}
+                    onClick={() => navigate('/billing')}
                     data-testid="gym-upgrade-btn"
                   >
                     <Sparkles size={15} />
-                    <span>{t('gym.upgradeTier')}</span>
+                    <span>{isAccessActive ? t('gym.upgradeTier') : t('gym.choosePlan', 'Choose a plan')}</span>
                   </UpgradeBtn>
                 )}
               </BannerRight>
@@ -239,6 +244,11 @@ const CreateRoutineBtn = styled.button`
   &:hover {
     background: rgba(255, 255, 255, 0.14);
     transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 

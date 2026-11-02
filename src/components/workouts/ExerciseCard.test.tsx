@@ -18,7 +18,7 @@ describe('ExerciseCard', () => {
       <ExerciseCard
         exercise={exercise}
         position={1}
-        onAddSet={vi.fn()}
+        onAddSets={vi.fn()}
         onRemoveSet={vi.fn()}
         onRemoveExercise={vi.fn()}
         onUpdateSet={onUpdateSet}
@@ -32,15 +32,13 @@ describe('ExerciseCard', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('offers a default add-set action and a copy of the last set', () => {
-    const onAddSet = vi.fn();
-    const onAddSetFromLast = vi.fn();
+  it('adds one, two, three or four sets', () => {
+    const onAddSets = vi.fn();
     render(
       <ExerciseCard
         exercise={exercise}
         position={1}
-        onAddSet={onAddSet}
-        onAddSetFromLast={onAddSetFromLast}
+        onAddSets={onAddSets}
         onRemoveSet={vi.fn()}
         onRemoveExercise={vi.fn()}
         onUpdateSet={vi.fn()}
@@ -50,9 +48,53 @@ describe('ExerciseCard', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Add Set' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add set from last' }));
-    expect(onAddSet).toHaveBeenCalledTimes(1);
-    expect(onAddSetFromLast).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Add 2 sets' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add 4 sets' }));
+    expect(onAddSets.mock.calls).toEqual([[1], [2], [4]]);
+    expect(screen.queryByRole('button', { name: 'Add set from last' })).not.toBeInTheDocument();
+  });
+
+  it('disables batches that would pass six sets and shows the limit', () => {
+    const fourSets = {
+      ...exercise,
+      sets: Array.from({ length: 4 }, (_, index) => ({ ...exercise.sets[0], id: `set-${index}` })),
+    };
+    const { rerender } = render(
+      <ExerciseCard
+        exercise={fourSets}
+        position={1}
+        onAddSets={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Add 2 sets' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Add 3 sets' })).toBeDisabled();
+    expect(screen.queryByText('6 sets max')).not.toBeInTheDocument();
+
+    const sixSets = {
+      ...exercise,
+      sets: Array.from({ length: 6 }, (_, index) => ({ ...exercise.sets[0], id: `set-${index}` })),
+    };
+    rerender(
+      <ExerciseCard
+        exercise={sixSets}
+        position={1}
+        onAddSets={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Add Set' })).toBeDisabled();
+    expect(screen.getByText('6 sets max')).toBeInTheDocument();
   });
 
   it('shows static set values in read-only state', () => {
@@ -60,7 +102,7 @@ describe('ExerciseCard', () => {
       <ExerciseCard
         exercise={exercise}
         position={1}
-        onAddSet={vi.fn()}
+        onAddSets={vi.fn()}
         onRemoveSet={vi.fn()}
         onRemoveExercise={vi.fn()}
         onUpdateSet={vi.fn()}
@@ -81,7 +123,7 @@ describe('ExerciseCard', () => {
       <ExerciseCard
         exercise={exercise}
         position={1}
-        onAddSet={vi.fn()}
+        onAddSets={vi.fn()}
         onRemoveSet={vi.fn()}
         onRemoveExercise={vi.fn()}
         onUpdateSet={vi.fn()}
@@ -99,7 +141,7 @@ describe('ExerciseCard', () => {
       <ExerciseCard
         exercise={{ ...exercise, supersetColor: null }}
         position={1}
-        onAddSet={vi.fn()}
+        onAddSets={vi.fn()}
         onRemoveSet={vi.fn()}
         onRemoveExercise={vi.fn()}
         onUpdateSet={vi.fn()}

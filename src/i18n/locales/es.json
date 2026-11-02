@@ -345,7 +345,9 @@
     "exploreGyms": "Explorar Gimnasios",
     "searchGyms": "Buscar gimnasios por nombre o ciudad...",
     "noGymsFound": "No se encontraron gimnasios que coincidan con la búsqueda",
-    "filterCity": "Todas las ciudades"
+    "filterCity": "Todas las ciudades",
+    "accessPaused": "La prueba terminó: elige un plan para seguir agregando miembros, rutinas y artículos",
+    "choosePlan": "Elegir un plan"
   },
   "dashboard": {
     "label": "Panel",
@@ -418,7 +420,8 @@
     "rpe": "RPE",
     "target": "Objetivo: {{target}}",
     "addSet": "Agregar serie",
-    "addSetFromLast": "Agregar serie (última)",
+    "addSetsCount": "Agregar {{count}} series",
+    "maxSets": "Máximo {{max}} series",
     "exerciseLibrary": "Biblioteca de ejercicios",
     "exerciseCategories": "Categorías de ejercicios",
     "count": "{{count}} ejercicios",
@@ -883,10 +886,16 @@
       "openOriginal": "Abrir Imagen Original",
       "confirmApprove": "¿Estás seguro de que deseas aprobar este pago? Esto activará o extenderá de inmediato la suscripción Plus del usuario y restaurará las rutinas restringidas.",
       "confirmReject": "Rechazar Pago",
-      "approvedToast": "¡Pago aprobado! Suscripción Plus activada.",
+      "approvedToast": "¡Pago aprobado! Suscripción {{plan}} activada.",
       "rejectedToast": "Pago rechazado.",
       "approveFailed": "No se pudo aprobar el pago.",
-      "rejectFailed": "No se pudo rechazar el pago."
+      "rejectFailed": "No se pudo rechazar el pago.",
+      "approveBtnPlan": "Confirmar y activar {{plan}}",
+      "approvePrompt": "¿Aprobar este pago de {{amount}} USD de {{user}}? Verifica que ese monto exacto llegó a nuestra cuenta.",
+      "approvePromptVes": "En bolívares: {{amount}}.",
+      "bcvRate": "BCV {{rate}} ({{date}})",
+      "rejectPrompt": "Explica por qué no se pudo verificar este pago. El usuario recibe este motivo por correo.",
+      "rejectPlaceholder": "p. ej. Número de referencia no encontrado en el estado de cuenta"
     },
     "reports": {
       "title": "Denuncias de contenido",
@@ -1118,7 +1127,7 @@
       "joinWaitlist": "Próximamente",
       "startTrial": "Comenzar Prueba Gratuita de 30 Días",
       "choosePlan": "Comenzar",
-      "disclaimer": "La integración de pagos estará disponible muy pronto. Los planes Plus actualmente se activan mediante invitación o administración.",
+      "disclaimer": "Paga con Pago Móvil, transferencia, Zinli, Binance Pay o Zelle. Tu plan se activa en cuanto nuestro equipo verifica el pago. Los montos en bolívares usan la tasa oficial del BCV del día.",
       "trainer": {
         "free": {
           "title": "Entrenador Free",
@@ -1172,12 +1181,10 @@
         },
         "pro": {
           "title": "Atleta Pro",
-          "desc": "Para deportistas de alto nivel que requieren métricas avanzadas.",
-          "f1": "Rutinas propias ilimitadas",
-          "f2": "Ejercicios personalizados ilimitados",
-          "f3": "Múltiples entrenadores simultáneos",
-          "f4": "Gráficas de progresión de 1RM y volumen",
-          "f5": "Recomendaciones prioritarias con IA"
+          "desc": "Para atletas que arman más de su propio entrenamiento.",
+          "f1": "Hasta 10 rutinas propias",
+          "f2": "Hasta 10 ejercicios personalizados privados",
+          "f3": "Todo lo incluido en Plus"
         }
       },
       "gym": {
@@ -1224,8 +1231,8 @@
       "a3": "Gymmi Mobile está desarrollada de forma nativa para iOS y Android, permitiendo a los atletas registrar pesos, RPE y cronómetros de descanso directamente en el gimnasio.",
       "q4": "¿Cómo funciona la traducción con IA Gemini?",
       "a4": "Gymmi integra Google Gemini AI para traducir al instante ejercicios personalizados e instrucciones entre inglés y español, facilitando el entrenamiento bilingüe.",
-      "q5": "¿Cuándo estará disponible el plan Pro?",
-      "a5": "El plan Pro está actualmente en fase de desarrollo activo. Incorporará capacidad ilimitada de clientes, cuentas colaborativas para gimnasios y analíticas avanzadas.",
+      "q5": "¿Está disponible el plan Pro?",
+      "a5": "Sí. Pro está disponible para entrenadores, atletas y gimnasios. Atleta Pro amplía tus límites a 10 rutinas propias y 10 ejercicios personalizados; Entrenador Pro a 35 clientes, 20 plantillas de rutinas y 15 ejercicios personalizados; Gimnasio Pro a 300 miembros.",
       "q6": "¿Cómo funcionan los Niveles de Fuerza y las Clasificaciones?",
       "a6": "Gymmi calcula automáticamente el 1RM estimado mediante la fórmula científica de Epley a partir de las series registradas. Los atletas alcanzan niveles calibrados (Diamante, Platino, Oro, Plata, Bronce) en los levantamientos principales. Entrenadores y gimnasios pueden ver clasificaciones semanales, mensuales e históricas.",
       "q7": "¿Cómo funciona Gymmi para gimnasios e instalaciones?",
@@ -1416,7 +1423,16 @@
     "freeBadge": "Nivel Gratuito",
     "validUntilDetail": "Válido hasta {{date}}",
     "manageBilling": "Gestionar Suscripción y Facturación",
-    "upgradePrompt": "Pásate a Gymmi Plus para desbloquear rutinas ilimitadas, ejercicios personalizados y analíticas avanzadas de progreso."
+    "upgradePrompt": "Pásate a Gymmi Plus para desbloquear rutinas ilimitadas, ejercicios personalizados y analíticas avanzadas de progreso.",
+    "planActive": "SUSCRIPCIÓN {{plan}} ACTIVA",
+    "belowCurrentPlan": "Menor que tu plan",
+    "belowCurrentPlanHint": "Podrás cambiar a un plan menor cuando termine el actual.",
+    "amountToPay": "Monto a pagar",
+    "vesEquivalent": "{{usd}} a la tasa oficial del BCV de Bs. {{rate}} por USD ({{date}})",
+    "vesPaused": "Los pagos en bolívares están en pausa hasta que esté disponible la tasa BCV del día. Puedes pagar en USD con Zelle, Zinli o Binance Pay.",
+    "blockedPending": "Ya tienes un pago en revisión. Espera a que lo revisemos antes de enviar otro.",
+    "blockedNoPlan": "Los planes no están disponibles en este momento. Inténtalo más tarde.",
+    "blockedNoMethod": "No hay métodos de pago disponibles en este momento."
   },
   "tour": {
     "stepCounter": "Paso {{current}} de {{total}}",

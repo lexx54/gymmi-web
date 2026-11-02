@@ -6,6 +6,11 @@ import { ArticleEditorModal } from './ArticleEditorModal';
 import * as articlesApi from '../../services/api/articles';
 import * as imageUpload from '../../utils/imageUpload';
 
+vi.mock('react-router-dom', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('react-router-dom')>()),
+  useNavigate: () => vi.fn(),
+}));
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },

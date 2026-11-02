@@ -20,7 +20,7 @@ import {
 } from '../components/workouts/WorkoutsShell';
 import { WorkoutsHeader } from '../components/workouts/WorkoutsHeader';
 import type { LibraryExercise, RoutineExercise, SetField } from '../components/workouts/types';
-import { DEFAULT_SET, isInSupersetAddGroup } from '../components/workouts/addSet';
+import { appendSets, DEFAULT_SET, isInSupersetAddGroup } from '../components/workouts/addSet';
 import { useAuth } from '../context/AuthContext';
 import { useExercises } from '../hooks/useExercises';
 import {
@@ -240,28 +240,16 @@ export default function WorkoutsPage() {
     [dayLocked, updateActiveExercises],
   );
 
-  const handleAddSet = useCallback(
-    (exerciseId: string, repeatLast = false) => {
+  const handleAddSets = useCallback(
+    (exerciseId: string, count: number) => {
       updateActiveExercises((current) => {
         const source = current.find((exercise) => exercise.id === exerciseId);
         if (!source) return current;
-        return current.map((exercise) => {
-          if (!isInSupersetAddGroup(exercise, source)) return exercise;
-          const previous = repeatLast ? exercise.sets.at(-1) : undefined;
-          return {
-            ...exercise,
-            sets: [
-              ...exercise.sets,
-              {
-                id: nextId('set'),
-                weight: previous?.weight ?? DEFAULT_SET.weight,
-                reps: previous?.reps ?? DEFAULT_SET.reps,
-                restSeconds: previous?.restSeconds ?? DEFAULT_SET.restSeconds,
-                rpe: previous?.rpe ?? DEFAULT_SET.rpe,
-              },
-            ],
-          };
-        });
+        return current.map((exercise) =>
+          isInSupersetAddGroup(exercise, source)
+            ? { ...exercise, sets: appendSets(exercise.sets, count, () => nextId('set')) }
+            : exercise,
+        );
       });
     },
     [updateActiveExercises],
@@ -460,8 +448,7 @@ export default function WorkoutsPage() {
                   key={exercise.id}
                   exercise={exercise}
                   position={index + 1}
-                  onAddSet={() => handleAddSet(exercise.id)}
-                  onAddSetFromLast={() => handleAddSet(exercise.id, true)}
+                  onAddSets={(count) => handleAddSets(exercise.id, count)}
                   onRemoveSet={(setId) => updateExercise(exercise.id, (item) => ({
                     ...item,
                     sets: item.sets.filter((set) => set.id !== setId),

@@ -1,6 +1,7 @@
-import { ArrowDown, ArrowUp, CopyPlus, PlusSquare, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, PlusSquare, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { MAX_SETS_PER_EXERCISE, SET_BATCH_SIZES } from './addSet';
 import { SetRow } from './SetRow';
 import { SUPERSET_COLORS, type SupersetColor } from '../../services/api/workouts';
 import type { RoutineExercise, SetField } from './types';
@@ -8,8 +9,8 @@ import type { RoutineExercise, SetField } from './types';
 type ExerciseCardProps = {
   exercise: RoutineExercise;
   position: number;
-  onAddSet: () => void;
-  onAddSetFromLast?: () => void;
+  /** Adds `count` copies of the last set. */
+  onAddSets: (count: number) => void;
   onRemoveSet: (setId: string) => void;
   onRemoveExercise: () => void;
   onUpdateSet: (setId: string, field: SetField, value: number) => void;
@@ -24,8 +25,7 @@ type ExerciseCardProps = {
 export function ExerciseCard({
   exercise,
   position,
-  onAddSet,
-  onAddSetFromLast,
+  onAddSets,
   onRemoveSet,
   onRemoveExercise,
   onUpdateSet,
@@ -111,18 +111,28 @@ export function ExerciseCard({
 
           {!readOnly && (
             <AddSetRow>
-              <AddSetButton type="button" onClick={onAddSet}>
+              <AddSetButton
+                type="button"
+                onClick={() => onAddSets(1)}
+                disabled={exercise.sets.length >= MAX_SETS_PER_EXERCISE}
+              >
                 <PlusSquare size={14} />
                 {t('workouts.addSet')}
               </AddSetButton>
-              <AddSetButton
-                type="button"
-                onClick={onAddSetFromLast}
-                disabled={!onAddSetFromLast || exercise.sets.length === 0}
-              >
-                <CopyPlus size={14} />
-                {t('workouts.addSetFromLast')}
-              </AddSetButton>
+              {SET_BATCH_SIZES.map((count) => (
+                <AddSetButton
+                  key={count}
+                  type="button"
+                  onClick={() => onAddSets(count)}
+                  disabled={exercise.sets.length + count > MAX_SETS_PER_EXERCISE}
+                  aria-label={t('workouts.addSetsCount', { count })}
+                >
+                  ×{count}
+                </AddSetButton>
+              ))}
+              {exercise.sets.length >= MAX_SETS_PER_EXERCISE ? (
+                <SetLimitNote>{t('workouts.maxSets', { max: MAX_SETS_PER_EXERCISE })}</SetLimitNote>
+              ) : null}
             </AddSetRow>
           )}
         </CardBody>
@@ -288,7 +298,15 @@ const AddSetRow = styled.div`
   margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 1rem 1.4rem;
+`;
+
+const SetLimitNote = styled.span`
+  color: #e7bdbb;
+  opacity: 0.7;
+  font-size: 0.65rem;
+  font-weight: 700;
 `;
 
 const AddSetButton = styled.button`

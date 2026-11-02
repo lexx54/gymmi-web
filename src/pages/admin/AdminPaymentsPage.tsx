@@ -28,6 +28,20 @@ import {
 } from '../../services/api/payments';
 import { getApiErrorMessage } from '../../services/api/errors';
 import type { Payment, PaymentStatus } from '../../types/payments';
+import { formatRate, formatUsd, formatVes, planLabel } from '../../utils/billing';
+
+/**
+ * Receipts must be https images; the API also checks they're our uploads.
+ * Anything else (older rows, odd schemes) is not rendered or linked.
+ */
+const isSafeReceiptUrl = (url: string | null): url is string => {
+  if (!url) return false;
+  try {
+    return new URL(url).protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
 
 export default function AdminPaymentsPage() {
   const { user } = useAuth();
@@ -50,9 +64,14 @@ export default function AdminPaymentsPage() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: (paymentId: string) => approveAdminPayment(paymentId),
-    onSuccess: () => {
-      toast.success(t('admin.payments.approvedToast', 'Payment approved and Plus activated!'));
+    mutationFn: (payment: Payment) => approveAdminPayment(payment.id),
+    onSuccess: (_data, payment) => {
+      toast.success(
+        t('admin.payments.approvedToast', {
+          plan: planLabel(payment.plan),
+          defaultValue: 'Payment approved! {{plan}} subscription activated.',
+        }),
+      );
       setPaymentToApprove(null);
       queryClient.invalidateQueries({ queryKey: ['admin', 'payments'] });
     },
@@ -204,16 +223,26 @@ export default function AdminPaymentsPage() {
                         )}
                       </Td>
                       <Td>
-                        <AmountText>${item.amountUsd} USD</AmountText>
-                        {item.amountVes && (
-                          <SubMeta>Bs. {item.amountVes}</SubMeta>
-                        )}
+                        <AmountText>{formatUsd(item.amountUsd)} USD</AmountText>
+                        {item.amountVes ? (
+                          <SubMeta>{formatVes(item.amountVes)}</SubMeta>
+                        ) : null}
+                        {item.exchangeRate ? (
+                          <SubMeta>
+                            {t('admin.payments.bcvRate', {
+                              rate: formatRate(item.exchangeRate),
+                              date: item.exchangeRateDate ?? '',
+                              defaultValue: 'BCV {{rate}} ({{date}})',
+                            })}
+                          </SubMeta>
+                        ) : null}
+                        {item.notes ? <SubMeta title={item.notes}>📝 {item.notes}</SubMeta> : null}
                       </Td>
                       <Td>
-                        {item.receiptUrl ? (
+                        {isSafeReceiptUrl(item.receiptUrl) ? (
                           <ReceiptThumbnailButton
                             type="button"
-                            onClick={() => setInspectReceiptUrl(item.receiptUrl!)}
+                            onClick={() => setInspectReceiptUrl(item.receiptUrl)}
                           >
                             <ReceiptThumbnail
                               src={item.receiptUrl}
@@ -337,10 +366,21 @@ export default function AdminPaymentsPage() {
                 </ModalHeader>
                 <ModalBody>
                   <p>
-                    Are you sure you want to approve this payment of{' '}
-                    <strong>${paymentToApprove.amountUsd} USD</strong> for user{' '}
-                    <strong>{paymentToApprove.user?.username}</strong>?
+                    {t('admin.payments.approvePrompt', {
+                      amount: formatUsd(paymentToApprove.amountUsd),
+                      user: paymentToApprove.user?.username ?? '',
+                      defaultValue:
+                        'Approve this payment of {{amount}} USD for {{user}}? Check that this exact amount reached our account.',
+                    })}
                   </p>
+                  {paymentToApprove.amountVes ? (
+                    <p>
+                      {t('admin.payments.approvePromptVes', {
+                        amount: formatVes(paymentToApprove.amountVes),
+                        defaultValue: 'In Bolívares: {{amount}}.',
+                      })}
+                    </p>
+                  ) : null}
                   <ApprovalSummaryBox>
                     <SummaryRow>
                       <span>Plan:</span>
@@ -372,13 +412,14 @@ export default function AdminPaymentsPage() {
                   <ConfirmApproveBtn
                     type="button"
                     disabled={approveMutation.isPending}
-                    onClick={() =>
-                      approveMutation.mutate(paymentToApprove.id)
-                    }
+                    onClick={() => approveMutation.mutate(paymentToApprove)}
                   >
                     {approveMutation.isPending
                       ? t('common.approving', 'Approving...')
-                      : t('admin.payments.approveBtn', 'Confirm & Activate Plus')}
+                      : t('admin.payments.approveBtnPlan', {
+                          plan: planLabel(paymentToApprove.plan),
+                          defaultValue: 'Confirm & activate {{plan}}',
+                        })}
                   </ConfirmApproveBtn>
                 </ModalFooter>
               </ModalCard>
@@ -402,12 +443,18 @@ export default function AdminPaymentsPage() {
                 </ModalHeader>
                 <ModalBody>
                   <p>
-                    Please specify why this payment reference could not be
-                    verified:
+                    {t(
+                      'admin.payments.rejectPrompt',
+                      'Explain why this payment could not be verified. The user receives this reason by email.',
+                    )}
                   </p>
                   <RejectInput
                     required
-                    placeholder="e.g. Reference number not found on bank statement"
+                    maxLength={500}
+                    placeholder={t(
+                      'admin.payments.rejectPlaceholder',
+                      'e.g. Reference number not found on bank statement',
+                    )}
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
                   />
@@ -421,11 +468,11 @@ export default function AdminPaymentsPage() {
                   </CancelButton>
                   <ConfirmRejectBtn
                     type="button"
-                    disabled={rejectMutation.isPending}
+                    disabled={rejectMutation.isPending || !rejectionReason.trim()}
                     onClick={() =>
                       rejectMutation.mutate({
                         paymentId: paymentToReject.id,
-                        reason: rejectionReason,
+                        reason: rejectionReason.trim(),
                       })
                     }
                   >

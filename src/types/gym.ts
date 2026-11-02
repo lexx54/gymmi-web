@@ -106,6 +106,11 @@ export interface GymDashboardData {
   trialDaysRemaining: number | null;
   daysRemainingInTrial?: number | null;
   isTrialActive: boolean;
+  /**
+   * False once the trial ended without a current paid plan: the gym can't add
+   * members, catalog routines or articles until it picks a plan.
+   */
+  isAccessActive?: boolean;
   joinCode?: string | null;
   logoUrl?: string | null;
 }

@@ -72,6 +72,16 @@ This architecture fully complies with **Apple App Store Guideline 3.1.3(b) (Mult
 
 ---
 
+## Prices, Bolívares and plan rules
+
+- Prices come from `GET /payments/config` (`plans`); the billing page never uses local prices and does not send an amount (the API charges its own). The landing page uses the same API prices and falls back to `PRICING_DATA` only if the request fails.
+- Pago Móvil and bank transfer show the Bolívar amount at the official BCV rate (`exchangeRate`). When the API has no recent rate they show a "paused" notice and can't be submitted; USD methods still work.
+- Only methods present in the config are shown.
+- Plans smaller than the user's active plan are disabled ("Below your plan"), and a new payment can't be submitted while one is pending.
+- Athlete (Client) Pro is on sale: 10 solo routines and 10 custom exercises.
+- Admin payments show USD, Bs. and the BCV rate used; receipts render only for `https:` URLs; rejecting requires a reason (emailed to the user).
+- Gyms whose trial ended without a plan (`isAccessActive: false` on `/gyms/me`) see a "choose a plan" banner linking here, and adding members, catalog routines or articles is blocked with a toast that links to `/billing`.
+
 ## Changes Made in This Task
 1. Added full i18n support in `en.json` and `es.json` for `billing.*`, `admin.payments.*`, `nav.billing`, and `nav.payments`.
 2. Created comprehensive unit test suites `BillingPage.test.tsx` and `AdminPaymentsPage.test.tsx` (10 tests, 100% pass rate).

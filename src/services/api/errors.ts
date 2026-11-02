@@ -25,3 +25,12 @@ export function getApiErrorMessage(error: unknown, fallback = ''): string {
   if (Array.isArray(message)) return message[0] ?? fallback;
   return message || fallback;
 }
+
+/**
+ * True when the API refused because a gym's trial ended without a current
+ * plan (402 PAYMENT_REQUIRED). Show the API message with a link to /billing.
+ */
+export function isPaymentRequiredError(error: unknown): boolean {
+  const response = (error as AxiosError<ApiErrorDetails>)?.response;
+  return response?.status === 402 || response?.data?.code === 'PAYMENT_REQUIRED';
+}

@@ -138,12 +138,10 @@ describe('AdminPaymentsPage', () => {
     fireEvent.click(approveBtn);
 
     // Modal appears
-    expect(screen.getAllByText(/Are you sure you want to approve this payment/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Check that this exact amount reached our account/i).length).toBeGreaterThan(0);
 
-    // Confirm button inside modal
-    const confirmButtons = screen.getAllByRole('button', { name: /Approve/i });
-    const modalConfirmBtn = confirmButtons[confirmButtons.length - 1];
-    fireEvent.click(modalConfirmBtn);
+    // The confirm button names the plan being activated, not always "Plus"
+    fireEvent.click(screen.getByRole('button', { name: /Confirm & activate/i }));
 
     await waitFor(() => {
       expect(paymentsApi.approveAdminPayment).toHaveBeenCalledWith('pay-pending-1');
@@ -156,6 +154,10 @@ describe('AdminPaymentsPage', () => {
 
     const rejectBtn = await screen.findByTitle('Reject Payment');
     fireEvent.click(rejectBtn);
+
+    // A reason is required before rejecting
+    const confirmBefore = screen.getAllByRole('button', { name: /Reject/i });
+    expect(confirmBefore[confirmBefore.length - 1]).toBeDisabled();
 
     // Modal appears
     const input = screen.getByPlaceholderText(/Reference number not found/i);
@@ -185,5 +187,20 @@ describe('AdminPaymentsPage', () => {
       'href',
       'https://r2.gymmi.app/receipts/test.jpg',
     );
+  });
+
+  it('does not render or link receipts that are not https', async () => {
+    (paymentsApi.fetchAdminPayments as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      items: [
+        { ...mockPendingPayment, receiptUrl: 'javascript:alert(1)' },
+      ],
+      total: 1,
+      page: 1,
+      limit: 20,
+    });
+    renderAdminPaymentsPage();
+
+    expect(await screen.findByText('None')).toBeInTheDocument();
+    expect(screen.queryByAltText('Receipt')).not.toBeInTheDocument();
   });
 });
