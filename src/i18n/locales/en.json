@@ -95,6 +95,16 @@
     },
     "apple": "Continue with Apple",
     "google": "Continue with Google",
+    "facebook": "Continue with Facebook",
+    "newToGymmi": "New to Gymmi?",
+    "brandHeadline": "Train with a",
+    "brandHeadlineAccent": "plan.",
+    "brandHeadlineSecond": "Progress with data.",
+    "brandFeatures": {
+      "routines": "Routines built for you",
+      "tracking": "Track every set",
+      "trainer": "Connect with your trainer"
+    },
     "haveAccount": "Already have an account?",
     "needAccount": "Need an account?",
     "lockout": "Too many attempts. Try again in {{time}}",
@@ -134,6 +144,33 @@
       "codeRequired": "Enter the code from the email",
       "codeFormat": "The code has 6 digits",
       "passwordMax": "Password must be at most {{count}} characters"
+    },
+    "signupPanel": {
+      "stepsLabel": "Signup steps",
+      "stepHints": {
+        "account": "Role, photo and login",
+        "body": "Age, height and goal",
+        "coaching": "Pricing and specialties",
+        "facility": "Name, location and cover",
+        "confirmation": "Check everything and finish"
+      },
+      "roles": {
+        "Client": {
+          "chip": "For you",
+          "headline": "Train with a plan,",
+          "headlineAccent": "progress with data."
+        },
+        "Trainer": {
+          "chip": "For trainers",
+          "headline": "Coach more clients",
+          "headlineAccent": "without spreadsheets."
+        },
+        "Gym": {
+          "chip": "For gyms",
+          "headline": "Your gym,",
+          "headlineAccent": "organized."
+        }
+      }
     },
     "stepAccount": "Account",
     "stepBody": "Body & Goals",
@@ -230,7 +267,7 @@
     "uploadPhoto": "Upload Photo",
     "changePhoto": "Change Photo",
     "removePhoto": "Remove Photo",
-    "trainerLogo": "Trainer Logo",
+    "trainerLogo": "Logo",
     "uploadLogo": "Upload Logo",
     "changeLogo": "Change Logo",
     "removeLogo": "Remove Logo",
@@ -931,6 +968,99 @@
       "previous": "Previous",
       "next": "Next",
       "page": "Page {{page}} of {{total}}"
+    },
+    "overview": {
+      "label": "Admin panel",
+      "headlinePrefix": "Platform",
+      "headlineAccent": "overview",
+      "bcvRate": "BCV rate · 1 USD = {{rate}} VES",
+      "loadFailed": "Couldn't load the platform overview.",
+      "retry": "Try again",
+      "attention": "Needs attention",
+      "pendingPayments": "Pending payments",
+      "nothingPending": "No payments waiting for review",
+      "pendingSub": "Oldest waiting {{age}} · {{amount}} to review",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "review": "Review",
+      "plansEnding": "Plans ending ≤ 7 days",
+      "remindedSub_one": "{{count}} already got the renewal reminder",
+      "remindedSub_other": "{{count}} already got the renewal reminder",
+      "seeUsers": "See users",
+      "trialsEnding": "Gym trials ending",
+      "trialsSub": "Within 7 days, no paid plan yet",
+      "openReports": "Open reports",
+      "reportsSub": "Content reports awaiting review",
+      "moderate": "Moderate",
+      "accounts": "Accounts",
+      "totalUsers": "Total users",
+      "roles": {
+        "Client": "Clients",
+        "Trainer": "Trainers",
+        "Gym": "Gyms",
+        "Admin": "Admins"
+      },
+      "plans": {
+        "plus": "Plus",
+        "pro": "Pro",
+        "maximum": "Maximum"
+      },
+      "onTrial_one": "{{count}} on trial",
+      "onTrial_other": "{{count}} on trial",
+      "last30Days": "Last 30 days",
+      "last30DaysLower": "last 30 days",
+      "newSignups": "New signups",
+      "signupsAria": "Daily signups by role over the last 30 days",
+      "revenue": "Approved revenue · {{month}}",
+      "vsLastMonth": "vs last month",
+      "noLastMonth": "No revenue last month",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "methods": {
+        "pago_movil": "Pago Móvil",
+        "bank_transfer": "Transfer",
+        "zinli": "Zinli",
+        "binance_pay": "Binance Pay",
+        "zelle": "Zelle",
+        "other": "Other"
+      },
+      "next7Days": "Next 7 days",
+      "noPlansEnding": "No paid plans end in the next 7 days.",
+      "user": "User",
+      "rolePlan": "Role · Plan",
+      "ends": "Ends",
+      "endsTomorrow": "Tomorrow",
+      "endsInDays_one": "{{count}} day",
+      "endsInDays_other": "{{count}} days",
+      "planMix": "Plan mix (paying users)",
+      "payingOf": "of {{total}} paying · {{percent}}%",
+      "lapsed": "Lapsed last 30 days",
+      "inGrace": "In downgrade grace",
+      "activity7d": "Platform activity · 7 days",
+      "workoutsLogged": "Workouts logged",
+      "activeUsers": "Active users",
+      "activeContracts": "Active trainer contracts",
+      "pendingContracts": "Contract requests pending",
+      "articlesPublished": "Articles published",
+      "routinesCreated": "Routines created",
+      "recentActivity": "Recent activity",
+      "noActivity": "Nothing has happened yet.",
+      "deletedUser": "Deleted user",
+      "targets": {
+        "ARTICLE": "an article",
+        "COMMENT": "a comment",
+        "USER": "a user"
+      },
+      "feed": {
+        "signup": "{{actor}} signed up as {{role}}",
+        "gymCreated": "{{actor}} created a gym account",
+        "paymentSubmitted": "{{actor}} submitted a {{amount}} {{method}} payment · {{plan}}",
+        "paymentApproved": "Payment from {{actor}} approved · {{amount}} {{plan}}",
+        "paymentRejected": "Payment from {{actor}} rejected · {{amount}}",
+        "report": "{{actor}} reported {{target}} · {{reason}}"
+      }
     }
   },
   "contracts": {

@@ -95,6 +95,16 @@
     },
     "apple": "Continuar con Apple",
     "google": "Continuar con Google",
+    "facebook": "Continuar con Facebook",
+    "newToGymmi": "¿Nuevo en Gymmi?",
+    "brandHeadline": "Entrena con",
+    "brandHeadlineAccent": "plan.",
+    "brandHeadlineSecond": "Progresa con datos.",
+    "brandFeatures": {
+      "routines": "Rutinas hechas a tu medida",
+      "tracking": "Seguimiento de cada serie",
+      "trainer": "Conecta con tu entrenador"
+    },
     "haveAccount": "¿Ya tienes una cuenta?",
     "needAccount": "¿Necesitas una cuenta?",
     "lockout": "Demasiados intentos. Inténtalo de nuevo en {{time}}",
@@ -134,6 +144,33 @@
       "codeRequired": "Ingresa el código del correo",
       "codeFormat": "El código tiene 6 dígitos",
       "passwordMax": "La contraseña debe tener como máximo {{count}} caracteres"
+    },
+    "signupPanel": {
+      "stepsLabel": "Pasos del registro",
+      "stepHints": {
+        "account": "Rol, foto y acceso",
+        "body": "Edad, estatura y objetivo",
+        "coaching": "Precios y especialidades",
+        "facility": "Nombre, ubicación y portada",
+        "confirmation": "Revisa todo y termina"
+      },
+      "roles": {
+        "Client": {
+          "chip": "Para ti",
+          "headline": "Entrena con plan,",
+          "headlineAccent": "progresa con datos."
+        },
+        "Trainer": {
+          "chip": "Para entrenadores",
+          "headline": "Entrena a más clientes",
+          "headlineAccent": "sin hojas de cálculo."
+        },
+        "Gym": {
+          "chip": "Para gimnasios",
+          "headline": "Tu gimnasio,",
+          "headlineAccent": "organizado."
+        }
+      }
     },
     "stepAccount": "Cuenta",
     "stepBody": "Cuerpo y Metas",
@@ -230,7 +267,7 @@
     "uploadPhoto": "Subir foto",
     "changePhoto": "Cambiar foto",
     "removePhoto": "Eliminar foto",
-    "trainerLogo": "Logotipo de entrenador",
+    "trainerLogo": "Logo",
     "uploadLogo": "Subir logotipo",
     "changeLogo": "Cambiar logotipo",
     "removeLogo": "Eliminar logotipo",
@@ -931,6 +968,99 @@
       "previous": "Anterior",
       "next": "Siguiente",
       "page": "Página {{page}} de {{total}}"
+    },
+    "overview": {
+      "label": "Panel de administración",
+      "headlinePrefix": "Resumen de la",
+      "headlineAccent": "plataforma",
+      "bcvRate": "Tasa BCV · 1 USD = {{rate}} VES",
+      "loadFailed": "No se pudo cargar el resumen de la plataforma.",
+      "retry": "Reintentar",
+      "attention": "Requiere atención",
+      "pendingPayments": "Pagos pendientes",
+      "nothingPending": "No hay pagos por revisar",
+      "pendingSub": "El más antiguo espera {{age}} · {{amount}} por revisar",
+      "hours_one": "{{count}} hora",
+      "hours_other": "{{count}} horas",
+      "days_one": "{{count}} día",
+      "days_other": "{{count}} días",
+      "review": "Revisar",
+      "plansEnding": "Planes que vencen ≤ 7 días",
+      "remindedSub_one": "{{count}} ya recibió el recordatorio",
+      "remindedSub_other": "{{count}} ya recibieron el recordatorio",
+      "seeUsers": "Ver usuarios",
+      "trialsEnding": "Pruebas de gym por vencer",
+      "trialsSub": "En 7 días, aún sin plan pago",
+      "openReports": "Reportes abiertos",
+      "reportsSub": "Reportes de contenido por revisar",
+      "moderate": "Moderar",
+      "accounts": "Cuentas",
+      "totalUsers": "Usuarios totales",
+      "roles": {
+        "Client": "Clientes",
+        "Trainer": "Entrenadores",
+        "Gym": "Gimnasios",
+        "Admin": "Administradores"
+      },
+      "plans": {
+        "plus": "Plus",
+        "pro": "Pro",
+        "maximum": "Máximo"
+      },
+      "onTrial_one": "{{count}} en prueba",
+      "onTrial_other": "{{count}} en prueba",
+      "last30Days": "Últimos 30 días",
+      "last30DaysLower": "últimos 30 días",
+      "newSignups": "Nuevos registros",
+      "signupsAria": "Registros diarios por rol en los últimos 30 días",
+      "revenue": "Ingresos aprobados · {{month}}",
+      "vsLastMonth": "vs mes anterior",
+      "noLastMonth": "Sin ingresos el mes anterior",
+      "approved": "Aprobados",
+      "rejected": "Rechazados",
+      "methods": {
+        "pago_movil": "Pago Móvil",
+        "bank_transfer": "Transferencia",
+        "zinli": "Zinli",
+        "binance_pay": "Binance Pay",
+        "zelle": "Zelle",
+        "other": "Otro"
+      },
+      "next7Days": "Próximos 7 días",
+      "noPlansEnding": "Ningún plan pago vence en los próximos 7 días.",
+      "user": "Usuario",
+      "rolePlan": "Rol · Plan",
+      "ends": "Vence",
+      "endsTomorrow": "Mañana",
+      "endsInDays_one": "{{count}} día",
+      "endsInDays_other": "{{count}} días",
+      "planMix": "Distribución de planes (pagos)",
+      "payingOf": "de {{total}} pagan · {{percent}}%",
+      "lapsed": "Vencidos últimos 30 días",
+      "inGrace": "En gracia por downgrade",
+      "activity7d": "Actividad · 7 días",
+      "workoutsLogged": "Entrenamientos registrados",
+      "activeUsers": "Usuarios activos",
+      "activeContracts": "Contratos activos",
+      "pendingContracts": "Solicitudes de contrato pendientes",
+      "articlesPublished": "Artículos publicados",
+      "routinesCreated": "Rutinas creadas",
+      "recentActivity": "Actividad reciente",
+      "noActivity": "Aún no ha pasado nada.",
+      "deletedUser": "Usuario eliminado",
+      "targets": {
+        "ARTICLE": "un artículo",
+        "COMMENT": "un comentario",
+        "USER": "un usuario"
+      },
+      "feed": {
+        "signup": "{{actor}} se registró como {{role}}",
+        "gymCreated": "{{actor}} creó una cuenta de gimnasio",
+        "paymentSubmitted": "{{actor}} envió un pago de {{amount}} por {{method}} · {{plan}}",
+        "paymentApproved": "Pago de {{actor}} aprobado · {{amount}} {{plan}}",
+        "paymentRejected": "Pago de {{actor}} rechazado · {{amount}}",
+        "report": "{{actor}} reportó {{target}} · {{reason}}"
+      }
     }
   },
   "contracts": {

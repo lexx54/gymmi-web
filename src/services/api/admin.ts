@@ -6,6 +6,7 @@ import type {
   RoleDto,
   PaginatedUsers,
 } from '../../types/rbac';
+import type { AdminOverview } from '../../types/adminOverview';
 
 export async function fetchRoles(): Promise<RoleDto[]> {
   const { data } = await apiClient.get<RoleDto[]>('/admin/roles');
@@ -46,5 +47,10 @@ export async function patchAdminUser(
   body: AdminUserPatch,
 ): Promise<AdminUserDto> {
   const { data } = await apiClient.patch<AdminUserDto>(`/admin/users/${userId}`, body);
+  return data;
+}
+
+export async function fetchAdminOverview(): Promise<AdminOverview> {
+  const { data } = await apiClient.get<AdminOverview>('/admin/overview');
   return data;
 }

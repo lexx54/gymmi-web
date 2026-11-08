@@ -9,6 +9,7 @@ import { StartWorkoutButton } from '../dashboard/StartWorkoutButton';
 import { StatStack } from '../dashboard/StatStack';
 import { WeeklyProgressCard } from '../dashboard/WeeklyProgressCard';
 import { ActiveWorkoutCard } from '../dashboard/ActiveWorkoutCard';
+import { AdminOverview } from '../admin-dashboard/AdminOverview';
 import { SpotlightTour } from '../tour/SpotlightTour';
 import { hasSeenUserTour } from '../../services/storage/tourStorage';
 import { useAuth } from '../../context/AuthContext';
@@ -26,6 +27,7 @@ export function DashboardLayout() {
   const username = user?.username ?? 'Alex';
   const isGym = user?.role?.name === 'Gym';
   const isClient = user?.role?.name === 'Client';
+  const isAdmin = user?.role?.name === 'Admin';
   const { data: gymData } = useMyGym(isGym);
 
   const gymTier = (gymData?.tier ?? gymData?.gym?.tier ?? 'trial').toLowerCase();
@@ -56,62 +58,68 @@ export function DashboardLayout() {
       <Sidebar username={username} />
       <MainPanel>
         <TopBar />
-        <HeaderArea data-tour="dashboard-header">
-          <DashboardHeader username={username} />
-          <div data-tour="active-workout">
-            <ActiveWorkoutCard enabled={isClient} />
-          </div>
-          {isGym && gymData && (
-            <GymTrialBanner data-testid="gym-trial-banner" data-tour="gym-banner">
-              <BannerLeft>
-                <Clock size={18} />
-                <span>
-                  {!isAccessActive
-                    ? t('gym.accessPaused', 'Trial ended — choose a plan to keep adding members, routines and articles')
-                    : isTrial
-                      ? isTrialActive
-                        ? t('gym.trialEnding', { days: trialDaysRemaining })
-                        : t('gym.trialExpired')
-                      : `${gymTier.toUpperCase()} Plan`}
-                </span>
-                <CapacityBadge>
-                  {t('gym.capacityProgress', {
-                    current: activeMembers,
-                    max: capacity,
-                  })}
-                </CapacityBadge>
-              </BannerLeft>
-              <BannerRight>
-                <CreateRoutineBtn
-                  type="button"
-                  onClick={() => navigate('/workout/new')}
-                  disabled={!isAccessActive}
-                  data-testid="gym-create-routine-btn"
-                >
-                  <Dumbbell size={15} />
-                  <span>{t('gym.createRoutine')}</span>
-                </CreateRoutineBtn>
-                {(isTrial || !isAccessActive) && (
-                  <UpgradeBtn
-                    type="button"
-                    onClick={() => navigate('/billing')}
-                    data-testid="gym-upgrade-btn"
-                  >
-                    <Sparkles size={15} />
-                    <span>{isAccessActive ? t('gym.upgradeTier') : t('gym.choosePlan', 'Choose a plan')}</span>
-                  </UpgradeBtn>
-                )}
-              </BannerRight>
-            </GymTrialBanner>
-          )}
-        </HeaderArea>
-        <ContentGrid>
-          <OverviewGrid>
-            <WeeklyProgressCard />
-            <StatStack />
-          </OverviewGrid>
-          <RecentActivity />
-        </ContentGrid>
+        {isAdmin ? (
+          <AdminOverview username={username} />
+        ) : (
+          <>
+            <HeaderArea data-tour="dashboard-header">
+              <DashboardHeader username={username} />
+              <div data-tour="active-workout">
+                <ActiveWorkoutCard enabled={isClient} />
+              </div>
+              {isGym && gymData && (
+                <GymTrialBanner data-testid="gym-trial-banner" data-tour="gym-banner">
+                  <BannerLeft>
+                    <Clock size={18} />
+                    <span>
+                      {!isAccessActive
+                        ? t('gym.accessPaused', 'Trial ended — choose a plan to keep adding members, routines and articles')
+                        : isTrial
+                          ? isTrialActive
+                            ? t('gym.trialEnding', { days: trialDaysRemaining })
+                            : t('gym.trialExpired')
+                          : `${gymTier.toUpperCase()} Plan`}
+                    </span>
+                    <CapacityBadge>
+                      {t('gym.capacityProgress', {
+                        current: activeMembers,
+                        max: capacity,
+                      })}
+                    </CapacityBadge>
+                  </BannerLeft>
+                  <BannerRight>
+                    <CreateRoutineBtn
+                      type="button"
+                      onClick={() => navigate('/workout/new')}
+                      disabled={!isAccessActive}
+                      data-testid="gym-create-routine-btn"
+                    >
+                      <Dumbbell size={15} />
+                      <span>{t('gym.createRoutine')}</span>
+                    </CreateRoutineBtn>
+                    {(isTrial || !isAccessActive) && (
+                      <UpgradeBtn
+                        type="button"
+                        onClick={() => navigate('/billing')}
+                        data-testid="gym-upgrade-btn"
+                      >
+                        <Sparkles size={15} />
+                        <span>{isAccessActive ? t('gym.upgradeTier') : t('gym.choosePlan', 'Choose a plan')}</span>
+                      </UpgradeBtn>
+                    )}
+                  </BannerRight>
+                </GymTrialBanner>
+              )}
+            </HeaderArea>
+            <ContentGrid>
+              <OverviewGrid>
+                <WeeklyProgressCard />
+                <StatStack />
+              </OverviewGrid>
+              <RecentActivity />
+            </ContentGrid>
+          </>
+        )}
         {isClient && <StartWorkoutButton />}
         <SpotlightTour
           userId={user?.id}

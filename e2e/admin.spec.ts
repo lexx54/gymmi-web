@@ -40,5 +40,7 @@ test.describe('admin', () => {
 
     await expect(page.getByRole('link', { name: /^permissions$/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /^users$/i })).toBeVisible();
+    await expect(page.getByTestId('admin-overview')).toBeVisible();
+    await expect(page.getByText('Needs attention')).toBeVisible();
   });
 });

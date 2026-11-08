@@ -25,6 +25,9 @@ import { toast } from 'sonner';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useSignup } from '../hooks/useAuthApi';
+import { GymmiLogo } from '../components/common/GymmiLogo';
+import { BrandWordmark } from '../components/auth/AuthBrandPanel';
+import { SignupBrandPanel, type SignupRole } from '../components/auth/SignupBrandPanel';
 import {
   createStep1Schema,
   createStep2Schema,
@@ -522,25 +525,13 @@ export default function SignupPage() {
 
   return (
     <PageContainer>
-      <HeroPanel>
-        <HeroImage
-          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80"
-          alt="Gym"
-        />
-        <HeroContent>
-          <div>
-            <HeroTitle>Gymmi</HeroTitle>
-          </div>
-          <HeroFooter>
-            <HeroQuote>{t('auth.quote')}</HeroQuote>
-          </HeroFooter>
-        </HeroContent>
-      </HeroPanel>
+      <SignupBrandPanel role={(selectedRole ?? 'Client') as SignupRole} step={step} />
 
       <FormPanel>
         <FormInner>
           <MobileBrand>
-            <MobileBrandTitle>Gymmi</MobileBrandTitle>
+            <GymmiLogo size={40} />
+            <BrandWordmark>Gymmi</BrandWordmark>
           </MobileBrand>
 
           <FormCard>
@@ -1620,57 +1611,6 @@ const PageContainer = styled.div`
   background-color: #0d1121;
 `;
 
-const HeroPanel = styled.div`
-  display: none;
-  position: relative;
-  overflow: hidden;
-  background-color: #161b33;
-
-  @media (min-width: 1024px) {
-    display: flex;
-    width: 38%;
-  }
-`;
-
-const HeroImage = styled.img`
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.35;
-`;
-
-const HeroContent = styled.div`
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 3.5rem;
-  width: 100%;
-`;
-
-const HeroTitle = styled.h1`
-  font-size: 2.5rem;
-  line-height: 1.2;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.025em;
-`;
-
-const HeroFooter = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const HeroQuote = styled.p`
-  font-size: 1.15rem;
-  line-height: 1.6;
-  color: rgba(237, 242, 244, 0.85);
-  font-style: italic;
-  max-width: 24rem;
-`;
-
 const FormPanel = styled.div`
   flex: 1;
   display: flex;
@@ -1686,18 +1626,15 @@ const FormInner = styled.div`
 `;
 
 const MobileBrand = styled.div`
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
   margin-bottom: 1.5rem;
 
   @media (min-width: 1024px) {
     display: none;
   }
-`;
-
-const MobileBrandTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 800;
-  color: #ffffff;
 `;
 
 const FormCard = styled.div`
@@ -2285,13 +2222,22 @@ const PhotoUploadsContainer = styled.div<{ $twoCols?: boolean }>`
   width: 100%;
 `;
 
+// Each column spans the container's label / dropzone / error rows via
+// subgrid, so a label that wraps to two lines (e.g. "Logotipo de
+// entrenador (opcional)") grows the shared row and both dropzones stay level.
 const PhotoUploadCol = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0.5rem;
+  align-content: start;
   width: 100%;
   min-width: 0;
+
+  > label {
+    margin-bottom: 0;
+    align-self: end;
+  }
 `;
 
 const DropzoneCardWrapper = styled.div`

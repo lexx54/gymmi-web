@@ -13,6 +13,14 @@ Admin-only user management and role permission editing against the gymmi-api adm
 
 Sidebar shows Admin section only when `user.role.name === 'Admin'`.
 
+## Dashboard
+
+Admins see `AdminOverview` (`src/components/admin-dashboard/`) on `/dashboard`
+instead of the training widgets: attention cards linking to payments/users/
+reports, account KPIs, SVG signups chart, revenue, expiring plans, plan mix,
+platform activity and a recent-activity feed. Data: `useAdminOverview` →
+`GET /admin/overview` (refetches every 60s). Copy lives under `admin.overview.*`.
+
 ## Main flows
 
 - **Users:** Paginated table; inline role select, active checkbox, and Free/Plus checkbox → `PATCH /admin/users/:id` (`roleId`, `isActive`, `hasPaid`). Rows display the derived plan and optional downgrade grace time.
@@ -27,6 +35,7 @@ Sidebar shows Admin section only when `user.role.name === 'Admin'`.
 
 ## API
 
+- `GET /admin/overview`
 - `GET /admin/roles`
 - `GET /admin/roles/:roleId/permissions`
 - `PUT /admin/roles/:roleId/permissions`
