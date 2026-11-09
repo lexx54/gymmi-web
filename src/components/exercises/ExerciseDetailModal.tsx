@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, ImageIcon, Loader2, Pencil, Play, Scan, Trash2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  ImageIcon,
+  Loader2,
+  Pencil,
+  Play,
+  Scan,
+  Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Modal } from '../common/Modal';
@@ -9,6 +19,7 @@ import {
   type Exercise,
   type LocalizedText,
 } from '../../services/api/exercises';
+import { toSafeVideoUrl } from '../../utils/videoUrl';
 
 type ExerciseDetailModalProps = {
   exercise: Exercise | null;
@@ -45,6 +56,7 @@ export function ExerciseDetailModal({
   }
 
   const images = exercise?.images ?? [];
+  const videoUrl = toSafeVideoUrl(exercise?.videoUrl);
   const hasImages = images.length > 0;
   const slideCount = hasImages ? images.length : MEDIA_SLIDES.length;
   const currentIndex = slideIndex < slideCount ? slideIndex : 0;
@@ -175,6 +187,17 @@ export function ExerciseDetailModal({
               </ActivationTile>
             </ActivationGrid>
           </Field>
+
+          {videoUrl ? (
+            <Field>
+              <FieldLabel>{t('exercises.videoUrl')}</FieldLabel>
+              <VideoLink href={videoUrl} target="_blank" rel="noopener noreferrer">
+                <Play size={15} aria-hidden />
+                {t('exercises.watchVideo')}
+                <ExternalLink size={13} aria-hidden />
+              </VideoLink>
+            </Field>
+          ) : null}
 
           <Field>
             <FieldLabel>{t('exercises.detailedInstructions')}</FieldLabel>
@@ -437,6 +460,31 @@ const FieldValue = styled.p`
   color: #f7f7ff;
   font-size: 0.95rem;
   font-weight: 700;
+`;
+
+const VideoLink = styled.a`
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid #5d3f3e;
+  border-radius: 999px;
+  background: #26283d;
+  color: #ffb3b1;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background: #313349;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb3b1;
+    outline-offset: 2px;
+  }
 `;
 
 const Instructions = styled.p`

@@ -23,6 +23,8 @@ export type ExerciseDraft = {
   tags: ExerciseTag[];
   /** Uploaded photo URLs, in display order. */
   images: string[];
+  /** Optional external demo video link; empty string when unset. */
+  videoUrl: string;
 };
 
 export type ExerciseSummary = {

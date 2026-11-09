@@ -50,6 +50,8 @@ import {
 import { getApiErrorDetails, getApiErrorMessage, type ApiErrorDetails } from '../services/api/errors';
 import { MAX_EXERCISE_IMAGES } from '../utils/imageUpload';
 import { canEditExercise } from '../utils/exercisePermissions';
+import { toSafeVideoUrl } from '../utils/videoUrl';
+import { VideoLinkCard } from '../components/exercises/VideoLinkCard';
 
 const INITIAL_DRAFT: ExerciseDraft = {
   name: '',
@@ -62,6 +64,7 @@ const INITIAL_DRAFT: ExerciseDraft = {
   movementType: null,
   tags: [],
   images: [],
+  videoUrl: '',
 };
 
 /**
@@ -86,6 +89,7 @@ function draftToCreateParams(draft: ExerciseDraft): CreateExerciseParams {
     movementType: draft.movementType,
     tags: draft.tags,
     images: draft.images,
+    videoUrl: draft.videoUrl.trim() || null,
   };
 }
 
@@ -102,6 +106,7 @@ function exerciseToDraft(exercise: Exercise): ExerciseDraft {
     movementType: exercise.movementType as MovementType | null,
     tags: exercise.tags,
     images: exercise.images,
+    videoUrl: exercise.videoUrl ?? '',
   };
 }
 
@@ -309,6 +314,10 @@ export default function ExerciseBuilderPage() {
       toast.error(t('exercises.instructionsRequired'));
       return;
     }
+    if (draft.videoUrl.trim() && !toSafeVideoUrl(draft.videoUrl)) {
+      toast.error(t('exercises.videoUrlInvalid'));
+      return;
+    }
     if (isUploadingImages) {
       toast.error(t('exercises.images.stillUploading'));
       return;
@@ -371,6 +380,10 @@ export default function ExerciseBuilderPage() {
                 onEquipmentChange={handleEquipmentChange}
               />
               <InstructionsCard value={draft.instructions} onChange={handleInstructionsChange} />
+              <VideoLinkCard
+                value={draft.videoUrl}
+                onChange={(videoUrl) => setDraft((prev) => ({ ...prev, videoUrl }))}
+              />
               <ActivationMapCard
                 muscleNames={muscleOptions ?? []}
                 primary={draft.targetMuscle}

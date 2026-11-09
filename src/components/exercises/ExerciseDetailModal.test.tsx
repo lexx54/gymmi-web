@@ -88,4 +88,31 @@ describe('ExerciseDetailModal', () => {
 
     expect(screen.queryByRole('button', { name: /^delete$/i })).not.toBeInTheDocument();
   });
+
+  it('links to the exercise video in a new tab', () => {
+    render(
+      <ExerciseDetailModal
+        exercise={{ ...exercise, videoUrl: 'https://www.youtube.com/watch?v=abc' }}
+        onClose={vi.fn()}
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: /watch video/i });
+    expect(link).toHaveAttribute('href', 'https://www.youtube.com/watch?v=abc');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('hides the video link when missing or unsafe', () => {
+    const { rerender } = render(<ExerciseDetailModal exercise={exercise} onClose={vi.fn()} />);
+    expect(screen.queryByRole('link', { name: /watch video/i })).not.toBeInTheDocument();
+
+    rerender(
+      <ExerciseDetailModal
+        exercise={{ ...exercise, videoUrl: 'javascript:alert(1)' }}
+        onClose={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole('link', { name: /watch video/i })).not.toBeInTheDocument();
+  });
 });

@@ -25,6 +25,8 @@ export type Exercise = {
   tags: string[];
   /** Public URLs of uploaded photos, in display order (max 3). */
   images: string[];
+  /** Optional external demo video (http/https), e.g. a YouTube link. */
+  videoUrl?: string | null;
   /** Creator user id; null for admin-managed catalog exercises. */
   ownerId?: string | null;
   /** Owning gym; null unless a gym created the exercise. */
@@ -43,6 +45,8 @@ export type CreateExerciseParams = {
   movementType?: string | null;
   tags: string[];
   images?: string[];
+  /** Blank or `null` clears the link. */
+  videoUrl?: string | null;
 };
 
 export type UpdateExerciseParams = Partial<CreateExerciseParams>;

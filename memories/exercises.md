@@ -85,3 +85,8 @@ Regression guard: `e2e/exercises.spec.ts` has a 390x844 test asserting `document
 - Added EN/ES map labels plus focused mapping, locale, and Playwright interaction coverage.
 - `CreateTagModal` uses a semantic styled `label`, fixing its `htmlFor` TypeScript build error without changing behavior.
 - Added custom-exercise usage, create/bulk route hints, downgrade warning, entitlement cache invalidation, and exact API error-message handling.
+
+## Video link
+
+- Builder: `VideoLinkCard` (left column, under instructions) edits an optional `videoUrl`; invalid links are flagged inline and block publish. Draft keeps `''`; writes send `trim() || null` (null clears it).
+- Detail: `ExerciseDetailModal` shows a "Watch video" link (`target="_blank"`, `rel="noopener noreferrer"`) only when `toSafeVideoUrl` (`src/utils/videoUrl.ts`) accepts it, so non-http(s) schemes never reach `href`.
