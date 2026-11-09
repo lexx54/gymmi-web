@@ -16,6 +16,12 @@ type PlusUpsellModalProps = {
   onClose: () => void;
 };
 
+/** Perks only Pro plans include, with the benefit line and the gym tier that unlocks them. */
+const PRO_FEATURES: Partial<Record<EntitlementResource, { benefit: string; gymTier: GymTier }>> = {
+  pdfExport: { benefit: 'pdf', gymTier: 'pro' },
+  branding: { benefit: 'branding', gymTier: 'maximum' },
+};
+
 /** Displays a billing-free Plus explanation for a plan-limited action. */
 export function PlusUpsellModal({
   isOpen,
@@ -27,10 +33,12 @@ export function PlusUpsellModal({
   const { t } = useTranslation();
   const target = details?.resource ?? resource;
   const isGym = details?.scope === 'gym';
-  // A Plus user hitting a limit can only go up to Pro; PDF export is a Pro-only perk.
-  const isPdfExport = target === 'pdfExport';
-  const isPlus = !isGym && (details?.plan === 'plus' || isPdfExport);
-  const nextGymTier = isGym ? NEXT_GYM_TIER[details?.plan as GymTier] ?? null : null;
+  // A Plus user hitting a limit can only go up to Pro; Pro-only perks always point at Pro.
+  const proFeature = target ? PRO_FEATURES[target] : undefined;
+  const isPlus = !isGym && (details?.plan === 'plus' || Boolean(proFeature));
+  const nextGymTier = isGym
+    ? proFeature?.gymTier ?? NEXT_GYM_TIER[details?.plan as GymTier] ?? null
+    : null;
   const nextGymLimits = nextGymTier ? GYM_PLAN_LIMITS[nextGymTier] : null;
   const title = isGym
     ? 'entitlements.gymUpsellTitle'
@@ -54,7 +62,7 @@ export function PlusUpsellModal({
                 {t(`landing.pricing.gym.${nextGymTier}.title`)}
               </PlanLabel>
               <Benefits>
-                {isPdfExport ? <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.pdf')}</li> : null}
+                {proFeature ? <li><Check size={16} aria-hidden />{t(`entitlements.gymBenefits.${proFeature.benefit}`)}</li> : null}
                 <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.members', { count: nextGymLimits.members })}</li>
                 <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.catalog', { count: nextGymLimits.catalogRoutines })}</li>
                 <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.exercises', { count: nextGymLimits.customExercises })}</li>
@@ -68,8 +76,8 @@ export function PlusUpsellModal({
               {t(isPlus ? 'entitlements.pro' : 'entitlements.plus')}
             </PlanLabel>
             <Benefits>
-              {(isPdfExport
-                ? ['benefitsPro.pdf']
+              {(proFeature
+                ? [`benefitsPro.${proFeature.benefit}`]
                 : isPlus
                 ? ['benefitsPro.seats', 'benefitsPro.templates', 'benefitsPro.exercises']
                 : ['benefits.templates', 'benefits.exercises', 'benefits.sharing']

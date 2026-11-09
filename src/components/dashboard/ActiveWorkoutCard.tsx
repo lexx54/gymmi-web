@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useMyWorkoutAssignment } from '../../hooks/useWorkouts';
+import { BrandBand } from '../branding/BrandBand';
 
 /**
  * Shows the client's single active workout assignment.
@@ -37,6 +38,11 @@ export function ActiveWorkoutCard({ enabled }: { enabled: boolean }) {
           <span>·</span>
           {t('workouts.exerciseCount', { count: exerciseCount })}
         </Meta>
+        {assignment.routine.brand && (
+          <BrandRow>
+            <BrandBand brand={assignment.routine.brand} variant="chip" />
+          </BrandRow>
+        )}
       </Copy>
       <OpenLink to={`/workout/${assignment.routineId}`} aria-label={t('workouts.openAssigned')}>
         <ArrowRight size={18} />
@@ -60,3 +66,4 @@ const Eyebrow = styled.p`margin: 0; color: #ffb3b1; font-size: .65rem; font-weig
 const Title = styled.h2`overflow: hidden; margin: .2rem 0; color: #fff; font-size: 1.1rem; text-overflow: ellipsis; white-space: nowrap;`;
 const Meta = styled.p`display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin: 0; color: #e7bdbb; font-size: .72rem;`;
 const OpenLink = styled(Link)`display: grid; flex: 0 0 2.5rem; height: 2.5rem; place-items: center; border-radius: 50%; background: #313349; color: #ffb3b1;`;
+const BrandRow = styled.div`margin-top: .55rem;`;

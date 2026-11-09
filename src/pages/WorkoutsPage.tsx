@@ -24,6 +24,7 @@ import { appendSets, DEFAULT_SET, isInSupersetAddGroup } from '../components/wor
 import { useAuth } from '../context/AuthContext';
 import { useExercises } from '../hooks/useExercises';
 import { useRoutinePdfExport } from '../hooks/useRoutinePdfExport';
+import { BrandBand } from '../components/branding/BrandBand';
 import {
   hasAnyEntitlementCapability,
   hasEntitlementCapability,
@@ -357,6 +358,9 @@ export default function WorkoutsPage() {
 
           <RoutinePane>
             {loading ? <Status>{t('common.loading')}</Status> : <>
+              {user?.role.name === 'Client' && persistedRoutine?.brand && (
+                <BrandBand brand={persistedRoutine.brand} />
+              )}
               <RoutineToolbar
                 title={title}
                 onTitleChange={setTitle}

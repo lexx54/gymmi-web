@@ -13,6 +13,8 @@ import {
 } from '../components/settings/SettingsShell';
 import { PhysicalProfileCard } from '../components/settings/PhysicalProfileCard';
 import { CoachingProfileCard } from '../components/settings/CoachingProfileCard';
+import { BrandSettingsCard } from '../components/settings/BrandSettingsCard';
+import { FacilityProfileCard } from '../components/settings/FacilityProfileCard';
 import { SubscriptionSettingsCard } from '../components/settings/SubscriptionSettingsCard';
 import { useAuth } from '../context/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -41,6 +43,7 @@ export default function SettingsPage() {
   const username = effectiveProfile?.username ?? 'Alex';
   const isTrainer = (effectiveProfile?.role?.name) === 'Trainer';
   const isAdmin = (effectiveProfile?.role?.name) === 'Admin';
+  const isGym = (effectiveProfile?.role?.name) === 'Gym';
 
   return (
     <SettingsPageShell>
@@ -57,6 +60,8 @@ export default function SettingsPage() {
           {isTrainer && (
             <CoachingProfileCard userProfile={effectiveProfile} isLoading={isLoading} />
           )}
+          {isTrainer && <BrandSettingsCard userProfile={effectiveProfile} />}
+          {isGym && <FacilityProfileCard />}
           <DataManagementCard />
           <DeleteAccountCard />
           <SettingsFooter />

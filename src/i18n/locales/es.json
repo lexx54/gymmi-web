@@ -386,7 +386,27 @@
     "noGymsFound": "No se encontraron gimnasios que coincidan con la búsqueda",
     "filterCity": "Todas las ciudades",
     "accessPaused": "La prueba terminó: elige un plan para seguir agregando miembros, rutinas y artículos",
-    "choosePlan": "Elegir un plan"
+    "choosePlan": "Elegir un plan",
+    "profile": {
+      "title": "Perfil del gimnasio",
+      "desc": "Lo que miembros y entrenadores ven de tu gimnasio.",
+      "name": "Nombre del gimnasio",
+      "description": "Descripción",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "website": "Sitio web",
+      "phone": "Teléfono",
+      "logo": "Logo",
+      "cover": "Imagen de portada",
+      "upload": "Subir",
+      "change": "Cambiar",
+      "remove": "Quitar",
+      "uploading": "Subiendo…",
+      "save": "Guardar perfil",
+      "saved": "Perfil guardado",
+      "saveFailed": "No se pudo guardar el perfil.",
+      "nameRequired": "Ingresa el nombre de tu gimnasio."
+    }
   },
   "dashboard": {
     "label": "Panel",
@@ -1195,7 +1215,8 @@
       "members": "Hasta {{count}} miembros activos",
       "catalog": "Hasta {{count}} rutinas en el catálogo",
       "exercises": "Hasta {{count}} ejercicios personalizados",
-      "pdf": "Exporta cualquier rutina a un PDF imprimible"
+      "pdf": "Exporta cualquier rutina a un PDF imprimible",
+      "branding": "Tu logo y color en las rutinas y PDFs de tus miembros"
     },
     "usage": "{{usage}} de {{limit}} usados",
     "trainerTemplateLimit": "Puedes mantener dos rutinas con Free. Plus incluye 8 rutinas y 5 ejercicios personalizados.",
@@ -1218,10 +1239,13 @@
       "seats": "Hasta 35 clientes aceptados",
       "templates": "Hasta 20 plantillas de rutinas",
       "exercises": "Hasta 15 ejercicios personalizados privados",
-      "pdf": "Exporta cualquier rutina a un PDF imprimible"
+      "pdf": "Exporta cualquier rutina a un PDF imprimible",
+      "branding": "Tu logo, nombre y color en las rutinas y PDFs de tus clientes"
     },
     "pdfExport": "Exportar rutinas a PDF está incluido en Pro.",
-    "gymPdfExport": "Exportar rutinas a PDF está incluido en Gym Pro y Gym Maximum."
+    "gymPdfExport": "Exportar rutinas a PDF está incluido en Gym Pro y Gym Maximum.",
+    "branding": "La marca personalizada está incluida en Coach Pro.",
+    "gymBranding": "La marca personalizada está incluida en Gym Maximum."
   },
   "landing": {
     "nav": {
@@ -1367,7 +1391,7 @@
           "f3": "Hasta 5 ejercicios personalizados privados",
           "f4": "Edición completa de plantillas de rutinas",
           "f5": "Compartir rutinas con otros entrenadores",
-          "f6": "Personalización de gimnasio (Solo en Pro)"
+          "f6": "Marca personalizada (solo Pro)"
         },
         "pro": {
           "title": "Entrenador Pro",
@@ -1435,7 +1459,7 @@
           "desc": "Instalaciones insignia y complejos de entrenamiento multiespacio.",
           "f1": "Hasta 500 socios activos",
           "f2": "Entrenadores ilimitados, hasta 20 rutinas en el catálogo y 20 ejercicios personalizados",
-          "f3": "Marca personalizada y logotipo del centro",
+          "f3": "Marca personalizada: tu logo y color en las rutinas y PDFs de tus miembros",
           "f4": "Analíticas completas de cohortes y mapas de calor",
           "f5": "Clasificaciones automáticas en todo el centro",
           "f6": "Soporte dedicado e integración guiada",
@@ -2183,5 +2207,35 @@
         ]
       }
     ]
+  },
+  "branding": {
+    "coachedBy": "Entrenado por {{name}}",
+    "atGym": "Rutina de {{name}}",
+    "settingsTitle": "Tu marca",
+    "settingsDesc": "Muestra tu logo, nombre y color a tus clientes en sus rutinas y en los PDFs exportados.",
+    "gymSettingsDesc": "Muestra tu logo y color a tus miembros en las rutinas del catálogo, los PDFs y tu póster QR impreso.",
+    "brandName": "Nombre de marca",
+    "brandNamePlaceholder": "p. ej. Iron Coaching",
+    "brandNameHint": "Si lo dejas vacío, tus clientes ven tu nombre de usuario.",
+    "brandColor": "Color de marca",
+    "customColor": "Color hex",
+    "invalidColor": "Usa un color como #0B3D91.",
+    "invalidName": "Usa entre 2 y 60 caracteres.",
+    "logo": "Logo",
+    "logoHint": "Edita tu logo en el perfil de entrenador. PNG o JPG se ven mejor en los PDFs.",
+    "preview": "Vista previa",
+    "previewClient": "Lo que ven tus clientes",
+    "previewPdf": "Encabezado del PDF",
+    "previewMembers": "Lo que ven tus miembros",
+    "save": "Guardar marca",
+    "saved": "Marca guardada",
+    "saveFailed": "No se pudo guardar la marca.",
+    "clear": "Restablecer",
+    "unlockPro": "Desbloquear con Coach Pro",
+    "unlockGym": "Desbloquear con Gym Maximum",
+    "proOnly": "Coach Pro",
+    "gymOnly": "Gym Maximum",
+    "session": "Sesión {{name}}",
+    "madeWithGymmi": "Hecho con Gymmi"
   }
 }

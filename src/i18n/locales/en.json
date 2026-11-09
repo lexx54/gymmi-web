@@ -386,7 +386,27 @@
     "noGymsFound": "No gyms found matching your search",
     "filterCity": "All Cities",
     "accessPaused": "Trial ended — choose a plan to keep adding members, routines and articles",
-    "choosePlan": "Choose a plan"
+    "choosePlan": "Choose a plan",
+    "profile": {
+      "title": "Facility profile",
+      "desc": "What members and coaches see about your gym.",
+      "name": "Gym name",
+      "description": "Description",
+      "city": "City",
+      "address": "Address",
+      "website": "Website",
+      "phone": "Phone",
+      "logo": "Logo",
+      "cover": "Cover image",
+      "upload": "Upload",
+      "change": "Change",
+      "remove": "Remove",
+      "uploading": "Uploading…",
+      "save": "Save profile",
+      "saved": "Profile saved",
+      "saveFailed": "The profile could not be saved.",
+      "nameRequired": "Enter your gym name."
+    }
   },
   "dashboard": {
     "label": "Dashboard",
@@ -1195,7 +1215,8 @@
       "members": "Up to {{count}} active members",
       "catalog": "Up to {{count}} catalog workouts",
       "exercises": "Up to {{count}} custom exercises",
-      "pdf": "Export any routine to a printable PDF"
+      "pdf": "Export any routine to a printable PDF",
+      "branding": "Your logo and color on member routines and PDFs"
     },
     "usage": "{{usage}} of {{limit}} used",
     "trainerTemplateLimit": "You can keep two routines on Free. Plus includes 8 routines and 5 custom exercises.",
@@ -1218,10 +1239,13 @@
       "seats": "Up to 35 accepted clients",
       "templates": "Up to 20 routine templates",
       "exercises": "Up to 15 private custom exercises",
-      "pdf": "Export any routine to a printable PDF"
+      "pdf": "Export any routine to a printable PDF",
+      "branding": "Your logo, name and color on your clients’ routines and PDFs"
     },
     "pdfExport": "Exporting routines to PDF is included with Pro.",
-    "gymPdfExport": "Exporting routines to PDF is included with Gym Pro and Gym Maximum."
+    "gymPdfExport": "Exporting routines to PDF is included with Gym Pro and Gym Maximum.",
+    "branding": "Custom branding is included with Coach Pro.",
+    "gymBranding": "Custom branding is included with Gym Maximum."
   },
   "landing": {
     "nav": {
@@ -1367,7 +1391,7 @@
           "f3": "Up to 5 private custom exercises",
           "f4": "Full routine template editing",
           "f5": "Routine sharing with other coaches",
-          "f6": "Custom gym branding (Pro only)"
+          "f6": "Custom branding (Pro only)"
         },
         "pro": {
           "title": "Coach Pro",
@@ -1435,7 +1459,7 @@
           "desc": "Flagship facilities and multi-coach fitness complexes.",
           "f1": "Up to 500 active gym members",
           "f2": "Unlimited coaches, up to 20 catalog workouts and 20 custom exercises",
-          "f3": "Custom facility branding & cover logo",
+          "f3": "Custom branding: your logo and color on member routines and PDFs",
           "f4": "Full cohort analytics & volume heatmaps",
           "f5": "Automated facility-wide classifications",
           "f6": "Dedicated facility support & onboarding",
@@ -2183,5 +2207,35 @@
         ]
       }
     ]
+  },
+  "branding": {
+    "coachedBy": "Coached by {{name}}",
+    "atGym": "{{name}} routine",
+    "settingsTitle": "Your brand",
+    "settingsDesc": "Show your logo, name and color to your clients on their routines and on exported PDFs.",
+    "gymSettingsDesc": "Show your logo and color to members on catalog routines, PDFs and your printed QR poster.",
+    "brandName": "Brand name",
+    "brandNamePlaceholder": "e.g. Iron Coaching",
+    "brandNameHint": "Clients see your username when this is empty.",
+    "brandColor": "Brand color",
+    "customColor": "Hex color",
+    "invalidColor": "Use a color like #0B3D91.",
+    "invalidName": "Use 2 to 60 characters.",
+    "logo": "Logo",
+    "logoHint": "Edit your logo in the coaching profile. PNG or JPG looks best on PDFs.",
+    "preview": "Preview",
+    "previewClient": "What your clients see",
+    "previewPdf": "PDF header",
+    "previewMembers": "What your members see",
+    "save": "Save brand",
+    "saved": "Brand saved",
+    "saveFailed": "The brand could not be saved.",
+    "clear": "Reset to default",
+    "unlockPro": "Unlock with Coach Pro",
+    "unlockGym": "Unlock with Gym Maximum",
+    "proOnly": "Coach Pro",
+    "gymOnly": "Gym Maximum",
+    "session": "{{name}} Session",
+    "madeWithGymmi": "Made with Gymmi"
   }
 }

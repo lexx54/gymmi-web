@@ -54,6 +54,17 @@ export type WorkoutDay = {
   exercises: WorkoutRoutineExercise[];
 };
 
+/** A coach's (Coach Pro) or gym's (Gym Maximum) brand, resolved by the API. */
+export type Brand = {
+  kind: 'trainer' | 'gym';
+  name: string;
+  logoUrl: string | null;
+  /** Accent color `#rrggbb`. */
+  color: string;
+  /** White or near-black, readable on `color`. */
+  textColor: string;
+};
+
 export type WorkoutRoutine = {
   id: string;
   name: string;
@@ -68,6 +79,7 @@ export type WorkoutRoutine = {
   daysOfWeek?: number[];
   routineExercises?: any[];
   assignment?: WorkoutAssignmentWindow | null;
+  brand?: Brand | null;
 };
 
 export type WorkoutAssignmentWindow = {

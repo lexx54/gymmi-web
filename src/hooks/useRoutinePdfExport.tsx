@@ -2,10 +2,9 @@ import { useCallback, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { AxiosError } from 'axios';
-import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import type { ApiErrorDetails } from '../services/api/errors';
 import { exportWorkoutPdf } from '../services/api/workouts';
-import { hasEntitlementCapability, useEntitlements } from './usePermissions';
+import { useFeatureUpsell } from './useFeatureUpsell';
 
 type ExportableRoutine = { id: string; name: string };
 
@@ -55,50 +54,25 @@ export function useRoutinePdfExport(): {
   upsellModal: ReactNode;
 } {
   const { t } = useTranslation();
-  const { data: entitlements, plan } = useEntitlements();
+  const { requireFeature, showUpsell, upsellModal } = useFeatureUpsell('pdfExport');
   const [exportingId, setExportingId] = useState<string | null>(null);
-  const [upsell, setUpsell] = useState<ApiErrorDetails | null>(null);
-
-  const upsellDetails = useCallback((): ApiErrorDetails => {
-    if (entitlements?.gymTier) {
-      return {
-        code: 'PLAN_LIMIT',
-        resource: 'pdfExport',
-        scope: 'gym',
-        plan: entitlements.gymTier,
-        message: t('entitlements.gymPdfExport'),
-      };
-    }
-    return { code: 'PLAN_LIMIT', resource: 'pdfExport', plan, message: t('entitlements.pdfExport') };
-  }, [entitlements?.gymTier, plan, t]);
 
   const exportPdf = useCallback(
     async (routine: ExportableRoutine) => {
-      if (!hasEntitlementCapability(entitlements?.capabilities, 'canExportPdf')) {
-        setUpsell(upsellDetails());
-        return;
-      }
+      if (!requireFeature()) return;
       setExportingId(routine.id);
       try {
         const blob = await exportWorkoutPdf(routine.id);
         downloadBlob(blob, routinePdfFileName(routine.name));
       } catch (error) {
         const details = await blobErrorDetails(error);
-        if (details?.code === 'PLAN_LIMIT') setUpsell({ ...upsellDetails(), ...details });
+        if (details?.code === 'PLAN_LIMIT') showUpsell(details);
         else toast.error(t('workouts.exportPdfFailed'));
       } finally {
         setExportingId(null);
       }
     },
-    [entitlements?.capabilities, t, upsellDetails],
-  );
-
-  const upsellModal = (
-    <PlusUpsellModal
-      isOpen={Boolean(upsell)}
-      details={upsell ?? undefined}
-      onClose={() => setUpsell(null)}
-    />
+    [requireFeature, showUpsell, t],
   );
 
   return { exportPdf, exportingId, upsellModal };

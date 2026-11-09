@@ -15,7 +15,9 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
+import { useEntitlements } from '../../hooks/usePermissions';
+import { readableTextColor } from '../../utils/brand';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { TopBar } from '../../components/layout/TopBar';
 import { useAuth } from '../../context/AuthContext';
@@ -85,6 +87,9 @@ export default function GymMembersPage() {
   const gymName = gymData?.name ?? gymData?.gym?.name;
   const joinCode = gymData?.joinCode ?? gymData?.gym?.joinCode;
   const logoUrl = gymData?.logoUrl ?? gymData?.gym?.logoUrl;
+  const { data: entitlements } = useEntitlements();
+  // Gym Maximum: the printed poster uses the gym's brand color.
+  const posterColor = entitlements?.capabilities?.canBrand ? gymData?.gym?.brandColor ?? null : null;
 
   const handleCopyCode = async () => {
     if (!joinCode) return;
@@ -297,8 +302,9 @@ export default function GymMembersPage() {
                 </CloseIconBtn>
               </ModalHeader>
 
+              <PrintOnlyPoster />
               <ModalBody id="printable-qr-content">
-                <GymBrandingRow>
+                <GymBrandingRow $color={posterColor} $text={posterColor ? readableTextColor(posterColor) : null}>
                   {logoUrl ? <GymLogoImg src={logoUrl} alt={gymName || 'Gym'} /> : null}
                   <h3>{gymName}</h3>
                 </GymBrandingRow>
@@ -763,15 +769,45 @@ const ModalBody = styled.div`
   gap: 1.1rem;
 `;
 
-const GymBrandingRow = styled.div`
+const GymBrandingRow = styled.div<{ $color: string | null; $text: string | null }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  ${({ $color }) => ($color ? `background: ${$color}; padding: 0.85rem 1rem; border-radius: 0.9rem;` : '')}
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 
   h3 {
     margin: 0;
     font-size: 1.15rem;
-    color: #f7f7ff;
+    color: ${({ $text }) => $text ?? '#f7f7ff'};
+  }
+
+  @media print {
+    h3 {
+      font-size: 1.6rem;
+      color: ${({ $text }) => $text ?? '#111111'};
+    }
+  }
+`;
+
+/** "Print Poster" prints only the QR poster, not the whole members page. */
+const PrintOnlyPoster = createGlobalStyle`
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #printable-qr-content,
+    #printable-qr-content * {
+      visibility: visible;
+    }
+    #printable-qr-content {
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      background: #ffffff;
+      padding: 2rem;
+    }
   }
 `;
 

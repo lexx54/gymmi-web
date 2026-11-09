@@ -91,10 +91,17 @@ export async function loginViaApi(
   return response.json();
 }
 
+/** One admin login per worker: auth routes are rate-limited per IP and many tests need the admin. */
+let adminAuth: Promise<AuthResponse> | null = null;
+
 export async function loginAdminViaApi(
   request: APIRequestContext,
 ): Promise<AuthResponse> {
-  return loginViaApi(request, adminEmail, adminPassword);
+  adminAuth ??= loginViaApi(request, adminEmail, adminPassword).catch((error: unknown) => {
+    adminAuth = null;
+    throw error;
+  });
+  return adminAuth;
 }
 
 export async function markUserPaidViaApi(

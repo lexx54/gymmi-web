@@ -11,6 +11,7 @@ import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { NoRoutines } from '../components/workouts/NoRoutines';
 import { useAuth } from '../context/AuthContext';
 import { useRoutinePdfExport } from '../hooks/useRoutinePdfExport';
+import { BrandBand } from '../components/branding/BrandBand';
 import {
   useAssignWorkout,
   useDeleteWorkout,
@@ -170,6 +171,9 @@ export default function WorkoutLibraryPage() {
                   <Badge>{assigned ? t('workouts.assigned') : owned ? t('workouts.owned') : t('workouts.readOnly')}</Badge>
                   <Dumbbell size={20} aria-hidden />
                 </CardTop>
+                {isClient && routine.brand && (
+                  <BrandChipRow><BrandBand brand={routine.brand} variant="chip" /></BrandChipRow>
+                )}
                 <CardTitle>{routine.name}</CardTitle>
                 <CardDescription>{routine.description || t('workouts.noDescription')}</CardDescription>
                 <Metrics>
@@ -355,6 +359,7 @@ const Card = styled.article<{ $assigned: boolean }>`min-width: 0; border: 1px so
 const CardTop = styled.div`display: flex; justify-content: space-between; color: #ffb3b1;`;
 const Badge = styled.span`border-radius: 999px; padding: .35rem .65rem; background: #313349; font-size: .68rem; font-weight: 800; text-transform: uppercase;`;
 const CardTitle = styled.h2`margin: 1rem 0 .35rem;`;
+const BrandChipRow = styled.div`margin-top: .85rem;`;
 const CardDescription = styled.p`min-height: 2.5rem; color: #e7bdbb;`;
 const Metrics = styled.div`display: flex; gap: 1rem; color: #ffdad6; font-size: .78rem;`;
 const Actions = styled.footer`display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem;`;

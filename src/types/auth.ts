@@ -38,6 +38,9 @@ export type TrainerProfileParams = {
   specializations: string[];
   gyms?: string[];
   logoUrl?: string;
+  /** Coach Pro branding; `null` clears it. */
+  brandName?: string | null;
+  brandColor?: string | null;
 };
 
 export type GymProfileParams = {
@@ -45,9 +48,11 @@ export type GymProfileParams = {
   description?: string;
   address?: string;
   city?: string;
-  logoUrl?: string;
-  coverUrl?: string;
-  websiteUrl?: string;
+  logoUrl?: string | null;
+  coverUrl?: string | null;
+  /** Gym Maximum branding; `null` clears it. */
+  brandColor?: string | null;
+  websiteUrl?: string | null;
   phoneNumber?: string;
   amenities?: string[];
 };
@@ -104,6 +109,8 @@ export type FullUserProfile = {
     specializations: string[];
     gyms: string[];
     logoUrl?: string | null;
+    brandName?: string | null;
+    brandColor?: string | null;
     createdAt?: string;
     updatedAt?: string;
   } | null;

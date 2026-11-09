@@ -9,6 +9,8 @@ export interface GymProfile {
   city?: string | null;
   logoUrl?: string | null;
   coverUrl?: string | null;
+  /** Gym Maximum branding accent, `#rrggbb`. */
+  brandColor?: string | null;
   websiteUrl?: string | null;
   phoneNumber?: string | null;
   amenities?: string[] | null;
