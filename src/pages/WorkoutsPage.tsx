@@ -23,6 +23,7 @@ import type { LibraryExercise, RoutineExercise, SetField } from '../components/w
 import { appendSets, DEFAULT_SET, isInSupersetAddGroup } from '../components/workouts/addSet';
 import { useAuth } from '../context/AuthContext';
 import { useExercises } from '../hooks/useExercises';
+import { useRoutinePdfExport } from '../hooks/useRoutinePdfExport';
 import {
   hasAnyEntitlementCapability,
   hasEntitlementCapability,
@@ -106,6 +107,7 @@ export default function WorkoutsPage() {
   const { data: exercises = [], isLoading: exercisesLoading } = useExercises();
   const { data: entitlements } = useEntitlements();
   const { data: persistedRoutine, isLoading: routineLoading } = useWorkout(id);
+  const { exportPdf, exportingId, upsellModal: pdfUpsellModal } = useRoutinePdfExport();
   const createMutation = useCreateWorkout();
   const updateMutation = useUpdateWorkout();
   const [title, setTitle] = useState('');
@@ -370,6 +372,8 @@ export default function WorkoutsPage() {
                 onSave={handleSave}
                 isSaving={createMutation.isPending || updateMutation.isPending}
                 readOnly={readOnly}
+                onExportPdf={persistedRoutine ? () => void exportPdf(persistedRoutine) : undefined}
+                isExportingPdf={Boolean(persistedRoutine) && exportingId === persistedRoutine?.id}
               />
               {readOnly ? (
                 description.trim() ? <DescriptionText>{description}</DescriptionText> : null
@@ -481,6 +485,7 @@ export default function WorkoutsPage() {
         message={upsell?.message}
         onClose={() => setUpsell(null)}
       />
+      {pdfUpsellModal}
     </WorkoutsPageShell>
   );
 }

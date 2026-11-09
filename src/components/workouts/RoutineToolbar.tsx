@@ -1,4 +1,4 @@
-import { Save } from 'lucide-react';
+import { FileDown, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -10,6 +10,9 @@ type RoutineToolbarProps = {
   onSave: () => void;
   isSaving?: boolean;
   readOnly?: boolean;
+  /** Shown for saved routines, in both view and edit mode. */
+  onExportPdf?: () => void;
+  isExportingPdf?: boolean;
 };
 
 /**
@@ -23,6 +26,8 @@ export function RoutineToolbar({
   onSave,
   isSaving,
   readOnly,
+  onExportPdf,
+  isExportingPdf,
 }: RoutineToolbarProps) {
   const { t } = useTranslation();
 
@@ -38,11 +43,19 @@ export function RoutineToolbar({
         />
         <Meta>{t('workouts.durationEst', { duration: durationLabel, intensity: intensityLabel })}</Meta>
       </TitleBlock>
-      {!readOnly && <Actions>
-        <PrimaryButton type="button" onClick={onSave} disabled={isSaving}>
-          <Save size={16} />
-          {isSaving ? t('common.saving') : t('workouts.saveRoutine')}
-        </PrimaryButton>
+      {(!readOnly || onExportPdf) && <Actions>
+        {onExportPdf && (
+          <SecondaryButton type="button" onClick={onExportPdf} disabled={isExportingPdf}>
+            <FileDown size={16} />
+            {isExportingPdf ? t('workouts.exportingPdf') : t('workouts.exportPdf')}
+          </SecondaryButton>
+        )}
+        {!readOnly && (
+          <PrimaryButton type="button" onClick={onSave} disabled={isSaving}>
+            <Save size={16} />
+            {isSaving ? t('common.saving') : t('workouts.saveRoutine')}
+          </PrimaryButton>
+        )}
       </Actions>}
     </Container>
   );
@@ -61,6 +74,7 @@ const Container = styled.div`
 `;
 
 const TitleBlock = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -117,6 +131,7 @@ const Meta = styled.p`
 
 const Actions = styled.div`
   display: flex;
+  flex-shrink: 0;
   gap: 0.85rem;
 `;
 
@@ -148,5 +163,33 @@ const PrimaryButton = styled.button`
   &:disabled {
     cursor: wait;
     opacity: 0.65;
+  }
+`;
+
+const SecondaryButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.2rem;
+  border: 1px solid rgba(231, 189, 187, 0.25);
+  border-radius: 9999px;
+  background: transparent;
+  color: #ffb3b1;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: #ffb3b1;
+    background: rgba(255, 179, 177, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
   }
 `;

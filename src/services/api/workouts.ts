@@ -125,6 +125,12 @@ export async function fetchWorkout(id: string): Promise<WorkoutRoutine> {
   return data;
 }
 
+/** Downloads a routine as a PDF. Pro plans and Gym Pro/Maximum only; others get a 403 PLAN_LIMIT. */
+export async function exportWorkoutPdf(id: string): Promise<Blob> {
+  const { data } = await apiClient.get<Blob>(`/workouts/${id}/pdf`, { responseType: 'blob' });
+  return data;
+}
+
 export async function createWorkout(params: WorkoutRoutineWrite): Promise<WorkoutRoutine> {
   const { data } = await apiClient.post<WorkoutRoutine>('/workouts', params);
   return data;

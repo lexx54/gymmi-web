@@ -1,4 +1,4 @@
-import { CalendarPlus, Dumbbell, Edit3, Eye, Plus, Search, Share2, Trash2, Users } from 'lucide-react';
+import { CalendarPlus, Dumbbell, Edit3, Eye, FileDown, Plus, Search, Share2, Trash2, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { EntitlementGraceWarning } from '../components/entitlements/EntitlementG
 import { PlusUpsellModal } from '../components/entitlements/PlusUpsellModal';
 import { NoRoutines } from '../components/workouts/NoRoutines';
 import { useAuth } from '../context/AuthContext';
+import { useRoutinePdfExport } from '../hooks/useRoutinePdfExport';
 import {
   useAssignWorkout,
   useDeleteWorkout,
@@ -45,6 +46,7 @@ export default function WorkoutLibraryPage() {
   const { user } = useAuth();
   const { data: routines = [], isLoading, isError } = useWorkouts();
   const { data: entitlements } = useEntitlements();
+  const { exportPdf, exportingId, upsellModal: pdfUpsellModal } = useRoutinePdfExport();
   const isClient = user?.role.name === 'Client';
   const isTrainer = user?.role.name === 'Trainer';
   const { data: assignment } = useMyWorkoutAssignment(isClient);
@@ -176,6 +178,9 @@ export default function WorkoutLibraryPage() {
                 </Metrics>
                 <Actions>
                   <ActionLink to={`/workout/${routine.id}`}><Eye size={15} />{t('workouts.view')}</ActionLink>
+                  <ActionButton type="button" onClick={() => void exportPdf(routine)} disabled={exportingId === routine.id}>
+                    <FileDown size={15} />{exportingId === routine.id ? t('workouts.exportingPdf') : t('workouts.exportPdf')}
+                  </ActionButton>
                   {owned && (canEdit
                     ? <ActionLink to={`/workout/${routine.id}/edit`}><Edit3 size={15} />{t('workouts.edit')}</ActionLink>
                     : <ActionButton type="button" onClick={() => entitlements?.isCoveredClient ? toast.error(t('entitlements.coveredClient')) : setUpsell({ message: t('entitlements.editTemplate') })}><Edit3 size={15} />{t('workouts.edit')}</ActionButton>)}
@@ -216,6 +221,7 @@ export default function WorkoutLibraryPage() {
         message={upsell?.message}
         onClose={() => setUpsell(null)}
       />
+      {pdfUpsellModal}
     </PageShell>
   );
 }

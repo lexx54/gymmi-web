@@ -27,8 +27,9 @@ export function PlusUpsellModal({
   const { t } = useTranslation();
   const target = details?.resource ?? resource;
   const isGym = details?.scope === 'gym';
-  // A Plus user hitting a limit can only go up to Pro.
-  const isPlus = !isGym && details?.plan === 'plus';
+  // A Plus user hitting a limit can only go up to Pro; PDF export is a Pro-only perk.
+  const isPdfExport = target === 'pdfExport';
+  const isPlus = !isGym && (details?.plan === 'plus' || isPdfExport);
   const nextGymTier = isGym ? NEXT_GYM_TIER[details?.plan as GymTier] ?? null : null;
   const nextGymLimits = nextGymTier ? GYM_PLAN_LIMITS[nextGymTier] : null;
   const title = isGym
@@ -53,6 +54,7 @@ export function PlusUpsellModal({
                 {t(`landing.pricing.gym.${nextGymTier}.title`)}
               </PlanLabel>
               <Benefits>
+                {isPdfExport ? <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.pdf')}</li> : null}
                 <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.members', { count: nextGymLimits.members })}</li>
                 <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.catalog', { count: nextGymLimits.catalogRoutines })}</li>
                 <li><Check size={16} aria-hidden />{t('entitlements.gymBenefits.exercises', { count: nextGymLimits.customExercises })}</li>
@@ -66,7 +68,9 @@ export function PlusUpsellModal({
               {t(isPlus ? 'entitlements.pro' : 'entitlements.plus')}
             </PlanLabel>
             <Benefits>
-              {(isPlus
+              {(isPdfExport
+                ? ['benefitsPro.pdf']
+                : isPlus
                 ? ['benefitsPro.seats', 'benefitsPro.templates', 'benefitsPro.exercises']
                 : ['benefits.templates', 'benefits.exercises', 'benefits.sharing']
               ).map((key) => (

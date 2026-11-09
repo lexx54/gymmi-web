@@ -19,7 +19,8 @@ export type EntitlementResource =
   | 'templates'
   | 'trainerSeats'
   | 'customExercises'
-  | 'sharing';
+  | 'sharing'
+  | 'pdfExport';
 
 export type EntitlementCapabilities = {
   canCreateTemplate?: boolean;
@@ -32,16 +33,18 @@ export type EntitlementCapabilities = {
   canSelfAssign?: boolean;
   canCreateCustomExercise?: boolean;
   canCreateCustomExercises?: boolean;
+  /** Coach Pro, Athlete Pro, Gym Pro and Gym Maximum. */
+  canExportPdf?: boolean;
   [capability: string]: boolean | undefined;
 };
 
 export type EntitlementAmounts = Partial<
-  Record<Exclude<EntitlementResource, 'sharing'>, number>
+  Record<Exclude<EntitlementResource, 'sharing' | 'pdfExport'>, number>
 >;
 
 /** A `null` limit means unlimited. */
 export type EntitlementLimits = Partial<
-  Record<Exclude<EntitlementResource, 'sharing'>, number | null>
+  Record<Exclude<EntitlementResource, 'sharing' | 'pdfExport'>, number | null>
 >;
 
 export type EntitlementSnapshot = {

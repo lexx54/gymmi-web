@@ -82,6 +82,47 @@ test.describe('workouts', () => {
     expect(overflow.scroll).toBeLessThanOrEqual(overflow.client);
   });
 
+  test('Pro coach downloads a routine as PDF; Plus coach is offered Pro', async ({ page, request }) => {
+    const admin = await loginAdminViaApi(request);
+    const pro = await signupViaApi(request, { role: 'Trainer', prefix: 'pdfprocoach' });
+    await markUserPaidViaApi(request, admin.accessToken, pro.user.id, true, 'pro');
+    const exercise = await createExercise(request, admin.accessToken, `E2E PDF Bench ${Date.now()}`);
+    const name = `E2E PDF Routine ${Date.now()}`;
+    const routine = await createRoutine(request, pro.accessToken, exercise.id, name);
+
+    // From the library card
+    await applyAuthToPage(page, pro);
+    await page.goto('/workout');
+    await page.getByRole('searchbox', { name: /search your library/i }).fill(name);
+    const card = page.getByRole('heading', { name }).locator('..');
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      card.getByRole('button', { name: 'Export PDF' }).click(),
+    ]);
+    expect(download.suggestedFilename()).toBe(`${name.toLowerCase().replace(/ /g, '-')}.pdf`);
+    const bytes = await (await download.createReadStream()).toArray();
+    expect(Buffer.concat(bytes).subarray(0, 5).toString()).toBe('%PDF-');
+
+    // From the routine page
+    await page.goto(`/workout/${routine.id}`);
+    const [pageDownload] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Export PDF' }).click(),
+    ]);
+    expect(pageDownload.suggestedFilename()).toMatch(/\.pdf$/);
+
+    // A Plus coach sees the Pro upsell instead of a download
+    const plus = await signupViaApi(request, { role: 'Trainer', prefix: 'pdfpluscoach' });
+    await markUserPaidViaApi(request, admin.accessToken, plus.user.id, true, 'plus');
+    await createRoutine(request, plus.accessToken, exercise.id, `${name} Plus`);
+    await applyAuthToPage(page, plus);
+    await page.goto('/workout');
+    await page.getByRole('searchbox', { name: /search your library/i }).fill(`${name} Plus`);
+    await page.getByRole('heading', { name: `${name} Plus` }).locator('..').getByRole('button', { name: 'Export PDF' }).click();
+    await expect(page.getByRole('dialog', { name: 'Unlock more with Pro' })).toBeVisible();
+    await expect(page.getByText('Exporting routines to PDF is included with Pro.')).toBeVisible();
+  });
+
   test('client sees active assignment and read-only routine', async ({ page, request }) => {
     const admin = await loginAdminViaApi(request);
     const trainer = await signupViaApi(request, { role: 'Trainer', prefix: 'assigntrainer' });

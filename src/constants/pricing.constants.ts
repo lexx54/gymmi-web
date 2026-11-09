@@ -123,6 +123,7 @@ export const PRICING_DATA: {
         { textKey: 'landing.pricing.client.pro.f1', included: true, highlight: true },
         { textKey: 'landing.pricing.client.pro.f2', included: true, highlight: true },
         { textKey: 'landing.pricing.client.pro.f3', included: true },
+        { textKey: 'landing.pricing.client.pro.f4', included: true, highlight: true },
       ],
     },
   ],
@@ -155,6 +156,7 @@ export const PRICING_DATA: {
         { textKey: 'landing.pricing.gym.pro.f4', included: true },
         { textKey: 'landing.pricing.gym.pro.f5', included: true },
         { textKey: 'landing.pricing.gym.pro.f6', included: true },
+        { textKey: 'landing.pricing.gym.pro.f7', included: true },
       ],
     },
     {
@@ -169,6 +171,7 @@ export const PRICING_DATA: {
         { textKey: 'landing.pricing.gym.maximum.f4', included: true },
         { textKey: 'landing.pricing.gym.maximum.f5', included: true },
         { textKey: 'landing.pricing.gym.maximum.f6', included: true },
+        { textKey: 'landing.pricing.gym.maximum.f7', included: true },
       ],
     },
   ],

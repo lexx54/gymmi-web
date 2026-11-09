@@ -1,4 +1,4 @@
-import { Dumbbell, Edit3, Plus, Search, Trash2 } from 'lucide-react';
+import { Dumbbell, Edit3, FileDown, Plus, Search, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import { TopBar } from '../../components/layout/TopBar';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkouts, useDeleteWorkout } from '../../hooks/useWorkouts';
+import { useRoutinePdfExport } from '../../hooks/useRoutinePdfExport';
 import { useMyGym } from '../../hooks/useGyms';
 import { PlusUpsellModal } from '../../components/entitlements/PlusUpsellModal';
 import type { ApiErrorDetails } from '../../services/api/errors';
@@ -16,6 +17,7 @@ import { toastGymAccessPaused } from '../../utils/gymAccess';
 
 export default function GymCatalogPage() {
   const { t } = useTranslation();
+  const { exportPdf, exportingId, upsellModal: pdfUpsellModal } = useRoutinePdfExport();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: routines = [], isLoading, isError } = useWorkouts();
@@ -134,6 +136,16 @@ export default function GymCatalogPage() {
                 <CardActions>
                   <ActionIcon
                     type="button"
+                    onClick={() => void exportPdf(routine)}
+                    disabled={exportingId === routine.id}
+                    title={t('workouts.exportPdf')}
+                    aria-label={t('workouts.exportPdfNamed', { name: routine.name })}
+                    data-testid={`export-pdf-${routine.id}`}
+                  >
+                    <FileDown size={15} />
+                  </ActionIcon>
+                  <ActionIcon
+                    type="button"
                     onClick={() => navigate(`/workout/${routine.id}/edit`)}
                     title={t('workouts.edit')}
                     data-testid={`edit-routine-${routine.id}`}
@@ -167,6 +179,7 @@ export default function GymCatalogPage() {
         details={upsell ?? undefined}
         onClose={() => setUpsell(null)}
       />
+      {pdfUpsellModal}
     </PageShell>
   );
 }

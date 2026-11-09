@@ -611,7 +611,11 @@
       "twoDaysAgo": "2 days ago",
       "fiveDaysAgo": "5 days ago",
       "lastWeek": "Last week"
-    }
+    },
+    "exportPdf": "Export PDF",
+    "exportingPdf": "Exporting…",
+    "exportPdfFailed": "The PDF could not be exported. Try again.",
+    "exportPdfNamed": "Export {{name}} to PDF"
   },
   "exercises": {
     "catalog": "Catalog",
@@ -1190,7 +1194,8 @@
     "gymBenefits": {
       "members": "Up to {{count}} active members",
       "catalog": "Up to {{count}} catalog workouts",
-      "exercises": "Up to {{count}} custom exercises"
+      "exercises": "Up to {{count}} custom exercises",
+      "pdf": "Export any routine to a printable PDF"
     },
     "usage": "{{usage}} of {{limit}} used",
     "trainerTemplateLimit": "You can keep two routines on Free. Plus includes 8 routines and 5 custom exercises.",
@@ -1212,8 +1217,11 @@
     "benefitsPro": {
       "seats": "Up to 35 accepted clients",
       "templates": "Up to 20 routine templates",
-      "exercises": "Up to 15 private custom exercises"
-    }
+      "exercises": "Up to 15 private custom exercises",
+      "pdf": "Export any routine to a printable PDF"
+    },
+    "pdfExport": "Exporting routines to PDF is included with Pro.",
+    "gymPdfExport": "Exporting routines to PDF is included with Gym Pro and Gym Maximum."
   },
   "landing": {
     "nav": {
@@ -1396,7 +1404,8 @@
           "desc": "For athletes who build more of their own training.",
           "f1": "Up to 10 owned solo routines",
           "f2": "Up to 10 private custom exercises",
-          "f3": "Everything in Plus"
+          "f3": "Everything in Plus",
+          "f4": "Export routines to PDF"
         }
       },
       "gym": {
@@ -1418,7 +1427,8 @@
           "f3": "Catalog of up to 10 workouts and 10 custom exercises",
           "f4": "Advanced member retention & volume analytics",
           "f5": "Facility leaderboards & strength tiers",
-          "f6": "Priority facility listing"
+          "f6": "Priority facility listing",
+          "f7": "Export routines to PDF"
         },
         "maximum": {
           "title": "Gym Maximum",
@@ -1428,7 +1438,8 @@
           "f3": "Custom facility branding & cover logo",
           "f4": "Full cohort analytics & volume heatmaps",
           "f5": "Automated facility-wide classifications",
-          "f6": "Dedicated facility support & onboarding"
+          "f6": "Dedicated facility support & onboarding",
+          "f7": "Export routines to PDF"
         }
       }
     },

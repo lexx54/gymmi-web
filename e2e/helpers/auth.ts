@@ -102,10 +102,11 @@ export async function markUserPaidViaApi(
   adminToken: string,
   userId: string,
   hasPaid = true,
+  paidPlan?: 'plus' | 'pro',
 ) {
   const response = await request.patch(`${apiUrl}/admin/users/${userId}`, {
     headers: { Authorization: `Bearer ${adminToken}` },
-    data: { hasPaid },
+    data: paidPlan ? { hasPaid, paidPlan } : { hasPaid },
   });
   expect(response.status()).toBe(200);
 }

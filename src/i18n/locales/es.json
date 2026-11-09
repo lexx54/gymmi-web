@@ -611,7 +611,11 @@
       "twoDaysAgo": "Hace 2 días",
       "fiveDaysAgo": "Hace 5 días",
       "lastWeek": "Semana pasada"
-    }
+    },
+    "exportPdf": "Exportar PDF",
+    "exportingPdf": "Exportando…",
+    "exportPdfFailed": "No se pudo exportar el PDF. Inténtalo de nuevo.",
+    "exportPdfNamed": "Exportar {{name}} a PDF"
   },
   "exercises": {
     "catalog": "Catálogo",
@@ -1190,7 +1194,8 @@
     "gymBenefits": {
       "members": "Hasta {{count}} miembros activos",
       "catalog": "Hasta {{count}} rutinas en el catálogo",
-      "exercises": "Hasta {{count}} ejercicios personalizados"
+      "exercises": "Hasta {{count}} ejercicios personalizados",
+      "pdf": "Exporta cualquier rutina a un PDF imprimible"
     },
     "usage": "{{usage}} de {{limit}} usados",
     "trainerTemplateLimit": "Puedes mantener dos rutinas con Free. Plus incluye 8 rutinas y 5 ejercicios personalizados.",
@@ -1212,8 +1217,11 @@
     "benefitsPro": {
       "seats": "Hasta 35 clientes aceptados",
       "templates": "Hasta 20 plantillas de rutinas",
-      "exercises": "Hasta 15 ejercicios personalizados privados"
-    }
+      "exercises": "Hasta 15 ejercicios personalizados privados",
+      "pdf": "Exporta cualquier rutina a un PDF imprimible"
+    },
+    "pdfExport": "Exportar rutinas a PDF está incluido en Pro.",
+    "gymPdfExport": "Exportar rutinas a PDF está incluido en Gym Pro y Gym Maximum."
   },
   "landing": {
     "nav": {
@@ -1396,7 +1404,8 @@
           "desc": "Para atletas que arman más de su propio entrenamiento.",
           "f1": "Hasta 10 rutinas propias",
           "f2": "Hasta 10 ejercicios personalizados privados",
-          "f3": "Todo lo incluido en Plus"
+          "f3": "Todo lo incluido en Plus",
+          "f4": "Exporta rutinas a PDF"
         }
       },
       "gym": {
@@ -1418,7 +1427,8 @@
           "f3": "Catálogo de hasta 10 rutinas y 10 ejercicios personalizados",
           "f4": "Analíticas avanzadas de retención y volumen",
           "f5": "Tablas de clasificación del centro y niveles de fuerza",
-          "f6": "Posicionamiento prioritario del centro"
+          "f6": "Posicionamiento prioritario del centro",
+          "f7": "Exporta rutinas a PDF"
         },
         "maximum": {
           "title": "Gimnasio Maximum",
@@ -1428,7 +1438,8 @@
           "f3": "Marca personalizada y logotipo del centro",
           "f4": "Analíticas completas de cohortes y mapas de calor",
           "f5": "Clasificaciones automáticas en todo el centro",
-          "f6": "Soporte dedicado e integración guiada"
+          "f6": "Soporte dedicado e integración guiada",
+          "f7": "Exporta rutinas a PDF"
         }
       }
     },
