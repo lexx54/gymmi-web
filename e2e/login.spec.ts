@@ -1,15 +1,5 @@
 import { expect, test } from '@playwright/test';
-
-const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3001';
-const password = 'secret12';
-
-function uniqueUser() {
-  const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  return {
-    email: `login-e2e-${id}@example.com`,
-    username: `logine2e${id.replace(/[^a-zA-Z0-9]/g, '')}`,
-  };
-}
+import { password, signupViaApi } from './helpers/auth';
 
 test.describe('login', () => {
   test('renders the login form', async ({ page }) => {
@@ -41,22 +31,12 @@ test.describe('login', () => {
     await page.locator('input[type="password"]').fill('wrong12');
     await page.getByRole('button', { name: /^login$/i }).click();
 
-    await expect(page.getByText('Invalid email/password')).toBeVisible();
+    await expect(page.getByText('Incorrect email, username or password.')).toBeVisible();
     await expect(page).toHaveURL(/\/login$/);
   });
 
-  test('logs in and redirects to the dashboard', async ({ page }) => {
-    const user = uniqueUser();
-
-    const signupResponse = await page.request.post(`${apiUrl}/auth/signup`, {
-      headers: { 'X-Client-Id': `playwright-signup-${user.username}` },
-      data: {
-        ...user,
-        password,
-        role: 'Client',
-      },
-    });
-    expect(signupResponse.status()).toBe(201);
+  test('logs in and redirects to the dashboard', async ({ page, request }) => {
+    const { user } = await signupViaApi(request, { role: 'Client', prefix: 'logine2e' });
 
     await page.goto('/login');
     await page.getByPlaceholder('email@mail.com').fill(user.email);

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
@@ -85,40 +85,88 @@ describe('LandingPage', () => {
     const user = userEvent.setup();
     render(<LandingPage />, { wrapper: createWrapper() });
 
-    // Default tab is Routine Builder
-    expect(screen.getByText(/Visual Workout Programming/i)).toBeInTheDocument();
+    // Default tab: web Routine Builder replica (Mon–Sun tabs, add from library)
+    expect(screen.getByText(/Weekly Routine Builder/i)).toBeInTheDocument();
+    const builder = screen.getByTestId('routine-builder-mockup');
+    await user.click(within(builder).getByRole('button', { name: 'Wed' }));
+    expect(within(builder).getByText(/1\. Barbell Back Squat/)).toBeInTheDocument();
+    await user.click(within(builder).getByRole('button', { name: /Leg Press/ }));
+    expect(within(builder).getByText(/3\. Leg Press/)).toBeInTheDocument();
 
-    // Switch to Muscle Body Map
-    const bodyMapTab = screen.getByRole('tab', { name: /muscle body map/i });
-    await user.click(bodyMapTab);
-    expect(screen.getByText(/Interactive Muscle Targeting/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Chest' })).toBeInTheDocument();
+    // Muscle map: picking an exercise repaints the real body map
+    await user.click(screen.getByRole('tab', { name: /muscle map/i }));
+    expect(screen.getByText(/See Every Muscle an Exercise Works/i)).toBeInTheDocument();
+    const bodyMap = screen.getByTestId('body-map-mockup');
+    await user.click(within(bodyMap).getByRole('button', { name: 'Barbell Back Squat' }));
+    expect(bodyMap.querySelector('[data-muscle="Quads"]')).toHaveAttribute('data-tier', 'primary');
 
-    // Switch to Active Workout
-    const activeTab = screen.getByRole('tab', { name: /active workout/i });
-    await user.click(activeTab);
-    expect(screen.getByText(/Real-Time Workout Execution/i)).toBeInTheDocument();
+    // Active Workout: log a custom set, then the rest-complete alert
+    await user.click(screen.getByRole('tab', { name: /active workout/i }));
+    expect(screen.getByText(/Log Every Set on Your Phone/i)).toBeInTheDocument();
+    const logSet = screen.getByTestId('log-set-mockup');
+    await user.click(within(logSet).getAllByRole('button', { name: 'Log Set' }).at(-1)!);
+    expect(within(logSet).getByText('Rest Complete!')).toBeInTheDocument();
 
-    // Switch to Strength Leaderboards
+    // Coaching: request → accept → assign → weekly copy
+    await user.click(screen.getByRole('tab', { name: /coaching pipeline/i }));
+    const flow = screen.getByTestId('coaching-flow-mockup');
+    await user.click(within(flow).getByRole('button', { name: 'Accept' }));
+    await user.click(within(flow).getByRole('button', { name: 'Two weeks' }));
+    await user.click(within(flow).getByRole('button', { name: 'Confirm' }));
+    expect(within(flow).getByText('Current assignment')).toBeInTheDocument();
+    expect(within(flow).getByText('Week 2')).toBeInTheDocument();
+    expect(within(flow).queryByText('Week 3')).not.toBeInTheDocument();
+
+    // Strength Leaderboards
     const leaderboardTab = screen.getByRole('tab', { name: /strength leaderboard/i });
     await user.click(leaderboardTab);
     expect(screen.getByText(/Automated Strength Tiers & Leaderboards/i)).toBeInTheDocument();
     expect(screen.getByText('Cohort Leaderboard Live Preview')).toBeInTheDocument();
+    expect(screen.getByText('Your Standing')).toBeInTheDocument();
     expect(screen.getAllByText('Alex Sterling')[0]).toBeInTheDocument();
 
     // Switch lift to Barbell Back Squat
     const squatBtn = screen.getByRole('button', { name: 'Barbell Back Squat' });
     await user.click(squatBtn);
-    expect(screen.getByText('David Kim')).toBeInTheDocument();
+    expect(screen.getAllByText('David Kim')[0]).toBeInTheDocument();
 
-    // Switch to Facility Console
+    // Facility Console: coaches page replica with publishing toggles
     const facilityTab = screen.getByRole('tab', { name: /facility console/i });
     await user.click(facilityTab);
     expect(screen.getByText(/Gym Facility & Studio Management/i)).toBeInTheDocument();
-    expect(screen.getByText('Facility Command Center')).toBeInTheDocument();
-    expect(screen.getByText('MEMBER CAPACITY')).toBeInTheDocument();
-    expect(screen.getAllByText('74 / 100 (74%)')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('CAN PUBLISH')[0]).toBeInTheDocument();
+    const coaches = screen.getByTestId('gym-coaches-mockup');
+    expect(within(coaches).getByText('2 of 3 catalog workouts used')).toBeInTheDocument();
+    const toggle = within(coaches).getByRole('switch', { name: /Mike Torres/ });
+    expect(toggle).toHaveAttribute('aria-checked', 'false');
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('renders product-accurate hero and audience mockups', async () => {
+    const user = userEvent.setup();
+    render(<LandingPage />, { wrapper: createWrapper() });
+
+    // Hero: mobile Active Workout replica — double-tap logs the active set and starts rest
+    const session = screen.getByTestId('hero-active-session');
+    expect(within(session).getByText('Set 3 of 4 in progress')).toBeInTheDocument();
+    await user.dblClick(within(session).getByRole('button', { name: /double-tap/i }));
+    expect(within(session).getByText('Set 4 of 4 in progress')).toBeInTheDocument();
+    expect(within(session).getByRole('button', { name: 'Skip Rest' })).toBeInTheDocument();
+
+    // Coach row: Clients page replica with the real 15-seat Plus limit
+    const clients = screen.getByTestId('clients-page-mockup');
+    expect(within(clients).getByText('Free includes 2 accepted clients. Plus includes up to 15.')).toBeInTheDocument();
+    await user.click(within(clients).getByRole('button', { name: 'Accept' }));
+    expect(within(clients).getByText('3 of 15 accepted client seats used')).toBeInTheDocument();
+
+    // Athlete row: mobile Home replica
+    expect(within(screen.getByTestId('mobile-home-mockup')).getByText('2 of 3 workouts completed')).toBeInTheDocument();
+
+    // Gym row: Members page replica
+    const members = screen.getByTestId('gym-members-mockup');
+    expect(within(members).getByText('74 / 100 Members (74%)')).toBeInTheDocument();
+    await user.click(within(members).getByRole('button', { name: 'Approve' }));
+    expect(within(members).getByText('75 / 100 Members (75%)')).toBeInTheDocument();
   });
 
   it('renders pricing plans with every paid plan purchasable, including Athlete Pro', async () => {
@@ -187,20 +235,10 @@ describe('LandingPage', () => {
     await user.click(gymTab);
 
     // Gym annual prices ($20, $40, $80)
-    expect(screen.getByText('20')).toBeInTheDocument();
-    expect(screen.getByText('40')).toBeInTheDocument();
-    expect(screen.getByText('80')).toBeInTheDocument();
-  });
-
-  it('allows interacting with the hero workout preview checklist', async () => {
-    const user = userEvent.setup();
-    render(<LandingPage />, { wrapper: createWrapper() });
-
-    const benchPressRow = screen.getAllByText('Barbell Bench Press')[0];
-    await user.click(benchPressRow);
-
-    // Clicking toggles completion state
-    expect(benchPressRow).toBeInTheDocument();
+    const pricing = document.getElementById('pricing')!;
+    expect(within(pricing).getByText('20')).toBeInTheDocument();
+    expect(within(pricing).getByText('40')).toBeInTheDocument();
+    expect(within(pricing).getByText('80')).toBeInTheDocument();
   });
 
   it('renders gym facility section in audience deep dive and faq', async () => {
@@ -211,7 +249,7 @@ describe('LandingPage', () => {
     expect(screen.getAllByText(/For Gym Facilities/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Empower Your Facility. Unify Coaches & Members./i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /register your facility/i })).toHaveAttribute('href', '/signup');
-    expect(screen.getByText('Active Member Capacity')).toBeInTheDocument();
+    expect(screen.getByTestId('gym-members-mockup')).toHaveTextContent('Gym Members Roster');
 
     // FAQ accordion for gym
     const gymFaq = screen.getByText(/How does Gymmi work for gym facilities and studios\?/i);

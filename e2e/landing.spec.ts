@@ -37,19 +37,19 @@ test.describe('Landing Page', () => {
     await expect(featuresSection).toBeVisible();
 
     // Default Routine Builder tab
-    await expect(featuresSection.getByText('Visual Workout Programming')).toBeVisible();
+    await expect(featuresSection.getByText('Weekly Routine Builder')).toBeVisible();
 
     // Click Muscle Body Map tab
-    await featuresSection.getByRole('tab', { name: /muscle body map/i }).click();
-    await expect(featuresSection.getByText('Interactive Muscle Targeting')).toBeVisible();
+    await featuresSection.getByRole('tab', { name: /muscle map/i }).click();
+    await expect(featuresSection.getByText('See Every Muscle an Exercise Works')).toBeVisible();
 
     // Interact with muscle selector
-    await featuresSection.getByRole('button', { name: 'Legs' }).click();
-    await expect(featuresSection.getByText('Barbell Back Squat')).toBeVisible();
+    await featuresSection.getByRole('button', { name: 'Barbell Back Squat' }).click();
+    await expect(featuresSection.locator('[data-muscle="Quads"]').first()).toHaveAttribute('data-tier', 'primary');
 
     // Click Active Workout tab
     await featuresSection.getByRole('tab', { name: /active workout/i }).click();
-    await expect(featuresSection.getByText('Real-Time Workout Execution')).toBeVisible();
+    await expect(featuresSection.getByText('Log Every Set on Your Phone')).toBeVisible();
   });
 
   test('allows toggling roles and billing frequency in the pricing section', async ({ page }) => {
@@ -61,9 +61,11 @@ test.describe('Landing Page', () => {
     await expect(pricingSection.getByText('Coach Plus')).toBeVisible();
     await expect(pricingSection.getByText('Coach Pro')).toBeVisible();
 
-    // Verify Pro tier button is disabled
-    const proButton = pricingSection.getByRole('button', { name: /coming soon/i }).last();
-    await expect(proButton).toBeDisabled();
+    // Every paid plan is purchasable: no disabled "Coming Soon" CTA, and Pro's CTA leads to signup
+    await expect(pricingSection.getByRole('button', { name: /coming soon/i })).toHaveCount(0);
+    await pricingSection.getByRole('button', { name: 'Get Started', exact: true }).last().click();
+    await expect(page).toHaveURL(/\/signup$/);
+    await page.goBack();
 
     // Switch to Athlete / Client tab
     await pricingSection.getByRole('tab', { name: /for athletes & clients/i }).click();

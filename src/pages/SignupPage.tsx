@@ -567,7 +567,7 @@ export default function SignupPage() {
                         </RoleIconWrap>
                         <RoleTextWrap>
                           <RoleName>{t('auth.roles.Client')}</RoleName>
-                          <RoleDesc>Track workouts, volume, and personal records</RoleDesc>
+                          <RoleDesc>{t('auth.roleDescs.Client')}</RoleDesc>
                         </RoleTextWrap>
                         {selectedRole === 'Client' && <CheckBadge><Check size={14} /></CheckBadge>}
                       </RoleCard>
@@ -583,7 +583,7 @@ export default function SignupPage() {
                         </RoleIconWrap>
                         <RoleTextWrap>
                           <RoleName>{t('auth.roles.Trainer')}</RoleName>
-                          <RoleDesc>Coach clients, assign routines, manage roster</RoleDesc>
+                          <RoleDesc>{t('auth.roleDescs.Trainer')}</RoleDesc>
                         </RoleTextWrap>
                         {selectedRole === 'Trainer' && <CheckBadge><Check size={14} /></CheckBadge>}
                       </RoleCard>
@@ -599,7 +599,7 @@ export default function SignupPage() {
                         </RoleIconWrap>
                         <RoleTextWrap>
                           <RoleName>{t('auth.roles.Gym')}</RoleName>
-                          <RoleDesc>Manage facility, routine library, coaches, members</RoleDesc>
+                          <RoleDesc>{t('auth.roleDescs.Gym')}</RoleDesc>
                         </RoleTextWrap>
                         {selectedRole === 'Gym' && <CheckBadge><Check size={14} /></CheckBadge>}
                       </RoleCard>

@@ -68,3 +68,22 @@ The Landing Page (`/`) serves as the primary marketing, onboarding, and ecosyste
     - Added localized copy for all new facility features, audience highlights, and FAQ items in English and Spanish.
   - **Automated Tests (`LandingPage.test.tsx`)**:
     - Added test coverage verifying the Facility tab switch, audience deep dive gym row, and FAQ accordion interaction.
+
+## Product-accurate mockups (`src/components/landing/mockups/`)
+
+Every landing preview is a replica of a real screen. When the real screen changes, update its mockup.
+
+| Mockup | Real screen it copies |
+| --- | --- |
+| `ActiveSessionMockup` (hero) | Mobile `gymmi/src/screens/ActiveWorkoutScreen.tsx`: set table SET/WEIGHT/REPS/RPE/DONE, double-tap logs a set, rest countdown with Skip Rest |
+| `RoutineBuilderMockup` | Web `src/pages/WorkoutsPage.tsx`: Mon–Sun tabs, Weight (kg)/Reps/Rest/RPE sets, supersets, add from library |
+| `BodyMapMockup` | Web exercise catalog filters + the real `ExerciseBodyMap` component (reused, read-only) |
+| `LogSetMockup` | Mobile custom-mode "Log Set" modal and "Rest Complete!" alert |
+| `CoachingFlowMockup` | Web `ClientsPage` pending requests → library "Assign" dialog (Week/Two weeks/Month/Trimester/Custom) → weekly client copy |
+| `GymCoachesMockup` | Web gym coaches page: "Can Publish Routines" toggle, catalog usage (Gym Plus = 3) |
+| `ClientsPageMockup`, `MobileHomeMockup`, `GymMembersMockup` | Web `ClientsPage` (15-seat Plus limit), mobile `HomeScreen`, web `GymMembersPage` |
+
+Rules:
+- Labels reuse the product's own i18n keys (`contracts.*`, `gym.*`, `workouts.*`, `entitlements.*`). Mobile-only strings are copied into `landing.mock.*` from `gymmi/src/i18n/locales`.
+- Limits shown must match `gymmi-api/src/entitlements/entitlements.constants.ts` and `gymmi-api/src/gyms/gyms.constants.ts`.
+- Colors follow the real apps (navy `#101225` surfaces, `#ef233c` / `#ff4f5e` red, `#ffb3b1` pink).

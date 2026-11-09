@@ -84,7 +84,7 @@ export function Sidebar({ username }: SidebarProps) {
 
   return (
     <SidebarAside>
-      <SidebarBrand>KINETIC</SidebarBrand>
+      <SidebarBrand>GYMMI</SidebarBrand>
       <ProfileCard>
         <Avatar $img={user?.avatarUrl} />
         <ProfileText>

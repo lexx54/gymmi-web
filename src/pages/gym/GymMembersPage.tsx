@@ -135,7 +135,7 @@ export default function GymMembersPage() {
               <span>{t('gym.capacity')}</span>
             </CapacityLabelGroup>
             <CapacityCount>
-              <strong>{activeMembers.length}</strong> / {capacity} {t('gym.members')} ({capacityPercent}%)
+              {t('gym.capacityProgress', { current: activeMembers.length, max: capacity })} ({capacityPercent}%)
             </CapacityCount>
           </CapacityHeader>
           <ProgressBarTrack>

@@ -91,6 +91,18 @@ test.describe('workouts', () => {
     const exercise = await createExercise(request, admin.accessToken, `E2E Row ${Date.now()}`);
     const name = `E2E Assigned Routine ${Date.now()}`;
     const routine = await createRoutine(request, trainer.accessToken, exercise.id, name);
+
+    // Assigning requires an accepted contract: the client requests the trainer, the trainer accepts.
+    const contract = await request.post(`${apiUrl}/contracts`, {
+      headers: { Authorization: `Bearer ${client.accessToken}` },
+      data: { trainerId: trainer.user.id, period: 'WEEK' },
+    });
+    expect(contract.status()).toBe(201);
+    const accepted = await request.post(`${apiUrl}/contracts/${(await contract.json()).id}/accept`, {
+      headers: { Authorization: `Bearer ${trainer.accessToken}` },
+    });
+    expect(accepted.status()).toBe(201);
+
     const assignment = await request.post(`${apiUrl}/workouts/${routine.id}/assignments`, {
       headers: { Authorization: `Bearer ${trainer.accessToken}` },
       data: { clientId: client.user.id, period: 'WEEK' },
@@ -101,7 +113,9 @@ test.describe('workouts', () => {
     await page.goto('/dashboard');
     await expect(page.getByText(name)).toBeVisible();
     await page.getByRole('link', { name: /open assigned routine/i }).click();
-    await expect(page).toHaveURL(`/workout/${routine.id}`);
+    // The client opens their own assigned copy of the routine, not the trainer's template.
+    await expect(page).toHaveURL(/\/workout\/[0-9a-f-]{36}$/);
+    expect(page.url()).not.toContain(routine.id);
     await expect(page.getByLabel('Routine title')).toHaveValue(name);
     await expect(page.getByLabel('Routine title')).toBeDisabled();
     await expect(page.getByRole('button', { name: /remove exercise/i })).toHaveCount(0);

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { loginViaUi, signupViaApi } from './helpers/auth';
+import { applyAuthToPage, signupViaApi } from './helpers/auth';
 
 test.describe('list catalogs via exercise builder', () => {
   test('loads muscle and equipment options from the API', async ({
@@ -7,7 +7,7 @@ test.describe('list catalogs via exercise builder', () => {
     request,
   }) => {
     const gym = await signupViaApi(request, { role: 'Gym', prefix: 'listweb' });
-    await loginViaUi(page, gym.user.email);
+    await applyAuthToPage(page, gym);
     await page.goto('/exercises/new');
 
     const muscleSelect = page.getByLabel('Target Muscle Group');

@@ -1,55 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import {
   ArrowRight,
   Flame,
-  CheckCircle2,
-  Clock,
   Activity,
-  Award,
   Sparkles,
   LayoutDashboard,
   Trophy,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { ActiveSessionMockup } from './mockups/ActiveSessionMockup';
 
 export const HeroSection: React.FC = () => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  // Interactive demo card state
-  const [completedSets, setCompletedSets] = useState<Record<number, boolean>>({
-    1: true,
-    2: true,
-    3: false,
-  });
-  const [seconds, setSeconds] = useState(1725); // 28:45
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatTimer = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  const toggleSet = (index: number) => {
-    setCompletedSets((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
-  const completedCount = Object.values(completedSets).filter(Boolean).length;
-  const progressPercent = Math.round((completedCount / 3) * 100);
 
   const scrollToFeatures = () => {
     const el = document.getElementById('features');
@@ -114,7 +81,7 @@ export const HeroSection: React.FC = () => {
                 <Activity size={18} />
               </MetricIconWrapper>
               <MetricDetails>
-                <MetricValue>Live</MetricValue>
+                <MetricValue>{t('landing.hero.statLoggingValue')}</MetricValue>
                 <MetricLabel>{t('landing.hero.statLogging')}</MetricLabel>
               </MetricDetails>
             </MetricItem>
@@ -126,112 +93,16 @@ export const HeroSection: React.FC = () => {
                 <Trophy size={18} />
               </MetricIconWrapper>
               <MetricDetails>
-                <MetricValue>5 Tiers</MetricValue>
+                <MetricValue>{t('landing.hero.statTiersValue')}</MetricValue>
                 <MetricLabel>{t('landing.hero.statClassifications')}</MetricLabel>
               </MetricDetails>
             </MetricItem>
           </MetricsStrip>
         </HeroTextSection>
 
-        {/* Right Column: Interactive Workout Card */}
+        {/* Right Column: replica of the mobile Active Workout screen */}
         <HeroPreviewSection>
-          <InteractiveCardContainer>
-            <CardHeader>
-              <CardBadge>
-                <LiveDot />
-                <span>{t('landing.preview.badge')}</span>
-              </CardBadge>
-              <TimerBadge>
-                <Clock size={14} />
-                <span>{formatTimer(seconds)}</span>
-              </TimerBadge>
-            </CardHeader>
-
-            <RoutineInfo>
-              <RoutineTitle>{t('landing.preview.routineName')}</RoutineTitle>
-              <RoutineMeta>{t('landing.preview.meta')}</RoutineMeta>
-            </RoutineInfo>
-
-            <ProgressWrapper>
-              <ProgressHeader>
-                <span>{t('landing.preview.completed', { count: completedCount })}</span>
-                <span>{progressPercent}%</span>
-              </ProgressHeader>
-              <ProgressBarTrack>
-                <ProgressBarFill $width={progressPercent} />
-              </ProgressBarTrack>
-            </ProgressWrapper>
-
-            <ExerciseList>
-              {/* Exercise 1 */}
-              <ExerciseRow
-                $completed={!!completedSets[1]}
-                onClick={() => toggleSet(1)}
-                role="button"
-                tabIndex={0}
-              >
-                <CheckIconWrapper $completed={!!completedSets[1]}>
-                  <CheckCircle2 size={18} />
-                </CheckIconWrapper>
-                <ExerciseDetails>
-                  <ExerciseName $completed={!!completedSets[1]}>
-                    {t('landing.preview.ex1Name')}
-                  </ExerciseName>
-                  <ExerciseSpecs>{t('landing.preview.ex1Detail')}</ExerciseSpecs>
-                </ExerciseDetails>
-                <StatusTag $completed={!!completedSets[1]}>
-                  {completedSets[1] ? 'DONE' : 'NEXT'}
-                </StatusTag>
-              </ExerciseRow>
-
-              {/* Exercise 2 */}
-              <ExerciseRow
-                $completed={!!completedSets[2]}
-                onClick={() => toggleSet(2)}
-                role="button"
-                tabIndex={0}
-              >
-                <CheckIconWrapper $completed={!!completedSets[2]}>
-                  <CheckCircle2 size={18} />
-                </CheckIconWrapper>
-                <ExerciseDetails>
-                  <ExerciseName $completed={!!completedSets[2]}>
-                    {t('landing.preview.ex2Name')}
-                  </ExerciseName>
-                  <ExerciseSpecs>{t('landing.preview.ex2Detail')}</ExerciseSpecs>
-                </ExerciseDetails>
-                <StatusTag $completed={!!completedSets[2]}>
-                  {completedSets[2] ? 'DONE' : 'NEXT'}
-                </StatusTag>
-              </ExerciseRow>
-
-              {/* Exercise 3 */}
-              <ExerciseRow
-                $completed={!!completedSets[3]}
-                onClick={() => toggleSet(3)}
-                role="button"
-                tabIndex={0}
-              >
-                <CheckIconWrapper $completed={!!completedSets[3]}>
-                  <CheckCircle2 size={18} />
-                </CheckIconWrapper>
-                <ExerciseDetails>
-                  <ExerciseName $completed={!!completedSets[3]}>
-                    {t('landing.preview.ex3Name')}
-                  </ExerciseName>
-                  <ExerciseSpecs>{t('landing.preview.ex3Detail')}</ExerciseSpecs>
-                </ExerciseDetails>
-                <StatusTag $completed={!!completedSets[3]}>
-                  {completedSets[3] ? 'DONE' : 'IN PROGRESS'}
-                </StatusTag>
-              </ExerciseRow>
-            </ExerciseList>
-
-            <CardFooter>
-              <Award size={16} color="#ef233c" />
-              <span>Tap any exercise to simulate real-time completion</span>
-            </CardFooter>
-          </InteractiveCardContainer>
+          <ActiveSessionMockup />
         </HeroPreviewSection>
       </HeroContent>
     </HeroWrapper>
@@ -457,193 +328,3 @@ const HeroPreviewSection = styled.div`
   justify-content: center;
 `;
 
-const InteractiveCardContainer = styled.div`
-  width: 100%;
-  max-width: 440px;
-  background: rgba(30, 41, 59, 0.75);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 1.5rem;
-  padding: 1.75rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(239, 35, 60, 0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const CardBadge = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(239, 35, 60, 0.15);
-  border: 1px solid rgba(239, 35, 60, 0.3);
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
-  color: #f87171;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-`;
-
-const LiveDot = styled.span`
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ef233c;
-  box-shadow: 0 0 8px #ef233c;
-  animation: pulse 1.8s infinite;
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-  }
-`;
-
-const TimerBadge = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: #94a3b8;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-`;
-
-const RoutineInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const RoutineTitle = styled.h3`
-  color: #ffffff;
-  font-size: 1.35rem;
-  font-weight: 800;
-`;
-
-const RoutineMeta = styled.span`
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 500;
-`;
-
-const ProgressWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-`;
-
-const ProgressHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  color: #94a3b8;
-  font-size: 0.8125rem;
-  font-weight: 600;
-`;
-
-const ProgressBarTrack = styled.div`
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
-  overflow: hidden;
-`;
-
-const ProgressBarFill = styled.div<{ $width: number }>`
-  height: 100%;
-  width: ${({ $width }) => $width}%;
-  background: linear-gradient(90deg, #ef233c, #f87171);
-  border-radius: 9999px;
-  transition: width 0.3s ease;
-`;
-
-const ExerciseList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-`;
-
-const ExerciseRow = styled.div<{ $completed: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.875rem;
-  background: ${({ $completed }) =>
-    $completed ? 'rgba(239, 35, 60, 0.08)' : 'rgba(255, 255, 255, 0.04)'};
-  border: 1px solid
-    ${({ $completed }) => ($completed ? 'rgba(239, 35, 60, 0.25)' : 'rgba(255, 255, 255, 0.06)')};
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateX(2px);
-  }
-`;
-
-const CheckIconWrapper = styled.div<{ $completed: boolean }>`
-  color: ${({ $completed }) => ($completed ? '#ef233c' : '#475569')};
-  display: flex;
-  align-items: center;
-  transition: color 0.2s ease;
-`;
-
-const ExerciseDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
-const ExerciseName = styled.span<{ $completed: boolean }>`
-  color: ${({ $completed }) => ($completed ? '#f1f5f9' : '#cbd5e1')};
-  font-size: 0.9375rem;
-  font-weight: 700;
-  text-decoration: ${({ $completed }) => ($completed ? 'line-through' : 'none')};
-  opacity: ${({ $completed }) => ($completed ? 0.85 : 1)};
-`;
-
-const ExerciseSpecs = styled.span`
-  color: #64748b;
-  font-size: 0.8125rem;
-  font-weight: 500;
-`;
-
-const StatusTag = styled.span<{ $completed: boolean }>`
-  font-size: 0.6875rem;
-  font-weight: 800;
-  padding: 0.2rem 0.5rem;
-  border-radius: 0.375rem;
-  background: ${({ $completed }) =>
-    $completed ? 'rgba(239, 35, 60, 0.15)' : 'rgba(255, 255, 255, 0.06)'};
-  color: ${({ $completed }) => ($completed ? '#f87171' : '#94a3b8')};
-  letter-spacing: 0.03em;
-`;
-
-const CardFooter = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: #64748b;
-  font-size: 0.75rem;
-  font-weight: 600;
-`;

@@ -1,7 +1,14 @@
-import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type APIResponse, type Page } from '@playwright/test';
+import { LEGAL_CONFIG } from '../../src/constants/legal.constants';
 
 export const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3001';
 export const password = 'secret12';
+
+/** Signup requires accepting the Terms revision the web app currently shows. */
+export const signupTerms = {
+  acceptTerms: true,
+  termsVersion: LEGAL_CONFIG.lastUpdated,
+} as const;
 
 /** Must match gymmi-api/test/helpers/auth.ts E2E_ADMIN_* (created by globalSetup). */
 export const adminEmail = 'e2e-admin@gymmi.local';
@@ -18,6 +25,26 @@ export type AuthResponse = {
     role: { id: string; name: string };
   };
 };
+
+/**
+ * The API rate-limits auth routes per IP (10/min), and every e2e request comes from 127.0.0.1.
+ * On 429, wait for the window to reset (Retry-After) and retry, extending the test timeout.
+ */
+async function postAuth(
+  request: APIRequestContext,
+  url: string,
+  options: Parameters<APIRequestContext['post']>[1],
+): Promise<APIResponse> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const response = await request.post(url, options);
+    if (response.status() !== 429) return response;
+    const retryAfter = Number(response.headers()['retry-after']);
+    const waitMs = (Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 30) * 1000 + 500;
+    test.info().setTimeout(test.info().timeout + waitMs);
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+  return request.post(url, options);
+}
 
 export function uniqueUser(prefix: string) {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -37,13 +64,14 @@ export async function signupViaApi(
   },
 ): Promise<AuthResponse> {
   const user = uniqueUser(opts.prefix ?? 'webe2e');
-  const response = await request.post(`${apiUrl}/auth/signup`, {
+  const response = await postAuth(request, `${apiUrl}/auth/signup`, {
     headers: { 'X-Client-Id': `playwright-signup-${user.clientId}` },
     data: {
       email: user.email,
       username: user.username,
       password,
       role: opts.role,
+      ...signupTerms,
     },
   });
   expect(response.status()).toBe(201);
@@ -55,7 +83,7 @@ export async function loginViaApi(
   identifier: string,
   pwd = password,
 ): Promise<AuthResponse> {
-  const response = await request.post(`${apiUrl}/auth/login`, {
+  const response = await postAuth(request, `${apiUrl}/auth/login`, {
     headers: { 'X-Client-Id': `playwright-login-${Date.now()}` },
     data: { identifier, password: pwd },
   });

@@ -3,7 +3,6 @@ import {
   apiUrl,
   applyAuthToPage,
   loginAdminViaApi,
-  loginViaUi,
   markUserPaidViaApi,
   signupViaApi,
 } from './helpers/auth';
@@ -14,20 +13,22 @@ const csvHeaders =
 const localized = (value: string) => ({ en: value, es: value });
 
 test.describe('exercises', () => {
-  test('client can view catalog but cannot create', async ({ page, request }) => {
+  test('free client can view catalog and is offered Plus to create', async ({ page, request }) => {
     const client = await signupViaApi(request, {
       role: 'Client',
       prefix: 'exclient',
     });
 
-    await loginViaUi(page, client.user.email);
+    await applyAuthToPage(page, client);
     await page.goto('/exercises');
 
-    await expect(page.getByText('Design your movement catalog')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Exercises' })).toBeVisible();
+    // Clients can create custom exercises on Plus; Free clients get the upsell instead of the builder.
+    await page.locator('header').getByRole('button', { name: 'Create Exercise' }).click();
     await expect(
-      page.getByRole('button', { name: /create exercise/i }),
-    ).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /bulk csv/i })).toHaveCount(0);
+      page.getByText('Custom exercises are included with Plus, up to 5.'),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/exercises$/);
   });
 
   test('filters exercises and paginates the catalog at 10 per page', async ({
@@ -188,7 +189,7 @@ test.describe('exercises', () => {
     await applyAuthToPage(page, admin);
     await page.goto('/exercises');
 
-    await expect(page.getByText('Design your movement catalog')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Exercises' })).toBeVisible();
     await expect(
       page.getByRole('searchbox', { name: /filter exercises/i }),
     ).toBeVisible();
@@ -208,7 +209,7 @@ test.describe('exercises', () => {
     const gym = await signupViaApi(request, { role: 'Gym', prefix: 'exgym' });
     await markUserPaidViaApi(request, admin.accessToken, gym.user.id, true);
 
-    await loginViaUi(page, gym.user.email);
+    await applyAuthToPage(page, gym);
     await page.goto('/exercises');
 
     // Empty catalog also renders a "Create Exercise" button inside the
@@ -233,23 +234,40 @@ test.describe('exercises', () => {
     await expect(page.getByText(exerciseName)).toBeVisible();
   });
 
-  test('unpaid gym cannot publish an exercise', async ({ page, request }) => {
+  test('trial gym at its custom exercise limit cannot publish another', async ({
+    page,
+    request,
+  }) => {
+    // New gyms start a 30-day trial with Gym Plus limits: 5 custom exercises.
     const gym = await signupViaApi(request, {
       role: 'Gym',
-      prefix: 'exunpaid',
+      prefix: 'exlimit',
     });
+    const suffix = Date.now().toString();
+    for (let i = 1; i <= 5; i += 1) {
+      const created = await request.post(`${apiUrl}/exercises`, {
+        headers: { Authorization: `Bearer ${gym.accessToken}` },
+        data: {
+          name: `E2E Trial Exercise ${suffix}-${i}`,
+          targetMuscle: localized('Quads'),
+          equipment: localized('Barbell'),
+          instructions: localized('Trial gym custom exercise.'),
+          activationMap: {
+            secondary: localized('Glutes'),
+            stabilizers: localized('Calves'),
+          },
+          difficulty: 'Intermediate',
+          movementType: 'Compound',
+          tags: ['strength'],
+        },
+      });
+      expect(created.status()).toBe(201);
+    }
 
-    await loginViaUi(page, gym.user.email);
+    await applyAuthToPage(page, gym);
     await page.goto('/exercises/new');
 
-    await page.getByLabel('Exercise Name').fill(`Unpaid Draft ${Date.now()}`);
-    await page
-      .getByPlaceholder('Break down the movement step-by-step...')
-      .fill('Should fail payment gate.');
-
-    await page.getByRole('button', { name: /publish exercise/i }).click();
-
-    await expect(page.getByText('Could not publish exercise')).toBeVisible();
+    await expect(page.getByText('Your gym plan includes 5 custom exercises.')).toBeVisible();
     await expect(page).toHaveURL(/\/exercises\/new$/);
   });
 
