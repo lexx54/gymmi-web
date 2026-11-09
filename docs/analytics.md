@@ -10,6 +10,7 @@ Web training analytics dashboard powered by the authoritative `/analytics` backe
      - `VolumeTrendsCard`: Live 4-week volume trend curve, total kg volume, and delta vs previous 4 weeks.
      - `ConsistencyHeatmapCard`: Live 7x5 day intensity heatmap (duration-based tiers 0–4), day streak, completion percentage against planned routine days, and total workouts.
   3. `PersonalRecordsCard` (Bottom): Top personal records list displaying max weight, dates, reps, and progression status pills (`ALL-TIME BEST`, `NEW PR`, `STEADY`).
+- For Admin users, renders `AdminAnalytics` instead of the athlete cards (see below).
 - For Trainer users, includes a Client Selector dropdown to seamlessly toggle between "My Training" and any contracted client's training analytics.
 
 ## Route
@@ -44,3 +45,24 @@ Web training analytics dashboard powered by the authoritative `/analytics` backe
   - Enhanced backend (`gymmi-api`) `computeMuscleLoad` to classify sets and track distinct exercise counts into specific muscle groups (`chest`, `back`, `legs`, `shoulders`, `arms`, `core`).
   - Added `exercisesCount` to `MuscleSegmentDto` and `MuscleSegment`.
   - Grouped `VolumeTrendsCard` and `ConsistencyHeatmapCard` side-by-side in `SplitGrid` sharing 50% / 50% width.
+
+## Admin platform analytics
+
+Admins have no training of their own, so `/analytics` shows platform trends from `GET /admin/analytics`. This is the extended, historical counterpart of the admin dashboard (`AdminOverview`), which stays focused on what needs action today.
+
+- Tabs: Growth, Revenue, Engagement, Content. Range picker: 7D / 30D / 90D / 12M.
+- Tab and range live in the URL (`/analytics?tab=revenue&range=90d`), so a view can be shared.
+- Each KPI shows the change against the previous window of equal length. `lapsed plans` and `reports` count a drop as good news.
+- Charts use `TrendChart` (plain SVG, stacked bars or lines, `<title>` tooltips per bucket).
+- Engagement includes a retention heatmap of the last 6 weekly signup cohorts.
+- When the range changes, the previous data stays on screen and dims (`keepPreviousData`) until the new range loads.
+
+### Key files
+
+- `src/components/admin-analytics/AdminAnalytics.tsx`
+- `src/components/admin-analytics/TrendChart.tsx`
+- `src/components/admin-analytics/format.ts`
+- `src/components/admin-dashboard/ui.tsx` (card primitives shared with `AdminOverview`)
+- `src/hooks/useAdminAnalytics.ts`
+- `src/types/adminAnalytics.ts`
+- `src/components/admin-analytics/AdminAnalytics.test.tsx`

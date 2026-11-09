@@ -10,6 +10,24 @@ import type {
 } from '../../types/adminOverview';
 import { ROLE_COLORS } from './colors';
 import { SignupsChart } from './SignupsChart';
+import {
+  BarRow,
+  Bars,
+  Card,
+  CardHead,
+  CardTitle,
+  Delta,
+  Dot,
+  ErrorBox,
+  Eyebrow,
+  Fill,
+  Legend,
+  LinkButton,
+  Mini,
+  MiniGrid,
+  Muted,
+  Track,
+} from './ui';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ROLES: OverviewRole[] = ['Client', 'Trainer', 'Gym'];
@@ -451,15 +469,6 @@ function Kpi({ label, color, value, delta, extra, t, testId }: KpiProps) {
   );
 }
 
-function Mini({ value, label, color }: { value: string; label: string; color?: string }) {
-  return (
-    <div>
-      <MiniValue style={color ? { color } : undefined}>{value}</MiniValue>
-      <MiniLabel>{label}</MiniLabel>
-    </div>
-  );
-}
-
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -508,15 +517,6 @@ const Accent = styled.span`
   color: #ef233c;
 `;
 
-const Eyebrow = styled.p`
-  margin: 0;
-  color: #d4d8ee;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.65rem;
-  font-weight: 700;
-`;
-
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -562,33 +562,6 @@ const ThreeGrid = styled.div`
   @media (max-width: 1100px) {
     grid-template-columns: 1fr;
   }
-`;
-
-const Card = styled.article`
-  min-width: 0;
-  border-radius: 1.35rem;
-  border: 1px solid rgba(126, 136, 175, 0.18);
-  background: linear-gradient(180deg, #181d36 0%, #12152d 100%);
-  padding: 1.1rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-`;
-
-const CardHead = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-`;
-
-const CardTitle = styled.h3`
-  margin: 0.35rem 0 0;
-  color: #f4f5ff;
-  font-size: 1.2rem;
-  font-weight: 800;
-  text-transform: uppercase;
 `;
 
 const AttentionButton = styled.button<{ $color: string }>`
@@ -651,99 +624,11 @@ const KpiValue = styled.p`
   line-height: 1.1;
 `;
 
-const Muted = styled.p`
-  margin: 0;
-  color: #8a90b2;
-  font-size: 0.8rem;
-`;
-
-const Delta = styled.span<{ $positive?: boolean }>`
-  color: ${({ $positive }) => ($positive ? '#3ecf8e' : '#ef4d5f')};
-  font-weight: 700;
-`;
-
-const Dot = styled.i<{ $color: string }>`
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: ${({ $color }) => $color};
-  flex-shrink: 0;
-`;
-
-const Legend = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.9rem;
-  font-size: 0.75rem;
-  color: #8a90b2;
-  margin-top: 0.5rem;
-
-  span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-`;
-
 const Money = styled.p`
   margin: 0.5rem 0 0;
   font-size: 2.5rem;
   font-weight: 800;
   color: #f5f6ff;
-`;
-
-const Bars = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 0.9rem;
-`;
-
-const BarRow = styled.div`
-  display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr) 4.5rem;
-  gap: 0.6rem;
-  align-items: center;
-  font-size: 0.75rem;
-  color: #d4d8ee;
-
-  span:last-child {
-    text-align: right;
-  }
-`;
-
-const Track = styled.div`
-  height: 8px;
-  border-radius: 99px;
-  background: rgba(126, 136, 175, 0.16);
-  overflow: hidden;
-`;
-
-const Fill = styled.div`
-  height: 100%;
-  border-radius: 99px;
-  background: #ef233c;
-`;
-
-const MiniGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 0.9rem;
-`;
-
-const MiniValue = styled.p`
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #f5f6ff;
-`;
-
-const MiniLabel = styled.p`
-  margin: 0;
-  font-size: 0.72rem;
-  color: #8a90b2;
 `;
 
 const BigLine = styled.p`
@@ -825,20 +710,3 @@ const Feed = styled.ul`
   }
 `;
 
-const ErrorBox = styled.div`
-  padding: 1rem 1.2rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(239, 77, 95, 0.4);
-  background: rgba(239, 77, 95, 0.08);
-  color: #f5f6ff;
-`;
-
-const LinkButton = styled.button`
-  background: none;
-  border: none;
-  color: #efc0c4;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-`;

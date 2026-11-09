@@ -7,6 +7,7 @@ import type {
   PaginatedUsers,
 } from '../../types/rbac';
 import type { AdminOverview } from '../../types/adminOverview';
+import type { AdminAnalytics, AnalyticsRange } from '../../types/adminAnalytics';
 
 export async function fetchRoles(): Promise<RoleDto[]> {
   const { data } = await apiClient.get<RoleDto[]>('/admin/roles');
@@ -52,5 +53,10 @@ export async function patchAdminUser(
 
 export async function fetchAdminOverview(): Promise<AdminOverview> {
   const { data } = await apiClient.get<AdminOverview>('/admin/overview');
+  return data;
+}
+
+export async function fetchAdminAnalytics(range: AnalyticsRange): Promise<AdminAnalytics> {
+  const { data } = await apiClient.get<AdminAnalytics>('/admin/analytics', { params: { range } });
   return data;
 }

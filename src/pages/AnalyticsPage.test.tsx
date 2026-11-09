@@ -9,6 +9,7 @@ import AnalyticsPage from './AnalyticsPage';
 import * as authContext from '../context/AuthContext';
 import * as analyticsApi from '../services/api/analytics';
 import * as contractsApi from '../services/api/contracts';
+import * as adminApi from '../services/api/admin';
 
 const mockAnalytics: analyticsApi.AnalyticsResponse = {
   volumeTrends: {
@@ -197,5 +198,28 @@ describe('AnalyticsPage', () => {
     expect(screen.getByText('Shoulders')).toBeInTheDocument();
     expect(screen.getByText('1 exercise')).toBeInTheDocument();
     expect(screen.getByText('40%')).toBeInTheDocument();
+  });
+
+  it('shows platform analytics instead of training cards for admins', async () => {
+    vi.spyOn(authContext, 'useAuth').mockReturnValue({
+      user: {
+        id: 'admin-1',
+        email: 'admin@gymmi.local',
+        username: 'Root',
+        role: { id: 'r-9', name: 'Admin' },
+      } as unknown as ReturnType<typeof authContext.useAuth>['user'],
+      isAuthenticated: true,
+      isLoading: false,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: vi.fn(),
+    });
+    const fetchAdmin = vi.spyOn(adminApi, 'fetchAdminAnalytics').mockReturnValue(new Promise(() => {}));
+
+    render(<AnalyticsPage />, { wrapper: createWrapper() });
+
+    expect(screen.getByTestId('admin-analytics')).toBeInTheDocument();
+    expect(fetchAdmin).toHaveBeenCalledWith('30d');
+    expect(analyticsApi.fetchMyAnalytics).not.toHaveBeenCalled();
   });
 });

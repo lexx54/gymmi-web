@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { AdminAnalytics } from '../components/admin-analytics/AdminAnalytics';
 import {
   AnalyticsContent,
   AnalyticsMain,
@@ -19,12 +20,14 @@ import { fetchContractClients } from '../services/api/contracts';
 
 /**
  * Analytics dashboard displaying live training metrics with client switching for trainers.
+ * Admins get platform analytics instead, since they have no training of their own.
  */
 export default function AnalyticsPage() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const username = user?.username ?? 'Alex';
   const isTrainer = user?.role?.name === 'Trainer';
+  const isAdmin = user?.role?.name === 'Admin';
 
   const [selectedClientId, setSelectedClientId] = useState<string>('');
 
@@ -39,6 +42,7 @@ export default function AnalyticsPage() {
     queryKey: ['analytics', selectedClientId || 'me'],
     queryFn: () =>
       selectedClientId ? fetchClientAnalytics(selectedClientId) : fetchMyAnalytics(),
+    enabled: !isAdmin,
   });
 
   return (
@@ -47,32 +51,38 @@ export default function AnalyticsPage() {
       <AnalyticsMain>
         <TopBar title={t('nav.analytics')} />
         <AnalyticsContent>
-          {isTrainer && clientsRoster.length > 0 && (
-            <HeaderControlRow>
-              <ControlLabel htmlFor="client-selector">
-                {t('analytics.selectClient', 'Select Client')}:
-              </ControlLabel>
-              <ClientSelect
-                id="client-selector"
-                value={selectedClientId}
-                onChange={(e) => setSelectedClientId(e.target.value)}
-              >
-                <option value="">{t('analytics.myTraining', 'My Training')}</option>
-                {clientsRoster.map((roster) => (
-                  <option key={roster.client.id} value={roster.client.id}>
-                    {roster.client.username} ({roster.client.email})
-                  </option>
-                ))}
-              </ClientSelect>
-            </HeaderControlRow>
-          )}
+          {isAdmin ? (
+            <AdminAnalytics />
+          ) : (
+            <>
+              {isTrainer && clientsRoster.length > 0 && (
+                <HeaderControlRow>
+                  <ControlLabel htmlFor="client-selector">
+                    {t('analytics.selectClient', 'Select Client')}:
+                  </ControlLabel>
+                  <ClientSelect
+                    id="client-selector"
+                    value={selectedClientId}
+                    onChange={(e) => setSelectedClientId(e.target.value)}
+                  >
+                    <option value="">{t('analytics.myTraining', 'My Training')}</option>
+                    {clientsRoster.map((roster) => (
+                      <option key={roster.client.id} value={roster.client.id}>
+                        {roster.client.username} ({roster.client.email})
+                      </option>
+                    ))}
+                  </ClientSelect>
+                </HeaderControlRow>
+              )}
 
-          <MuscleLoadCard data={analytics?.muscleLoad} isLoading={isLoading} />
-          <SplitGrid>
-            <VolumeTrendsCard data={analytics?.volumeTrends} isLoading={isLoading} />
-            <ConsistencyHeatmapCard data={analytics?.consistency} isLoading={isLoading} />
-          </SplitGrid>
-          <PersonalRecordsCard records={analytics?.personalRecords} isLoading={isLoading} />
+              <MuscleLoadCard data={analytics?.muscleLoad} isLoading={isLoading} />
+              <SplitGrid>
+                <VolumeTrendsCard data={analytics?.volumeTrends} isLoading={isLoading} />
+                <ConsistencyHeatmapCard data={analytics?.consistency} isLoading={isLoading} />
+              </SplitGrid>
+              <PersonalRecordsCard records={analytics?.personalRecords} isLoading={isLoading} />
+            </>
+          )}
         </AnalyticsContent>
       </AnalyticsMain>
     </AnalyticsPageShell>
