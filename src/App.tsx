@@ -4,7 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { PrivateRoute } from './components/PrivateRoute'
 import { PublicRoute } from './components/PublicRoute'
-import { RoleRoute } from './components/RoleRoute'
+import { ExcludeRoleRoute, RoleRoute } from './components/RoleRoute'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
@@ -84,7 +84,7 @@ function App() {
           <Route path="/exercises" element={<ExercisesPage />} />
           <Route path="/exercises/new" element={<ExerciseBuilderPage />} />
           <Route path="/exercises/:exerciseId/edit" element={<ExerciseBuilderPage />} />
-          <Route path="/billing" element={<BillingPage />} />
+          <Route path="/billing" element={<ExcludeRoleRoute role="Admin" redirectTo="/admin/payments"><BillingPage /></ExcludeRoleRoute>} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin/permissions" element={<RoleRoute role="Admin"><AdminPermissionsPage /></RoleRoute>} />
           <Route path="/admin/users" element={<RoleRoute role="Admin"><AdminUsersPage /></RoleRoute>} />

@@ -93,9 +93,6 @@
       "Client": "User",
       "Gym": "Gym / Facility"
     },
-    "apple": "Continue with Apple",
-    "google": "Continue with Google",
-    "facebook": "Continue with Facebook",
     "newToGymmi": "New to Gymmi?",
     "brandHeadline": "Train with a",
     "brandHeadlineAccent": "plan.",

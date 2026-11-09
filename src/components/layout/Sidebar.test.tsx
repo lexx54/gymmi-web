@@ -5,9 +5,10 @@ import { Sidebar } from './Sidebar';
 
 const mockSignOut = vi.fn().mockResolvedValue(undefined);
 const mockNavigate = vi.fn();
+let mockUser: { role: { name: string } } | undefined;
 
 vi.mock('../../context/AuthContext', () => ({
-  useAuth: () => ({ signOut: mockSignOut }),
+  useAuth: () => ({ signOut: mockSignOut, user: mockUser }),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -22,6 +23,34 @@ describe('Sidebar', () => {
   beforeEach(() => {
     mockSignOut.mockClear();
     mockNavigate.mockClear();
+    mockUser = undefined;
+  });
+
+  it('shows Billing & Plans to non-admin users', () => {
+    mockUser = { role: { name: 'Client' } };
+    render(
+      <MemoryRouter>
+        <Sidebar username="testuser" />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Billing & Plans').closest('a')).toHaveAttribute('href', '/billing');
+    expect(screen.queryByText('Payments')).not.toBeInTheDocument();
+  });
+
+  it('puts Payments in the Billing slot for admins, once', () => {
+    mockUser = { role: { name: 'Admin' } };
+    render(
+      <MemoryRouter>
+        <Sidebar username="testuser" />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText('Billing & Plans')).not.toBeInTheDocument();
+    const payments = screen.getAllByText('Payments').map((el) => el.closest('a'));
+    expect(payments).toHaveLength(1);
+    expect(payments[0]).toHaveAttribute('href', '/admin/payments');
+    expect(screen.getByText('Reports')).toBeInTheDocument();
   });
 
   it('renders all navigation items', () => {

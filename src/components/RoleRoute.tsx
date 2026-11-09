@@ -18,3 +18,21 @@ export function RoleRoute({ role, children, redirectTo = '/dashboard' }: RoleRou
   }
   return <>{children}</>;
 }
+
+type ExcludeRoleRouteProps = {
+  role: string;
+  children: ReactNode;
+  redirectTo: string;
+};
+
+/**
+ * Route guard that sends users with the given role elsewhere and renders
+ * children for everyone else.
+ */
+export function ExcludeRoleRoute({ role, children, redirectTo }: ExcludeRoleRouteProps) {
+  const { user } = useAuth();
+  if (user?.role?.name === role) {
+    return <Navigate to={redirectTo} replace />;
+  }
+  return <>{children}</>;
+}

@@ -40,6 +40,7 @@ export default function SettingsPage() {
 
   const username = effectiveProfile?.username ?? 'Alex';
   const isTrainer = (effectiveProfile?.role?.name) === 'Trainer';
+  const isAdmin = (effectiveProfile?.role?.name) === 'Admin';
 
   return (
     <SettingsPageShell>
@@ -48,7 +49,7 @@ export default function SettingsPage() {
         <TopBar title={t('settings.title')} />
         <SettingsContent>
           <ProfileHeroCard userProfile={effectiveProfile} />
-          <SubscriptionSettingsCard userProfile={effectiveProfile} />
+          {!isAdmin && <SubscriptionSettingsCard userProfile={effectiveProfile} />}
           <MiddleGrid>
             <AccountSettingsCard userProfile={effectiveProfile} />
             <PhysicalProfileCard userProfile={effectiveProfile} isLoading={isLoading} />

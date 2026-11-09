@@ -21,7 +21,7 @@ This architecture fully complies with **Apple App Store Guideline 3.1.3(b) (Mult
 8. Submitting calls `POST /payments` and displays recent submissions in a history table.
 
 ### 2. Admin Verification Flow (`/admin/payments`)
-1. Administrator accesses `/admin/payments` (accessible via Admin sidebar).
+1. Administrator accesses `/admin/payments`. For admins, the sidebar shows **Payments** where other roles see **Billing & Plans**. Admins have no plan of their own: `/billing` redirects them to `/admin/payments` (`ExcludeRoleRoute` in `src/components/RoleRoute.tsx`), and Settings hides `SubscriptionSettingsCard`.
 2. Filter tabs allow viewing `PENDING`, `APPROVED`, `REJECTED`, or `ALL` payments with pagination.
 3. For each submission, table shows user details (avatar, username, email, role), plan & cycle, method, reference #, amounts (USD & Bs), and receipt thumbnail.
 4. Clicking receipt thumbnail opens high-resolution inspection modal with external link to full image.

@@ -37,13 +37,19 @@ const gymItems: SidebarItem[] = [
   { labelKey: 'nav.settings', to: '/settings', icon: Settings, tourId: 'nav-settings' },
 ];
 
+const adminPaymentsItem: SidebarItem = {
+  labelKey: 'nav.payments',
+  to: '/admin/payments',
+  icon: CreditCard,
+  tourId: 'nav-payments',
+};
+
 /**
  * Displays the main dashboard navigation sidebar.
  */
 const adminItems: SidebarItem[] = [
   { labelKey: 'nav.permissions', to: '/admin/permissions', icon: Shield, tourId: 'nav-permissions' },
   { labelKey: 'nav.users', to: '/admin/users', icon: Users, tourId: 'nav-users' },
-  { labelKey: 'nav.payments', to: '/admin/payments', icon: CreditCard, tourId: 'nav-payments' },
   { labelKey: 'nav.reports', to: '/admin/reports', icon: Flag, tourId: 'nav-reports' },
 ];
 
@@ -56,7 +62,12 @@ export function Sidebar({ username }: SidebarProps) {
   const isClient = user?.role?.name === 'Client';
   const isGym = user?.role?.name === 'Gym';
 
-  const displayedItems = isGym ? gymItems : sidebarItems;
+  // Admins have no plan of their own: the Billing slot opens payment review instead.
+  const displayedItems = isGym
+    ? gymItems
+    : isAdmin
+      ? sidebarItems.map((item) => (item.to === '/billing' ? adminPaymentsItem : item))
+      : sidebarItems;
   const roleItems: SidebarItem[] = isTrainer
     ? [
         { labelKey: 'nav.clients', to: '/clients', icon: Users, tourId: 'nav-clients' },
