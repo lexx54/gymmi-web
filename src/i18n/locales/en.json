@@ -513,6 +513,8 @@
     "editable": "Editable",
     "readOnly": "Read only",
     "supersetGroup": "Superset group",
+    "exerciseNotes": "Notes",
+    "exerciseNotesPlaceholder": "Add cues or instructions for this exercise",
     "noSuperset": "No superset",
     "supersetNumber": "Superset {{number}}",
     "supersetTag": "Superset",

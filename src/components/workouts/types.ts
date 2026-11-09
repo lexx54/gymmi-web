@@ -22,6 +22,7 @@ export type RoutineExercise = {
   name: string;
   target: string;
   supersetColor: SupersetColor | null;
+  notes: string;
   sets: SetEntry[];
 };
 

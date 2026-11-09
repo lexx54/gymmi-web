@@ -66,6 +66,7 @@ function routineToDays(routine: WorkoutRoutine): BuilderDay[] {
       name: item.exercise.name,
       target: resolveLocalizedText(item.exercise.targetMuscle),
       supersetColor: item.supersetColor,
+      notes: item.notes ?? '',
       sets: item.sets.map((set) => ({
         id: set.id,
         weight: set.weight,
@@ -86,6 +87,7 @@ function toWriteDays(days: BuilderDay[]): WorkoutDayWrite[] {
       exercises: day.exercises.map((exercise) => ({
         exerciseId: exercise.exerciseId,
         supersetColor: exercise.supersetColor,
+        notes: exercise.notes.trim() || null,
         sets: exercise.sets.map(({ weight, reps, restSeconds, rpe }) => ({
           weight,
           reps,
@@ -236,6 +238,7 @@ export default function WorkoutsPage() {
           name: exercise.name,
           target: exercise.category,
           supersetColor: null,
+          notes: '',
           sets: [{ id: nextId('set'), ...DEFAULT_SET }],
         },
       ]);
@@ -471,6 +474,10 @@ export default function WorkoutsPage() {
                   onSupersetChange={(color: SupersetColor | null) => updateExercise(
                     exercise.id,
                     (item) => ({ ...item, supersetColor: color }),
+                  )}
+                  onNotesChange={(notes) => updateExercise(
+                    exercise.id,
+                    (item) => ({ ...item, notes }),
                   )}
                   readOnly={dayReadOnly}
                 />

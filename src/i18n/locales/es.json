@@ -513,6 +513,8 @@
     "editable": "Editable",
     "readOnly": "Solo lectura",
     "supersetGroup": "Grupo de superserie",
+    "exerciseNotes": "Notas",
+    "exerciseNotesPlaceholder": "Agrega indicaciones o instrucciones para este ejercicio",
     "noSuperset": "Sin superserie",
     "supersetNumber": "Superserie {{number}}",
     "supersetTag": "Superserie",

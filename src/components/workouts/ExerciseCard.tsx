@@ -1,9 +1,13 @@
-import { ArrowDown, ArrowUp, PlusSquare, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, MessageSquareText, PlusSquare, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { MAX_SETS_PER_EXERCISE, SET_BATCH_SIZES } from './addSet';
 import { SetRow } from './SetRow';
-import { SUPERSET_COLORS, type SupersetColor } from '../../services/api/workouts';
+import {
+  MAX_EXERCISE_NOTES_LENGTH,
+  SUPERSET_COLORS,
+  type SupersetColor,
+} from '../../services/api/workouts';
 import type { RoutineExercise, SetField } from './types';
 
 type ExerciseCardProps = {
@@ -16,6 +20,8 @@ type ExerciseCardProps = {
   onUpdateSet: (setId: string, field: SetField, value: number) => void;
   onMove: (direction: -1 | 1) => void;
   onSupersetChange: (color: SupersetColor | null) => void;
+  /** Updates the exercise's coaching note (e.g. trainer cues for an assigned client). */
+  onNotesChange: (notes: string) => void;
   readOnly?: boolean;
 };
 
@@ -31,10 +37,13 @@ export function ExerciseCard({
   onUpdateSet,
   onMove,
   onSupersetChange,
+  onNotesChange,
   readOnly,
 }: ExerciseCardProps) {
   const { t } = useTranslation();
   const positionLabel = position.toString().padStart(2, '0');
+  const notesId = `exercise-notes-${exercise.id}`;
+  const trimmedNotes = exercise.notes.trim();
   const supersetNumber = exercise.supersetColor
     ? SUPERSET_COLORS.indexOf(exercise.supersetColor) + 1
     : 0;
@@ -84,6 +93,29 @@ export function ExerciseCard({
         </CardHeader>
 
         <CardBody>
+          {readOnly ? (
+            trimmedNotes && (
+              <NotesBlock aria-label={t('workouts.exerciseNotes')}>
+                <MessageSquareText size={14} aria-hidden />
+                <NotesText>{trimmedNotes}</NotesText>
+              </NotesBlock>
+            )
+          ) : (
+            <NotesField>
+              <NotesLabel htmlFor={notesId}>
+                <MessageSquareText size={12} aria-hidden />
+                {t('workouts.exerciseNotes')}
+              </NotesLabel>
+              <NotesInput
+                id={notesId}
+                rows={2}
+                value={exercise.notes}
+                maxLength={MAX_EXERCISE_NOTES_LENGTH}
+                placeholder={t('workouts.exerciseNotesPlaceholder')}
+                onChange={(event) => onNotesChange(event.target.value)}
+              />
+            </NotesField>
+          )}
           <TableScroll><SetsTable $readOnly={readOnly}>
             <thead>
               <tr>
@@ -270,6 +302,68 @@ const IconButton = styled.button<{ $danger?: boolean }>`
 
 const CardBody = styled.div`
   padding: 1.6rem 1.6rem 1.5rem;
+`;
+
+const NotesBlock = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 1rem;
+  border-left: 3px solid #ffb3b1;
+  border-radius: 0.6rem;
+  background: #26283d;
+  color: #ffb3b1;
+`;
+
+const NotesText = styled.p`
+  margin: 0;
+  color: #e0e0fc;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+`;
+
+const NotesField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1.2rem;
+`;
+
+const NotesLabel = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #e7bdbb;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.6rem;
+  font-weight: 700;
+`;
+
+const NotesInput = styled.textarea`
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 2.8rem;
+  border: 1px solid rgba(231, 189, 187, 0.25);
+  border-radius: 0.7rem;
+  padding: 0.6rem 0.8rem;
+  background: #26283d;
+  color: #e0e0fc;
+  font: inherit;
+  font-size: 0.85rem;
+
+  &::placeholder {
+    color: rgba(231, 189, 187, 0.55);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb3b1;
+    outline-offset: 1px;
+  }
 `;
 
 const TableScroll = styled.div`

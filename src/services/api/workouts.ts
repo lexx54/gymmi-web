@@ -7,6 +7,9 @@ export type WorkoutPeriod = (typeof WORKOUT_PERIODS)[number];
 export const SUPERSET_COLORS = ['#ff535a', '#ffb347', '#55c2ff', '#9b7bff'] as const;
 export type SupersetColor = (typeof SUPERSET_COLORS)[number];
 
+/** Mirrors `MAX_EXERCISE_NOTES_LENGTH` in the API routine DTO. */
+export const MAX_EXERCISE_NOTES_LENGTH = 250;
+
 export type WorkoutSetWrite = {
   weight: number;
   reps: number;
@@ -17,6 +20,8 @@ export type WorkoutSetWrite = {
 export type WorkoutExerciseWrite = {
   exerciseId: string;
   supersetColor?: SupersetColor | null;
+  /** Coaching note shown with the exercise (max `MAX_EXERCISE_NOTES_LENGTH`). */
+  notes?: string | null;
   sets: WorkoutSetWrite[];
 };
 
@@ -42,6 +47,7 @@ export type WorkoutRoutineExercise = {
   exerciseId: string;
   position: number;
   supersetColor: SupersetColor | null;
+  notes: string | null;
   exercise: Exercise;
   sets: WorkoutSet[];
 };

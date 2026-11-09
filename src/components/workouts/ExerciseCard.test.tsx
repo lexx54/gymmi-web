@@ -8,6 +8,7 @@ const exercise = {
   name: 'Incline Bench Press',
   target: 'Chest',
   supersetColor: '#ff535a' as const,
+  notes: '',
   sets: [{ id: 'set', weight: 80, reps: 10, restSeconds: 90, rpe: 8 }],
 };
 
@@ -24,6 +25,7 @@ describe('ExerciseCard', () => {
         onUpdateSet={onUpdateSet}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
       />,
     );
 
@@ -44,6 +46,7 @@ describe('ExerciseCard', () => {
         onUpdateSet={vi.fn()}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
       />,
     );
 
@@ -69,6 +72,7 @@ describe('ExerciseCard', () => {
         onUpdateSet={vi.fn()}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
       />,
     );
 
@@ -90,6 +94,7 @@ describe('ExerciseCard', () => {
         onUpdateSet={vi.fn()}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
       />,
     );
 
@@ -108,6 +113,7 @@ describe('ExerciseCard', () => {
         onUpdateSet={vi.fn()}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
         readOnly
       />,
     );
@@ -129,6 +135,7 @@ describe('ExerciseCard', () => {
         onUpdateSet={vi.fn()}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
         readOnly
       />,
     );
@@ -147,10 +154,70 @@ describe('ExerciseCard', () => {
         onUpdateSet={vi.fn()}
         onMove={vi.fn()}
         onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
         readOnly
       />,
     );
 
     expect(screen.queryByTitle(/superset \d/i)).not.toBeInTheDocument();
+  });
+
+  it('edits exercise notes in edit mode', () => {
+    const onNotesChange = vi.fn();
+    render(
+      <ExerciseCard
+        exercise={exercise}
+        position={1}
+        onAddSets={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+        onNotesChange={onNotesChange}
+      />,
+    );
+
+    const field = screen.getByLabelText('Notes');
+    expect(field).toHaveAttribute('maxLength', '250');
+    fireEvent.change(field, { target: { value: 'Slow eccentric' } });
+    expect(onNotesChange).toHaveBeenCalledWith('Slow eccentric');
+  });
+
+  it('shows notes read-only and hides the block when empty', () => {
+    const { rerender } = render(
+      <ExerciseCard
+        exercise={{ ...exercise, notes: 'Keep elbows tucked' }}
+        position={1}
+        onAddSets={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
+        readOnly
+      />,
+    );
+
+    expect(screen.getByText('Keep elbows tucked')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'Notes' })).not.toBeInTheDocument();
+
+    rerender(
+      <ExerciseCard
+        exercise={{ ...exercise, notes: '   ' }}
+        position={1}
+        onAddSets={vi.fn()}
+        onRemoveSet={vi.fn()}
+        onRemoveExercise={vi.fn()}
+        onUpdateSet={vi.fn()}
+        onMove={vi.fn()}
+        onSupersetChange={vi.fn()}
+        onNotesChange={vi.fn()}
+        readOnly
+      />,
+    );
+
+    expect(screen.queryByLabelText('Notes')).not.toBeInTheDocument();
   });
 });

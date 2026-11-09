@@ -175,41 +175,84 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
         class="sc-ienaaN raesE"
       >
         <div
-          class="sc-dIvsxA pARfO"
+          class="sc-dlMzIO eviIYD"
+        >
+          <label
+            class="sc-kfYpvV ldXNjN"
+            for="exercise-notes-routine-exercise"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-message-square-text"
+              fill="none"
+              height="12"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="12"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
+              />
+              <path
+                d="M7 11h10"
+              />
+              <path
+                d="M7 15h6"
+              />
+              <path
+                d="M7 7h8"
+              />
+            </svg>
+            Notes
+          </label>
+          <textarea
+            class="sc-fKgHSI iddHjH"
+            id="exercise-notes-routine-exercise"
+            maxlength="250"
+            placeholder="Add cues or instructions for this exercise"
+            rows="2"
+          />
+        </div>
+        <div
+          class="sc-bCwgXz gKahnQ"
         >
           <table
-            class="sc-hHEhmb hVvXYd"
+            class="sc-iwaiTi kUeUmc"
           >
             <thead>
               <tr>
                 <th
-                  class="sc-dlMzIO kiNAAY"
+                  class="sc-cxNIPq eReNWo"
                 >
                   Set
                 </th>
                 <th
-                  class="sc-dlMzIO kiNAAY"
+                  class="sc-cxNIPq eReNWo"
                 >
                   Weight (kg)
                 </th>
                 <th
-                  class="sc-dlMzIO kiNAAY"
+                  class="sc-cxNIPq eReNWo"
                 >
                   Reps
                 </th>
                 <th
-                  class="sc-dlMzIO kiNAAY"
+                  class="sc-cxNIPq eReNWo"
                 >
                   Rest
                 </th>
                 <th
-                  class="sc-dlMzIO kiNAAY"
+                  class="sc-cxNIPq eReNWo"
                 >
                   RPE
                 </th>
                 <th
                   aria-hidden="true"
-                  class="sc-dlMzIO kiNAAY"
+                  class="sc-cxNIPq eReNWo"
                 />
               </tr>
             </thead>
@@ -310,10 +353,10 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
           </table>
         </div>
         <div
-          class="sc-kfYpvV dsUzQs"
+          class="sc-lmgQQD dRXpUe"
         >
           <button
-            class="sc-bCwgXz gBIloH"
+            class="sc-giAsBR eTjprs"
             type="button"
           >
             <svg
@@ -347,7 +390,7 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
           </button>
           <button
             aria-label="Add 2 sets"
-            class="sc-bCwgXz gBIloH"
+            class="sc-giAsBR eTjprs"
             type="button"
           >
             ×
@@ -355,7 +398,7 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
           </button>
           <button
             aria-label="Add 3 sets"
-            class="sc-bCwgXz gBIloH"
+            class="sc-giAsBR eTjprs"
             type="button"
           >
             ×
@@ -363,7 +406,7 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
           </button>
           <button
             aria-label="Add 4 sets"
-            class="sc-bCwgXz gBIloH"
+            class="sc-giAsBR eTjprs"
             type="button"
           >
             ×
