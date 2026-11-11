@@ -1,6 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchMyGym,
+  fetchMyGymActivity,
   updateMyGym,
   fetchMyGymMembers,
   removeGymMember,
@@ -22,22 +23,39 @@ import {
   rejectGymMember,
   requestAffiliation,
   fetchMyAffiliations,
-} from '../services/api/gyms';
-import type { GymProfileParams } from '../types/auth';
+} from "../services/api/gyms";
+import type { GymProfileParams } from "../types/auth";
 
-export const myGymQueryKey = ['gyms', 'me'] as const;
-export const myGymMembersQueryKey = ['gyms', 'me', 'members'] as const;
-export const myPendingMembersQueryKey = ['gyms', 'me', 'members', 'pending'] as const;
-export const myGymCoachesQueryKey = ['gyms', 'me', 'coaches'] as const;
-export const publicGymsQueryKey = (params?: { search?: string; city?: string }) =>
-  ['gyms', 'public', params] as const;
-export const myMembershipsQueryKey = ['gyms', 'me', 'memberships'] as const;
-export const myAffiliationsQueryKey = ['gyms', 'me', 'affiliations'] as const;
+export const myGymQueryKey = ["gyms", "me"] as const;
+export const myGymActivityQueryKey = ["gyms", "me", "activity"] as const;
+export const myGymMembersQueryKey = ["gyms", "me", "members"] as const;
+export const myPendingMembersQueryKey = [
+  "gyms",
+  "me",
+  "members",
+  "pending",
+] as const;
+export const myGymCoachesQueryKey = ["gyms", "me", "coaches"] as const;
+export const publicGymsQueryKey = (params?: {
+  search?: string;
+  city?: string;
+}) => ["gyms", "public", params] as const;
+export const myMembershipsQueryKey = ["gyms", "me", "memberships"] as const;
+export const myAffiliationsQueryKey = ["gyms", "me", "affiliations"] as const;
 
 export function useMyGym(enabled = true) {
   return useQuery({
     queryKey: myGymQueryKey,
     queryFn: fetchMyGym,
+    enabled,
+  });
+}
+
+/** Weekly unique active members per weekday (Mon–Sun) for the gym owner dashboard. */
+export function useMyGymActivity(enabled = true) {
+  return useQuery({
+    queryKey: myGymActivityQueryKey,
+    queryFn: fetchMyGymActivity,
     enabled,
   });
 }
@@ -136,7 +154,7 @@ export function usePublicGyms(params?: { search?: string; city?: string }) {
 
 export function usePublicGym(id: string, enabled = true) {
   return useQuery({
-    queryKey: ['gyms', 'public', id],
+    queryKey: ["gyms", "public", id],
     queryFn: () => fetchPublicGym(id),
     enabled: Boolean(id) && enabled,
   });
@@ -213,7 +231,9 @@ export function useApproveGymMember() {
   return useMutation({
     mutationFn: (memberId: string) => approveGymMember(memberId),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: myPendingMembersQueryKey });
+      void queryClient.invalidateQueries({
+        queryKey: myPendingMembersQueryKey,
+      });
       void queryClient.invalidateQueries({ queryKey: myGymMembersQueryKey });
       void queryClient.invalidateQueries({ queryKey: myGymQueryKey });
     },
@@ -225,7 +245,9 @@ export function useRejectGymMember() {
   return useMutation({
     mutationFn: (memberId: string) => rejectGymMember(memberId),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: myPendingMembersQueryKey });
+      void queryClient.invalidateQueries({
+        queryKey: myPendingMembersQueryKey,
+      });
       void queryClient.invalidateQueries({ queryKey: myGymMembersQueryKey });
       void queryClient.invalidateQueries({ queryKey: myGymQueryKey });
     },

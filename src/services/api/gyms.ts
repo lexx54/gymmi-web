@@ -1,19 +1,20 @@
-import apiClient from './client';
+import apiClient from "./client";
 import type {
   GymProfile,
   GymMember,
   GymCoach,
   GymDashboardData,
+  GymActivityResponse,
   PublicGymItem,
   GymMembershipItem,
-} from '../../types/gym';
-import type { GymProfileParams } from '../../types/auth';
+} from "../../types/gym";
+import type { GymProfileParams } from "../../types/auth";
 
 export async function fetchPublicGyms(params?: {
   search?: string;
   city?: string;
 }): Promise<PublicGymItem[]> {
-  const { data } = await apiClient.get<PublicGymItem[]>('/gyms', { params });
+  const { data } = await apiClient.get<PublicGymItem[]>("/gyms", { params });
   return data;
 }
 
@@ -23,37 +24,53 @@ export async function fetchPublicGym(id: string): Promise<PublicGymItem> {
 }
 
 export async function fetchMyGym(): Promise<GymDashboardData> {
-  const { data } = await apiClient.get<GymDashboardData>('/gyms/me');
+  const { data } = await apiClient.get<GymDashboardData>("/gyms/me");
   return data;
 }
 
-export async function updateMyGym(payload: Partial<GymProfileParams>): Promise<GymProfile> {
-  const { data } = await apiClient.patch<GymProfile>('/gyms/me', payload);
+export async function fetchMyGymActivity(): Promise<GymActivityResponse> {
+  const { data } =
+    await apiClient.get<GymActivityResponse>("/gyms/me/activity");
+  return data;
+}
+
+export async function updateMyGym(
+  payload: Partial<GymProfileParams>,
+): Promise<GymProfile> {
+  const { data } = await apiClient.patch<GymProfile>("/gyms/me", payload);
   return data;
 }
 
 export async function fetchMyGymMembers(): Promise<GymMember[]> {
-  const { data } = await apiClient.get<GymMember[]>('/gyms/me/members');
+  const { data } = await apiClient.get<GymMember[]>("/gyms/me/members");
   return data;
 }
 
-export async function removeGymMember(memberId: string): Promise<{ message: string }> {
-  const { data } = await apiClient.delete<{ message: string }>(`/gyms/me/members/${memberId}`);
+export async function removeGymMember(
+  memberId: string,
+): Promise<{ message: string }> {
+  const { data } = await apiClient.delete<{ message: string }>(
+    `/gyms/me/members/${memberId}`,
+  );
   return data;
 }
 
 export async function fetchMyGymCoaches(): Promise<GymCoach[]> {
-  const { data } = await apiClient.get<GymCoach[]>('/gyms/me/coaches');
+  const { data } = await apiClient.get<GymCoach[]>("/gyms/me/coaches");
   return data;
 }
 
 export async function approveGymCoach(coachId: string): Promise<GymCoach> {
-  const { data } = await apiClient.post<GymCoach>(`/gyms/me/coaches/${coachId}/approve`);
+  const { data } = await apiClient.post<GymCoach>(
+    `/gyms/me/coaches/${coachId}/approve`,
+  );
   return data;
 }
 
 export async function rejectGymCoach(coachId: string): Promise<GymCoach> {
-  const { data } = await apiClient.post<GymCoach>(`/gyms/me/coaches/${coachId}/reject`);
+  const { data } = await apiClient.post<GymCoach>(
+    `/gyms/me/coaches/${coachId}/reject`,
+  );
   return data;
 }
 
@@ -61,14 +78,21 @@ export async function updateCoachPermissions(
   coachId: string,
   canPublishRoutines: boolean,
 ): Promise<GymCoach> {
-  const { data } = await apiClient.patch<GymCoach>(`/gyms/me/coaches/${coachId}/permissions`, {
-    canPublishRoutines,
-  });
+  const { data } = await apiClient.patch<GymCoach>(
+    `/gyms/me/coaches/${coachId}/permissions`,
+    {
+      canPublishRoutines,
+    },
+  );
   return data;
 }
 
-export async function removeGymCoach(coachId: string): Promise<{ message: string }> {
-  const { data } = await apiClient.delete<{ message: string }>(`/gyms/me/coaches/${coachId}`);
+export async function removeGymCoach(
+  coachId: string,
+): Promise<{ message: string }> {
+  const { data } = await apiClient.delete<{ message: string }>(
+    `/gyms/me/coaches/${coachId}`,
+  );
   return data;
 }
 
@@ -82,7 +106,9 @@ export async function requestGymMembership(gymId: string): Promise<GymMember> {
   return data;
 }
 
-export async function cancelGymMembershipRequest(gymId: string): Promise<{ success: boolean }> {
+export async function cancelGymMembershipRequest(
+  gymId: string,
+): Promise<{ success: boolean }> {
   const { data } = await apiClient.delete<{ success: boolean }>(
     `/gyms/me/memberships/requests/${gymId}`,
   );
@@ -93,24 +119,33 @@ export async function joinGymByCode(code: string): Promise<{
   success: boolean;
   gymId: string;
   status: string;
-  gym: { id: string; name: string; logoUrl?: string | null; city?: string | null };
+  gym: {
+    id: string;
+    name: string;
+    logoUrl?: string | null;
+    city?: string | null;
+  };
 }> {
-  const { data } = await apiClient.post('/gyms/join-by-code', { code });
+  const { data } = await apiClient.post("/gyms/join-by-code", { code });
   return data;
 }
 
 export async function leaveGym(gymId: string): Promise<{ message: string }> {
-  const { data } = await apiClient.post<{ message: string }>(`/gyms/${gymId}/leave`);
+  const { data } = await apiClient.post<{ message: string }>(
+    `/gyms/${gymId}/leave`,
+  );
   return data;
 }
 
 export async function fetchMyMemberships(): Promise<GymMembershipItem[]> {
-  const { data } = await apiClient.get<GymMembershipItem[]>('/gyms/me/memberships');
+  const { data } = await apiClient.get<GymMembershipItem[]>(
+    "/gyms/me/memberships",
+  );
   return data;
 }
 
 export async function fetchMyPendingMembers(): Promise<GymMember[]> {
-  const { data } = await apiClient.get<GymMember[]>('/gyms/me/members/pending');
+  const { data } = await apiClient.get<GymMember[]>("/gyms/me/members/pending");
   return data;
 }
 
@@ -138,6 +173,6 @@ export async function requestAffiliation(gymId: string): Promise<GymCoach> {
 }
 
 export async function fetchMyAffiliations(): Promise<GymCoach[]> {
-  const { data } = await apiClient.get<GymCoach[]>('/gyms/me/affiliations');
+  const { data } = await apiClient.get<GymCoach[]>("/gyms/me/affiliations");
   return data;
 }

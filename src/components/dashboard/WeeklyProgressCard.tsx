@@ -1,36 +1,38 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useAuth } from '../../context/AuthContext';
-import { useMyAnalytics } from '../../hooks/useAnalytics';
-import { useTrainerDashboard } from '../../hooks/useTrainerDashboard';
-import { useMyGym } from '../../hooks/useGyms';
+import { useTranslation } from "react-i18next";
+import styled from "styled-components";
+import { useAuth } from "../../context/AuthContext";
+import { useMyAnalytics } from "../../hooks/useAnalytics";
+import { useTrainerDashboard } from "../../hooks/useTrainerDashboard";
+import { useMyGymActivity } from "../../hooks/useGyms";
 
 const WEEKDAYS = [
-  { index: 0, dayKey: 'dates.mon' },
-  { index: 1, dayKey: 'dates.tue' },
-  { index: 2, dayKey: 'dates.wed' },
-  { index: 3, dayKey: 'dates.thu' },
-  { index: 4, dayKey: 'dates.fri' },
-  { index: 5, dayKey: 'dates.sat' },
-  { index: 6, dayKey: 'dates.sun' },
+  { index: 0, dayKey: "dates.mon" },
+  { index: 1, dayKey: "dates.tue" },
+  { index: 2, dayKey: "dates.wed" },
+  { index: 3, dayKey: "dates.thu" },
+  { index: 4, dayKey: "dates.fri" },
+  { index: 5, dayKey: "dates.sat" },
+  { index: 6, dayKey: "dates.sun" },
 ];
 
 /**
  * Displays weekly workout progress:
  * - For Clients: Mon–Sun daily volume bars with peak scaling and goal reached %.
  * - For Trainers: Mon–Sun client activity bars (unique clients trained) scaled against total contracted clients, with active rate %.
- * - For Gyms: Capacity utilization % and member baseline across weekdays.
+ * - For Gyms: Mon–Sun member activity bars (unique members trained) scaled against total active members, with active rate %.
  */
 export function WeeklyProgressCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const isTrainer = user?.role?.name === 'Trainer';
-  const isClient = user?.role?.name === 'Client';
-  const isGym = user?.role?.name === 'Gym';
+  const isTrainer = user?.role?.name === "Trainer";
+  const isClient = user?.role?.name === "Client";
+  const isGym = user?.role?.name === "Gym";
 
-  const { data: analytics, isLoading: isClientLoading } = useMyAnalytics(isClient);
-  const { data: trainerData, isLoading: isTrainerLoading } = useTrainerDashboard(isTrainer);
-  const { data: gymData, isLoading: isGymLoading } = useMyGym(isGym);
+  const { data: analytics, isLoading: isClientLoading } =
+    useMyAnalytics(isClient);
+  const { data: trainerData, isLoading: isTrainerLoading } =
+    useTrainerDashboard(isTrainer);
+  const { data: gymData, isLoading: isGymLoading } = useMyGymActivity(isGym);
 
   // Current weekday (0=Mon, ..., 6=Sun)
   const jsDay = new Date().getDay();
@@ -38,29 +40,26 @@ export function WeeklyProgressCard() {
 
   // Header stats & titles
   const title = isGym
-    ? t('gym.capacity')
+    ? t("dashboard.memberActivity")
     : isTrainer
-      ? t('dashboard.clientActivity')
-      : t('dashboard.volumeTraining');
-  const percentCaption = isGym
-    ? t('gym.capacity')
-    : isTrainer
-      ? t('dashboard.activeRate')
-      : t('dashboard.goalReached');
+      ? t("dashboard.clientActivity")
+      : t("dashboard.volumeTraining");
+  const percentCaption =
+    isGym || isTrainer ? t("dashboard.activeRate") : t("dashboard.goalReached");
 
-  let percentValue = '0%';
+  let percentValue = "0%";
   if (isGym) {
-    const cap = Math.max(1, gymData?.capacity ?? 100);
-    const used = gymData?.activeMembersCount ?? 0;
-    percentValue = isGymLoading && !gymData ? '...' : `${Math.round((used / cap) * 100)}%`;
+    percentValue =
+      isGymLoading && !gymData ? "..." : `${gymData?.activeRatePercent ?? 0}%`;
   } else if (isTrainer) {
     percentValue =
       isTrainerLoading && !trainerData
-        ? '...'
+        ? "..."
         : `${trainerData?.clientActivity?.activeRatePercent ?? 0}%`;
   } else {
     const completionPercent = analytics?.consistency?.completionPercent ?? 0;
-    percentValue = isClientLoading && !analytics ? '...' : `${completionPercent}%`;
+    percentValue =
+      isClientLoading && !analytics ? "..." : `${completionPercent}%`;
   }
 
   // Client daily volume calculations
@@ -71,11 +70,15 @@ export function WeeklyProgressCard() {
   const totalClients = trainerData?.clientActivity?.totalClients ?? 0;
   const trainerDaily = trainerData?.clientActivity?.daily ?? [];
 
+  // Gym member activity calculations
+  const totalMembers = gymData?.totalMembers ?? 0;
+  const gymDaily = gymData?.daily ?? [];
+
   return (
     <Card data-testid="weekly-progress-card" data-tour="weekly-progress">
       <HeaderRow>
         <div>
-          <Eyebrow>{t('dashboard.weeklyProgress')}</Eyebrow>
+          <Eyebrow>{t("dashboard.weeklyProgress")}</Eyebrow>
           <Title>{title}</Title>
         </div>
         <PercentWrap>
@@ -88,25 +91,33 @@ export function WeeklyProgressCard() {
         {WEEKDAYS.map((day) => {
           let height = 12;
           let hasData = false;
-          let barTitle = '';
-          let barDisplayValue = '';
+          let barTitle = "";
+          let barDisplayValue = "";
 
           if (isGym) {
-            const cap = Math.max(1, gymData?.capacity ?? 100);
-            const activeMembers = gymData?.activeMembersCount ?? 0;
+            const entry = gymDaily.find((v) => v.weekday === day.index);
+            const activeMembers = entry?.activeMembers ?? 0;
             hasData = activeMembers > 0;
-            height = hasData ? Math.max(18, Math.round((activeMembers / cap) * 92)) : 12;
-            barTitle = `${t(day.dayKey)}: ${activeMembers} ${t('gym.members')}`;
-            barDisplayValue = hasData ? String(activeMembers) : '';
+            height = hasData
+              ? Math.max(
+                  18,
+                  Math.round((activeMembers / Math.max(1, totalMembers)) * 92),
+                )
+              : 12;
+            barTitle = `${t(day.dayKey)}: ${activeMembers} ${t("gym.members")}`;
+            barDisplayValue = hasData ? String(activeMembers) : "";
           } else if (isTrainer) {
             const entry = trainerDaily.find((v) => v.weekday === day.index);
             const activeClients = entry?.activeClients ?? 0;
             hasData = activeClients > 0;
             height = hasData
-              ? Math.max(18, Math.round((activeClients / Math.max(1, totalClients)) * 92))
+              ? Math.max(
+                  18,
+                  Math.round((activeClients / Math.max(1, totalClients)) * 92),
+                )
               : 12;
-            barTitle = `${t(day.dayKey)}: ${activeClients} ${t('dashboard.clients')}`;
-            barDisplayValue = hasData ? String(activeClients) : '';
+            barTitle = `${t(day.dayKey)}: ${activeClients} ${t("dashboard.clients")}`;
+            barDisplayValue = hasData ? String(activeClients) : "";
           } else {
             const entry = dailyVolume.find((v) => v.weekday === day.index);
             const volume = entry?.volumeKg ?? 0;
@@ -119,7 +130,7 @@ export function WeeklyProgressCard() {
               ? volume >= 1000
                 ? `${(volume / 1000).toFixed(1)}k`
                 : String(volume)
-              : '';
+              : "";
           }
 
           const isActive = day.index === currentWeekday;
@@ -213,7 +224,11 @@ const BarsWrap = styled.div`
   align-items: stretch;
   gap: 0.8rem;
   padding: 2.2rem 0.8rem 0.9rem;
-  background: linear-gradient(180deg, rgba(18, 21, 41, 0.4) 0%, rgba(13, 17, 33, 0.75) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(18, 21, 41, 0.4) 0%,
+    rgba(13, 17, 33, 0.75) 100%
+  );
 `;
 
 const BarItem = styled.div`
@@ -233,25 +248,29 @@ const BarTrack = styled.div`
   justify-content: center;
 `;
 
-const Bar = styled.div<{ $height: number; $active: boolean; $hasVolume: boolean }>`
+const Bar = styled.div<{
+  $height: number;
+  $active: boolean;
+  $hasVolume: boolean;
+}>`
   width: 100%;
   height: ${({ $height }) => `${$height}%`};
   min-height: 1.5rem;
   border-radius: 0.75rem 0.75rem 0.4rem 0.4rem;
   background: ${({ $active, $hasVolume }) =>
     $hasVolume
-      ? 'linear-gradient(180deg, #ff8a93 0%, #ef233c 95%)'
+      ? "linear-gradient(180deg, #ff8a93 0%, #ef233c 95%)"
       : $active
-        ? 'linear-gradient(180deg, rgba(239, 35, 60, 0.35) 0%, rgba(239, 35, 60, 0.15) 100%)'
-        : 'linear-gradient(180deg, #2b3046 0%, #1f2334 100%)'};
+        ? "linear-gradient(180deg, rgba(239, 35, 60, 0.35) 0%, rgba(239, 35, 60, 0.15) 100%)"
+        : "linear-gradient(180deg, #2b3046 0%, #1f2334 100%)"};
   border: ${({ $active, $hasVolume }) =>
-    $active && !$hasVolume ? '1px dashed rgba(239, 35, 60, 0.6)' : 'none'};
+    $active && !$hasVolume ? "1px dashed rgba(239, 35, 60, 0.6)" : "none"};
   box-shadow: ${({ $hasVolume, $active }) =>
     $hasVolume
-      ? '0 0 16px rgba(239, 35, 60, 0.35)'
+      ? "0 0 16px rgba(239, 35, 60, 0.35)"
       : $active
-        ? '0 0 8px rgba(239, 35, 60, 0.2)'
-        : 'none'};
+        ? "0 0 8px rgba(239, 35, 60, 0.2)"
+        : "none"};
   transition: height 0.3s ease;
   position: relative;
 `;
@@ -268,9 +287,9 @@ const BarVolume = styled.span`
 `;
 
 const DayLabel = styled.span<{ $active?: boolean }>`
-  color: ${({ $active }) => ($active ? '#ffffff' : '#8e94b4')};
+  color: ${({ $active }) => ($active ? "#ffffff" : "#8e94b4")};
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.72rem;
-  font-weight: ${({ $active }) => ($active ? '700' : '600')};
+  font-weight: ${({ $active }) => ($active ? "700" : "600")};
 `;

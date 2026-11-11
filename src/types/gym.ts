@@ -1,4 +1,4 @@
-export type GymTier = 'trial' | 'plus' | 'pro' | 'maximum';
+export type GymTier = "trial" | "plus" | "pro" | "maximum";
 
 export interface GymProfile {
   id: string;
@@ -31,7 +31,7 @@ export interface GymMember {
   email?: string;
   avatarUrl?: string | null;
   goal?: string | null;
-  status: 'ACTIVE' | 'PENDING' | 'REJECTED' | 'CANCELLED';
+  status: "ACTIVE" | "PENDING" | "REJECTED" | "CANCELLED";
   joinedAt: string;
   client?: {
     id: string;
@@ -69,7 +69,7 @@ export interface GymCoach {
   description?: string;
   specializations?: string[];
   canPublishRoutines: boolean;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: "PENDING" | "APPROVED" | "REJECTED";
   affiliatedAt: string;
   trainer?: {
     id: string;
@@ -88,6 +88,19 @@ export interface GymCoach {
       logoUrl?: string | null;
     } | null;
   };
+}
+
+export interface GymDailyActivity {
+  weekday: number; // 0 = Mon, ..., 6 = Sun
+  date: string; // YYYY-MM-DD
+  activeMembers: number;
+}
+
+export interface GymActivityResponse {
+  totalMembers: number;
+  activeMembersThisWeek: number;
+  activeRatePercent: number;
+  daily: GymDailyActivity[];
 }
 
 export interface GymDashboardData {
@@ -120,7 +133,7 @@ export interface GymDashboardData {
 export interface GymMembershipItem {
   id: string;
   gymId: string;
-  status: 'ACTIVE' | 'PENDING' | 'REJECTED' | 'CANCELLED';
+  status: "ACTIVE" | "PENDING" | "REJECTED" | "CANCELLED";
   name?: string;
   description?: string | null;
   address?: string | null;
