@@ -43,7 +43,6 @@ import {
   PRESET_SPECIALIZATIONS,
   getSpecializationLabel,
   isSameSpecialization,
-  type PresetSpecialization,
 } from '../utils/specializations';
 
 const LOCKOUT_DURATION = 180_000;
@@ -333,20 +332,32 @@ export default function SignupPage() {
   };
 
   // Specialization tag handlers
-  const toggleSpecialization = (preset: PresetSpecialization) => {
-    const exists = currentSpecializations.some((s) => isSameSpecialization(s, preset));
-    const updated = exists
-      ? currentSpecializations.filter((s) => !isSameSpecialization(s, preset))
-      : [...currentSpecializations, preset.defaultEn];
-    setValue('specializations', updated, { shouldValidate: true });
+  const isTagSelected = (tag: string) => {
+    const preset = PRESET_SPECIALIZATIONS.find((p) => isSameSpecialization(tag, p));
+    return currentSpecializations.some((s) =>
+      preset ? isSameSpecialization(s, preset) : s.trim().toLowerCase() === tag.trim().toLowerCase(),
+    );
+  };
+
+  const addSpecialization = (tag: string) => {
+    const trimmed = tag.trim();
+    if (!trimmed) return;
+    if (!isTagSelected(trimmed)) {
+      setValue('specializations', [...currentSpecializations, trimmed], { shouldValidate: true });
+    }
+    clearErrors('specializations');
+  };
+
+  const removeSpecialization = (tag: string) => {
+    setValue(
+      'specializations',
+      currentSpecializations.filter((s) => s !== tag),
+      { shouldValidate: true },
+    );
   };
 
   const addCustomTag = () => {
-    const trimmed = customTagInput.trim();
-    if (!trimmed) return;
-    if (!currentSpecializations.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
-      setValue('specializations', [...currentSpecializations, trimmed], { shouldValidate: true });
-    }
+    addSpecialization(customTagInput);
     setCustomTagInput('');
   };
 
@@ -1267,47 +1278,40 @@ export default function SignupPage() {
                   {/* Specialization Tags */}
                   <FieldGroup>
                     <Label>{t('auth.specializations')}</Label>
-                    <ChipsWrap>
-                      {PRESET_SPECIALIZATIONS.map((preset) => {
-                        const isSelected = currentSpecializations.some((s) =>
-                          isSameSpecialization(s, preset),
-                        );
-                        return (
-                          <ChipBtn
-                            key={preset.key}
-                            type="button"
-                            $selected={isSelected}
-                            onClick={() => toggleSpecialization(preset)}
-                            data-testid={`tag-${preset.defaultEn}`}
-                          >
-                            {t(preset.labelKey)}
-                          </ChipBtn>
-                        );
-                      })}
-                    </ChipsWrap>
-                    {currentSpecializations.some(
-                      (s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p)),
-                    ) && (
+                    <StyledSelect
+                      data-testid="select-specialization"
+                      value=""
+                      onChange={(e) => addSpecialization(e.target.value)}
+                      $hasError={Boolean(errors.specializations)}
+                    >
+                      <option value="">{t('auth.specializationSelectPlaceholder')}</option>
+                      {PRESET_SPECIALIZATIONS.filter(
+                        (preset) => !currentSpecializations.some((s) => isSameSpecialization(s, preset)),
+                      ).map((preset) => (
+                        <option
+                          key={preset.key}
+                          value={preset.defaultEn}
+                          data-testid={`tag-${preset.defaultEn}`}
+                        >
+                          {t(preset.labelKey)}
+                        </option>
+                      ))}
+                    </StyledSelect>
+                    {currentSpecializations.length > 0 && (
                       <SelectedTagsWrap style={{ marginTop: '0.45rem' }}>
-                        {currentSpecializations
-                          .filter((s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p)))
-                          .map((customTag) => (
-                            <GymBadge key={customTag}>
-                              <span>{customTag}</span>
-                              <RemoveBtn
-                                type="button"
-                                onClick={() =>
-                                  setValue(
-                                    'specializations',
-                                    currentSpecializations.filter((s) => s !== customTag),
-                                    { shouldValidate: true },
-                                  )
-                                }
-                              >
-                                <X size={12} />
-                              </RemoveBtn>
-                            </GymBadge>
-                          ))}
+                        {currentSpecializations.map((tag) => (
+                          <GymBadge key={tag} data-testid={`selected-tag-${tag}`}>
+                            <span>{getSpecializationLabel(tag, t)}</span>
+                            <RemoveBtn
+                              type="button"
+                              aria-label={t('auth.removeTag')}
+                              data-testid={`remove-tag-${tag}`}
+                              onClick={() => removeSpecialization(tag)}
+                            >
+                              <X size={12} />
+                            </RemoveBtn>
+                          </GymBadge>
+                        ))}
                       </SelectedTagsWrap>
                     )}
 

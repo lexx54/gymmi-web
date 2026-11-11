@@ -132,6 +132,37 @@ describe('CoachingProfileCard', () => {
     });
   });
 
+  it('edits specializations with a preset list and removable badges', async () => {
+    const user = userEvent.setup();
+    render(<CoachingProfileCard userProfile={mockTrainerProfileData} />, {
+      wrapper: createWrapper(),
+    });
+
+    await user.click(screen.getByTestId('edit-coaching-profile-btn'));
+
+    // Existing tags are badges and no longer offered in the list
+    expect(screen.getByTestId('edit-selected-tag-Hypertrophy')).toBeInTheDocument();
+    expect(screen.queryByTestId('edit-tag-Hypertrophy')).not.toBeInTheDocument();
+
+    await user.selectOptions(screen.getByTestId('edit-select-specialization'), 'CrossFit');
+    await user.type(screen.getByTestId('edit-input-custom-tag'), 'Boxing{Enter}');
+    expect(screen.getByTestId('edit-selected-tag-Boxing')).toHaveTextContent('Boxing');
+    await user.click(screen.getByTestId('edit-remove-tag-HIIT & Cardio'));
+
+    await user.click(screen.getByTestId('save-coaching-profile-btn'));
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith(
+        {
+          trainerProfile: expect.objectContaining({
+            specializations: ['Hypertrophy', 'CrossFit', 'Boxing'],
+          }),
+        },
+        expect.any(Object),
+      );
+    });
+  });
+
   it('cancels edit mode without saving changes', async () => {
     const user = userEvent.setup();
     render(<CoachingProfileCard userProfile={mockTrainerProfileData} />, {

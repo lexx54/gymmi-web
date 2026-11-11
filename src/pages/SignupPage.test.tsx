@@ -225,7 +225,17 @@ describe('SignupPage Multi-Step Flow', () => {
       'Certified strength and conditioning coach with 8 years of elite training experience.',
     );
     await user.type(screen.getByTestId('input-monthlyPrice'), '140');
-    await user.click(screen.getByTestId('tag-Hypertrophy'));
+    await user.selectOptions(screen.getByTestId('select-specialization'), 'Hypertrophy');
+
+    // Selected preset becomes a badge and leaves the list
+    expect(screen.getByTestId('selected-tag-Hypertrophy')).toBeInTheDocument();
+    expect(screen.queryByTestId('tag-Hypertrophy')).not.toBeInTheDocument();
+
+    // Custom tag is added as a badge and can be removed
+    await user.type(screen.getByTestId('input-custom-tag'), 'Boxing{Enter}');
+    expect(screen.getByTestId('selected-tag-Boxing')).toHaveTextContent('Boxing');
+    await user.click(screen.getByTestId('remove-tag-Boxing'));
+    expect(screen.queryByTestId('selected-tag-Boxing')).not.toBeInTheDocument();
 
     await user.click(screen.getByTestId('step3-next'));
 
@@ -512,7 +522,7 @@ describe('SignupPage Multi-Step Flow', () => {
     });
     await user.type(screen.getByTestId('input-description'), 'Top notch personal trainer with certified background.');
     await user.type(screen.getByTestId('input-monthlyPrice'), '120');
-    await user.click(screen.getByTestId('tag-Hypertrophy'));
+    await user.selectOptions(screen.getByTestId('select-specialization'), 'Hypertrophy');
     await user.click(screen.getByTestId('step3-next'));
 
     // Confirmation Step
@@ -584,7 +594,7 @@ describe('SignupPage Multi-Step Flow', () => {
       'Dedicated certified strength coach offering gym and online programs.',
     );
     await user.type(screen.getByTestId('input-monthlyPrice'), '150');
-    await user.click(screen.getByTestId('tag-Weight Loss'));
+    await user.selectOptions(screen.getByTestId('select-specialization'), 'Weight Loss');
     await user.click(screen.getByTestId('step3-next'));
 
     // Confirmation Step

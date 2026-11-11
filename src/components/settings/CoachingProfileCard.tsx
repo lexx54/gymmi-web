@@ -10,7 +10,6 @@ import {
   PRESET_SPECIALIZATIONS,
   getSpecializationLabel,
   isSameSpecialization,
-  type PresetSpecialization,
 } from '../../utils/specializations';
 import type { FullUserProfile } from '../../types/auth';
 
@@ -63,20 +62,26 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
     }
   };
 
-  const toggleSpecialization = (preset: PresetSpecialization) => {
-    const exists = specializations.some((s) => isSameSpecialization(s, preset));
-    const updated = exists
-      ? specializations.filter((s) => !isSameSpecialization(s, preset))
-      : [...specializations, preset.defaultEn];
-    setSpecializations(updated);
+  const addSpecialization = (tag: string) => {
+    const trimmed = tag.trim();
+    if (!trimmed) return;
+    const preset = PRESET_SPECIALIZATIONS.find((p) => isSameSpecialization(trimmed, p));
+    const exists = specializations.some((s) =>
+      preset
+        ? isSameSpecialization(s, preset)
+        : s.trim().toLowerCase() === trimmed.toLowerCase(),
+    );
+    if (!exists) {
+      setSpecializations([...specializations, trimmed]);
+    }
+  };
+
+  const removeSpecialization = (tag: string) => {
+    setSpecializations(specializations.filter((s) => s !== tag));
   };
 
   const addCustomTag = () => {
-    const trimmed = customTagInput.trim();
-    if (!trimmed) return;
-    if (!specializations.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
-      setSpecializations([...specializations, trimmed]);
-    }
+    addSpecialization(customTagInput);
     setCustomTagInput('');
   };
 
@@ -278,39 +283,39 @@ export function CoachingProfileCard({ userProfile, isLoading }: CoachingProfileC
 
           <FieldGroup>
             <FieldLabel>{t('auth.specializations')}</FieldLabel>
-            <ChipsWrap>
-              {PRESET_SPECIALIZATIONS.map((preset) => {
-                const isSelected = specializations.some((s) => isSameSpecialization(s, preset));
-                return (
-                  <ChipBtn
-                    key={preset.key}
-                    type="button"
-                    $selected={isSelected}
-                    onClick={() => toggleSpecialization(preset)}
-                    data-testid={`edit-tag-${preset.defaultEn}`}
-                  >
-                    {t(preset.labelKey)}
-                  </ChipBtn>
-                );
-              })}
-            </ChipsWrap>
-            {specializations.some((s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p))) && (
+            <StyledSelect
+              data-testid="edit-select-specialization"
+              value=""
+              onChange={(e) => addSpecialization(e.target.value)}
+            >
+              <option value="">{t('auth.specializationSelectPlaceholder')}</option>
+              {PRESET_SPECIALIZATIONS.filter(
+                (preset) => !specializations.some((s) => isSameSpecialization(s, preset)),
+              ).map((preset) => (
+                <option
+                  key={preset.key}
+                  value={preset.defaultEn}
+                  data-testid={`edit-tag-${preset.defaultEn}`}
+                >
+                  {t(preset.labelKey)}
+                </option>
+              ))}
+            </StyledSelect>
+            {specializations.length > 0 && (
               <ChipsList style={{ marginTop: '0.45rem' }}>
-                {specializations
-                  .filter((s) => !PRESET_SPECIALIZATIONS.some((p) => isSameSpecialization(s, p)))
-                  .map((customTag) => (
-                    <GymChipEditable key={customTag}>
-                      <span>{customTag}</span>
-                      <RemoveBtn
-                        type="button"
-                        onClick={() =>
-                          setSpecializations(specializations.filter((s) => s !== customTag))
-                        }
-                      >
-                        <X size={12} />
-                      </RemoveBtn>
-                    </GymChipEditable>
-                  ))}
+                {specializations.map((tag) => (
+                  <GymChipEditable key={tag} data-testid={`edit-selected-tag-${tag}`}>
+                    <span>{getSpecializationLabel(tag, t)}</span>
+                    <RemoveBtn
+                      type="button"
+                      aria-label={t('auth.removeTag')}
+                      data-testid={`edit-remove-tag-${tag}`}
+                      onClick={() => removeSpecialization(tag)}
+                    >
+                      <X size={12} />
+                    </RemoveBtn>
+                  </GymChipEditable>
+                ))}
               </ChipsList>
             )}
             <TagInputRow>
@@ -600,22 +605,24 @@ const StyledTextarea = styled.textarea`
   }
 `;
 
-const ChipsWrap = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-`;
-
-const ChipBtn = styled.button<{ $selected?: boolean }>`
-  padding: 0.4rem 0.75rem;
-  border-radius: 9999px;
-  background: ${({ $selected }) =>
-    $selected ? 'linear-gradient(135deg, #ff8a93, #ef233c)' : '#0f1329'};
-  border: 1px solid ${({ $selected }) => ($selected ? '#ef233c' : 'rgba(126, 136, 175, 0.22)')};
-  color: ${({ $selected }) => ($selected ? '#ffffff' : '#b6bcdb')};
-  font-size: 0.75rem;
-  font-weight: 600;
+const StyledSelect = styled.select`
+  padding: 0.7rem 0.95rem;
+  border-radius: 0.75rem;
+  background: #0f1329;
+  border: 1px solid rgba(126, 136, 175, 0.25);
+  color: #ffffff;
+  font-size: 0.88rem;
+  outline: none;
   cursor: pointer;
+
+  &:focus {
+    border-color: #ef233c;
+  }
+
+  option {
+    background-color: #0f1329;
+    color: #ffffff;
+  }
 `;
 
 const TagInputRow = styled.div`

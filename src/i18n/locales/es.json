@@ -207,6 +207,8 @@
     "monthlyPricePlaceholder": "ej. 150",
     "specializations": "Especializaciones",
     "customTagPlaceholder": "Añadir etiqueta (presiona Enter)",
+    "specializationSelectPlaceholder": "Selecciona una especialización",
+    "removeTag": "Quitar",
     "gymAffiliations": "Gimnasios donde trabajas (Opcional, máx 3)",
     "gymPlaceholder": "Añadir nombre del gimnasio (presiona Enter)",
     "maxGymsReached": "Máximo 3 gimnasios agregados",

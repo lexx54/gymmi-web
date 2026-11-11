@@ -207,6 +207,8 @@
     "monthlyPricePlaceholder": "e.g. 150",
     "specializations": "Specialization Tags",
     "customTagPlaceholder": "Add custom tag (press Enter)",
+    "specializationSelectPlaceholder": "Select a specialization",
+    "removeTag": "Remove",
     "gymAffiliations": "Gym Affiliations (Optional, max 3)",
     "gymPlaceholder": "Add gym name (press Enter)",
     "maxGymsReached": "Maximum 3 gyms added",
