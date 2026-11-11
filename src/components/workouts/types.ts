@@ -13,7 +13,8 @@ export type SetEntry = {
   weight: number;
   reps: number;
   restSeconds: number;
-  rpe: number;
+  /** Reps in reserve logged by the client; read-only in the builder. */
+  rir?: number | null;
 };
 
 export type RoutineExercise = {
@@ -26,4 +27,4 @@ export type RoutineExercise = {
   sets: SetEntry[];
 };
 
-export type SetField = 'weight' | 'reps' | 'restSeconds' | 'rpe';
+export type SetField = 'weight' | 'reps' | 'restSeconds';

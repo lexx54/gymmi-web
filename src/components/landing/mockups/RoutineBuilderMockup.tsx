@@ -5,34 +5,34 @@ import { Dumbbell, Plus } from 'lucide-react';
 import { MOCK, Panel, Pill, Sub, WebBody, WebFrame, WebTitle, WebTopBar, pickLang } from './mockupStyles';
 
 type Label = { en: string; es: string };
-type DemoExercise = { name: Label; sets: { weight: number; reps: number; rest: number; rpe: number }[]; superset?: string };
+type DemoExercise = { name: Label; sets: { weight: number; reps: number; rest: number }[]; superset?: string };
 
-const set = (weight: number, reps: number, rest: number, rpe: number) => ({ weight, reps, rest, rpe });
+const set = (weight: number, reps: number, rest: number) => ({ weight, reps, rest });
 
 /** Weekday index uses `workouts.weekdays` keys (0 = Sunday). Monday-first order like the real builder. */
 const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
 const PLAN: Record<number, DemoExercise[]> = {
   1: [
-    { name: { en: 'Barbell Bench Press', es: 'Press de banca con barra' }, sets: [set(80, 8, 120, 7), set(80, 8, 120, 8), set(82.5, 6, 150, 8.5)] },
-    { name: { en: 'Overhead Barbell Press', es: 'Press militar con barra' }, sets: [set(45, 8, 90, 8), set(45, 8, 90, 8)] },
-    { name: { en: 'Triceps Rope Pushdown', es: 'Extensión de tríceps en polea' }, sets: [set(25, 12, 60, 8), set(25, 12, 60, 9)], superset: '#a855f7' },
-    { name: { en: 'Dumbbell Lateral Raise', es: 'Elevaciones laterales con mancuernas' }, sets: [set(10, 15, 60, 8), set(10, 15, 60, 9)], superset: '#a855f7' },
+    { name: { en: 'Barbell Bench Press', es: 'Press de banca con barra' }, sets: [set(80, 8, 120), set(80, 8, 120), set(82.5, 6, 150)] },
+    { name: { en: 'Overhead Barbell Press', es: 'Press militar con barra' }, sets: [set(45, 8, 90), set(45, 8, 90)] },
+    { name: { en: 'Triceps Rope Pushdown', es: 'Extensión de tríceps en polea' }, sets: [set(25, 12, 60), set(25, 12, 60)], superset: '#a855f7' },
+    { name: { en: 'Dumbbell Lateral Raise', es: 'Elevaciones laterales con mancuernas' }, sets: [set(10, 15, 60), set(10, 15, 60)], superset: '#a855f7' },
   ],
   3: [
-    { name: { en: 'Barbell Back Squat', es: 'Sentadilla trasera con barra' }, sets: [set(100, 6, 180, 7.5), set(100, 6, 180, 8), set(105, 5, 180, 8.5)] },
-    { name: { en: 'Romanian Deadlift', es: 'Peso muerto rumano' }, sets: [set(90, 8, 120, 8), set(90, 8, 120, 8)] },
+    { name: { en: 'Barbell Back Squat', es: 'Sentadilla trasera con barra' }, sets: [set(100, 6, 180), set(100, 6, 180), set(105, 5, 180)] },
+    { name: { en: 'Romanian Deadlift', es: 'Peso muerto rumano' }, sets: [set(90, 8, 120), set(90, 8, 120)] },
   ],
   5: [
-    { name: { en: 'Lat Pulldown', es: 'Jalón al pecho' }, sets: [set(60, 10, 90, 8), set(60, 10, 90, 8.5)], superset: '#38bdf8' },
-    { name: { en: 'Seated Cable Row', es: 'Remo sentado en polea' }, sets: [set(55, 10, 90, 8), set(55, 10, 90, 8.5)], superset: '#38bdf8' },
+    { name: { en: 'Lat Pulldown', es: 'Jalón al pecho' }, sets: [set(60, 10, 90), set(60, 10, 90)], superset: '#38bdf8' },
+    { name: { en: 'Seated Cable Row', es: 'Remo sentado en polea' }, sets: [set(55, 10, 90), set(55, 10, 90)], superset: '#38bdf8' },
   ],
 };
 
 const LIBRARY: DemoExercise[] = [
-  { name: { en: 'Incline Dumbbell Press', es: 'Press inclinado con mancuernas' }, sets: [set(28, 10, 90, 8), set(28, 10, 90, 8)] },
-  { name: { en: 'Face Pull', es: 'Face pull en polea' }, sets: [set(20, 15, 60, 7), set(20, 15, 60, 8)] },
-  { name: { en: 'Leg Press', es: 'Prensa de piernas' }, sets: [set(160, 10, 120, 8), set(160, 10, 120, 8)] },
+  { name: { en: 'Incline Dumbbell Press', es: 'Press inclinado con mancuernas' }, sets: [set(28, 10, 90), set(28, 10, 90)] },
+  { name: { en: 'Face Pull', es: 'Face pull en polea' }, sets: [set(20, 15, 60), set(20, 15, 60)] },
+  { name: { en: 'Leg Press', es: 'Prensa de piernas' }, sets: [set(160, 10, 120), set(160, 10, 120)] },
 ];
 
 /** Mirrors the web `WorkoutsPage` builder: Mon–Sun tabs, set table per exercise, add from the library. */
@@ -88,7 +88,6 @@ export function RoutineBuilderMockup() {
                     <th>{t('landing.mock.weightKg')}</th>
                     <th>{t('landing.mock.colReps')}</th>
                     <th>{t('landing.mock.restSec')}</th>
-                    <th>RPE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -98,7 +97,6 @@ export function RoutineBuilderMockup() {
                       <td><Cell>{s.weight}</Cell></td>
                       <td><Cell>{s.reps}</Cell></td>
                       <td><Cell>{s.rest}s</Cell></td>
-                      <td><Cell>{s.rpe}</Cell></td>
                     </tr>
                   ))}
                 </tbody>

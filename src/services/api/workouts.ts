@@ -14,7 +14,8 @@ export type WorkoutSetWrite = {
   weight: number;
   reps: number;
   restSeconds: number;
-  rpe: number;
+  /** Reps in reserve (0-2); only present where the client logged it in Advanced mode. */
+  rir?: number | null;
 };
 
 export type WorkoutExerciseWrite = {

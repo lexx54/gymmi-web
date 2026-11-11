@@ -60,3 +60,5 @@ API-backed routine library, multi-day routine builder, role-aware sharing/assign
 
 - Vitest: workout API contract, editable `ExerciseCard` snapshot, read-only static set values, superset side tab presence/absence, and `NoRoutines` empty/no-results actions.
 - Playwright: trainer creator actions, 390px overflow regression, active client assignment, and read-only detail.
+
+- RPE removed from the builder, read-only view and landing mockups. Sets carry optional `rir` (logged by clients in Advanced mode on mobile); `ExerciseCard` shows a read-only RIR column only when some set of that exercise has it, and saves preserve it.

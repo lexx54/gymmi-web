@@ -7,10 +7,10 @@ import { MOCK, PhoneFrame, Pill, pickLang } from './mockupStyles';
 const REST_SECONDS = 90;
 const EXERCISE = { en: 'Barbell Bench Press', es: 'Press de banca con barra' };
 const SETS = [
-  { weight: 80, reps: 8, rpe: 7 },
-  { weight: 80, reps: 8, rpe: 8 },
-  { weight: 82.5, reps: 6, rpe: 8.5 },
-  { weight: 82.5, reps: 6, rpe: 9 },
+  { weight: 80, reps: 8, rir: 2 },
+  { weight: 80, reps: 8, rir: 2 },
+  { weight: 82.5, reps: 6, rir: 1 },
+  { weight: 82.5, reps: 6, rir: 0 },
 ];
 /** The demo day has 3 exercises; this card is the first one. */
 const TOTAL_EXERCISES = 3;
@@ -114,7 +114,7 @@ export function ActiveSessionMockup() {
               <th>{t('landing.mock.colSet')}</th>
               <th>{t('landing.mock.colWeight')}</th>
               <th>{t('landing.mock.colReps')}</th>
-              <th>RPE</th>
+              <th>RIR</th>
               <th>{t('landing.mock.done')}</th>
             </tr>
           </thead>
@@ -134,7 +134,7 @@ export function ActiveSessionMockup() {
                     <Value $boxed={state === 'active'}>{set.reps}</Value>
                   </td>
                   <td>
-                    <Value $boxed={state === 'active'}>{set.rpe}</Value>
+                    <Value $boxed={state === 'active'}>{set.rir}</Value>
                   </td>
                   <td>
                     {state === 'pending' ? (

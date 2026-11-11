@@ -9,7 +9,7 @@ const exercise = {
   target: 'Chest',
   supersetColor: '#ff535a' as const,
   notes: '',
-  sets: [{ id: 'set', weight: 80, reps: 10, restSeconds: 90, rpe: 8 }],
+  sets: [{ id: 'set', weight: 80, reps: 10, restSeconds: 90 }],
 };
 
 describe('ExerciseCard', () => {
@@ -219,5 +219,39 @@ describe('ExerciseCard', () => {
     );
 
     expect(screen.queryByLabelText('Notes')).not.toBeInTheDocument();
+  });
+
+  it('shows the RIR column only when the client logged RIR on a set', () => {
+    const props = {
+      position: 1,
+      onAddSets: vi.fn(),
+      onRemoveSet: vi.fn(),
+      onRemoveExercise: vi.fn(),
+      onUpdateSet: vi.fn(),
+      onMove: vi.fn(),
+      onSupersetChange: vi.fn(),
+      onNotesChange: vi.fn(),
+      readOnly: true,
+    };
+    const { rerender } = render(<ExerciseCard {...props} exercise={exercise} />);
+    expect(screen.queryByText('RIR')).not.toBeInTheDocument();
+    expect(screen.queryByText('RPE')).not.toBeInTheDocument();
+
+    rerender(
+      <ExerciseCard
+        {...props}
+        exercise={{
+          ...exercise,
+          sets: [
+            { ...exercise.sets[0], rir: 1 },
+            { ...exercise.sets[0], id: 'set-2', rir: null },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByText('RIR')).toBeInTheDocument();
+    const rows = screen.getAllByRole('row').slice(1);
+    expect(rows[0].lastElementChild).toHaveTextContent('1');
+    expect(rows[1].lastElementChild).toHaveTextContent('—');
   });
 });

@@ -44,6 +44,7 @@ export function ExerciseCard({
   const positionLabel = position.toString().padStart(2, '0');
   const notesId = `exercise-notes-${exercise.id}`;
   const trimmedNotes = exercise.notes.trim();
+  const showRir = exercise.sets.some((set) => set.rir !== undefined && set.rir !== null);
   const supersetNumber = exercise.supersetColor
     ? SUPERSET_COLORS.indexOf(exercise.supersetColor) + 1
     : 0;
@@ -123,7 +124,7 @@ export function ExerciseCard({
                 <Th>{t('workouts.weight')}</Th>
                 <Th>{t('workouts.reps')}</Th>
                 <Th>{t('workouts.rest')}</Th>
-                <Th>{t('workouts.rpe')}</Th>
+                {showRir && <Th>{t('workouts.rir')}</Th>}
                 {!readOnly && <Th aria-hidden />}
               </tr>
             </thead>
@@ -136,6 +137,7 @@ export function ExerciseCard({
                   onRemove={() => onRemoveSet(set.id)}
                   onChange={(field, value) => onUpdateSet(set.id, field, value)}
                   readOnly={readOnly}
+                  showRir={showRir}
                 />
               ))}
             </tbody>

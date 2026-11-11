@@ -246,11 +246,6 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
                   Rest
                 </th>
                 <th
-                  class="sc-cxNIPq eReNWo"
-                >
-                  RPE
-                </th>
-                <th
                   aria-hidden="true"
                   class="sc-cxNIPq eReNWo"
                 />
@@ -303,19 +298,6 @@ exports[`ExerciseCard > renders editable set controls and emits rest changes 1`]
                     step="5"
                     type="number"
                     value="90"
-                  />
-                </td>
-                <td
-                  class="sc-gtstET dmYezx"
-                >
-                  <input
-                    aria-label="Set 1 RPE"
-                    class="sc-jSFhYz cLMxeN"
-                    max="10"
-                    min="0"
-                    step="0.5"
-                    type="number"
-                    value="8"
                   />
                 </td>
                 <td

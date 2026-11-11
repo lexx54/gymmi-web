@@ -72,7 +72,7 @@ function routineToDays(routine: WorkoutRoutine): BuilderDay[] {
         weight: set.weight,
         reps: set.reps,
         restSeconds: set.restSeconds,
-        rpe: set.rpe,
+        rir: set.rir ?? null,
       })),
     })),
   }));
@@ -88,11 +88,11 @@ function toWriteDays(days: BuilderDay[]): WorkoutDayWrite[] {
         exerciseId: exercise.exerciseId,
         supersetColor: exercise.supersetColor,
         notes: exercise.notes.trim() || null,
-        sets: exercise.sets.map(({ weight, reps, restSeconds, rpe }) => ({
+        sets: exercise.sets.map(({ weight, reps, restSeconds, rir }) => ({
           weight,
           reps,
           restSeconds,
-          rpe,
+          ...(rir !== undefined && rir !== null ? { rir } : {}),
         })),
       })),
     }));
@@ -295,7 +295,7 @@ export default function WorkoutsPage() {
       }, {});
       if (Object.values(colors).some((count) => count < 2)) return t('workouts.validation.superset');
       if (day.exercises.some((exercise) => exercise.sets.some((set) =>
-        set.weight < 0 || set.reps < 0 || set.restSeconds < 0 || set.rpe < 0 || set.rpe > 10))) {
+        set.weight < 0 || set.reps < 0 || set.restSeconds < 0))) {
         return t('workouts.validation.values');
       }
     }

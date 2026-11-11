@@ -25,7 +25,7 @@ const write = {
     exercises: [{
       exerciseId: '22222222-2222-4222-8222-222222222222',
       supersetColor: null,
-      sets: [{ weight: 80, reps: 10, restSeconds: 90, rpe: 8 }],
+      sets: [{ weight: 80, reps: 10, restSeconds: 90 }],
     }],
   }],
 };

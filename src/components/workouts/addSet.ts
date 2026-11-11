@@ -1,6 +1,6 @@
 import type { SetEntry } from './types';
 
-export const DEFAULT_SET = { weight: 0, reps: 10, restSeconds: 60, rpe: 7 };
+export const DEFAULT_SET = { weight: 0, reps: 10, restSeconds: 60 };
 
 /** Mirrors gymmi-api `MAX_SETS_PER_EXERCISE`. */
 export const MAX_SETS_PER_EXERCISE = 6;
@@ -23,7 +23,6 @@ export function appendSets(
     weight: last?.weight ?? DEFAULT_SET.weight,
     reps: last?.reps ?? DEFAULT_SET.reps,
     restSeconds: last?.restSeconds ?? DEFAULT_SET.restSeconds,
-    rpe: last?.rpe ?? DEFAULT_SET.rpe,
   };
   return [
     ...sets,

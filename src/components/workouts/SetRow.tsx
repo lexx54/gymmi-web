@@ -8,12 +8,17 @@ type SetRowProps = {
   onChange: (field: SetField, value: number) => void;
   onRemove: () => void;
   readOnly?: boolean;
+  /** Shows the client-logged RIR cell; only true when some set of the exercise has one. */
+  showRir?: boolean;
 };
 
 /**
  * Editable set row inside an ExerciseCard. Updates flow back through `onChange`.
  */
-export function SetRow({ index, set, onChange, onRemove, readOnly }: SetRowProps) {
+export function SetRow({ index, set, onChange, onRemove, readOnly, showRir }: SetRowProps) {
+  const rirCell = showRir ? (
+    <Cell><Value>{set.rir ?? '—'}</Value></Cell>
+  ) : null;
   return (
     <Row>
       <Cell>
@@ -24,7 +29,7 @@ export function SetRow({ index, set, onChange, onRemove, readOnly }: SetRowProps
           <Cell><Value>{set.weight}</Value></Cell>
           <Cell><Value>{set.reps}</Value></Cell>
           <Cell><Value>{set.restSeconds}</Value></Cell>
-          <Cell><Value>{set.rpe}</Value></Cell>
+          {rirCell}
         </>
       ) : (
         <>
@@ -61,18 +66,7 @@ export function SetRow({ index, set, onChange, onRemove, readOnly }: SetRowProps
               $width="4.5rem"
             />
           </Cell>
-          <Cell>
-            <NumberInput
-              type="number"
-              value={set.rpe}
-              min={0}
-              max={10}
-              step="0.5"
-              onChange={(event) => onChange('rpe', Number(event.target.value))}
-              aria-label={`Set ${index + 1} RPE`}
-              $width="4rem"
-            />
-          </Cell>
+          {rirCell}
           <RemoveCell>
             <RemoveButton type="button" aria-label={`Remove set ${index + 1}`} onClick={onRemove}>
               <X size={14} />

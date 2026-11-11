@@ -44,7 +44,7 @@ async function createRoutine(
         exercises: [{
           exerciseId,
           supersetColor: null,
-          sets: [{ weight: 80, reps: 10, restSeconds: 90, rpe: 8 }],
+          sets: [{ weight: 80, reps: 10, restSeconds: 90 }],
         }],
       }],
     },

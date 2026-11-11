@@ -31,7 +31,7 @@ async function assignRoutine(request: APIRequestContext, coach: AuthResponse, cl
     headers: { Authorization: `Bearer ${coach.accessToken}` },
     data: {
       name,
-      days: [{ weekday: 1, exercises: [{ exerciseId, supersetColor: null, sets: [{ weight: 80, reps: 8, restSeconds: 90, rpe: 8 }] }] }],
+      days: [{ weekday: 1, exercises: [{ exerciseId, supersetColor: null, sets: [{ weight: 80, reps: 8, restSeconds: 90 }] }] }],
     },
   });
   expect(routine.status()).toBe(201);
