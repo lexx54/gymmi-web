@@ -6,6 +6,9 @@ import type {
   CreatePaymentPayload,
   RejectPaymentPayload,
   PaymentStatus,
+  AdminExchangeRates,
+  ExchangeRateEntry,
+  SetExchangeRatePayload,
 } from '../../types/payments';
 
 export async function fetchPaymentConfig(): Promise<PaymentConfig> {
@@ -53,6 +56,23 @@ export async function rejectAdminPayment(
 ): Promise<Payment> {
   const { data } = await apiClient.patch<Payment>(
     `/admin/payments/${id}/reject`,
+    payload,
+  );
+  return data;
+}
+
+export async function fetchAdminExchangeRates(): Promise<AdminExchangeRates> {
+  const { data } = await apiClient.get<AdminExchangeRates>(
+    '/admin/exchange-rates',
+  );
+  return data;
+}
+
+export async function setAdminExchangeRate(
+  payload: SetExchangeRatePayload,
+): Promise<ExchangeRateEntry> {
+  const { data } = await apiClient.put<ExchangeRateEntry>(
+    '/admin/exchange-rate',
     payload,
   );
   return data;

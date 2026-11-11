@@ -20,6 +20,10 @@ vi.mock('../../services/api/payments', () => ({
   fetchAdminPayments: vi.fn(),
   approveAdminPayment: vi.fn(),
   rejectAdminPayment: vi.fn(),
+  fetchAdminExchangeRates: vi.fn(() =>
+    Promise.resolve({ current: null, maxAgeDays: 5, history: [] }),
+  ),
+  setAdminExchangeRate: vi.fn(),
 }));
 
 vi.mock('../../context/AuthContext', () => ({

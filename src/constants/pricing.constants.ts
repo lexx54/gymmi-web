@@ -131,8 +131,8 @@ export const PRICING_DATA: {
     {
       id: 'plus',
       badgeKey: 'landing.pricing.trialBadge',
-      monthlyPrice: 25,
-      annualPrice: 20,
+      monthlyPrice: 15,
+      annualPrice: 12,
       ctaKey: 'landing.pricing.startTrial',
       features: [
         { textKey: 'landing.pricing.gym.plus.f1', included: true, highlight: true },
@@ -146,8 +146,8 @@ export const PRICING_DATA: {
     {
       id: 'pro',
       badgeKey: 'landing.pricing.popularBadge',
-      monthlyPrice: 50,
-      annualPrice: 40,
+      monthlyPrice: 30,
+      annualPrice: 24,
       ctaKey: 'landing.pricing.choosePlan',
       features: [
         { textKey: 'landing.pricing.gym.pro.f1', included: true, highlight: true },
@@ -161,8 +161,8 @@ export const PRICING_DATA: {
     },
     {
       id: 'maximum',
-      monthlyPrice: 100,
-      annualPrice: 80,
+      monthlyPrice: 70,
+      annualPrice: 56,
       ctaKey: 'landing.pricing.choosePlan',
       features: [
         { textKey: 'landing.pricing.gym.maximum.f1', included: true, highlight: true },

@@ -21,6 +21,7 @@ import {
   ExercisesContent,
 } from '../../components/exercises/ExercisesShell';
 import { TopBar } from '../../components/layout/TopBar';
+import { ExchangeRateCard } from '../../components/admin-payments/ExchangeRateCard';
 import {
   fetchAdminPayments,
   approveAdminPayment,
@@ -116,6 +117,8 @@ export default function AdminPaymentsPage() {
           title={t('admin.payments.pageTitle', 'Payment Verifications')}
         />
         <ExercisesContent>
+          <ExchangeRateCard />
+
           {/* Status Filter Tabs */}
           <FilterRow>
             <FilterTab

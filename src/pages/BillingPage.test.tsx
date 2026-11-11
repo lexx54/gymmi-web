@@ -58,6 +58,8 @@ const mockConfig = {
 };
 
 const FUTURE = new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString();
+/** Inside the 5-day renewal window. */
+const SOON = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
 
 const mockUser = (overrides: Record<string, unknown> = {}) =>
   (authContext.useAuth as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -229,8 +231,42 @@ describe('BillingPage', () => {
     expect(payload).not.toHaveProperty('amountUsd');
   });
 
+  it('locks plan selection and hides payment until 5 days before the plan ends', async () => {
+    mockUser({ hasPaid: true, paidUntil: FUTURE, plan: 'plus' });
+    renderBillingPage();
+
+    expect(await screen.findByText(/You can renew or change plans from/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /annual/i })).toBeDisabled();
+    expect(screen.queryByText('Selected')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Submit Payment for Verification/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Pago Móvil/i })).not.toBeInTheDocument();
+  });
+
+  it('marks the current plan even while plan selection is locked', async () => {
+    mockUser({ hasPaid: true, paidUntil: FUTURE, plan: 'plus' });
+    renderBillingPage();
+
+    expect(await screen.findByText('Current plan')).toBeInTheDocument();
+    const current = document.querySelector('[aria-current="true"]');
+    expect(current).toHaveTextContent('Current plan');
+    expect(current).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('opens renewal in the last 5 days of the plan', async () => {
+    mockUser({ hasPaid: true, paidUntil: SOON, plan: 'plus' });
+    renderBillingPage();
+
+    expect(
+      await screen.findByRole('button', { name: /Submit Payment for Verification/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/You can renew or change plans from/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /annual/i })).toBeEnabled();
+  });
+
   it('blocks a smaller plan while a bigger one is active', async () => {
-    mockUser({ hasPaid: true, paidUntil: FUTURE, plan: 'pro' });
+    mockUser({ hasPaid: true, paidUntil: SOON, plan: 'pro' });
     renderBillingPage();
 
     expect(await screen.findByText('Below your plan')).toBeInTheDocument();

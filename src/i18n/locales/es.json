@@ -964,6 +964,18 @@
       "approvePrompt": "¿Aprobar este pago de {{amount}} USD de {{user}}? Verifica que ese monto exacto llegó a nuestra cuenta.",
       "approvePromptVes": "En bolívares: {{amount}}.",
       "bcvRate": "BCV {{rate}} ({{date}})",
+      "rate": {
+        "title": "Tasa de cambio BCV",
+        "current": "1 USD = {{rate}} VES · desde {{date}}",
+        "missing": "No hay tasa de los últimos {{days}} días. Los pagos en Bolívares están pausados hasta que ingreses una.",
+        "rateLabel": "VES por 1 USD",
+        "dateLabel": "Fecha Valor",
+        "save": "Guardar tasa",
+        "invalid": "Ingresa un número positivo, p. ej. 481,25.",
+        "hint": "Copia la tasa del dólar de bcv.org.ve. Si ya existe una tasa para esa fecha, se reemplaza.",
+        "savedToast": "Tasa BCV guardada: {{rate}} VES para el {{date}}.",
+        "saveFailed": "No se pudo guardar la tasa."
+      },
       "rejectPrompt": "Explica por qué no se pudo verificar este pago. El usuario recibe este motivo por correo.",
       "rejectPlaceholder": "p. ej. Número de referencia no encontrado en el estado de cuenta"
     },
@@ -1754,6 +1766,8 @@
     "planActive": "SUSCRIPCIÓN {{plan}} ACTIVA",
     "belowCurrentPlan": "Menor que tu plan",
     "belowCurrentPlanHint": "Podrás cambiar a un plan menor cuando termine el actual.",
+    "renewalLocked": "Tu plan está activo hasta el {{until}}. Podrás renovarlo o cambiar de plan a partir del {{opens}}, {{days}} días antes de que termine.",
+    "currentPlanTag": "Plan actual",
     "amountToPay": "Monto a pagar",
     "vesEquivalent": "{{usd}} a la tasa oficial del BCV de Bs. {{rate}} por USD ({{date}})",
     "vesPaused": "Los pagos en bolívares están en pausa hasta que esté disponible la tasa BCV del día. Puedes pagar en USD con Zelle, Zinli o Binance Pay.",

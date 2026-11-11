@@ -964,6 +964,18 @@
       "approvePrompt": "Approve this payment of {{amount}} USD for {{user}}? Check that this exact amount reached our account.",
       "approvePromptVes": "In Bolívares: {{amount}}.",
       "bcvRate": "BCV {{rate}} ({{date}})",
+      "rate": {
+        "title": "BCV exchange rate",
+        "current": "1 USD = {{rate}} VES · since {{date}}",
+        "missing": "No rate from the last {{days}} days. Bolívar payments are paused until you enter one.",
+        "rateLabel": "VES per 1 USD",
+        "dateLabel": "Valid from (Fecha Valor)",
+        "save": "Save rate",
+        "invalid": "Enter a positive number, e.g. 481,25.",
+        "hint": "Copy the USD rate from bcv.org.ve. Entering a rate for a date that already has one replaces it.",
+        "savedToast": "BCV rate saved: {{rate}} VES for {{date}}.",
+        "saveFailed": "Could not save the rate."
+      },
       "rejectPrompt": "Explain why this payment could not be verified. The user receives this reason by email.",
       "rejectPlaceholder": "e.g. Reference number not found on bank statement"
     },
@@ -1754,6 +1766,8 @@
     "planActive": "{{plan}} SUBSCRIPTION ACTIVE",
     "belowCurrentPlan": "Below your plan",
     "belowCurrentPlanHint": "You can switch to a smaller plan after your current one ends.",
+    "renewalLocked": "Your plan is active until {{until}}. You can renew or change plans from {{opens}}, {{days}} days before it ends.",
+    "currentPlanTag": "Current plan",
     "amountToPay": "Amount to pay",
     "vesEquivalent": "{{usd}} at the official BCV rate of Bs. {{rate}} per USD ({{date}})",
     "vesPaused": "Bolívar payments are paused until today's BCV rate is available. You can pay in USD with Zelle, Zinli or Binance Pay.",

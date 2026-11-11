@@ -40,6 +40,8 @@ import { PRICING_DATA } from '../constants/pricing.constants';
 import type { BillingCadence } from '../constants/pricing.constants';
 import type { PaymentMethod, CreatePaymentPayload, PaymentConfig } from '../types/payments';
 import {
+  DAY_MS,
+  RENEWAL_WINDOW_DAYS,
   formatRate,
   formatUsd,
   formatVes,
@@ -122,7 +124,7 @@ export default function BillingPage() {
     : null;
   const isExpiringSoon =
     paidUntilDate &&
-    paidUntilDate.getTime() - now < 5 * 24 * 60 * 60 * 1000;
+    paidUntilDate.getTime() - now < RENEWAL_WINDOW_DAYS * DAY_MS;
   const daysRemaining = paidUntilDate
     ? Math.max(
         0,
@@ -132,6 +134,13 @@ export default function BillingPage() {
       )
     : null;
   const isPlanActive = hasPaid && Boolean(paidUntilDate && paidUntilDate.getTime() > now);
+  // While a plan is active, renewing or changing plans only opens in its last
+  // RENEWAL_WINDOW_DAYS days (the API enforces the same rule).
+  const renewalLocked = isPlanActive && !isExpiringSoon;
+  const renewalOpensOn =
+    renewalLocked && paidUntilDate
+      ? new Date(paidUntilDate.getTime() - RENEWAL_WINDOW_DAYS * DAY_MS)
+      : null;
   const gymTier = effectiveUser?.gymProfile?.tier;
   // A gym's plan is its tier; everyone else's is `plan` (Plus when unset).
   const activePlanId = !isPlanActive
@@ -155,6 +164,7 @@ export default function BillingPage() {
     (p) => p.id !== 'free',
   );
   const isPlanSelectable = (planId: string, disabled?: boolean) =>
+    !renewalLocked &&
     !disabled && !isBelowActivePlan(planId, activePlanId) && priceFor(planId) !== null;
   const selectablePlans = availablePlans.filter((p) => isPlanSelectable(p.id, p.disabled));
   const selectedPlan =
@@ -364,6 +374,7 @@ export default function BillingPage() {
                 <CadenceButton
                   type="button"
                   $active={cadence === 'monthly'}
+                  disabled={renewalLocked}
                   onClick={() => setCadence('monthly')}
                 >
                   {t('landing.pricing.monthly', 'Monthly')}
@@ -371,6 +382,7 @@ export default function BillingPage() {
                 <CadenceButton
                   type="button"
                   $active={cadence === 'annual'}
+                  disabled={renewalLocked}
                   onClick={() => setCadence('annual')}
                 >
                   <span>{t('landing.pricing.annual', 'Annual')}</span>
@@ -379,19 +391,37 @@ export default function BillingPage() {
               </CadenceSwitchContainer>
             </SectionHeaderRow>
 
+            {renewalOpensOn && paidUntilDate && (
+              <RenewalLockedNote role="status">
+                <Clock size={16} />
+                <span>
+                  {t('billing.renewalLocked', {
+                    until: paidUntilDate.toLocaleDateString(),
+                    opens: renewalOpensOn.toLocaleDateString(),
+                    days: RENEWAL_WINDOW_DAYS,
+                    defaultValue:
+                      'Your plan is active until {{until}}. You can renew or change plans from {{opens}}, {{days}} days before it ends.',
+                  })}
+                </span>
+              </RenewalLockedNote>
+            )}
+
             <PlanCardsGrid>
               {availablePlans.map((plan) => {
                   const isSelected = selectedPlan?.id === plan.id;
                   const price = priceFor(plan.id);
                   const isBelow = isBelowActivePlan(plan.id, activePlanId);
                   const disabled = !isPlanSelectable(plan.id, plan.disabled);
+                  const isCurrent = activePlanId === plan.id;
 
                   return (
                     <PlanOptionCard
                       key={plan.id}
                       $selected={isSelected}
                       $disabled={disabled}
+                      $current={isCurrent}
                       aria-disabled={disabled}
+                      aria-current={isCurrent ? 'true' : undefined}
                       title={
                         isBelow
                           ? t('billing.belowCurrentPlanHint', 'You can switch to a smaller plan after your current one ends.')
@@ -407,6 +437,12 @@ export default function BillingPage() {
                           <DisabledTag>
                             {t('landing.pricing.comingSoonBadge', 'Coming Soon')}
                           </DisabledTag>
+                        )}
+                        {isCurrent && (
+                          <CurrentTag>
+                            <Sparkles size={12} />
+                            <span>{t('billing.currentPlanTag', 'Current plan')}</span>
+                          </CurrentTag>
                         )}
                         {isBelow && !plan.disabled && (
                           <DisabledTag>
@@ -456,6 +492,8 @@ export default function BillingPage() {
             </PlanCardsGrid>
           </CardSurface>
 
+          {!renewalLocked && (
+          <>
           {/* SECTION 3: Payment Destination Coordinates */}
           <CardSurface>
             <SectionLabel>{t('billing.step2', 'STEP 2: PAYMENT COORDINATES')}</SectionLabel>
@@ -750,6 +788,8 @@ export default function BillingPage() {
               </SubmitButton>
             </FormWrapper>
           </CardSurface>
+          </>
+          )}
 
           {/* SECTION 5: My Payment History */}
           <CardSurface>
@@ -981,6 +1021,30 @@ const CadenceButton = styled.button<{ $active: boolean }>`
   background: ${({ $active }) => ($active ? '#ef233c' : 'transparent')};
   color: ${({ $active }) => ($active ? '#ffffff' : '#94a3b8')};
   transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const RenewalLockedNote = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  background: rgba(96, 165, 250, 0.08);
+  color: #bfdbfe;
+  font-size: 0.875rem;
+  line-height: 1.4;
+
+  svg {
+    flex-shrink: 0;
+    color: #60a5fa;
+  }
 `;
 
 const SaveBadge = styled.span`
@@ -998,24 +1062,58 @@ const PlanCardsGrid = styled.div`
   gap: 1rem;
 `;
 
-const PlanOptionCard = styled.div<{ $selected: boolean; $disabled?: boolean }>`
+const CURRENT_PLAN_COLOR = '#34d399';
+
+const PlanOptionCard = styled.div<{
+  $selected: boolean;
+  $disabled?: boolean;
+  $current?: boolean;
+}>`
   padding: 1.25rem;
   border-radius: 1rem;
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
-  opacity: ${({ $disabled }) => ($disabled ? 0.6 : 1)};
-  background: ${({ $selected }) =>
-    $selected ? 'rgba(239, 35, 60, 0.08)' : 'rgba(255, 255, 255, 0.03)'};
+  /* The current plan stays fully visible even when it can't be picked. */
+  opacity: ${({ $disabled, $current }) => ($disabled && !$current ? 0.6 : 1)};
+  background: ${({ $selected, $current }) =>
+    $selected
+      ? 'rgba(239, 35, 60, 0.08)'
+      : $current
+        ? 'rgba(52, 211, 153, 0.06)'
+        : 'rgba(255, 255, 255, 0.03)'};
   border: 2px solid
-    ${({ $selected }) => ($selected ? '#ef233c' : 'rgba(255, 255, 255, 0.08)')};
+    ${({ $selected, $current }) =>
+      $selected ? '#ef233c' : $current ? CURRENT_PLAN_COLOR : 'rgba(255, 255, 255, 0.08)'};
+  box-shadow: ${({ $current }) =>
+    $current
+      ? '0 0 0 4px rgba(52, 211, 153, 0.12), 0 8px 28px rgba(52, 211, 153, 0.22)'
+      : 'none'};
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 
   &:hover {
-    border-color: ${({ $selected, $disabled }) =>
-      $disabled ? 'rgba(255, 255, 255, 0.08)' : $selected ? '#ef233c' : 'rgba(255, 255, 255, 0.25)'};
+    border-color: ${({ $selected, $disabled, $current }) =>
+      $selected
+        ? '#ef233c'
+        : $current
+          ? CURRENT_PLAN_COLOR
+          : $disabled
+            ? 'rgba(255, 255, 255, 0.08)'
+            : 'rgba(255, 255, 255, 0.25)'};
   }
+`;
+
+const CurrentTag = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: ${CURRENT_PLAN_COLOR};
+  background: rgba(52, 211, 153, 0.14);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
 `;
 
 const PlanHeader = styled.div`

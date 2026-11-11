@@ -31,3 +31,30 @@ export const formatRate = (rate: number): string => rateFormat.format(rate);
 /** "plus" → "Plus" */
 export const planLabel = (plan: string): string =>
   plan ? plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase() : '';
+
+/** Caracas calendar date (UTC−4, no DST) as YYYY-MM-DD; matches the API. */
+export const caracasToday = (now: Date = new Date()): string =>
+  new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+/**
+ * Accepts "481.25", "481,25" and BCV-style "1.234,56". Returns null if not a
+ * positive number.
+ */
+export const parseRateInput = (text: string): number | null => {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  const normalized = trimmed.includes(',')
+    ? trimmed.replace(/\./g, '').replace(',', '.')
+    : trimmed;
+  if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
+  const value = Number(normalized);
+  return Number.isFinite(value) && value > 0 ? value : null;
+};
+
+/**
+ * While a paid plan is active, renewing or changing plans opens only in its
+ * last this-many days. Mirrors RENEWAL_WINDOW_DAYS in the API.
+ */
+export const RENEWAL_WINDOW_DAYS = 5;
+
+export const DAY_MS = 24 * 60 * 60 * 1000;

@@ -126,3 +126,25 @@ export interface CreatePaymentPayload {
 export interface RejectPaymentPayload {
   rejectionReason: string;
 }
+
+/** One admin-entered BCV rate (Bolívares per USD). */
+export interface ExchangeRateEntry {
+  rate: number;
+  /** YYYY-MM-DD the rate applies to. */
+  validFor: string;
+  /** ISO timestamp of when it was entered. */
+  fetchedAt: string;
+}
+
+export interface AdminExchangeRates {
+  /** Rate in effect today; null means Bolívar payments are paused. */
+  current: { rate: number; validFor: string } | null;
+  /** Bolívar payments pause once the latest rate is older than this. */
+  maxAgeDays: number;
+  history: ExchangeRateEntry[];
+}
+
+export interface SetExchangeRatePayload {
+  rate: number;
+  validFor?: string;
+}

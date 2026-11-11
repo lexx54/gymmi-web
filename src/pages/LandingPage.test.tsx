@@ -208,9 +208,9 @@ describe('LandingPage', () => {
     expect(screen.getByText('Gym Plus')).toBeInTheDocument();
     expect(screen.getByText('Gym Pro')).toBeInTheDocument();
     expect(screen.getByText('Gym Maximum')).toBeInTheDocument();
-    expect(screen.getByText('25')).toBeInTheDocument();
-    expect(screen.getByText('50')).toBeInTheDocument();
-    expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getByText('15')).toBeInTheDocument();
+    expect(screen.getByText('30')).toBeInTheDocument();
+    expect(screen.getByText('70')).toBeInTheDocument();
     expect(screen.getByText('30-Day Free Trial')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /start 30-day free trial/i })).toBeInTheDocument();
   });
@@ -234,11 +234,11 @@ describe('LandingPage', () => {
     const gymTab = screen.getByRole('tab', { name: /for gym facilities/i });
     await user.click(gymTab);
 
-    // Gym annual prices ($20, $40, $80)
+    // Gym annual prices ($12, $24, $56)
     const pricing = document.getElementById('pricing')!;
-    expect(within(pricing).getByText('20')).toBeInTheDocument();
-    expect(within(pricing).getByText('40')).toBeInTheDocument();
-    expect(within(pricing).getByText('80')).toBeInTheDocument();
+    expect(within(pricing).getByText('12')).toBeInTheDocument();
+    expect(within(pricing).getByText('24')).toBeInTheDocument();
+    expect(within(pricing).getByText('56')).toBeInTheDocument();
   });
 
   it('renders gym facility section in audience deep dive and faq', async () => {
