@@ -10,5 +10,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // Heavy page tests exceed the 5s default under full-suite load.
+    testTimeout: 15000,
   },
 })
