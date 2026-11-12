@@ -1632,6 +1632,8 @@
     "by": "Por",
     "fromTrainer": "Entrenador",
     "fromGym": "Gimnasio",
+    "locked": "Sin acceso",
+    "lockedHint": "Ya no tienes acceso a este artículo. Quita el marcador para borrarlo.",
     "sources": {
       "all": "Todos los artículos",
       "trainer": "De entrenadores",

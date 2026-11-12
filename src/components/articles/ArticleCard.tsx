@@ -3,6 +3,7 @@ import {
   Clock,
   Edit3,
   Heart,
+  Lock,
   MessageSquare,
   ShieldCheck,
   Trash2,
@@ -34,6 +35,9 @@ export function ArticleCard({
   const { t } = useTranslation();
   const toggleLikeMutation = useToggleArticleLike();
   const toggleBookmarkMutation = useToggleArticleBookmark();
+  // Bookmarked, but the user lost access: show it disabled. Only removing the
+  // bookmark still works.
+  const locked = article.locked === true;
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -57,11 +61,18 @@ export function ArticleCard({
 
   return (
     <CardContainer
-      onClick={onClick}
+      onClick={locked ? undefined : onClick}
+      $locked={locked}
+      aria-disabled={locked || undefined}
+      title={locked ? t('articles.lockedHint') : undefined}
       data-testid={`article-card-${article.id}`}
     >
       <CoverArea>
-        {article.coverImageUrl ? (
+        {locked ? (
+          <FallbackBanner>
+            <Lock size={28} color="rgba(255, 255, 255, 0.25)" />
+          </FallbackBanner>
+        ) : article.coverImageUrl ? (
           <CoverImg src={article.coverImageUrl} alt={article.title} />
         ) : (
           <FallbackBanner>
@@ -71,6 +82,12 @@ export function ArticleCard({
         <CategoryPill>{article.category}</CategoryPill>
         {article.status === 'DRAFT' && (
           <DraftPill>{t('articles.draft')}</DraftPill>
+        )}
+        {locked && (
+          <LockedPill data-testid={`article-locked-${article.id}`}>
+            <Lock size={11} />
+            {t('articles.locked')}
+          </LockedPill>
         )}
       </CoverArea>
 
@@ -98,7 +115,11 @@ export function ArticleCard({
         </TopMeta>
 
         <Title>{article.title}</Title>
-        {article.excerpt && <Excerpt>{article.excerpt}</Excerpt>}
+        {locked ? (
+          <Excerpt>{t('articles.lockedHint')}</Excerpt>
+        ) : (
+          article.excerpt && <Excerpt>{article.excerpt}</Excerpt>
+        )}
 
         <FooterRow>
           <ActionGroup>
@@ -106,6 +127,7 @@ export function ArticleCard({
               type="button"
               $active={article.isLikedByMe}
               onClick={handleLike}
+              disabled={locked}
               data-testid={`like-btn-${article.id}`}
             >
               <Heart
@@ -165,7 +187,7 @@ export function ArticleCard({
   );
 }
 
-const CardContainer = styled.article`
+const CardContainer = styled.article<{ $locked?: boolean }>`
   background: #141830;
   border: 1px solid rgba(126, 136, 175, 0.15);
   border-radius: 1rem;
@@ -181,6 +203,20 @@ const CardContainer = styled.article`
     border-color: rgba(239, 35, 60, 0.4);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   }
+
+  ${(p) =>
+    p.$locked &&
+    `
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.55;
+
+    &:hover {
+      transform: none;
+      border-color: rgba(126, 136, 175, 0.15);
+      box-shadow: none;
+    }
+  `}
 `;
 
 const CoverArea = styled.div`
@@ -243,6 +279,24 @@ const DraftPill = styled.span`
   color: #0b0d1b;
   font-size: 0.68rem;
   font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+`;
+
+const LockedPill = styled.span`
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(15, 18, 38, 0.9);
+  color: #cbd0e2;
+  border: 1px solid rgba(126, 136, 175, 0.35);
+  font-size: 0.68rem;
+  font-weight: 700;
   padding: 0.2rem 0.55rem;
   border-radius: 9999px;
   text-transform: uppercase;
@@ -338,6 +392,11 @@ const InteractiveBtn = styled.button<{ $active?: boolean }>`
 
   &:hover {
     color: #ef233c;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: #7c84aa;
   }
 `;
 

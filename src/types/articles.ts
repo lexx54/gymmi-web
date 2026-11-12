@@ -45,6 +45,8 @@ export interface ArticleItem {
   commentsCount: number;
   isLikedByMe: boolean;
   isBookmarkedByMe: boolean;
+  /** Saved feed only: the user bookmarked it but has lost access. */
+  locked?: boolean;
 }
 
 export interface ArticleCommentItem {

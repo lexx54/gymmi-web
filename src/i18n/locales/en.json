@@ -1632,6 +1632,8 @@
     "by": "By",
     "fromTrainer": "Coach",
     "fromGym": "Facility",
+    "locked": "No access",
+    "lockedHint": "You no longer have access to this article. Remove the bookmark to clear it.",
     "sources": {
       "all": "All Articles",
       "trainer": "From Coaches",
